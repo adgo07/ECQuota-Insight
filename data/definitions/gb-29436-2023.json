@@ -1,0 +1,1211 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29436-2023",
+  "number": "GB 29436-2023",
+  "title": "甲醇、乙二醇和二甲醚单位产品能源消耗限额",
+  "version": "2023",
+  "publication_status": "published",
+  "publication_date": "2023-11-27",
+  "effective_date": "2024-12-01",
+  "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+  "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+  "products": [
+    {
+      "id": "methanol-bituminous",
+      "name": "烟煤制甲醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "methanol-bituminous.comprehensive-energy",
+          "name": "烟煤制甲醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.methanol-bituminous.comprehensive_energy",
+              "label": "烟煤制甲醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.methanol-bituminous.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1380",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "methanol-anthracite",
+      "name": "无烟煤制甲醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "methanol-anthracite.comprehensive-energy",
+          "name": "无烟煤制甲醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.methanol-anthracite.comprehensive_energy",
+              "label": "无烟煤制甲醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.methanol-anthracite.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "常压间歇固定床煤气化技术采用无烟煤时执行本行；连续加压煤气化执行烟煤指标。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "methanol-lignite",
+      "name": "褐煤制甲醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "methanol-lignite.comprehensive-energy",
+          "name": "褐煤制甲醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.methanol-lignite.comprehensive_energy",
+              "label": "褐煤制甲醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.methanol-lignite.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "methanol-natural-gas",
+      "name": "天然气制甲醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "methanol-natural-gas.comprehensive-energy",
+          "name": "天然气制甲醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.methanol-natural-gas.comprehensive_energy",
+              "label": "天然气制甲醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.methanol-natural-gas.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1380",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "methanol-coke-oven-gas",
+      "name": "焦炉煤气制甲醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "methanol-coke-oven-gas.comprehensive-energy",
+          "name": "焦炉煤气制甲醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.methanol-coke-oven-gas.comprehensive_energy",
+              "label": "焦炉煤气制甲醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.methanol-coke-oven-gas.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1280",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "ethylene-glycol-ethylene",
+      "name": "乙烯制乙二醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "ethylene-glycol-ethylene.comprehensive-energy",
+          "name": "乙烯制乙二醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ethylene-glycol-ethylene.comprehensive_energy",
+              "label": "乙烯制乙二醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ethylene-glycol-ethylene.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "335",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "375",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "470",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": [
+            "明细模式产量应按附录E当量环氧乙烷产量折算。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethylene-glycol-syngas",
+      "name": "合成气制乙二醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "ethylene-glycol-syngas.comprehensive-energy",
+          "name": "合成气制乙二醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ethylene-glycol-syngas.comprehensive_energy",
+              "label": "合成气制乙二醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ethylene-glycol-syngas.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "850",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "ethylene-glycol-coal",
+      "name": "煤制乙二醇",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "ethylene-glycol-coal.comprehensive-energy",
+          "name": "煤制乙二醇单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ethylene-glycol-coal.comprehensive_energy",
+              "label": "煤制乙二醇单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ethylene-glycol-coal.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2850",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "3100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 4,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "dimethyl-ether",
+      "name": "甲醇制二甲醚",
+      "description": "单位产品综合能耗",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "dimethyl-ether.comprehensive-energy",
+          "name": "甲醇制二甲醚单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.dimethyl-ether.comprehensive_energy",
+              "label": "甲醇制二甲醚单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.dimethyl-ether.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1140",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29436-2023",
+              "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+              "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+              "page": 5,
+              "clause": "4.3",
+              "table": "表3",
+              "note": null
+            }
+          ],
+          "notes": [
+            "原料甲醇折100%，折标准煤系数0.6794 kgce/kg。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "CAT-023"
+  ]
+}

@@ -1,0 +1,361 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29446-2019",
+  "number": "GB 29446-2019",
+  "title": "选煤电力消耗限额",
+  "version": "2019",
+  "publication_status": "published",
+  "publication_date": "2019-12-17",
+  "effective_date": "2020-07-01",
+  "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+  "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+  "products": [
+    {
+      "id": "gb_29446-2019-coking-coal",
+      "name": "炼焦煤选煤企业选煤电力单耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29446-2019.coking-coal",
+          "name": "炼焦煤选煤企业选煤电力单耗",
+          "unit": "kW·h/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.coking-coal",
+              "label": "炼焦煤选煤企业选煤电力单耗实际值",
+              "data_type": "decimal",
+              "unit": "kW·h/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.coking-coal",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kW·h/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 3,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_29446-2019-power-coal",
+      "name": "动力煤选煤企业选煤电力单耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29446-2019.power-coal",
+          "name": "动力煤选煤企业选煤电力单耗",
+          "unit": "kW·h/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-coal",
+              "label": "动力煤选煤企业选煤电力单耗实际值",
+              "data_type": "decimal",
+              "unit": "kW·h/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-coal",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kW·h/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kW·h/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 3,
+              "clause": "第4章 能耗限额等级",
+              "table": "表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

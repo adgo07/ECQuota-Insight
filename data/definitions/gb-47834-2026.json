@@ -1,0 +1,2783 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-47834-2026",
+  "number": "GB 47834-2026",
+  "title": "晶体硅光伏组件和逆变器能效限定值及能效等级",
+  "version": "2026",
+  "publication_status": "published",
+  "publication_date": "2026-06-27",
+  "effective_date": "2027-01-01",
+  "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+  "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+  "products": [
+    {
+      "id": "module-topcon",
+      "name": "TOPCon电池晶体硅光伏组件",
+      "description": "适用于地面用n型晶体硅光伏组件。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.module-topcon.conversion-efficiency",
+          "name": "TOPCon电池晶体硅光伏组件光电转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-topcon.conversion-efficiency",
+              "label": "TOPCon电池晶体硅光伏组件光电转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-topcon.conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-topcon.degradation-rate",
+          "name": "TOPCon电池晶体硅光伏组件耦合环境应力衰减率",
+          "unit": "%",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.module-topcon.degradation-rate",
+              "label": "TOPCon电池晶体硅光伏组件耦合环境应力衰减率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-topcon.degradation-rate",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "双面/单面组件均适用；限值不高于8.6%，三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-topcon.bifaciality",
+          "name": "TOPCon电池双面晶体硅光伏组件双面率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-topcon.bifaciality",
+              "label": "TOPCon电池双面晶体硅光伏组件双面率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-topcon.bifaciality",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 0,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "仅双面组件适用；单面组件标记为不适用；三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module-hjt",
+      "name": "HJT电池晶体硅光伏组件",
+      "description": "适用于地面用n型晶体硅光伏组件。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.module-hjt.conversion-efficiency",
+          "name": "HJT电池晶体硅光伏组件光电转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-hjt.conversion-efficiency",
+              "label": "HJT电池晶体硅光伏组件光电转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-hjt.conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "23.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "23.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-hjt.degradation-rate",
+          "name": "HJT电池晶体硅光伏组件耦合环境应力衰减率",
+          "unit": "%",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.module-hjt.degradation-rate",
+              "label": "HJT电池晶体硅光伏组件耦合环境应力衰减率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-hjt.degradation-rate",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "双面/单面组件均适用；限值不高于8.6%，三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-hjt.bifaciality",
+          "name": "HJT电池双面晶体硅光伏组件双面率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-hjt.bifaciality",
+              "label": "HJT电池双面晶体硅光伏组件双面率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-hjt.bifaciality",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 0,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "仅双面组件适用；单面组件标记为不适用；三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module-bc",
+      "name": "BC电池晶体硅光伏组件",
+      "description": "适用于地面用n型晶体硅光伏组件。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.module-bc.conversion-efficiency",
+          "name": "BC电池晶体硅光伏组件光电转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-bc.conversion-efficiency",
+              "label": "BC电池晶体硅光伏组件光电转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-bc.conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "23.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "23.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-bc.degradation-rate",
+          "name": "BC电池晶体硅光伏组件耦合环境应力衰减率",
+          "unit": "%",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.module-bc.degradation-rate",
+              "label": "BC电池晶体硅光伏组件耦合环境应力衰减率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-bc.degradation-rate",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 1,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "双面/单面组件均适用；限值不高于8.6%，三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.module-bc.bifaciality",
+          "name": "BC电池双面晶体硅光伏组件双面率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.module-bc.bifaciality",
+              "label": "BC电池双面晶体硅光伏组件双面率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.module-bc.bifaciality",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 0,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 4,
+              "clause": "5.2.1",
+              "table": "正文",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "仅双面组件适用；单面组件标记为不适用；三等级均执行该限定值",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-20-50kw",
+      "name": "光伏并网逆变器（20<P≤50）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-20-50kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（20<P≤50）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-20-50kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（20<P≤50）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-20-50kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "97.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "97.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-20-50kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（20<P≤50）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-20-50kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（20<P≤50）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-20-50kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.40",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.40",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-50-100kw",
+      "name": "光伏并网逆变器（50<P≤100）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-50-100kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（50<P≤100）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-50-100kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（50<P≤100）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-50-100kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.05",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "97.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.05",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "97.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-50-100kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（50<P≤100）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-50-100kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（50<P≤100）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-50-100kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-100-150kw",
+      "name": "光伏并网逆变器（100<P≤150）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-100-150kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（100<P≤150）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-100-150kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（100<P≤150）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-100-150kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-100-150kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（100<P≤150）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-100-150kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（100<P≤150）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-100-150kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-150-200kw",
+      "name": "光伏并网逆变器（150<P≤200）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-150-200kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（150<P≤200）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-150-200kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（150<P≤200）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-150-200kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-150-200kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（150<P≤200）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-150-200kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（150<P≤200）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-150-200kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-200-500kw",
+      "name": "光伏并网逆变器（200<P≤500）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-200-500kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（200<P≤500）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-200-500kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（200<P≤500）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-200-500kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-200-500kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（200<P≤500）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-200-500kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（200<P≤500）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-200-500kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "99.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "99.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverter-over-500kw",
+      "name": "光伏并网逆变器（P>500）",
+      "description": "不适用于20kW及以下以及500kW以上组串式逆变器。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47834-2026.inverter-over-500kw.weighted-total-efficiency",
+          "name": "光伏并网逆变器（P>500）平均加权总效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-over-500kw.weighted-total-efficiency",
+              "label": "光伏并网逆变器（P>500）平均加权总效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-over-500kw.weighted-total-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.48",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "98.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.48",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        },
+        {
+          "id": "GB_47834-2026.inverter-over-500kw.max-conversion-efficiency",
+          "name": "光伏并网逆变器（P>500）最大转换效率",
+          "unit": "%",
+          "comparison": "gte",
+          "input_definitions": [
+            {
+              "key": "actual.inverter-over-500kw.max-conversion-efficiency",
+              "label": "光伏并网逆变器（P>500）最大转换效率实际值",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.inverter-over-500kw.max-conversion-efficiency",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "99.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "99.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "98.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "98.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "%",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 47834-2026",
+              "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
+              "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
+              "page": 3,
+              "clause": "5.1.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "CAT-064-NEW"
+  ]
+}

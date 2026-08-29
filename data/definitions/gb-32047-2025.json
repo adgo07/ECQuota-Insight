@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-32047-2025",
+  "number": "GB 32047-2025",
+  "title": "啤酒单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "published",
+  "publication_date": "2025-01-24",
+  "effective_date": "2026-08-01",
+  "source_file": "48.GB 32047-2025啤酒单位产品能源消耗限额.pdf",
+  "source_sha256": "cca2e587cbff0120698c200e6d66d197b04c1d47284110c201ff62d0a4d47bb5",
+  "products": [
+    {
+      "id": "gb_32047-2025-beer",
+      "name": "啤酒单位产品综合能耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32047-2025.beer",
+          "name": "啤酒单位产品综合能耗",
+          "unit": "kgce/kL",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.beer",
+              "label": "啤酒单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kL",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.beer",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/kL",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "26",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "26",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kL",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32047-2025",
+              "source_file": "48.GB 32047-2025啤酒单位产品能源消耗限额.pdf",
+              "source_sha256": "cca2e587cbff0120698c200e6d66d197b04c1d47284110c201ff62d0a4d47bb5",
+              "page": 5,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

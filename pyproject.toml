@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "uebench"
+version = "0.1.0"
+description = "Windows offline unit-product energy consumption benchmarking application"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "PySide6==6.10.1",
+  "SQLAlchemy>=2.0.36,<2.1",
+  "alembic>=1.14,<2",
+  "pydantic>=2.10,<3",
+  "openpyxl>=3.1.5,<4",
+  "cryptography>=44,<47",
+  "packaging>=24,<27",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "hypothesis>=6.122,<7",
+]
+release = [
+  "pyinstaller==6.20.0",
+]
+
+[project.scripts]
+uebench = "uebench.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/uebench"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["uebench"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

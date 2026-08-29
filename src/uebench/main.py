@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+import sys
+import logging
+from pathlib import Path
+
+from PySide6.QtGui import QFont, QFontDatabase
+from PySide6.QtWidgets import QApplication
+
+from .bootstrap import create_context
+from .ui.main_window import create_main_window
+
+
+def configure_application_font(application: QApplication) -> None:
+    candidates = [
+        Path("C:/Windows/Fonts/msyh.ttc"),
+        Path("C:/Windows/Fonts/simhei.ttf"),
+    ]
+    for candidate in candidates:
+        if not candidate.exists():
+            continue
+        font_id = QFontDatabase.addApplicationFont(str(candidate))
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        if families:
+            application.setFont(QFont(families[0], 10))
+            return
+
+
+def install_bundled_package(context) -> None:
+    if context.package_service is None or context.standards.list_all():
+        return
+    resource_directory = Path(__file__).resolve().parent / "resources"
+    packages = sorted(resource_directory.glob("initial-standard-package-*.uebench"))
+    if not packages:
+        return
+    try:
+        context.package_service.install(packages[-1])
+    except Exception:
+        logging.getLogger(__name__).exception("内置初始标准包安装失败")
+
+
+def main() -> int:
+    application = QApplication.instance() or QApplication(sys.argv)
+    application.setApplicationName("单位产品能耗对标软件")
+    application.setOrganizationName("UEBench")
+    configure_application_font(application)
+    resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
+    context = create_context(public_key_path=resource_key)
+    install_bundled_package(context)
+    window = create_main_window(context)
+    window.show()
+    code = application.exec()
+    context.database.dispose()
+    return code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,1049 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29447-2026",
+  "number": "GB 29447-2026",
+  "title": "硅多晶和锗单位产品能源消耗限额",
+  "version": "2026",
+  "publication_status": "published",
+  "publication_date": "2026-06-27",
+  "effective_date": "2027-01-01",
+  "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+  "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+  "products": [
+    {
+      "id": "polysilicon-trichlorosilane",
+      "name": "硅多晶（三氯氢硅法）",
+      "description": "以合格硅多晶产量计算的单位产品综合能耗。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.polysilicon-trichlorosilane.comprehensive-energy",
+          "name": "硅多晶（三氯氢硅法）单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.polysilicon-trichlorosilane.comprehensive-energy",
+              "label": "硅多晶（三氯氢硅法）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.polysilicon-trichlorosilane.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "6.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "6.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "polysilicon-silane-fluidized-bed",
+      "name": "硅多晶（硅烷流化床法）",
+      "description": "以合格硅多晶产量计算的单位产品综合能耗。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.polysilicon-silane-fluidized-bed.comprehensive-energy",
+          "name": "硅多晶（硅烷流化床法）单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.polysilicon-silane-fluidized-bed.comprehensive-energy",
+              "label": "硅多晶（硅烷流化床法）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.polysilicon-silane-fluidized-bed.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "high-purity-germanium-tetrachloride",
+      "name": "高纯四氯化锗",
+      "description": "锗产品能耗按对应锗金属量折算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.high-purity-germanium-tetrachloride.comprehensive-energy",
+          "name": "高纯四氯化锗单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.high-purity-germanium-tetrachloride.comprehensive-energy",
+              "label": "高纯四氯化锗单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.high-purity-germanium-tetrachloride.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "high-purity-germanium-dioxide",
+      "name": "高纯二氧化锗",
+      "description": "锗产品能耗按对应锗金属量折算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.high-purity-germanium-dioxide.comprehensive-energy",
+          "name": "高纯二氧化锗单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.high-purity-germanium-dioxide.comprehensive-energy",
+              "label": "高纯二氧化锗单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.high-purity-germanium-dioxide.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1.1",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1.1",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zone-melting-germanium-ingot",
+      "name": "区熔锗锭",
+      "description": "锗产品能耗按对应锗金属量折算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.zone-melting-germanium-ingot.comprehensive-energy",
+          "name": "区熔锗锭单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.zone-melting-germanium-ingot.comprehensive-energy",
+              "label": "区熔锗锭单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.zone-melting-germanium-ingot.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "7.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "9.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "18.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "7.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "9.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "18.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "germanium-single-crystal",
+      "name": "锗单晶",
+      "description": "锗产品能耗按对应锗金属量折算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29447-2026.germanium-single-crystal.comprehensive-energy",
+          "name": "锗单晶单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.germanium-single-crystal.comprehensive-energy",
+              "label": "锗单晶单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.germanium-single-crystal.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "6.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "6.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "6.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "6.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 29447-2026",
+              "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
+              "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
+              "page": 2,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "CAT-029-REPLACE"
+  ]
+}
