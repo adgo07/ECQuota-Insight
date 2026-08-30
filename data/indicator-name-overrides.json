@@ -1,0 +1,2812 @@
+{
+  "schema_version": "1.0",
+  "source_workbook": "统一标准规则确认表.xlsx",
+  "generated_at": "2026-08-30",
+  "description": "用户确认的产品/工序与指标名称；唯一键为指标ID，不按产品名去重。",
+  "mappings": {
+    "cement.comprehensive_energy": {
+      "product": "水泥产品",
+      "indicator": "单位产品综合能耗"
+    },
+    "clinker.comprehensive": {
+      "product": "水泥熟料",
+      "indicator": "单位产品综合能耗"
+    },
+    "clinker.electricity": {
+      "product": "水泥熟料",
+      "indicator": "单位产品综合电耗"
+    },
+    "clinker.coal": {
+      "product": "水泥熟料",
+      "indicator": "单位产品综合煤耗"
+    },
+    "cement-preparation.electricity": {
+      "product": "水泥制备工段",
+      "indicator": "电耗"
+    },
+    "GB_21252-2023.ceramic-tile-abs-le-0.2": {
+      "product": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率≤0.2%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.ceramic-tile-abs-0.2-0.5": {
+      "product": "陶瓷砖（干压）/陶瓷瓦（干压），0.2%＜吸水率≤0.5%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.ceramic-tile-abs-0.5-10": {
+      "product": "陶瓷砖（干压）/陶瓷瓦（干压），0.5%＜吸水率≤10%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.ceramic-tile-abs-gt-10": {
+      "product": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率＞10%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.ceramic-board": {
+      "product": "陶瓷板",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.dry-hung-hollow-board-extruded-tile": {
+      "product": "干挂空心陶瓷板、陶瓷瓦（挤压）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.sanitary-ware-abs-le-0.3": {
+      "product": "卫生陶瓷，吸水率≤0.3%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.sanitary-ware-abs-gt-0.3": {
+      "product": "卫生陶瓷，吸水率＞0.3%",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21252-2023.alumina-grinding-ball-90-series": {
+      "product": "耐磨氧化铝球（90系列）",
+      "indicator": "单位产品综合能耗"
+    },
+    "sintering.energy": {
+      "product": "烧结工序",
+      "indicator": "单位产品能耗"
+    },
+    "pelletizing.energy": {
+      "product": "球团工序",
+      "indicator": "单位产品能耗"
+    },
+    "blast-furnace.energy": {
+      "product": "高炉工序",
+      "indicator": "单位产品能耗"
+    },
+    "converter.energy": {
+      "product": "转炉工序",
+      "indicator": "单位产品能耗"
+    },
+    "electric-arc-furnace-lt50.energy": {
+      "product": "电弧炉工序（容量＜50t）",
+      "indicator": "单位产品能耗"
+    },
+    "electric-arc-furnace-50-70.energy": {
+      "product": "电弧炉工序（50t≤容量＜70t）",
+      "indicator": "单位产品能耗"
+    },
+    "electric-arc-furnace-ge70.energy": {
+      "product": "电弧炉工序（容量≥70t）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_21257-2024.caustic-liquid-30": {
+      "product": "液碱（质量分数≥30.0%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.caustic-liquid-45": {
+      "product": "液碱（质量分数≥45.0%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.caustic-solid": {
+      "product": "固碱（质量分数≥98.0%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-carbide-general": {
+      "product": "电石法聚氯乙烯树脂（通用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-carbide-paste": {
+      "product": "电石法聚氯乙烯树脂（糊用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-ethylene-general": {
+      "product": "乙烯法/联合法/姜钟法聚氯乙烯树脂（通用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-ethylene-paste": {
+      "product": "乙烯法/联合法/姜钟法聚氯乙烯树脂（糊用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-monomer-general": {
+      "product": "单体法聚氯乙烯树脂（通用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.pvc-monomer-paste": {
+      "product": "单体法聚氯乙烯树脂（糊用型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.methane-chloride-no-entry": {
+      "product": "甲烷氯化物，四氯化碳转化成其他产品不进入生产系统",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.methane-chloride-methyl": {
+      "product": "甲烷氯化物，四氯化碳转化成一氯甲烷并进入生产系统",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21257-2024.methane-chloride-chloroform": {
+      "product": "甲烷氯化物，四氯化碳转化成三氯甲烷并进入生产系统",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21258-2024.power-1": {
+      "product": "燃煤发电机组（超超临界·1000MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-2": {
+      "product": "燃煤发电机组（超超临界·600MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-3": {
+      "product": "燃煤发电机组（超临界·600MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-4": {
+      "product": "燃煤发电机组（超临界·300MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-5": {
+      "product": "燃煤发电机组（亚临界·600MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-6": {
+      "product": "燃煤发电机组（亚临界·300MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.power-7": {
+      "product": "燃煤发电机组（超高压·200及以下MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_21258-2024.heat-1": {
+      "product": "燃煤发电机组（超超临界·1000MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21258-2024.heat-2": {
+      "product": "燃煤发电机组（超超临界·600MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21258-2024.heat-3": {
+      "product": "燃煤发电机组（超临界·600MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21258-2024.heat-4": {
+      "product": "燃煤发电机组（超临界·300MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21258-2024.heat-5": {
+      "product": "燃煤发电机组（亚临界·600MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21258-2024.heat-6": {
+      "product": "燃煤发电机组（亚临界·300MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_21340-2019.flat-capacity-le-500": {
+      "product": "平板玻璃（生产线设计生产能力≤500 t/d）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21340-2019.flat-capacity-500-800": {
+      "product": "平板玻璃（500 t/d＜生产线设计生产能力≤800 t/d）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21340-2019.flat-capacity-gt-800": {
+      "product": "平板玻璃（生产线设计生产能力＞800 t/d）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21340-2019.tempered-4": {
+      "product": "钢化玻璃/平面普通钢化玻璃/3 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-5": {
+      "product": "钢化玻璃/平面普通钢化玻璃/4 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-6": {
+      "product": "钢化玻璃/平面普通钢化玻璃/5 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-7": {
+      "product": "钢化玻璃/平面普通钢化玻璃/6 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-8": {
+      "product": "钢化玻璃/平面普通钢化玻璃/8 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-9": {
+      "product": "钢化玻璃/平面普通钢化玻璃/10 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-10": {
+      "product": "钢化玻璃/平面普通钢化玻璃/12 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-11": {
+      "product": "钢化玻璃/平面普通钢化玻璃/15 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-12": {
+      "product": "钢化玻璃/平面普通钢化玻璃/19 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-13": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/3 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-14": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/4 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-15": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/5 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-16": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/6 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-17": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/8 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-18": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/10 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-19": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/12 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-20": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/15 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-21": {
+      "product": "钢化玻璃/平面低辐射镀膜钢化玻璃/19 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-22": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/3 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-23": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/4 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-24": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/5 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-25": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/6 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-26": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/8 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-27": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/10 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-28": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/12 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-29": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/15 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-30": {
+      "product": "钢化玻璃/曲面普通钢化玻璃/19 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-31": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/3 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-32": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/4 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-33": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/5 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-34": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/6 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-35": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/8 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-36": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/10 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-37": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/12 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-38": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/15 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.tempered-39": {
+      "product": "钢化玻璃/曲面低辐射镀膜钢化玻璃/19 mm厚度",
+      "indicator": "电耗"
+    },
+    "GB_21340-2019.rolled-solar-le-300": {
+      "product": "光伏压延玻璃（生产线设计生产能力≤300 t/d）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21340-2019.rolled-solar-gt-300": {
+      "product": "光伏压延玻璃（生产线设计生产能力＞300 t/d）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21340-2019.cast-stone": {
+      "product": "铸石",
+      "indicator": "单位产品综合能耗"
+    },
+    "ferrosilicon.smelting_electricity": {
+      "product": "硅铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "ferrosilicon.comprehensive_energy": {
+      "product": "硅铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "electric-high-carbon-ferromanganese.smelting_electricity": {
+      "product": "电炉高碳锰铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "electric-high-carbon-ferromanganese.comprehensive_energy": {
+      "product": "电炉高碳锰铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "ferromanganese-silicon.smelting_electricity": {
+      "product": "锰硅合金",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "ferromanganese-silicon.comprehensive_energy": {
+      "product": "锰硅合金",
+      "indicator": "单位产品综合能耗"
+    },
+    "low-carbon-ferromanganese-silicon.smelting_electricity": {
+      "product": "低碳锰硅合金",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "low-carbon-ferromanganese-silicon.comprehensive_energy": {
+      "product": "低碳锰硅合金",
+      "indicator": "单位产品综合能耗"
+    },
+    "micro-carbon-ferromanganese.smelting_electricity": {
+      "product": "微碳锰铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "micro-carbon-ferromanganese.comprehensive_energy": {
+      "product": "微碳锰铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "high-carbon-ferrochrome.smelting_electricity": {
+      "product": "高碳铬铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "high-carbon-ferrochrome.comprehensive_energy": {
+      "product": "高碳铬铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "charge-ferrochrome.smelting_electricity": {
+      "product": "炉料级铬铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "charge-ferrochrome.comprehensive_energy": {
+      "product": "炉料级铬铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "medium-low-carbon-ferrochrome.smelting_electricity": {
+      "product": "中（低）碳铬铁",
+      "indicator": "单位产品冶炼电耗"
+    },
+    "medium-low-carbon-ferrochrome.comprehensive_energy": {
+      "product": "中（低）碳铬铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "blast-furnace-ferromanganese.coke_consumption": {
+      "product": "高炉锰铁",
+      "indicator": "单位产品焦炭消耗"
+    },
+    "blast-furnace-ferromanganese.comprehensive_energy": {
+      "product": "高炉锰铁",
+      "indicator": "单位产品综合能耗"
+    },
+    "top-charging-coke-oven.energy": {
+      "product": "顶装焦炉",
+      "indicator": "单位产品能耗"
+    },
+    "stamp-charging-coke-oven.energy": {
+      "product": "捣固焦炉",
+      "indicator": "单位产品能耗"
+    },
+    "GB_21343-2023.calcium-carbide-energy": {
+      "product": "电石",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.calcium-carbide-electricity": {
+      "product": "电石电炉",
+      "indicator": "电耗"
+    },
+    "GB_21343-2023.vinyl-acetate-acetylene": {
+      "product": "乙炔法乙酸乙烯酯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.vinyl-acetate-ethylene": {
+      "product": "乙烯法乙酸乙烯酯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.pva-acetylene": {
+      "product": "乙炔法聚乙烯醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.pva-ethylene": {
+      "product": "乙烯法聚乙烯醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.bdo-acetaldehyde": {
+      "product": "炔醛法1,4-丁二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.bdo-maleic": {
+      "product": "顺酐法1,4-丁二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.bdo-allyl": {
+      "product": "烯丙醇法1,4-丁二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.dicyandiamide": {
+      "product": "双氰胺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.cyanamide-30": {
+      "product": "30%单氰胺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21343-2023.cyanamide-50": {
+      "product": "50%单氰胺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonia-anthracite": {
+      "product": "合成氨（优质无烟块煤）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonia-nonpremium": {
+      "product": "合成氨（非优质无烟块煤、型煤）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonia-powder-coal": {
+      "product": "合成氨（粉煤，包括无烟粉煤、烟煤）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonia-lignite": {
+      "product": "合成氨（褐煤）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonia-natural-gas": {
+      "product": "合成氨（天然气）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.urea-steam-turbine": {
+      "product": "尿素（二氧化碳压缩机汽轮机驱动）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.urea-electric-motor": {
+      "product": "尿素（二氧化碳压缩机电动机驱动）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.ammonium-bicarbonate": {
+      "product": "碳酸氢铵",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21344-2023.map-traditional-granular": {
+      "product": "磷酸一铵（传统法、粒状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.map-traditional-powder": {
+      "product": "磷酸一铵（传统法、粉状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.map-slurry-granular": {
+      "product": "磷酸一铵（料浆法、粒状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.map-slurry-powder": {
+      "product": "磷酸一铵（料浆法、粉状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.dap-traditional-granular": {
+      "product": "磷酸二铵（传统法、粒状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.dap-slurry-granular": {
+      "product": "磷酸二铵（料浆法、粒状）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.potassium-brine": {
+      "product": "硫酸钾（水盐体系法、含钾卤水为原料）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.potassium-seawater": {
+      "product": "硫酸钾（水盐体系法、海水和卤水为原料）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.potassium-mirabilite": {
+      "product": "硫酸钾（水盐体系法、芒硝法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21344-2023.potassium-mannheim": {
+      "product": "硫酸钾（非水盐体系法、曼海姆法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "electrolytic-aluminum.aluminum-liquid-ac": {
+      "product": "电解铝",
+      "indicator": "电耗"
+    },
+    "electrolytic-aluminum.aluminum-liquid-comprehensive-ac": {
+      "product": "电解铝",
+      "indicator": "综合交流电耗"
+    },
+    "electrolytic-aluminum.aluminum-ingot-comprehensive-ac": {
+      "product": "电解铝",
+      "indicator": "综合交流电耗"
+    },
+    "electrolytic-aluminum.aluminum-ingot-comprehensive-energy": {
+      "product": "电解铝",
+      "indicator": "单位产品综合能耗"
+    },
+    "alumina-bayer.process-energy": {
+      "product": "拜耳法氧化铝",
+      "indicator": "工艺能耗"
+    },
+    "alumina-bayer.comprehensive-energy": {
+      "product": "拜耳法氧化铝",
+      "indicator": "综合能耗"
+    },
+    "alumina-other.process-energy": {
+      "product": "其他工艺氧化铝",
+      "indicator": "工艺能耗"
+    },
+    "alumina-other.comprehensive-energy": {
+      "product": "其他工艺氧化铝",
+      "indicator": "综合能耗"
+    },
+    "GB_21347-2023.industrial-silicon-charcoal": {
+      "product": "工业硅（主还原剂为木炭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21347-2023.industrial-silicon-petcoke-coal": {
+      "product": "工业硅（主还原剂为石油焦和煤混合）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21347-2023.industrial-silicon-coal": {
+      "product": "工业硅（主还原剂为煤）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21347-2023.magnesium": {
+      "product": "镁",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-1": {
+      "product": "管材 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-2": {
+      "product": "管材 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-3": {
+      "product": "管材 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-4": {
+      "product": "管材 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-5": {
+      "product": "管材 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-6": {
+      "product": "管材 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-7": {
+      "product": "管材 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-8": {
+      "product": "管材 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-9": {
+      "product": "管材 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-10": {
+      "product": "管材 青铜、高铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-11": {
+      "product": "管材 青铜、高铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-12": {
+      "product": "管材 青铜、高铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-13": {
+      "product": "管材 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-14": {
+      "product": "管材 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-2-row-15": {
+      "product": "管材 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-16": {
+      "product": "棒材、线材（挤压法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-17": {
+      "product": "棒材、线材（挤压法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-18": {
+      "product": "棒材、线材（挤压法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-19": {
+      "product": "棒材、线材（挤压法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-20": {
+      "product": "棒材、线材（挤压法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-21": {
+      "product": "棒材、线材（挤压法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-22": {
+      "product": "棒材、线材（挤压法） 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-23": {
+      "product": "棒材、线材（挤压法） 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-24": {
+      "product": "棒材、线材（挤压法） 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-25": {
+      "product": "棒材、线材（挤压法） 青铜、高铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-26": {
+      "product": "棒材、线材（挤压法） 青铜、高铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-27": {
+      "product": "棒材、线材（挤压法） 青铜、高铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-28": {
+      "product": "棒材、线材（挤压法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-29": {
+      "product": "棒材、线材（挤压法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-3-row-30": {
+      "product": "棒材、线材（挤压法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-31": {
+      "product": "棒材、线材（连续法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-32": {
+      "product": "棒材、线材（连续法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-33": {
+      "product": "棒材、线材（连续法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-34": {
+      "product": "棒材、线材（连续法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-35": {
+      "product": "棒材、线材（连续法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-36": {
+      "product": "棒材、线材（连续法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-37": {
+      "product": "棒材、线材（连续法） 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-38": {
+      "product": "棒材、线材（连续法） 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-39": {
+      "product": "棒材、线材（连续法） 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-40": {
+      "product": "棒材、线材（连续法） 青铜、高铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-41": {
+      "product": "棒材、线材（连续法） 青铜、高铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-42": {
+      "product": "棒材、线材（连续法） 青铜、高铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-43": {
+      "product": "棒材、线材（连续法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-44": {
+      "product": "棒材、线材（连续法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-4-row-45": {
+      "product": "棒材、线材（连续法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-46": {
+      "product": "棒材、线材（连续铸造法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-47": {
+      "product": "棒材、线材（连续铸造法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-48": {
+      "product": "棒材、线材（连续铸造法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-49": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-50": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-51": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-52": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-53": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-54": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-55": {
+      "product": "棒材、线材（连续铸造法） 青铜、高铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-56": {
+      "product": "棒材、线材（连续铸造法） 青铜、高铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-57": {
+      "product": "棒材、线材（连续铸造法） 青铜、高铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-58": {
+      "product": "棒材、线材（连续铸造法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-59": {
+      "product": "棒材、线材（连续铸造法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-5-row-60": {
+      "product": "棒材、线材（连续铸造法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-61": {
+      "product": "棒材、线材（连续铸造法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-62": {
+      "product": "棒材、线材（连续铸造法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-63": {
+      "product": "棒材、线材（连续铸造法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-64": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-65": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-66": {
+      "product": "棒材、线材（连续铸造法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-67": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-68": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-69": {
+      "product": "棒材、线材（连续铸造法） 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-70": {
+      "product": "棒材、线材（连续铸造法） 青铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-71": {
+      "product": "棒材、线材（连续铸造法） 青铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-72": {
+      "product": "棒材、线材（连续铸造法） 青铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-73": {
+      "product": "棒材、线材（连续铸造法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-74": {
+      "product": "棒材、线材（连续铸造法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-6-row-75": {
+      "product": "棒材、线材（连续铸造法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-76": {
+      "product": "板、带、箔材（热轧法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-77": {
+      "product": "板、带、箔材（热轧法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-78": {
+      "product": "板、带、箔材（热轧法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-79": {
+      "product": "板、带、箔材（热轧法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-80": {
+      "product": "板、带、箔材（热轧法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-81": {
+      "product": "板、带、箔材（热轧法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-82": {
+      "product": "板、带、箔材（热轧法） 复杂黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-83": {
+      "product": "板、带、箔材（热轧法） 复杂黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-84": {
+      "product": "板、带、箔材（热轧法） 复杂黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-85": {
+      "product": "板、带、箔材（热轧法） 青铜、高铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-86": {
+      "product": "板、带、箔材（热轧法） 青铜、高铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-87": {
+      "product": "板、带、箔材（热轧法） 青铜、高铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-88": {
+      "product": "板、带、箔材（热轧法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-89": {
+      "product": "板、带、箔材（热轧法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-7-row-90": {
+      "product": "板、带、箔材（热轧法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-91": {
+      "product": "板、带、箔材（水平方向连续铸造法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-92": {
+      "product": "板、带、箔材（水平方向连续铸造法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-93": {
+      "product": "板、带、箔材（水平方向连续铸造法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-94": {
+      "product": "板、带、箔材（水平方向连续铸造法） 普通黄铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-95": {
+      "product": "板、带、箔材（水平方向连续铸造法） 普通黄铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-96": {
+      "product": "板、带、箔材（水平方向连续铸造法） 普通黄铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-97": {
+      "product": "板、带、箔材（水平方向连续铸造法） 青铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-98": {
+      "product": "板、带、箔材（水平方向连续铸造法） 青铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-99": {
+      "product": "板、带、箔材（水平方向连续铸造法） 青铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-100": {
+      "product": "板、带、箔材（水平方向连续铸造法） 白铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-101": {
+      "product": "板、带、箔材（水平方向连续铸造法） 白铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-8-row-102": {
+      "product": "板、带、箔材（水平方向连续铸造法） 白铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-9-row-103": {
+      "product": "板、带、箔材（连续挤压法） 紫铜熔铸工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-9-row-104": {
+      "product": "板、带、箔材（连续挤压法） 紫铜加工工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-9-row-105": {
+      "product": "板、带、箔材（连续挤压法） 紫铜全工序",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-10-wire-106": {
+      "product": "上引连铸法/阴极铜电工用铜线坯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-10-wire-107": {
+      "product": "连铸连轧法/阴极铜电工用铜线坯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21350-2023.table-10-wire-108": {
+      "product": "连铸连轧法/再生铜电工用铜线坯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-1": {
+      "product": "扁铸锭/熔融态铝及铝合金为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-2": {
+      "product": "扁铸锭/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-3": {
+      "product": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-4": {
+      "product": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-5": {
+      "product": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-2-row-6": {
+      "product": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-7": {
+      "product": "实心圆铸锭/建筑型材/熔融态铝及铝合金为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-8": {
+      "product": "实心圆铸锭/建筑型材/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-9": {
+      "product": "实心圆铸锭/建筑型材/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-10": {
+      "product": "实心圆铸锭/建筑型材/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-11": {
+      "product": "实心圆铸锭/其他/熔融态铝及铝合金为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-12": {
+      "product": "实心圆铸锭/其他/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-13": {
+      "product": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-14": {
+      "product": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-15": {
+      "product": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-3-row-16": {
+      "product": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-4-row-17": {
+      "product": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-4-row-18": {
+      "product": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-4-row-19": {
+      "product": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-4-row-20": {
+      "product": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-21": {
+      "product": "热轧板材/热轧（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-22": {
+      "product": "热轧板材/热轧（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-23": {
+      "product": "热轧板材/热轧+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-24": {
+      "product": "热轧板材/热轧+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-25": {
+      "product": "热轧板材/热轧+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-26": {
+      "product": "热轧板材/热轧+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-27": {
+      "product": "热轧板材/热轧+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-5-row-28": {
+      "product": "热轧板材/热轧+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-29": {
+      "product": "冷轧板材/冷轧（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-30": {
+      "product": "冷轧板材/冷轧（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-31": {
+      "product": "冷轧板材/冷轧+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-32": {
+      "product": "冷轧板材/冷轧+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-33": {
+      "product": "冷轧板材/冷轧+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-34": {
+      "product": "冷轧板材/冷轧+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-35": {
+      "product": "冷轧板材/冷轧+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-6-row-36": {
+      "product": "冷轧板材/冷轧+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-7-row-37": {
+      "product": "热轧带材/热轧（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-7-row-38": {
+      "product": "热轧带材/热轧（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-7-row-39": {
+      "product": "热轧带材/热轧+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-7-row-40": {
+      "product": "热轧带材/热轧+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-41": {
+      "product": "冷轧带材/冷轧（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-42": {
+      "product": "冷轧带材/冷轧（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-43": {
+      "product": "冷轧带材/冷轧+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-44": {
+      "product": "冷轧带材/冷轧+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-45": {
+      "product": "冷轧带材/冷轧+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-46": {
+      "product": "冷轧带材/冷轧+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-47": {
+      "product": "冷轧带材/冷轧+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-8-row-48": {
+      "product": "冷轧带材/冷轧+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-9-row-49": {
+      "product": "铸轧带材/熔融态铝及铝合金为主原料",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-9-row-50": {
+      "product": "铸轧带材/重熔用铝锭及固态回收铝为主原料",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-51": {
+      "product": "箔材/无零箔/冷轧",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-52": {
+      "product": "箔材/无零箔/冷轧+退火",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-53": {
+      "product": "箔材/单零箔/冷轧",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-54": {
+      "product": "箔材/单零箔/冷轧+退火",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-55": {
+      "product": "箔材/双零箔/冷轧",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-10-row-56": {
+      "product": "箔材/双零箔/冷轧+退火",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-57": {
+      "product": "挤压无缝管材/挤压（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-58": {
+      "product": "挤压无缝管材/挤压（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-59": {
+      "product": "挤压无缝管材/挤压+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-60": {
+      "product": "挤压无缝管材/挤压+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-61": {
+      "product": "挤压无缝管材/挤压+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-62": {
+      "product": "挤压无缝管材/挤压+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-63": {
+      "product": "挤压无缝管材/挤压+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-11-row-64": {
+      "product": "挤压无缝管材/挤压+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-65": {
+      "product": "挤压棒材、板材、线材/挤压（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-66": {
+      "product": "挤压棒材、板材、线材/挤压（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-67": {
+      "product": "挤压棒材、板材、线材/挤压+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-68": {
+      "product": "挤压棒材、板材、线材/挤压+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-69": {
+      "product": "挤压棒材、板材、线材/挤压+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-70": {
+      "product": "挤压棒材、板材、线材/挤压+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-71": {
+      "product": "挤压棒材、板材、线材/挤压+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-12-row-72": {
+      "product": "挤压棒材、板材、线材/挤压+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-73": {
+      "product": "一般工业用挤压型材/挤压（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-74": {
+      "product": "一般工业用挤压型材/挤压（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-75": {
+      "product": "一般工业用挤压型材/挤压+退火（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-76": {
+      "product": "一般工业用挤压型材/挤压+退火（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-77": {
+      "product": "一般工业用挤压型材/挤压+固溶热处理（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-78": {
+      "product": "一般工业用挤压型材/挤压+固溶热处理（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-79": {
+      "product": "一般工业用挤压型材/挤压+固溶热处理+人工时效（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-80": {
+      "product": "一般工业用挤压型材/挤压+固溶热处理+人工时效（II类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-13-row-81": {
+      "product": "建筑型材/挤压（I类）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-82": {
+      "product": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-83": {
+      "product": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制+固溶热处理",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-84": {
+      "product": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制+固溶热处理+人工时效",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-85": {
+      "product": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-86": {
+      "product": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制+固溶热处理",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-14-row-87": {
+      "product": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制+固溶热处理+人工时效",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-88": {
+      "product": "连铸连轧线材",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-89": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/直径＞10 mm",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-90": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/5 mm＜直径≤10 mm",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-91": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/直径≤5 mm",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-92": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/5 mm＜直径≤10 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-93": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/3 mm＜直径≤5 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-94": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/1 mm＜直径≤3 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-95": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/0.5 mm＜直径≤1 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-96": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/0.25 mm＜直径≤0.5 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-15-row-97": {
+      "product": "拉制棒材、紧固件（含钢钉）用线材/0.10 mm＜直径≤0.25 mm（其他线材）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-16-row-98": {
+      "product": "经表面处理的管、棒、型材/阳极氧化产品",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-16-row-99": {
+      "product": "经表面处理的管、棒、型材/电泳涂漆产品",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-16-row-100": {
+      "product": "经表面处理的管、棒、型材/喷粉产品",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-16-row-101": {
+      "product": "经表面处理的管、棒、型材/喷漆产品",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-17-row-102": {
+      "product": "复合型材",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-18-row-103": {
+      "product": "自由锻件/锻造",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-18-row-104": {
+      "product": "自由锻件/锻造+退火",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-18-row-105": {
+      "product": "自由锻件/锻造+固溶热处理+时效",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-19-row-106": {
+      "product": "模锻件/锻造",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-19-row-107": {
+      "product": "模锻件/锻造+退火",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21351-2023.table-19-row-108": {
+      "product": "模锻件/锻造+固溶热处理+时效",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_1": {
+      "product": "普通功率石墨电极",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_2": {
+      "product": "普通功率石墨电极",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21370_2017.manual_candidate_3": {
+      "product": "高功率石墨电极",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_4": {
+      "product": "高功率石墨电极",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21370_2017.manual_candidate_5": {
+      "product": "超高功率石墨电极",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_6": {
+      "product": "超高功率石墨电极",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21370_2017.manual_candidate_7": {
+      "product": "炭电极（产品直径≤1000 mm）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_8": {
+      "product": "炭电极（产品直径＞1000 mm）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_9": {
+      "product": "（半）石墨质炭块",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_10": {
+      "product": "微孔炭块",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_11": {
+      "product": "焙烧工序（产品直径≤500 mm）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_21370_2017.manual_candidate_12": {
+      "product": "焙烧工序（500 mm＜产品直径≤1000 mm）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_21370_2017.manual_candidate_13": {
+      "product": "焙烧工序（产品直径＞1000 mm）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_21370_2017.manual_candidate_14": {
+      "product": "石墨化工序（普通功率石墨电极）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_15": {
+      "product": "石墨化工序（普通功率石墨电极）",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21370_2017.manual_candidate_16": {
+      "product": "石墨化工序（高功率石墨电极)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_17": {
+      "product": "石墨化工序（高功率石墨电极)",
+      "indicator": "单位产品电耗"
+    },
+    "GB_21370_2017.manual_candidate_18": {
+      "product": "石墨化工序（超高功率石墨电极）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_21370_2017.manual_candidate_19": {
+      "product": "石墨化工序（超高功率石墨电极）",
+      "indicator": "单位产品电耗"
+    },
+    "GB_25323_2023.manual_candidate_1": {
+      "product": "粗铜工艺（铜精矿-粗铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_2": {
+      "product": "阳极铜工艺（铜精矿-阳极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_3": {
+      "product": "铜电解工序（阳极铜-阴极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_4": {
+      "product": "铜冶炼（铜精矿-阴极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_5": {
+      "product": "粗铜冶炼工艺阳极铜（粗铜-阳极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_6": {
+      "product": "粗铜冶炼工艺粗铜（粗铜-阴极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_7": {
+      "product": "杂铜冶炼工艺粗铜（杂铜-粗铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_8": {
+      "product": "杂铜冶炼工艺阳极铜（杂铜-阳极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_9": {
+      "product": "杂铜冶炼工艺杂铜（杂铜-阴极铜）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_10": {
+      "product": "火法炼锌粗锌锭工序（精矿-粗锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_11": {
+      "product": "火法炼锌粗精锌锭工序（粗锌锭-精锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_12": {
+      "product": "火法炼锌精锌锭（精矿-精锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_13": {
+      "product": "湿法炼锌电锌锭（含渣处理）（精矿-电锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_14": {
+      "product": "湿法炼锌电锌锭（无渣处理）（精矿-电锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_15": {
+      "product": "富集氧化锌工序（二次资源含锌12%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_16": {
+      "product": "富集氧化锌工序（二次资源含锌8%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_17": {
+      "product": "富集氧化锌工序（二次资源含锌5%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_18": {
+      "product": "富集锌焙砂工序（进一步富集并脱除氟、氯）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_19": {
+      "product": "富集锌焙砂工序（二次资源含锌12%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_20": {
+      "product": "富集锌焙砂工序（二次资源含锌8%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_21": {
+      "product": "富集锌焙砂工序（二次资源含锌5%）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_22": {
+      "product": "湿法炼锌（不含渣处理）（富集氧化锌-电锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_23": {
+      "product": "湿法炼锌（含渣处理）（富集氧化锌-电锌锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_24": {
+      "product": "粗铅工艺（铅精矿-粗铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_25": {
+      "product": "铅电解精炼工序（粗铅-铅锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_26": {
+      "product": "铅冶炼（铅精矿-铅锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_27": {
+      "product": "废电池预处理工序（废电池-铅屑、铅膏）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_28": {
+      "product": "铅膏冶炼工序（铅膏-再生粗铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_29": {
+      "product": "铅屑冶炼工序（铅屑-再生粗铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_30": {
+      "product": "火法精炼工艺（再生粗铅-再生铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_31": {
+      "product": "再生铅（废电池-再生铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_32": {
+      "product": "金属态铅废料-再生铅工艺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_33": {
+      "product": "高镍锍工艺（镍精矿-高镍锍）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_34": {
+      "product": "镍精炼工艺（高镍锍-电解镍）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_35": {
+      "product": "电解工序（阳极镍-电解镍）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_36": {
+      "product": "镍冶炼（镍精矿-电解镍）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_37": {
+      "product": "熔前处理工序（硫精矿-锡焙砂、焙烧渣）沸腾炉处理",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_38": {
+      "product": "熔前处理工序（硫精矿-锡焙砂、焙烧渣）回转窑处理",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_39": {
+      "product": "还原熔炼工序（锡焙砂、锡精矿-粗锡）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_40": {
+      "product": "精炼工序（粗锡-锡锭、焊锡）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_41": {
+      "product": "炼渣工序（含锡渣料-含锡烟尘）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_42": {
+      "product": "锡冶炼（锡精矿-锡锭、焊锡）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_43": {
+      "product": "粗炼工序（锑低品位矿-锑氧）（硫化锑矿）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_44": {
+      "product": "粗炼工序（锑精矿-锑氧）（硫化锑矿）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_45": {
+      "product": "精炼工序（锑氧-锑锭）（硫化锑矿）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_46": {
+      "product": "锑冶炼（锑低品位矿-锑锭）（硫化锑矿）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_47": {
+      "product": "锑冶炼（锑精矿-锑锭）（硫化锑矿）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_48": {
+      "product": "粗炼、吹炼工序（脆硫铅锑精矿-锑氧、底铅）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_49": {
+      "product": "炼渣工序（鼓风炉渣-锑氧、铅锑粗合金）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_50": {
+      "product": "精炼工序（锑氧、底铅-锑锭、高铅锑锭、铅锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_51": {
+      "product": "脆硫铅锑矿冶炼（脆硫铅锑精矿-锑锭、高铅锑锭、铅锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_52": {
+      "product": "氯化锆工艺（锆原料-氯化锆溶液）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_53": {
+      "product": "电积锆工艺（氯化锆溶液-电积锆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_54": {
+      "product": "锆冶炼（锆原料-电积锆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_55": {
+      "product": "四氧化二锆工艺（氯化锆溶液或硝酸锆溶液或硫酸锆溶液-四氧化二锆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_56": {
+      "product": "氯化锆（锆原料-氯化锆晶体）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_57": {
+      "product": "硫酸锆（锆原料-硫酸锆晶体）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_58": {
+      "product": "硫化钛精矿冶炼（硫化钛精矿-钛锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25323_2023.manual_candidate_59": {
+      "product": "氧化钛原料冶炼（氧化钛原料-钛锭）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_25324-2022.prebaked-anode-calcination": {
+      "product": "铝电解用预焙阳极煅烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.prebaked-anode-forming": {
+      "product": "铝电解用预焙阳极成型工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.prebaked-anode-roasting": {
+      "product": "铝电解用预焙阳极焙烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.prebaked-anode-assembly": {
+      "product": "铝电解用预焙阳极组装工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.graphitic-cathode-calcination": {
+      "product": "铝电解用石墨质阴极炭块煅烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.graphitic-cathode-forming-roasting": {
+      "product": "铝电解用石墨质阴极炭块成型焙烧加工工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.graphitized-cathode-calcination": {
+      "product": "铝电解用石墨化阴极炭块煅烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.graphitized-cathode-forming-roasting": {
+      "product": "铝电解用石墨化阴极炭块成型焙烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.graphitized-cathode-graphitization": {
+      "product": "铝电解用石墨化阴极炭块石墨化加工工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.cathode-paste-calcination": {
+      "product": "铝电解用阴极糊煅烧工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_25324-2022.cathode-paste-kneading": {
+      "product": "铝电解用阴极糊混捏工序",
+      "indicator": "单位产品综合能源消耗"
+    },
+    "GB_29140-2024.ammonia-light": {
+      "product": "氨碱法轻质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.ammonia-heavy": {
+      "product": "氨碱法重质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.soda-ash-light": {
+      "product": "联碱法（精制工业盐为原料）轻质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.soda-ash-heavy": {
+      "product": "联碱法（精制工业盐为原料）重质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.natural-carbonation-light": {
+      "product": "天然碱法（碳化法）轻质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.natural-carbonation-heavy": {
+      "product": "天然碱法（碳化法）重质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.natural-evaporation-light": {
+      "product": "天然碱法（蒸发法）轻质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29140-2024.natural-evaporation-heavy": {
+      "product": "天然碱法（蒸发法）重质纯碱",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_1": {
+      "product": "硫磺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_2": {
+      "product": "硫磺",
+      "indicator": "吨酸电耗"
+    },
+    "GB_29141_2012.manual_candidate_3": {
+      "product": "硫铁矿",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_4": {
+      "product": "硫铁矿",
+      "indicator": "吨酸电耗"
+    },
+    "GB_29141_2012.manual_candidate_5": {
+      "product": "铜、镍冶炼烟气",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_6": {
+      "product": "铜、镍冶炼烟气",
+      "indicator": "吨酸电耗"
+    },
+    "GB_29141_2012.manual_candidate_7": {
+      "product": "铅冶炼烟气",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_8": {
+      "product": "铅冶炼烟气",
+      "indicator": "吨酸电耗"
+    },
+    "GB_29141_2012.manual_candidate_9": {
+      "product": "锌冶炼烟气",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_10": {
+      "product": "锌冶炼烟气",
+      "indicator": "吨酸电耗"
+    },
+    "GB_29141_2012.manual_candidate_11": {
+      "product": "其他有色金属冶炼烟气",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29141_2012.manual_candidate_12": {
+      "product": "其他有色金属冶炼烟气",
+      "indicator": "吨酸电耗"
+    },
+    "methanol-bituminous.comprehensive-energy": {
+      "product": "烟煤制甲醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "methanol-anthracite.comprehensive-energy": {
+      "product": "无烟煤制甲醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "methanol-lignite.comprehensive-energy": {
+      "product": "褐煤制甲醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "methanol-natural-gas.comprehensive-energy": {
+      "product": "天然气制甲醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "methanol-coke-oven-gas.comprehensive-energy": {
+      "product": "焦炉煤气制甲醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "ethylene-glycol-ethylene.comprehensive-energy": {
+      "product": "乙烯制乙二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "ethylene-glycol-syngas.comprehensive-energy": {
+      "product": "合成气制乙二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "ethylene-glycol-coal.comprehensive-energy": {
+      "product": "煤制乙二醇",
+      "indicator": "单位产品综合能耗"
+    },
+    "dimethyl-ether.comprehensive-energy": {
+      "product": "甲醇制二甲醚",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29438_2012.manual_candidate_1": {
+      "product": "聚甲醛",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29445-2025.underground": {
+      "product": "煤炭井工开采企业",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29445-2025.surface": {
+      "product": "煤炭露天开采企业",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29446-2019.coking-coal": {
+      "product": "炼焦煤选煤企业选煤电力单耗",
+      "indicator": "电耗"
+    },
+    "GB_29446-2019.power-coal": {
+      "product": "动力煤选煤企业选煤电力单耗",
+      "indicator": "电耗"
+    },
+    "GB_29447-2026.polysilicon-trichlorosilane.comprehensive-energy": {
+      "product": "硅多晶（三氯氢硅法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29447-2026.polysilicon-silane-fluidized-bed.comprehensive-energy": {
+      "product": "硅多晶（硅烷流化床法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29447-2026.high-purity-germanium-tetrachloride.comprehensive-energy": {
+      "product": "高纯四氯化锗",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29447-2026.high-purity-germanium-dioxide.comprehensive-energy": {
+      "product": "高纯二氧化锗",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29447-2026.zone-melting-germanium-ingot.comprehensive-energy": {
+      "product": "区熔锗锭",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29447-2026.germanium-single-crystal.comprehensive-energy": {
+      "product": "锗单晶",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29448-2022.sponge-titanium-full": {
+      "product": "海绵钛全流程生产",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29448-2022.sponge-titanium-half": {
+      "product": "海绵钛半流程生产",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29448-2022.titanium-ingot-two-melt": {
+      "product": "钛锭二次真空自耗电弧熔炼",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29448-2022.titanium-ingot-three-melt": {
+      "product": "钛锭三次真空自耗电弧熔炼",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.all-steel-radial": {
+      "product": "全钢子午线轮胎",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.semi-steel-radial": {
+      "product": "半钢子午线轮胎",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.earthmover": {
+      "product": "工程机械轮胎",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.bias": {
+      "product": "斜交轮胎",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.carbon-black-excluding-feedstock": {
+      "product": "炭黑（扣除原料用能）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29449-2024.carbon-black-including-feedstock": {
+      "product": "炭黑（不扣除原料用能）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_29995-2024.columnar-activated-carbon": {
+      "product": "柱状活性炭（原料用能不纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.briquette-activated-carbon": {
+      "product": "压块活性炭（原料用能不纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.raw-coal-crushed-activated-carbon": {
+      "product": "原煤破碎活性炭（原料用能不纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.activated-coke": {
+      "product": "活性焦（原料用能不纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.semi-coke": {
+      "product": "兰炭",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.columnar-activated-carbon-feedstock": {
+      "product": "柱状活性炭（原料用能纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.briquette-activated-carbon-feedstock": {
+      "product": "压块活性炭（原料用能纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.raw-coal-crushed-activated-carbon-feedstock": {
+      "product": "原煤破碎活性炭（原料用能纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_29995-2024.activated-coke-feedstock": {
+      "product": "活性焦（原料用能纳入）",
+      "indicator": "单位产品能耗"
+    },
+    "GB_30180-2024.mto": {
+      "product": "煤制烯烃（甲醇制烯烃MTO，原料用能不纳入）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30180-2024.mtp": {
+      "product": "煤制烯烃（甲醇制丙烯MTP，原料用能不纳入）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30180-2024.synthetic-natural-gas": {
+      "product": "煤制天然气",
+      "indicator": "单位产品能耗"
+    },
+    "GB_30180-2024.direct-liquefaction-oil": {
+      "product": "煤直接液化制油",
+      "indicator": "单位产品能耗"
+    },
+    "GB_30180-2024.indirect-liquefaction-oil": {
+      "product": "煤间接液化制油",
+      "indicator": "单位产品能耗"
+    },
+    "GB_30180-2024.mto-feedstock-included": {
+      "product": "煤制烯烃（甲醇制烯烃MTO，不扣除原料用能）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30180-2024.mtp-feedstock-included": {
+      "product": "煤制烯烃（甲醇制丙烯MTP，不扣除原料用能）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30183-2013.comparable-energy": {
+      "product": "岩棉、矿渣棉及其制品",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_30183-2013.comparable-coke": {
+      "product": "岩棉、矿渣棉及其制品",
+      "indicator": "单位产品可比熔融焦耗"
+    },
+    "GB_30184-2013.bituminous-with-carrier": {
+      "product": "沥青基防水卷材（有胎）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30184-2013.bituminous-without-carrier": {
+      "product": "沥青基防水卷材（无胎）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.refinery": {
+      "product": "炼油",
+      "indicator": "单位能量因数能耗"
+    },
+    "GB_30251-2024.ethylene": {
+      "product": "乙烯装置",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.polypropylene-gas": {
+      "product": "聚丙烯（连续气相法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.polypropylene-liquid": {
+      "product": "聚丙烯（连续液相本体法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.styrene-dehydrogenation": {
+      "product": "苯乙烯（纯乙烯法、乙苯脱氢法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.styrene-dry-gas": {
+      "product": "苯乙烯（干气法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.styrene-cooxidation": {
+      "product": "苯乙烯（乙苯共氧化法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.p-xylene": {
+      "product": "对二甲苯",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.propylene-oxide-chlorohydrin": {
+      "product": "环氧丙烷（氯醇法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.pta": {
+      "product": "精对苯二甲酸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.propylene-oxide-cooxidation": {
+      "product": "环氧丙烷（乙苯共氧化法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.propylene-oxide-isobutane": {
+      "product": "环氧丙烷（异丁烷共氧化法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.propylene-oxide-hydrogen-peroxide": {
+      "product": "环氧丙烷（过氧化氢法）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30251-2024.phthalic-anhydride": {
+      "product": "邻苯二甲酸酐",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_1": {
+      "product": "烧结多孔砖和多孔砌块",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_2": {
+      "product": "烧结空心砖和空心砌块",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_3": {
+      "product": "烧结保温砖和保温砌块",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_4": {
+      "product": "烧结实心制品",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_5": {
+      "product": "泡沫玻璃（外购熔容玻璃）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_6": {
+      "product": "泡沫玻璃（自制熔容玻璃）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_30526_2019.manual_candidate_7": {
+      "product": "泡沫玻璃（Ⅱ型）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31335-2024.surface-medium-plus": {
+      "product": "铁矿露天开采（中型及以上矿山）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.surface-small": {
+      "product": "铁矿露天开采（小型矿山）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.underground-medium-plus": {
+      "product": "铁矿地下开采（中型及以上矿山）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.underground-small": {
+      "product": "铁矿地下开采（小型矿山）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.beneficiation-weak-magnetic": {
+      "product": "铁矿选矿（弱磁选）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.beneficiation-combined": {
+      "product": "铁矿选矿（联合选别）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.roasting-rotary-kiln": {
+      "product": "铁矿选矿（焙烧选别，回转窑）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.roasting-shaft-furnace": {
+      "product": "铁矿选矿（焙烧选别，竖炉）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31335-2024.roasting-fluidized": {
+      "product": "铁矿选矿（焙烧选别，流态化）",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_31825-2024.bleached-chemical-wood-self": {
+      "product": "漂白化学木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.bleached-chemical-wood-market": {
+      "product": "漂白化学木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.unbleached-chemical-wood-self": {
+      "product": "未漂化学木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.unbleached-chemical-wood-market": {
+      "product": "未漂化学木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.bleached-chemical-nonwood-self": {
+      "product": "漂白化学非木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.bleached-chemical-nonwood-market": {
+      "product": "漂白化学非木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.unbleached-chemical-nonwood-self": {
+      "product": "未漂化学非木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.unbleached-chemical-nonwood-market": {
+      "product": "未漂化学非木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.chemical-mechanical-self": {
+      "product": "化学机械浆及机械浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.chemical-mechanical-market": {
+      "product": "化学机械浆及机械浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.dissolving-wood-self": {
+      "product": "溶解木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.dissolving-wood-market": {
+      "product": "溶解木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.dissolving-nonwood-self": {
+      "product": "溶解非木浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.dissolving-nonwood-market": {
+      "product": "溶解非木浆（商品浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.non-deinked-waste-self": {
+      "product": "未脱墨废纸浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.deinked-waste-self": {
+      "product": "脱墨废纸浆（自用浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.newsprint": {
+      "product": "新闻纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.uncoated-printing-writing": {
+      "product": "非涂布印刷书写纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.coated-printing": {
+      "product": "涂布印刷纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.tissue-wood": {
+      "product": "卫生纸原纸、纸巾原纸、吸水衬纸（木浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.tissue-nonwood": {
+      "product": "卫生纸原纸、纸巾原纸、吸水衬纸（非木浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.wiping-wood": {
+      "product": "擦拭用纸（木浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.wiping-nonwood": {
+      "product": "擦拭用纸（非木浆）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.white-grey-board": {
+      "product": "白纸板、灰板纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.liner-gypsum-board": {
+      "product": "箱纸板、石膏板护面纸板",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.corrugating-tube-board": {
+      "product": "瓦楞原纸、纸管纸板",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.coated-board": {
+      "product": "涂布纸板",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.paper-bag": {
+      "product": "纸袋纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.decorative-wallpaper-base": {
+      "product": "装饰原纸、壁纸原纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.glassine": {
+      "product": "格拉辛纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.cigarette": {
+      "product": "卷烟纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.watermarked": {
+      "product": "水松原纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.aluminum-foil-liner": {
+      "product": "铝箔衬纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.stainless-liner": {
+      "product": "不锈钢衬纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.thermal-carbon": {
+      "product": "热敏原纸、无碳复写纸原纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.medical-packaging": {
+      "product": "医用包装纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.fruit-bag": {
+      "product": "育果袋纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_31825-2024.sublimation-transfer": {
+      "product": "热升华转印原纸",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_32047-2025.beer": {
+      "product": "啤酒",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_33654_2017.manual_candidate_1": {
+      "product": "建筑石膏",
+      "indicator": "单位产品可比综合能耗"
+    },
+    "GB_36888-2018.production": {
+      "product": "预拌混凝土",
+      "indicator": "单位产品生产能耗"
+    },
+    "GB_36888-2018.transport": {
+      "product": "预拌混凝土",
+      "indicator": "单位产品运输能耗"
+    },
+    "GB_36889-2025.polyester-polymerization": {
+      "product": "聚酯涤纶/聚合/聚酯熔体或切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-solid-phase": {
+      "product": "聚酯涤纶/固相增黏/高黏度切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-liquid-phase": {
+      "product": "聚酯涤纶/液相增黏/高黏度熔体",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-melt-poy": {
+      "product": "聚酯涤纶/熔体直接纺丝/预取向丝(POY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-melt-fdy": {
+      "product": "聚酯涤纶/熔体直接纺丝/全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-melt-industrial": {
+      "product": "聚酯涤纶/熔体直接纺丝/工业长丝",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-melt-staple": {
+      "product": "聚酯涤纶/熔体直接纺丝/短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-chip-poy": {
+      "product": "聚酯涤纶/切片纺丝/预取向丝(POY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-chip-fdy": {
+      "product": "聚酯涤纶/切片纺丝/全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-chip-industrial": {
+      "product": "聚酯涤纶/切片纺丝/工业长丝",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-chip-staple": {
+      "product": "聚酯涤纶/切片纺丝/短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-dty-low-pressure": {
+      "product": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力不大于0.12 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-dty-mid-pressure": {
+      "product": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力小于0.35 MPa、大于0.12 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polyester-dty-high-pressure": {
+      "product": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力不小于0.35 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-chip": {
+      "product": "循环再利用涤纶(物理法、物理化学法)/切片(瓶片到切片)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-poy": {
+      "product": "循环再利用涤纶/预取向丝(POY)(瓶片纺/切片纺)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-fdy-bottle": {
+      "product": "循环再利用涤纶/全拉伸丝(FDY)/瓶片纺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-fdy-chip": {
+      "product": "循环再利用涤纶/全拉伸丝(FDY)/切片纺",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-dty-low": {
+      "product": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力不大于0.12 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-dty-mid": {
+      "product": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力小于0.35 MPa、大于0.12 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-dty-high": {
+      "product": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力不小于0.35 MPa)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.recycled-staple": {
+      "product": "循环再利用涤纶/短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bottle-polyester-chip": {
+      "product": "瓶用聚酯/瓶用聚酯切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.viscose-staple": {
+      "product": "粘胶纤维/粘胶短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.viscose-modal": {
+      "product": "粘胶纤维/莫代尔短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.viscose-filament": {
+      "product": "粘胶纤维/粘胶长丝",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-civil-chip": {
+      "product": "锦纶6/聚合/民用切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-industrial-chip": {
+      "product": "锦纶6/聚合/工业用切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-poy-hoy": {
+      "product": "锦纶6/纺丝/预取向丝(POY)、高取向丝(HOY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-fdy": {
+      "product": "锦纶6/纺丝/全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-industrial": {
+      "product": "锦纶6/纺丝/工业长丝",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.nylon6-dty": {
+      "product": "锦纶6/加弹/拉伸变形丝(DTY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.spandex-dry": {
+      "product": "氨纶(干法纺丝)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.vinylon-high-strength": {
+      "product": "维纶/高强高模聚乙烯醇超短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.vinylon-water-soluble": {
+      "product": "维纶/水溶性聚乙烯醇短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.acrylic-dmac": {
+      "product": "腈纶(DMAc湿法二步法)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polypropylene-fdy": {
+      "product": "丙纶/丙纶全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polypropylene-bcf": {
+      "product": "丙纶/丙纶膨体长丝(BCF)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.polypropylene-staple": {
+      "product": "丙纶/丙纶短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.uhmwpe-halogen": {
+      "product": "超高分子量聚乙烯纤维(湿法纺丝)/卤化烃萃取剂",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.uhmwpe-hydrocarbon": {
+      "product": "超高分子量聚乙烯纤维(湿法纺丝)/碳氢萃取剂",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bicomponent-polymer": {
+      "product": "双组分复合纤维/双组分聚合熔体/切片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bicomponent-melt-poy": {
+      "product": "双组分复合纤维/熔体直接纺/预取向丝(POY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bicomponent-melt-fdy": {
+      "product": "双组分复合纤维/熔体直接纺/全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bicomponent-chip-poy": {
+      "product": "双组分复合纤维/切片纺/预取向丝(POY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.bicomponent-chip-fdy": {
+      "product": "双组分复合纤维/切片纺/全拉伸丝(FDY)",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.pe-pet-staple": {
+      "product": "聚乙烯/聚对苯二甲酸乙二醇酯(PE/PET)复合短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36889-2025.lmpet-pet-staple": {
+      "product": "低熔点聚酯(LMPET)/聚酯(PET)复合短纤维",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_36891-2018.sintered-mullite": {
+      "product": "烧结莫来石",
+      "indicator": "单位产品能耗"
+    },
+    "GB_36891-2018.fused-mullite": {
+      "product": "电熔莫来石",
+      "indicator": "单位产品电耗"
+    },
+    "GB_36892-2018.brown-fused-alumina": {
+      "product": "棕刚玉",
+      "indicator": "单位产品电耗"
+    },
+    "GB_36892-2018.white-fused-alumina": {
+      "product": "白刚玉",
+      "indicator": "单位产品电耗"
+    },
+    "GB_36892-2018.sub-white-fused-alumina": {
+      "product": "亚白刚玉",
+      "indicator": "单位产品电耗"
+    },
+    "GB_36892-2018.dense-fused-alumina": {
+      "product": "致密刚玉",
+      "indicator": "单位产品电耗"
+    },
+    "GB_36892-2018.sintered-corundum": {
+      "product": "烧结刚玉",
+      "indicator": "单位产品能耗"
+    },
+    "GB_38263_2019.manual_candidate_1": {
+      "product": "预制混凝土桩",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_2": {
+      "product": "环形混凝土电杆",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_3": {
+      "product": "混凝土和钢筋混凝土排水管",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_4": {
+      "product": "预应力钢筒混凝土管",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_5": {
+      "product": "加气混凝土",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_6": {
+      "product": "硅酸钙板",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_38263_2019.manual_candidate_7": {
+      "product": "预制混凝土衬砌管片",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45247-2025.power-1": {
+      "product": "燃气-蒸汽联合循环发电机组（H级/500MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_45247-2025.heat-1": {
+      "product": "燃气-蒸汽联合循环发电机组（H级/500MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_45247-2025.power-2": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/400MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_45247-2025.heat-2": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/400MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_45247-2025.power-3": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/300MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_45247-2025.heat-3": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/300MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_45247-2025.power-4": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/100MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_45247-2025.heat-4": {
+      "product": "燃气-蒸汽联合循环发电机组（F级/100MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_45247-2025.power-5": {
+      "product": "燃气-蒸汽联合循环发电机组（E级/100MW）",
+      "indicator": "供电煤耗率"
+    },
+    "GB_45247-2025.heat-5": {
+      "product": "燃气-蒸汽联合循环发电机组（E级/100MW）",
+      "indicator": "供热煤耗率"
+    },
+    "GB_45549-2025.flake-graphite": {
+      "product": "鳞片石墨",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.microcrystalline-graphite": {
+      "product": "微晶石墨",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.fluorite-lump": {
+      "product": "萤石块矿",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.fluorite-powder": {
+      "product": "萤石粉矿",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.fluorite-fine-two-stage": {
+      "product": "萤石精粉（两段磨矿工艺）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.fluorite-fine-three-stage": {
+      "product": "萤石精粉（三段磨矿工艺）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_45549-2025.fluorite-fine-comprehensive": {
+      "product": "萤石精粉（综合利用工艺）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_46029-2025.silver-process": {
+      "product": "银法甲醛",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_46029-2025.iron-molybdenum-process": {
+      "product": "铁钼法甲醛",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_47834-2026.module-topcon.conversion-efficiency": {
+      "product": "TOPCon电池晶体硅光伏组件",
+      "indicator": "光电转换效率"
+    },
+    "GB_47834-2026.module-topcon.degradation-rate": {
+      "product": "TOPCon电池晶体硅光伏组件",
+      "indicator": "耦合环境应力衰减率"
+    },
+    "GB_47834-2026.module-topcon.bifaciality": {
+      "product": "TOPCon电池晶体硅光伏组件",
+      "indicator": "双面率"
+    },
+    "GB_47834-2026.module-hjt.conversion-efficiency": {
+      "product": "HJT电池晶体硅光伏组件",
+      "indicator": "光电转换效率"
+    },
+    "GB_47834-2026.module-hjt.degradation-rate": {
+      "product": "HJT电池晶体硅光伏组件",
+      "indicator": "耦合环境应力衰减率"
+    },
+    "GB_47834-2026.module-hjt.bifaciality": {
+      "product": "HJT电池晶体硅光伏组件",
+      "indicator": "双面率"
+    },
+    "GB_47834-2026.module-bc.conversion-efficiency": {
+      "product": "BC电池晶体硅光伏组件",
+      "indicator": "光电转换效率"
+    },
+    "GB_47834-2026.module-bc.degradation-rate": {
+      "product": "BC电池晶体硅光伏组件",
+      "indicator": "耦合环境应力衰减率"
+    },
+    "GB_47834-2026.module-bc.bifaciality": {
+      "product": "BC电池晶体硅光伏组件",
+      "indicator": "双面率"
+    },
+    "GB_47834-2026.inverter-20-50kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（20<P≤50）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-20-50kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（20<P≤50）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47834-2026.inverter-50-100kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（50<P≤100）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-50-100kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（50<P≤100）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47834-2026.inverter-100-150kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（100<P≤150）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-100-150kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（100<P≤150）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47834-2026.inverter-150-200kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（150<P≤200）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-150-200kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（150<P≤200）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47834-2026.inverter-200-500kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（200<P≤500）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-200-500kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（200<P≤500）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47834-2026.inverter-over-500kw.weighted-total-efficiency": {
+      "product": "光伏并网逆变器（P>500）",
+      "indicator": "平均加权总效率"
+    },
+    "GB_47834-2026.inverter-over-500kw.max-conversion-efficiency": {
+      "product": "光伏并网逆变器（P>500）",
+      "indicator": "最大转换效率"
+    },
+    "GB_47835-2026.monocrystalline-silicon.comprehensive-energy": {
+      "product": "硅单晶（方棒）",
+      "indicator": "单位产品综合能耗"
+    },
+    "GB_47835-2026.monocrystalline-wafer.comprehensive-energy": {
+      "product": "硅单晶片",
+      "indicator": "单位产品综合能耗"
+    }
+  }
+}

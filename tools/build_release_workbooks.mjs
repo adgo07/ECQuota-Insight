@@ -81,6 +81,24 @@ function baseValue(indicator, level) {
   return expression.op === "constant" ? expression.value : "按条件修正";
 }
 
+function cleanText(value) {
+  return value === null || value === undefined ? "" : String(value).replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function fallbackNames(product, indicator) {
+  const productText = cleanText(product.name);
+  const indicatorText = cleanText(indicator.name);
+  if (productText === indicatorText) {
+    const suffixes = ["单位产品综合能耗", "单位产品能源消耗", "单位产品能耗", "单位产品电耗", "吨酸电耗", "单位产品焦耗", "单位产品煤耗", "单位产品天然气耗", "单位产品油耗", "单位产品水耗"];
+    const suffix = suffixes.find((item) => indicatorText.endsWith(item));
+    if (suffix && indicatorText.length > suffix.length) return { product: indicatorText.slice(0, -suffix.length).trim(), indicator: suffix };
+  }
+  if (indicatorText.startsWith(productText) && indicatorText.length > productText.length) {
+    return { product: productText, indicator: indicatorText.slice(productText.length).trim() };
+  }
+  return { product: productText, indicator: indicatorText };
+}
+
 function sourceSummary(indicator) {
   return indicator.source_references
     .map((item) => `PDF第${item.page}页；${item.clause ?? ""}${item.table ? `；${item.table}` : ""}`)
@@ -88,6 +106,14 @@ function sourceSummary(indicator) {
 }
 
 const definitionFiles = (await fs.readdir(path.join(dataRoot, "definitions"))).filter((name) => name.endsWith(".json"));
+let nameOverrides = {};
+try {
+  const overridePath = path.join(dataRoot, "indicator-name-overrides.json");
+  const overridePayload = JSON.parse(await fs.readFile(overridePath, "utf8"));
+  nameOverrides = overridePayload.mappings ?? {};
+} catch {
+  // 新增标准尚未建立人工命名映射时使用可审计的通用拆分；不阻断确认表生成。
+}
 const definitions = [];
 for (const filename of definitionFiles) {
   const definition = JSON.parse(await fs.readFile(path.join(dataRoot, "definitions", filename), "utf8"));
@@ -102,7 +128,7 @@ const rules = reviewWorkbook.worksheets.add("规则确认");
 const corrections = reviewWorkbook.worksheets.add("订正记录");
 reviewWorkbook.comments.setSelf({ displayName: "User" });
 
-title(summary, "A1:G1", `${scopeCount}项单位产品能耗限额标准规则确认表`, `范围固定为${scopeCount}项；draft/reviewed候选数据必须回到强制性标准原文复核，只有确认通过的规则才可发布。`)
+title(summary, "A1:G1", "统一标准规则确认表", `当前规则库共${scopeCount}项标准；draft/reviewed候选数据必须回到强制性标准原文复核，只有确认通过的规则才可发布。`)
 summary.getRange("A4:G4").values = [["标准编号", "标准名称", "产品/工序数", "指标数", "当前状态", "已同意指标数", "原文SHA-256"]];
 header(summary.getRange("A4:G4"));
 const summaryRows = definitions.map((definition) => [
@@ -146,13 +172,14 @@ for (const definition of definitions) {
   for (const product of definition.products) {
     for (const indicator of product.indicators) {
       const firstSource = indicator.source_references[0];
+      const names = nameOverrides[indicator.id] ?? fallbackNames(product, indicator);
       ruleRows.push([
         sequence,
         definition.number,
         definition.title,
-        product.name,
+        names.product,
         indicator.id,
-        indicator.name,
+        names.indicator,
         indicator.unit,
         baseValue(indicator, "level_1"),
         baseValue(indicator, "level_2"),
@@ -294,4 +321,4 @@ for (const [sheetName, fileName, range] of [["填写说明", "template-instructi
 const templateOutput = await SpreadsheetFile.exportXlsx(template);
 await templateOutput.save(path.join(outputDir, "单位产品能耗对标导入模板.xlsx"));
 
-process.stdout.write(`${path.join(outputDir, `${scopeCount}项标准规则确认表.xlsx`)}\n${path.join(outputDir, "单位产品能耗对标导入模板.xlsx")}\n`);
+process.stdout.write(`${path.join(outputDir, "统一标准规则确认表.xlsx")}\n${path.join(outputDir, "单位产品能耗对标导入模板.xlsx")}\n`);
