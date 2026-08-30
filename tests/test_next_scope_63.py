@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+import pytest
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-from uebench.domain.engine import EvaluationEngine
+from uebench.domain.engine import EvaluationEngine, EvaluationValidationError
 from uebench.domain.models import EnergyLine, EvaluationRequest, Grade, InputMode, InputValue, ProductionLine, PublicationStatus, StandardDefinition
 
 ROOT = Path("work/next-scope-63/data")
@@ -19,14 +20,6 @@ def _published() -> StandardDefinition:
     return _definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
 
 
-def _gb29435_definition() -> StandardDefinition:
-    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-29435-2012.json").read_text(encoding="utf-8"))
-
-
-def _gb29435_published() -> StandardDefinition:
-    return _gb29435_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
-
-
 def _energy_lines(*, total: str = "300") -> list[EnergyLine]:
     return [
         EnergyLine(line_id="production", energy_name="选矿/焙烧生产系统", category_key="production_system", amount=total, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
@@ -34,7 +27,6 @@ def _energy_lines(*, total: str = "300") -> list[EnergyLine]:
         EnergyLine(line_id="affiliated", energy_name="附属系统", category_key="affiliated_system", amount="0", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
         EnergyLine(line_id="output", energy_name="外供二次能源", category_key="external_output", direction="output", amount="0", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
     ]
-
 
 def test_gb29145_names_thresholds_and_citations_follow_standard() -> None:
     standard = _definition()
@@ -132,55 +124,183 @@ def test_gb29145_roasted_detail_does_not_apply_comparable_factor() -> None:
 
 
 
-def test_gb29435_names_levels_and_citations_follow_standard() -> None:
+
+def _gb29435_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-29435-2025.json").read_text(encoding="utf-8"))
+
+
+def _gb29435_published() -> StandardDefinition:
+    return _gb29435_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb29435_energy_lines(*, production: str = "1000", auxiliary: str = "200", affiliated: str = "100", exported: str = "100") -> list[EnergyLine]:
+    return [
+        EnergyLine(line_id="production", energy_name="主要生产系统", category_key="production_system", amount=production, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="auxiliary", energy_name="辅助生产系统", category_key="auxiliary_system", amount=auxiliary, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="affiliated", energy_name="附属生产系统", category_key="affiliated_system", amount=affiliated, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="output", energy_name="二次能源回收并外供", category_key="external_output", direction="output", amount=exported, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+    ]
+
+
+def test_gb29435_2025_names_levels_and_citations_follow_standard() -> None:
     standard = _gb29435_definition()
-    assert len(standard.products) == 31
+    assert standard.number == "GB 29435-2025"
+    assert standard.effective_date == date(2027, 1, 1)
+    assert standard.lifecycle_status.value == "future"
+    assert len(standard.products) == 51
     assert all(product.indicators[0].name == "单位产品综合能耗" for product in standard.products)
-    assert [
-        [product.indicators[0].thresholds.level_1.value, product.indicators[0].thresholds.level_2.value, product.indicators[0].thresholds.level_3.value]
-        for product in standard.products[:3]
-    ] == [["2.19", "2.31", "2.54"], ["2.47", "2.60", "2.86"], ["2.49", "2.62", "2.88"]]
-    assert {reference.page for product in standard.products for reference in product.indicators[0].source_references} >= {4, 5, 6, 7, 8, 10, 11}
+    assert standard.products[0].name == "离子型稀土矿生产—氧化镧"
+    assert [standard.products[i].indicators[0].thresholds.level_1.op for i in (0, 16, 27, 28, 33, 47)] == ["constant", "constant", "piecewise", "constant", "constant", "constant"]
+    assert [standard.products[0].indicators[0].thresholds.level_1.value, standard.products[0].indicators[0].thresholds.level_2.value, standard.products[0].indicators[0].thresholds.level_3.value] == ["1.41", "1.46", "1.62"]
+    assert {reference.page for product in standard.products for reference in product.indicators[0].source_references} >= {5, 6, 7, 8, 9, 10, 11}
 
 
-def test_gb29435_detail_formula_combines_direct_and_indirect_energy() -> None:
+def test_gb29435_2025_blocks_formal_evaluation_before_effective_date() -> None:
+    standard = _gb29435_published()
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 12, 31), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value="1.41", unit="tce/t")},
+    )
+    with pytest.raises(EvaluationValidationError, match="早于标准实施日期"):
+        EvaluationEngine().evaluate(standard, request)
+
+
+def test_gb29435_2025_detail_formula_converts_kgce_and_subtracts_external_output() -> None:
     standard = _gb29435_published()
     product = standard.products[0]
     request = EvaluationRequest(
-        evaluation_date=date(2025, 1, 1),
-        standard_id=standard.id,
-        product_id=product.id,
-        input_mode=InputMode.DETAIL,
-        inputs={},
-        energy_lines=[
-            EnergyLine(line_id="direct", energy_name="工序直接能耗", category_key="direct_process", amount="2.0", unit="tce", standard_coal_coefficient="1", coefficient_unit="tce/tce"),
-            EnergyLine(line_id="indirect", energy_name="间接辅助及损耗", category_key="indirect_aux_loss", amount="0.5", unit="tce", standard_coal_coefficient="1", coefficient_unit="tce/tce"),
-        ],
-        production_lines=[ProductionLine(line_id="p", product_name="氧化镧", category_key="qualified", quantity="1", unit="t")],
+        evaluation_date=date(2027, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={}, energy_lines=_gb29435_energy_lines(),
+        production_lines=[ProductionLine(line_id="p", product_name="氧化镧", quantity="1", unit="t")],
     )
     result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.actual_value == Decimal("2.5")
-    assert result.grade is Grade.LEVEL_3
-    assert any(step.operation == "add" and step.value == Decimal("2.5") for step in result.calculation_trace)
+    assert result.actual_value == Decimal("1.2")
+    assert result.grade is Grade.LEVEL_1
+    assert any("kgce换算为tce" in step.label for step in result.calculation_trace)
+    assert any(step.operation == "add" and step.value == Decimal("1200") for step in result.calculation_trace)
 
 
-def test_gb29435_missing_indirect_energy_is_incomplete() -> None:
+def test_gb29435_2025_missing_required_energy_category_is_incomplete() -> None:
     standard = _gb29435_published()
     product = standard.products[0]
+    lines = _gb29435_energy_lines()
     request = EvaluationRequest(
-        evaluation_date=date(2025, 1, 1),
-        standard_id=standard.id,
-        product_id=product.id,
-        input_mode=InputMode.DETAIL,
-        inputs={},
-        energy_lines=[EnergyLine(line_id="direct", energy_name="工序直接能耗", category_key="direct_process", amount="2.0", unit="tce", standard_coal_coefficient="1", coefficient_unit="tce/tce")],
-        production_lines=[ProductionLine(line_id="p", product_name="氧化镧", category_key="qualified", quantity="1", unit="t")],
+        evaluation_date=date(2027, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={}, energy_lines=lines[:3],
+        production_lines=[ProductionLine(line_id="p", product_name="氧化镧", quantity="1", unit="t")],
     )
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.INCOMPLETE
-    assert any("indirect_aux_loss" in warning for warning in result.warnings)
+    assert any("external_output" in warning for warning in result.warnings)
 
 
+def test_gb29435_2025_fluorocarbon_footnote_selects_table_three_or_table_two() -> None:
+    standard = _gb29435_published()
+    product = standard.products[27]
+    indicator = product.indicators[0]
+    process_key = product.input_definitions[0].key
+    direct = lambda process, value: EvaluationRequest(
+        evaluation_date=date(2027, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={process_key: InputValue(value=process), indicator.direct_input_key: InputValue(value=value, unit="tce/t")},
+    )
+    table3 = EvaluationEngine().evaluate(standard, direct("氧化焙烧-盐酸浸出", "0.66")).results[0]
+    table2 = EvaluationEngine().evaluate(standard, direct("浓硫酸强化焙烧", "1.38")).results[0]
+    assert table3.grade is Grade.LEVEL_1
+    assert table2.grade is Grade.LEVEL_1
+    missing = EvaluationEngine().evaluate(standard, EvaluationRequest(
+        evaluation_date=date(2027, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT, inputs={indicator.direct_input_key: InputValue(value="0.66", unit="tce/t")},
+    )).results[0]
+    assert missing.grade is Grade.INCOMPLETE
+
+def _gb30185_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-30185-2025.json").read_text(encoding="utf-8"))
+
+
+def _gb30185_published() -> StandardDefinition:
+    return _gb30185_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb30185_energy_lines(*, production: str = "2000", auxiliary: str = "1000", affiliated: str = "0") -> list[EnergyLine]:
+    return [
+        EnergyLine(line_id="production", energy_name="生产系统", category_key="production_system", amount=production, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="auxiliary", energy_name="辅助生产系统", category_key="auxiliary_system", amount=auxiliary, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="affiliated", energy_name="附属生产系统", category_key="affiliated_system", amount=affiliated, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+    ]
+
+
+def test_gb30185_names_levels_and_citations_follow_standard() -> None:
+    standard = _gb30185_definition()
+    assert standard.number == "GB 30185-2025"
+    assert standard.title == "铝(塑)复合板单位产品能源消耗限额"
+    assert standard.effective_date == date(2026, 3, 1)
+    assert standard.lifecycle_status.value == "active"
+    assert len(standard.products) == 7
+    assert [product.name for product in standard.products] == [
+        "铝塑复合板—热压复合装饰板",
+        "铝塑复合板—化成涂装和热压复合",
+        "铝塑复合板—幕墙板热压复合",
+        "铝塑复合板—幕墙板化成涂装和热压复合",
+        "不燃铝复合板",
+        "装饰用铝单板—粉末喷涂",
+        "装饰用铝单板—液体喷涂",
+    ]
+    assert all(product.indicators[0].name == "单位产品综合能耗" for product in standard.products)
+    assert all(product.indicators[0].unit == "kgce/10^4m2" for product in standard.products)
+    assert [
+        [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value]
+        for product in standard.products for indicator in product.indicators
+    ] == [
+        ["2400", "3000", "4400"], ["3500", "5000", "6500"], ["2700", "3200", "4800"],
+        ["4400", "5600", "7600"], ["3200", "3900", "5400"], ["7000", "8500", "10200"],
+        ["12000", "14000", "17200"],
+    ]
+    assert {reference.page for product in standard.products for reference in product.indicators[0].source_references} >= {5, 6, 7, 8}
+
+
+def test_gb30185_direct_values_grade_at_level_one_boundary() -> None:
+    standard = _gb30185_published()
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 3, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value="2400", unit="kgce/10^4m2")},
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("2400")
+    assert result.grade is Grade.LEVEL_1
+
+
+def test_gb30185_detail_formula_uses_three_energy_systems_and_formula_two() -> None:
+    standard = _gb30185_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 3, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={}, energy_lines=_gb30185_energy_lines(),
+        production_lines=[ProductionLine(line_id="p", product_name=product.name, category_key="qualified", quantity="1", unit="10^4m2")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("3000")
+    assert result.grade is Grade.LEVEL_2
+    assert any(step.operation == "per_unit" and step.value == Decimal("3000") for step in result.calculation_trace)
+
+
+def test_gb30185_detail_missing_energy_system_is_incomplete() -> None:
+    standard = _gb30185_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 3, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={}, energy_lines=_gb30185_energy_lines()[:2],
+        production_lines=[ProductionLine(line_id="p", product_name=product.name, category_key="qualified", quantity="1", unit="10^4m2")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("energy.category.affiliated_system.net_standard_coal" in warning for warning in result.warnings)
 
 def _gb30182_definition() -> StandardDefinition:
     return StandardDefinition.model_validate_json((ROOT / "definitions/gb-30182-2013.json").read_text(encoding="utf-8"))
@@ -250,3 +370,16 @@ def test_gb30182_missing_direct_electricity_is_incomplete_only_for_electricity_i
     assert results[0].grade is Grade.LEVEL_1
     assert results[1].grade is Grade.INCOMPLETE
     assert any("direct_electricity" in warning for warning in results[1].warnings)
+
+
+
+
+def test_gb29435_replacement_is_reflected_in_active_scope() -> None:
+    scope = json.loads((ROOT / "scope-63.json").read_text(encoding="utf-8"))
+    assert "GB 29435-2025" in scope["standards"]
+    assert "GB 29435-2012" not in scope["standards"]
+    retired = ROOT / "retired-definitions/gb-29435-2012.json"
+    retired_definition = StandardDefinition.model_validate_json(retired.read_text(encoding="utf-8"))
+    assert retired_definition.lifecycle_status.value == "obsolete"
+    assert retired_definition.obsolete_date == date(2027, 1, 1)
+    assert retired_definition.replaced_by == ["GB 29435-2025"]

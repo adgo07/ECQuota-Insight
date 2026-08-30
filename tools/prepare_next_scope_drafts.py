@@ -26,16 +26,33 @@ ARCHIVE = ROOT / "work" / "archive-data-63"
 CURRENT = ROOT / "data"
 SOURCE = Path(r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本")
 
-# Standards explicitly confirmed as superseded.  The replacement is taken from
-# the current published catalog; old definitions are not copied into the active
-# isolated scope.  Keep this mapping auditable when future standards change.
+# Standards explicitly confirmed as superseded. Old definitions are not copied
+# into the active isolated scope; every replacement remains auditable.
 REPLACEMENTS = {
     "GB 29447-2022": "GB 29447-2026",
     "GB 29141-2012": "GB 29141-2024",
     "GB 29437-2012": "GB 29141-2024",
     "GB 29441-2012": "GB 29141-2024",
+    "GB 29435-2012": "GB 29435-2025",
 }
 
+# New source supplied after the released 46-standard data set was built. It is
+# injected only into the isolated draft workspace; the formal release catalog
+# remains unchanged until rule confirmation.
+EXTRA_CATALOG_ITEMS = {
+    "GB 29435-2025": {
+        "sequence": 22,
+        "id": "gb-29435-2025",
+        "number": "GB 29435-2025",
+        "title": "稀土冶炼企业单位产品能源消耗限额",
+        "publication_date": "2025-12-31",
+        "effective_date": "2027-01-01",
+        "remark": "代替GB 29435-2012",
+        "source_file": "【2027-01-01实施】22. GB+29435-2025 稀土冶炼企业单位产品能源消耗限额.pdf",
+        "source_sha256": "",
+        "status": "draft",
+    },
+}
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -223,6 +240,7 @@ def main() -> None:
     archive_catalog = json.loads((ARCHIVE / "catalog.json").read_text(encoding="utf-8"))
     current_catalog = json.loads((CURRENT / "catalog.json").read_text(encoding="utf-8"))
     current_by_number = {item["number"]: item for item in current_catalog["standards"]}
+    current_by_number.update({key: dict(value) for key, value in EXTRA_CATALOG_ITEMS.items()})
     rows: list[dict] = []
     for item in archive_catalog["standards"]:
         number = item["number"]
@@ -305,6 +323,21 @@ def main() -> None:
             target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             generated[number] = len(indicators)
 
+    # The 2025 revisions have full hand-transcribed rule builders so a fresh
+    # isolated workspace can reproduce the same drafts without relying on
+    # generic candidate rows or old-version data.
+    if any(item["number"] == "GB 29435-2025" for item in rows):
+        from refine_gb29435_2025_rule import build as build_gb29435_2025
+        item = next(item for item in rows if item["number"] == "GB 29435-2025")
+        target = definitions_dir / "gb-29435-2025.json"
+        definition = build_gb29435_2025(item["source_file"], item["source_sha256"])
+        target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if any(item["number"] == "GB 30185-2025" for item in rows):
+        from refine_gb30185_rule import build as build_gb30185_2025
+        item = next(item for item in rows if item["number"] == "GB 30185-2025")
+        target = definitions_dir / "gb-30185-2025.json"
+        definition = build_gb30185_2025(item["source_file"], item["source_sha256"])
+        target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     errors = []
     for path in sorted(definitions_dir.glob("*.json")):
         try:
