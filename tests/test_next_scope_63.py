@@ -492,3 +492,176 @@ def test_gb29435_replacement_is_reflected_in_active_scope() -> None:
     assert retired_definition.lifecycle_status.value == "obsolete"
     assert retired_definition.obsolete_date == date(2027, 1, 1)
     assert retired_definition.replaced_by == ["GB 29435-2025"]
+
+
+def _gb31823_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json(
+        (ROOT / "definitions/gb-31823-2021.json").read_text(encoding="utf-8")
+    )
+
+
+def _gb31823_published() -> StandardDefinition:
+    return _gb31823_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb31823_energy_lines(*, production: str = "0", auxiliary: str = "0", affiliated: str = "0", pipeline_heat: str = "0") -> list[EnergyLine]:
+    return [
+        EnergyLine(line_id="production", energy_name="生产系统", category_key="production_system", amount=production, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="auxiliary", energy_name="辅助生产系统", category_key="auxiliary_system", amount=auxiliary, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="affiliated", energy_name="附属生产系统", category_key="affiliated_system", amount=affiliated, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="pipeline-heat", energy_name="管道伴热", category_key="pipeline_heat", amount=pipeline_heat, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+    ]
+
+
+def test_gb31823_names_levels_and_citations_follow_standard() -> None:
+    standard = _gb31823_definition()
+    assert standard.number == "GB 31823-2021"
+    assert standard.title == "码头作业单位产品能源消耗限额"
+    assert standard.effective_date == date(2022, 11, 1)
+    assert standard.lifecycle_status.value == "active"
+    assert standard.supersedes == ["GB 31823-2015", "GB 31827-2015"]
+    assert [product.name for product in standard.products] == ["集装箱码头", "干散货码头", "原油码头"]
+    assert all(product.indicators[0].name == "单位产品可比综合能耗" for product in standard.products)
+    assert [product.indicators[0].unit for product in standard.products] == ["tce/10^4TEU", "tce/10^4t", "tce/10^4t"]
+    assert [
+        [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value]
+        for product in standard.products for indicator in product.indicators
+    ] == [["24", "28", "45"], ["1.8", "2.0", "2.7"], ["0.36", "0.51", "0.88"]]
+    assert {reference.page for product in standard.products for reference in product.indicators[0].source_references} >= {4, 5, 6, 7, 8, 9, 10}
+
+
+def test_gb31823_direct_level_one_boundaries() -> None:
+    standard = _gb31823_published()
+    engine = EvaluationEngine()
+    for product in standard.products:
+        indicator = product.indicators[0]
+        request = EvaluationRequest(
+            evaluation_date=date(2022, 11, 1),
+            standard_id=standard.id,
+            product_id=product.id,
+            input_mode=InputMode.DIRECT,
+            inputs={indicator.direct_input_key: InputValue(value=indicator.thresholds.level_1.value, unit=indicator.unit)},
+        )
+        result = engine.evaluate(standard, request).results[0]
+        assert result.actual_value == Decimal(indicator.thresholds.level_1.value)
+        assert result.grade is Grade.LEVEL_1
+
+
+def test_gb31823_container_detail_uses_adaptation_factor_and_teu_throughput() -> None:
+    standard = _gb31823_published()
+    product = standard.products[0]
+    base_inputs = {"condition.GB31823.container.adaptation_degree": InputValue(value="2", unit="ratio")}
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs=base_inputs,
+        energy_lines=_gb31823_energy_lines(production="24000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="集装箱吞吐量", quantity="1", unit="10^4TEU")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("24")
+    assert result.grade is Grade.LEVEL_1
+    adjusted = request.model_copy(update={"inputs": {"condition.GB31823.container.adaptation_degree": InputValue(value="2.5", unit="ratio")}})
+    adjusted_result = EvaluationEngine().evaluate(standard, adjusted).results[0]
+    assert adjusted_result.actual_value == Decimal("22.8")
+    assert any("a=0.95" in step.label for step in adjusted_result.calculation_trace)
+
+
+def test_gb31823_dry_bulk_detail_uses_g_k_and_c_corrections() -> None:
+    standard = _gb31823_published()
+    product = standard.products[1]
+    inputs = {
+        "condition.GB31823.dry_bulk.portal_crane": InputValue(value=False),
+        "condition.GB31823.dry_bulk.direct_to_factory": InputValue(value=False),
+        "condition.GB31823.dry_bulk.unloading_share": InputValue(value="0.5", unit="fraction"),
+        "condition.GB31823.dry_bulk.work_line_length": InputValue(value="500", unit="m"),
+        "condition.GB31823.dry_bulk.heating_region": InputValue(value="采暖地区"),
+    }
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs=inputs,
+        energy_lines=_gb31823_energy_lines(production="1000", auxiliary="500"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="干散货吞吐量", quantity="1", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    expected = (Decimal("1") / (Decimal("1.4") * Decimal("0.5") + Decimal("0.04")) * Decimal("1.1") + Decimal("0.5")) * Decimal("0.95")
+    assert result.actual_value == expected
+    assert result.grade is Grade.LEVEL_2
+    assert any("g=1/(1.4w+0.04)" in step.label for step in result.calculation_trace)
+
+
+def test_gb31823_dry_bulk_portal_crane_branch_does_not_require_unloading_share() -> None:
+    standard = _gb31823_published()
+    product = standard.products[1]
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "condition.GB31823.dry_bulk.portal_crane": InputValue(value=True),
+            "condition.GB31823.dry_bulk.work_line_length": InputValue(value="500", unit="m"),
+            "condition.GB31823.dry_bulk.heating_region": InputValue(value="非采暖地区"),
+        },
+        energy_lines=_gb31823_energy_lines(production="1000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="干散货吞吐量", quantity="1", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("1.1")
+    assert result.grade is Grade.LEVEL_1
+
+
+def test_gb31823_dry_bulk_missing_conditional_inputs_is_incomplete() -> None:
+    standard = _gb31823_published()
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=standard.products[1].id,
+        input_mode=InputMode.DETAIL,
+        inputs={"condition.GB31823.dry_bulk.portal_crane": InputValue(value=False)},
+        energy_lines=_gb31823_energy_lines(production="1000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="干散货吞吐量", quantity="1", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("direct_to_factory" in warning for warning in result.warnings)
+
+
+def test_gb31823_crude_oil_detail_uses_pipeline_heat_beta() -> None:
+    standard = _gb31823_published()
+    product = standard.products[2]
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={"condition.GB31823.crude_oil.pipeline_heat_temperature": InputValue(value="0", unit="℃")},
+        energy_lines=_gb31823_energy_lines(production="3000", auxiliary="500", pipeline_heat="1000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="原油吞吐量", quantity="10", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("0.445")
+    assert result.grade is Grade.LEVEL_2
+    assert any("βt×Ebp" in step.label for step in result.calculation_trace)
+
+
+def test_gb31823_crude_oil_missing_pipeline_heat_is_incomplete() -> None:
+    standard = _gb31823_published()
+    product = standard.products[2]
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={"condition.GB31823.crude_oil.pipeline_heat_temperature": InputValue(value="5", unit="℃")},
+        energy_lines=_gb31823_energy_lines(production="3000", auxiliary="500", pipeline_heat="0")[:3],
+        production_lines=[ProductionLine(line_id="throughput", product_name="原油吞吐量", quantity="10", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("pipeline_heat" in warning for warning in result.warnings)
+
+
+def test_gb31823_crude_oil_missing_temperature_is_incomplete() -> None:
+    standard = _gb31823_published()
+    product = standard.products[2]
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={},
+        energy_lines=_gb31823_energy_lines(production="3000", auxiliary="500", pipeline_heat="1000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="原油吞吐量", quantity="10", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("pipeline_heat_temperature" in warning for warning in result.warnings)

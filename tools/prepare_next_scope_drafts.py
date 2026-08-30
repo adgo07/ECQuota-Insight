@@ -85,7 +85,15 @@ REPLACEMENT_CORRECTIONS = [
         "reason": "按现行强制文本封面和前言记录替代关系；新规则保留draft，确认后再发布。",
         "source": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
     },
-]
+    {
+        "id": "CAT-REPLACE-31823-2021",
+        "standard_number": "GB 31823-2021",
+        "fields": ["number", "title", "remark", "scope"],
+        "original": {"number": "GB 31823-2015、GB 31827-2015", "title": "集装箱码头/干散货码头单位产品能源消耗限额", "remark": "", "scope": "旧版分别管理集装箱和干散货码头"},
+        "corrected": {"number": "GB 31823-2021", "title": "码头作业单位产品能源消耗限额", "remark": "代替GB 31823-2015、GB 31827-2015", "scope": "专业化集装箱、干散货（煤炭/矿石）、原油码头"},
+        "reason": "按现行强制文本封面和前言记录替代关系；新规则保留draft，确认后再发布。",
+        "source": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+    },]
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -382,6 +390,12 @@ def main() -> None:
         item = next(item for item in rows if item["number"] == "GB 30185-2025")
         target = definitions_dir / "gb-30185-2025.json"
         definition = build_gb30185_2025(item["source_file"], item["source_sha256"])
+        target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if any(item["number"] == "GB 31823-2021" for item in rows):
+        from refine_gb31823_rule import build as build_gb31823_2021
+        item = next(item for item in rows if item["number"] == "GB 31823-2021")
+        target = definitions_dir / "gb-31823-2021.json"
+        definition = build_gb31823_2021(item["source_file"], item["source_sha256"])
         target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     errors = []
     for path in sorted(definitions_dir.glob("*.json")):

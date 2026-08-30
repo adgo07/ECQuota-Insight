@@ -509,11 +509,16 @@ class EvaluationEngine:
             }
             required_definitions.update({definition.key: definition for definition in indicator.input_definitions})
             for definition in required_definitions.values():
+                # Skip definitions that belong only to the other input mode
+                # before evaluating required_if. Otherwise direct entry can
+                # incorrectly require a detail-only selector.
+                if not definition.required or input_mode not in definition.modes:
+                    continue
                 condition_met = (
                     definition.required_if is None
                     or self.conditions.evaluate(definition.required_if, context)
                 )
-                if definition.required and condition_met and input_mode in definition.modes:
+                if condition_met:
                     context.require(definition.key)
 
             if input_mode is InputMode.DIRECT:
