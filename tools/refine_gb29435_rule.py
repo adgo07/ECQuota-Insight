@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-"""Refine the 31 product rows of GB 29435-2012.
+"""Build an auditable draft model for GB 29435-2012.
 
-The source tables provide three limits for every product: advanced (level 1),
-access (level 2) and existing (level 3).  This script gives each row its
-product name and models the standard's tce/t result from the engine's kgce
-energy input.  The definition deliberately remains ``draft`` until the
-confirmation workbook is completed and independently reviewed.
+The rule stays draft until the 31 product rows and the energy-allocation input
+categories are independently confirmed against the source standard.
 """
 
 import argparse
@@ -14,7 +11,6 @@ import json
 from pathlib import Path
 
 from uebench.domain.models import StandardDefinition
-
 
 NUMBER = "GB 29435-2012"
 
@@ -29,114 +25,112 @@ def node(op: str, *, value: str | None = None, input_key: str | None = None,
     }
 
 
+def inp(key: str, unit: str | None = None, label: str | None = None) -> dict:
+    return node("input", input_key=key, unit=unit, label=label)
+
+
+def const(value: str, unit: str | None = None) -> dict:
+    return node("constant", value=value, unit=unit)
+
+
+def add(*args: dict, unit: str | None = None, label: str | None = None) -> dict:
+    return node("add", args=list(args), unit=unit, label=label)
+
+
+def div(left: dict, right: dict, unit: str | None = None, label: str | None = None) -> dict:
+    return node("divide", args=[left, right], unit=unit, label=label)
+
+
+def input_definition(key: str, label: str, unit: str, *, modes: list[str], minimum: str | None = None) -> dict:
+    return {
+        "key": key, "label": label, "data_type": "decimal", "unit": unit,
+        "required": True, "required_if": None, "modes": modes,
+        "minimum": minimum, "maximum": None, "choices": [],
+        "description": "按GB 29435-2012第5.1、5.2节录入；尚未确认前仅作草案。",
+    }
+
+
 def refine(data_dir: Path) -> Path:
     path = data_dir / "definitions" / "gb-29435-2012.json"
-    original = json.loads(path.read_text(encoding="utf-8"))
-    if original.get("number") != NUMBER:
-        raise ValueError(f"规则文件标准号不符：{original.get('number')}")
-
-    # Table 1 (existing), Table 2 (access) and Table 3 (advanced), in the
-    # exact row order of the standard.  Values are tce/t.
-    rows = [
-        ("lanthanum-oxide", "氧化镧", ("2.19", "2.31", "2.54")),
-        ("cerium-oxide", "氧化铈", ("2.47", "2.60", "2.86")),
-        ("praseodymium-oxide", "氧化镨", ("2.49", "2.62", "2.88")),
-        ("neodymium-oxide", "氧化钕", ("2.45", "2.58", "2.84")),
-        ("samarium-oxide", "氧化钐", ("2.25", "2.37", "2.61")),
-        ("europium-oxide", "氧化铕", ("2.58", "2.72", "2.99")),
-        ("gadolinium-oxide", "氧化钆", ("1.94", "2.04", "2.25")),
-        ("terbium-oxide", "氧化铽", ("2.16", "2.27", "2.50")),
-        ("dysprosium-oxide", "氧化镝", ("2.16", "2.27", "2.50")),
-        ("holmium-oxide", "氧化钬", ("1.98", "2.08", "2.29")),
-        ("erbium-oxide", "氧化铒", ("1.97", "2.07", "2.27")),
-        ("thulium-oxide", "氧化铥", ("2.02", "2.13", "2.35")),
-        ("ytterbium-oxide", "氧化镱", ("2.09", "2.20", "2.41")),
-        ("rare-earth-tricolor-red", "灯用稀土三基色荧光粉（红）", ("0.81", "0.85", "0.94")),
-        ("rare-earth-tricolor-green", "灯用稀土三基色荧光粉（绿）", ("2.67", "2.81", "3.09")),
-        ("rare-earth-tricolor-blue", "灯用稀土三基色荧光粉（蓝）", ("3.87", "4.07", "4.48")),
-        ("lutetium-oxide", "氧化镥", ("2.18", "2.29", "2.52")),
-        ("yttrium-oxide", "氧化钇", ("2.06", "2.17", "2.39")),
-        ("yttrium-europium-oxide", "荧光级氧化钇铕", ("1.96", "2.06", "2.26")),
-        ("praseodymium-neodymium-oxide", "镨钕氧化物", ("2.35", "2.47", "2.71")),
-        ("lanthanum-metal", "金属镧", ("1.32", "1.39", "1.53")),
-        ("cerium-metal", "金属铈", ("1.10", "1.16", "1.28")),
-        ("praseodymium-metal", "金属镨", ("1.23", "1.29", "1.42")),
-        ("neodymium-metal", "金属钕", ("1.15", "1.21", "1.33")),
-        ("samarium-metal", "金属钐", ("3.15", "3.32", "3.65")),
-        ("dysprosium-metal", "金属镝", ("2.24", "2.36", "2.60")),
-        ("praseodymium-neodymium-alloy", "镨钕合金", ("1.23", "1.29", "1.42")),
-        ("gadolinium-iron-alloy", "钆铁合金", ("1.31", "1.38", "1.52")),
-        ("dysprosium-iron-alloy", "镝铁合金", ("1.37", "1.44", "1.58")),
-        ("mixed-rare-earth-metal", "混合稀土金属", ("1.62", "1.70", "1.87")),
-        ("rare-earth-polishing-powder", "稀土抛光粉", ("1.56", "1.64", "1.80")),
+    definition = json.loads(path.read_text(encoding="utf-8"))
+    if definition.get("number") != NUMBER:
+        raise ValueError(f"规则文件标准号不符：{definition.get('number')}")
+    source_file = definition["source_file"]
+    source_sha = definition["source_sha256"]
+    refs = [
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 4, "clause": "4.1～4.2", "table": "表1、表2",
+         "note": "现有企业限定值和新建企业准入值；分别作为3级和2级基础限额。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 5, "clause": "4.3", "table": "表3",
+         "note": "先进值作为1级基础限额。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 6, "clause": "5.1.1～5.1.7", "table": "式（1）",
+         "note": "企业生产能耗统计范围、外销/生活/建设能耗扣除、余热和分摊原则。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 7, "clause": "5.2.1～5.2.3", "table": "式（2）～（4）",
+         "note": "工序实物单耗、能源单耗和综合能源单耗计算方法。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 8, "clause": "5.3.1～5.3.8", "table": "计算范围",
+         "note": "各类稀土产品的工艺计算范围和适用生产方法。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 10, "clause": "附录A", "table": "表A.1",
+         "note": "常用能源折标准煤参考系数。"},
+        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
+         "page": 11, "clause": "附录B", "table": "表B.1",
+         "note": "耗能工质能源等价值参考值。"},
     ]
-    if len(original.get("products", [])) != len(rows):
-        raise ValueError("原规则产品行数不是31，拒绝静默覆盖")
-
-    source_file, source_sha = original["source_file"], original["source_sha256"]
-    references = [
-        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
-         "page": 4, "clause": "第4章、表1、表2", "table": "表1、表2",
-         "note": "表1为现有水平、表2为准入值；本规则按表中产品行逐一映射。"},
-        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
-         "page": 5, "clause": "第4章、表3", "table": "表3",
-         "note": "表3为先进值；等级比较方向为单位产品综合能耗越低越好。"},
-        {"standard_number": NUMBER, "source_file": source_file, "source_sha256": source_sha,
-         "page": 7, "clause": "5.2、6.1～6.3", "table": "公式及统计范围",
-         "note": "综合能耗按标准规定的生产系统边界折标后除以合格产品产量；具体工序边界仍需复核。"},
-    ]
-
-    products: list[dict] = []
-    for product_id, name, levels in rows:
-        actual_key = f"actual.GB_29435_2012.{product_id}.energy"
-        energy = node("input", input_key="energy.total_standard_coal", unit="kgce",
-                      label="统计期综合能耗（标准煤）")
-        production = node("input", input_key="production.total_equivalent", unit="t",
-                          label=f"{name}合格产品产量")
-        # The domain engine stores standard coal in kgce; the standard table
-        # reports tce/t, so divide the energy numerator by 1000 first.
-        detail = node("divide", args=[
-            node("divide", args=[energy, node("constant", value="1000", unit="kgce/tce")],
-                 unit="tce", label="综合能耗折算为吨标准煤"),
-            production], unit="tce/t", label=f"{name}单位产品综合能耗（第5.2节）")
-        defs = [{
-            "key": actual_key, "label": f"{name}单位产品综合能耗实际值",
-            "data_type": "decimal", "unit": "tce/t", "required": True,
-            "required_if": None, "modes": ["DIRECT"], "minimum": "0",
-            "maximum": None, "choices": [],
-            "description": f"直接录入按GB 29435-2012第5章核算的{name}单位产品综合能耗。",
-        }]
+    products = []
+    for original_product in definition.get("products", []):
+        product_name = original_product["name"]
+        original_indicator = original_product["indicators"][0]
+        direct_key = f"actual.GB_29435_2012.{original_product['id']}.comprehensive_energy"
+        direct_def = input_definition(direct_key, f"{product_name}单位产品综合能耗实际值", "tce/t", modes=["DIRECT"], minimum="0")
+        production = inp("production.total_equivalent", "t", "合格产品产量 P_z")
+        direct_energy = inp("energy.category.direct_process.net_standard_coal", "tce", "工序直接综合能耗 E_H（折标准煤）")
+        indirect_energy = inp("energy.category.indirect_aux_loss.net_standard_coal", "tce", "间接辅助能耗及损耗分摊量")
+        direct_unit = div(direct_energy, production, unit="tce/t", label="工序能源单耗 E_I（公式3）")
+        indirect_unit = div(indirect_energy, production, unit="tce/t", label="间接辅助能耗单耗 E_F")
+        detail_formula = add(direct_unit, indirect_unit, unit="tce/t", label=f"{product_name}综合能源单耗 E_Z（公式4）")
         indicator = {
-            "id": f"GB_29435_2012.{product_id}.comprehensive-energy",
-            "name": f"{name}单位产品综合能耗", "unit": "tce/t", "comparison": "lte",
-            "input_definitions": defs, "applicability": {"op": "always"},
-            "direct_input_key": actual_key, "detail_formula": detail,
-            "base_thresholds": {f"level_{i}": node("constant", value=value, unit="tce/t")
-                                for i, value in enumerate(levels, 1)},
-            "thresholds": {f"level_{i}": node("constant", value=value, unit="tce/t")
-                           for i, value in enumerate(levels, 1)},
-            "display_places": 2, "source_references": references,
-            "notes": ["candidate_from_original_pdf", "not_for_formal_evaluation",
-                      "requires_independent_review",
-                      "product_name_and_three_levels_transcribed_from_tables_1_2_3",
-                      "production_boundary_and_qualified_output_definition_require_clause_5_review"],
+            "id": original_indicator["id"],
+            "name": "单位产品综合能耗",
+            "unit": "tce/t",
+            "comparison": "lte",
+            "input_definitions": [direct_def],
+            "applicability": {"op": "always"},
+            "direct_input_key": direct_key,
+            "detail_formula": detail_formula,
+            "base_thresholds": {f"level_{i}": const(v, "tce/t") for i, v in enumerate((original_indicator["base_thresholds"][f"level_{i}"]["value"] for i in (1, 2, 3)), 1)},
+            "thresholds": {f"level_{i}": const(v, "tce/t") for i, v in enumerate((original_indicator["thresholds"][f"level_{i}"]["value"] for i in (1, 2, 3)), 1)},
+            "display_places": 2,
+            "source_references": refs,
+            "notes": [
+                "candidate_from_original_pdf", "not_for_formal_evaluation", "requires_independent_review",
+                "等级映射：先进值=1级，新建准入值=2级，现有企业限定值=3级。",
+                "明细模式按公式（3）和（4）计算：直接工序能耗与间接辅助/损耗分摊量分别除以合格产品产量后相加。",
+                "能源明细应把外销能源、生活用能、工程建设用能排除；同一生产线多产品无法分别计量时，按原文5.1.7的稀土金属含量比例分摊。",
+                "本草案将direct_process和indirect_aux_loss作为录入分类；分类边界和余热抵扣方式需独立复核。",
+            ],
         }
-        products.append({"id": product_id, "name": name,
-                         "description": f"GB 29435-2012表1～表3的{name}产品行。",
-                         "input_definitions": [], "indicators": [indicator]})
-
-    original["products"] = products
-    original["publication_status"] = "draft"
-    StandardDefinition.model_validate(original)
-    path.write_text(json.dumps(original, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        products.append({
+            "id": original_product["id"], "name": product_name,
+            "description": f"{product_name}；按原文第5.3节对应工艺范围统计。现有企业按3级限定值，新建企业按2级准入值。",
+            "input_definitions": [], "indicators": [indicator],
+        })
+    definition["products"] = products
+    definition["publication_status"] = "draft"
+    StandardDefinition.model_validate(definition)
+    path.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return path
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="精化GB 29435-2012草案规则（仍为draft）")
-    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-65/data"))
+    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-63/data"))
     args = parser.parse_args()
-    print(f"已精化 {NUMBER} 草案规则：{refine(args.data_dir.resolve())}")
+    path = refine(args.data_dir.resolve())
+    print(f"已精化 {NUMBER} 草案规则：{path}")
 
 
 if __name__ == "__main__":
