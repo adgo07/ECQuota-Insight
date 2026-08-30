@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.polysilicon-trichlorosilane.comprehensive-energy",
-          "name": "硅多晶（三氯氢硅法）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -190,7 +190,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.polysilicon-silane-fluidized-bed.comprehensive-energy",
-          "name": "硅多晶（硅烷流化床法）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -362,7 +362,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.high-purity-germanium-tetrachloride.comprehensive-energy",
-          "name": "高纯四氯化锗单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -534,7 +534,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.high-purity-germanium-dioxide.comprehensive-energy",
-          "name": "高纯二氧化锗单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -706,7 +706,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.zone-melting-germanium-ingot.comprehensive-energy",
-          "name": "区熔锗锭单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -878,7 +878,7 @@
       "indicators": [
         {
           "id": "GB_29447-2026.germanium-single-crystal.comprehensive-energy",
-          "name": "锗单晶单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [

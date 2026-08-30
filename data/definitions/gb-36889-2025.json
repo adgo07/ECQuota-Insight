@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-polymerization",
-          "name": "聚酯涤纶/聚合/聚酯熔体或切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -192,7 +192,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-solid-phase",
-          "name": "聚酯涤纶/固相增黏/高黏度切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -366,7 +366,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-liquid-phase",
-          "name": "聚酯涤纶/液相增黏/高黏度熔体",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -540,7 +540,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-melt-poy",
-          "name": "聚酯涤纶/熔体直接纺丝/预取向丝(POY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -714,7 +714,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-melt-fdy",
-          "name": "聚酯涤纶/熔体直接纺丝/全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -888,7 +888,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-melt-industrial",
-          "name": "聚酯涤纶/熔体直接纺丝/工业长丝",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1062,7 +1062,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-melt-staple",
-          "name": "聚酯涤纶/熔体直接纺丝/短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1236,7 +1236,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-chip-poy",
-          "name": "聚酯涤纶/切片纺丝/预取向丝(POY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1410,7 +1410,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-chip-fdy",
-          "name": "聚酯涤纶/切片纺丝/全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1584,7 +1584,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-chip-industrial",
-          "name": "聚酯涤纶/切片纺丝/工业长丝",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1758,7 +1758,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-chip-staple",
-          "name": "聚酯涤纶/切片纺丝/短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1932,7 +1932,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-dty-low-pressure",
-          "name": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力不大于0.12 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2106,7 +2106,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-dty-mid-pressure",
-          "name": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力小于0.35 MPa、大于0.12 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2280,7 +2280,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polyester-dty-high-pressure",
-          "name": "聚酯涤纶/加弹/拉伸变形丝(DTY)(网络喷嘴压力不小于0.35 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2454,7 +2454,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-chip",
-          "name": "循环再利用涤纶(物理法、物理化学法)/切片(瓶片到切片)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2628,7 +2628,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-poy",
-          "name": "循环再利用涤纶/预取向丝(POY)(瓶片纺/切片纺)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2802,7 +2802,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-fdy-bottle",
-          "name": "循环再利用涤纶/全拉伸丝(FDY)/瓶片纺",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2976,7 +2976,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-fdy-chip",
-          "name": "循环再利用涤纶/全拉伸丝(FDY)/切片纺",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3150,7 +3150,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-dty-low",
-          "name": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力不大于0.12 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3324,7 +3324,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-dty-mid",
-          "name": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力小于0.35 MPa、大于0.12 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3498,7 +3498,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-dty-high",
-          "name": "循环再利用涤纶/拉伸变形丝(DTY)(网络喷嘴压力不小于0.35 MPa)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3672,7 +3672,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.recycled-staple",
-          "name": "循环再利用涤纶/短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3846,7 +3846,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bottle-polyester-chip",
-          "name": "瓶用聚酯/瓶用聚酯切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4020,7 +4020,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.viscose-staple",
-          "name": "粘胶纤维/粘胶短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4194,7 +4194,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.viscose-modal",
-          "name": "粘胶纤维/莫代尔短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4368,7 +4368,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.viscose-filament",
-          "name": "粘胶纤维/粘胶长丝",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4542,7 +4542,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-civil-chip",
-          "name": "锦纶6/聚合/民用切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4716,7 +4716,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-industrial-chip",
-          "name": "锦纶6/聚合/工业用切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4890,7 +4890,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-poy-hoy",
-          "name": "锦纶6/纺丝/预取向丝(POY)、高取向丝(HOY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5064,7 +5064,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-fdy",
-          "name": "锦纶6/纺丝/全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5238,7 +5238,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-industrial",
-          "name": "锦纶6/纺丝/工业长丝",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5412,7 +5412,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.nylon6-dty",
-          "name": "锦纶6/加弹/拉伸变形丝(DTY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5586,7 +5586,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.spandex-dry",
-          "name": "氨纶(干法纺丝)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5760,7 +5760,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.vinylon-high-strength",
-          "name": "维纶/高强高模聚乙烯醇超短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5934,7 +5934,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.vinylon-water-soluble",
-          "name": "维纶/水溶性聚乙烯醇短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6108,7 +6108,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.acrylic-dmac",
-          "name": "腈纶(DMAc湿法二步法)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6282,7 +6282,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polypropylene-fdy",
-          "name": "丙纶/丙纶全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6456,7 +6456,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polypropylene-bcf",
-          "name": "丙纶/丙纶膨体长丝(BCF)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6630,7 +6630,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.polypropylene-staple",
-          "name": "丙纶/丙纶短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6804,7 +6804,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.uhmwpe-halogen",
-          "name": "超高分子量聚乙烯纤维(湿法纺丝)/卤化烃萃取剂",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6978,7 +6978,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.uhmwpe-hydrocarbon",
-          "name": "超高分子量聚乙烯纤维(湿法纺丝)/碳氢萃取剂",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7152,7 +7152,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bicomponent-polymer",
-          "name": "双组分复合纤维/双组分聚合熔体/切片",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7326,7 +7326,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bicomponent-melt-poy",
-          "name": "双组分复合纤维/熔体直接纺/预取向丝(POY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7500,7 +7500,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bicomponent-melt-fdy",
-          "name": "双组分复合纤维/熔体直接纺/全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7674,7 +7674,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bicomponent-chip-poy",
-          "name": "双组分复合纤维/切片纺/预取向丝(POY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7848,7 +7848,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.bicomponent-chip-fdy",
-          "name": "双组分复合纤维/切片纺/全拉伸丝(FDY)",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8022,7 +8022,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.pe-pet-staple",
-          "name": "聚乙烯/聚对苯二甲酸乙二醇酯(PE/PET)复合短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8196,7 +8196,7 @@
       "indicators": [
         {
           "id": "GB_36889-2025.lmpet-pet-staple",
-          "name": "低熔点聚酯(LMPET)/聚酯(PET)复合短纤维",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

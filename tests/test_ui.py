@@ -87,3 +87,22 @@ def test_result_view_shows_grade_count_without_overall_grade(tmp_path: Path, mon
     assert "不生成总体等级" in window.eval_summary.text()
     window.close()
     context.database.dispose()
+
+def test_duplicate_product_names_show_indicator_hint(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    standard = make_standard()
+    duplicate = standard.products[0].model_copy(deep=True)
+    duplicate.id = "product-2"
+    duplicate.name = standard.products[0].name
+    duplicate.indicators[0].id = "energy-2"
+    duplicate.indicators[0].name = "单位产品电耗"
+    standard.products.append(duplicate)
+    context.standards.install(standard)
+    window = MainWindow(context)
+    labels = [window.eval_product.itemText(index) for index in range(window.eval_product.count())]
+    assert any("测试产品（指标：单位产品能耗）" == label for label in labels)
+    assert any("测试产品（指标：单位产品电耗）" == label for label in labels)
+    assert [window.eval_product.itemData(index) for index in range(window.eval_product.count())] == ["product", "product-2"]
+    window.close()
+    context.database.dispose()

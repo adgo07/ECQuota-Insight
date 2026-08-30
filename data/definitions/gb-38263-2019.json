@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "manual-candidate-1",
-      "name": "预制混凝土桩单位产品综合能耗",
+      "name": "预制混凝土桩",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_1",
-          "name": "预制混凝土桩单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "manual-candidate-2",
-      "name": "环形混凝土电杆单位产品综合能耗",
+      "name": "环形混凝土电杆",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_2",
-          "name": "环形混凝土电杆单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "manual-candidate-3",
-      "name": "混凝土和钢筋混凝土排水管单位产品综合能耗",
+      "name": "混凝土和钢筋混凝土排水管",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_3",
-          "name": "混凝土和钢筋混凝土排水管单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "manual-candidate-4",
-      "name": "预应力钢筒混凝土管单位产品综合能耗",
+      "name": "预应力钢筒混凝土管",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_4",
-          "name": "预应力钢筒混凝土管单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "manual-candidate-5",
-      "name": "加气混凝土单位产品综合能耗",
+      "name": "加气混凝土",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_5",
-          "name": "加气混凝土单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -877,13 +877,13 @@
     },
     {
       "id": "manual-candidate-6",
-      "name": "硅酸钙板单位产品综合能耗",
+      "name": "硅酸钙板",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_6",
-          "name": "硅酸钙板单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -1050,13 +1050,13 @@
     },
     {
       "id": "manual-candidate-7",
-      "name": "预制混凝土衬砌管片单位产品综合能耗",
+      "name": "预制混凝土衬砌管片",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_38263_2019.manual_candidate_7",
-          "name": "预制混凝土衬砌管片单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [

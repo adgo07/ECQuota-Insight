@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_29446-2019.coking-coal",
-          "name": "炼焦煤选煤企业选煤电力单耗",
+          "name": "电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
@@ -191,7 +191,7 @@
       "indicators": [
         {
           "id": "GB_29446-2019.power-coal",
-          "name": "动力煤选煤企业选煤电力单耗",
+          "name": "电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [

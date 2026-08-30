@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_45247-2025-power-1",
-      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供电煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.power-1",
-          "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -294,13 +294,13 @@
     },
     {
       "id": "gb_45247-2025-heat-1",
-      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供热煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.heat-1",
-          "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -468,13 +468,13 @@
     },
     {
       "id": "gb_45247-2025-power-2",
-      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供电煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.power-2",
-          "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -750,13 +750,13 @@
     },
     {
       "id": "gb_45247-2025-heat-2",
-      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供热煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.heat-2",
-          "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -924,13 +924,13 @@
     },
     {
       "id": "gb_45247-2025-power-3",
-      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供电煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.power-3",
-          "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -1206,13 +1206,13 @@
     },
     {
       "id": "gb_45247-2025-heat-3",
-      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供热煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.heat-3",
-          "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -1380,13 +1380,13 @@
     },
     {
       "id": "gb_45247-2025-power-4",
-      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供电煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.power-4",
-          "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -1662,13 +1662,13 @@
     },
     {
       "id": "gb_45247-2025-heat-4",
-      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供热煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.heat-4",
-          "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -1836,13 +1836,13 @@
     },
     {
       "id": "gb_45247-2025-power-5",
-      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供电煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.power-5",
-          "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -2118,13 +2118,13 @@
     },
     {
       "id": "gb_45247-2025-heat-5",
-      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供热煤耗率",
+      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45247-2025.heat-5",
-          "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [

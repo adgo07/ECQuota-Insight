@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_21258-2024-power-1",
-      "name": "燃煤发电机组（超超临界·1000MW）供电煤耗率",
+      "name": "燃煤发电机组（超超临界·1000MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-1",
-          "name": "燃煤发电机组（超超临界·1000MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -344,13 +344,13 @@
     },
     {
       "id": "gb_21258-2024-power-2",
-      "name": "燃煤发电机组（超超临界·600MW）供电煤耗率",
+      "name": "燃煤发电机组（超超临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-2",
-          "name": "燃煤发电机组（超超临界·600MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -676,13 +676,13 @@
     },
     {
       "id": "gb_21258-2024-power-3",
-      "name": "燃煤发电机组（超临界·600MW）供电煤耗率",
+      "name": "燃煤发电机组（超临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-3",
-          "name": "燃煤发电机组（超临界·600MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -1009,13 +1009,13 @@
     },
     {
       "id": "gb_21258-2024-power-4",
-      "name": "燃煤发电机组（超临界·300MW）供电煤耗率",
+      "name": "燃煤发电机组（超临界·300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-4",
-          "name": "燃煤发电机组（超临界·300MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -1342,13 +1342,13 @@
     },
     {
       "id": "gb_21258-2024-power-5",
-      "name": "燃煤发电机组（亚临界·600MW）供电煤耗率",
+      "name": "燃煤发电机组（亚临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-5",
-          "name": "燃煤发电机组（亚临界·600MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -1675,13 +1675,13 @@
     },
     {
       "id": "gb_21258-2024-power-6",
-      "name": "燃煤发电机组（亚临界·300MW）供电煤耗率",
+      "name": "燃煤发电机组（亚临界·300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-6",
-          "name": "燃煤发电机组（亚临界·300MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -2008,13 +2008,13 @@
     },
     {
       "id": "gb_21258-2024-power-7",
-      "name": "燃煤发电机组（超高压·200及以下MW）供电煤耗率",
+      "name": "燃煤发电机组（超高压·200及以下MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.power-7",
-          "name": "燃煤发电机组（超高压·200及以下MW）供电煤耗率",
+          "name": "供电煤耗率",
           "unit": "gce/(kW·h)",
           "comparison": "lte",
           "input_definitions": [
@@ -2222,13 +2222,13 @@
     },
     {
       "id": "gb_21258-2024-heat-1",
-      "name": "燃煤发电机组（超超临界·1000MW）供热煤耗率",
+      "name": "燃煤发电机组（超超临界·1000MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-1",
-          "name": "燃煤发电机组（超超临界·1000MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -2488,13 +2488,13 @@
     },
     {
       "id": "gb_21258-2024-heat-2",
-      "name": "燃煤发电机组（超超临界·600MW）供热煤耗率",
+      "name": "燃煤发电机组（超超临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-2",
-          "name": "燃煤发电机组（超超临界·600MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -2754,13 +2754,13 @@
     },
     {
       "id": "gb_21258-2024-heat-3",
-      "name": "燃煤发电机组（超临界·600MW）供热煤耗率",
+      "name": "燃煤发电机组（超临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-3",
-          "name": "燃煤发电机组（超临界·600MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -3020,13 +3020,13 @@
     },
     {
       "id": "gb_21258-2024-heat-4",
-      "name": "燃煤发电机组（超临界·300MW）供热煤耗率",
+      "name": "燃煤发电机组（超临界·300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-4",
-          "name": "燃煤发电机组（超临界·300MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -3286,13 +3286,13 @@
     },
     {
       "id": "gb_21258-2024-heat-5",
-      "name": "燃煤发电机组（亚临界·600MW）供热煤耗率",
+      "name": "燃煤发电机组（亚临界·600MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-5",
-          "name": "燃煤发电机组（亚临界·600MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [
@@ -3552,13 +3552,13 @@
     },
     {
       "id": "gb_21258-2024-heat-6",
-      "name": "燃煤发电机组（亚临界·300MW）供热煤耗率",
+      "name": "燃煤发电机组（亚临界·300MW）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21258-2024.heat-6",
-          "name": "燃煤发电机组（亚临界·300MW）供热煤耗率",
+          "name": "供热煤耗率",
           "unit": "kgce/GJ",
           "comparison": "lte",
           "input_definitions": [

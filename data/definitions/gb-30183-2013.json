@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_30183-2013-comparable-energy",
-      "name": "岩棉、矿渣棉及其制品单位产品可比综合能耗",
+      "name": "岩棉、矿渣棉及其制品",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_30183-2013.comparable-energy",
-          "name": "岩棉、矿渣棉及其制品单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_30183-2013-comparable-coke",
-      "name": "岩棉、矿渣棉及其制品单位产品可比熔融焦耗",
+      "name": "岩棉、矿渣棉及其制品",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_30183-2013.comparable-coke",
-          "name": "岩棉、矿渣棉及其制品单位产品可比熔融焦耗",
+          "name": "单位产品可比熔融焦耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

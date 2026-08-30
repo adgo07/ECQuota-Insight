@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_29445-2025-underground",
-      "name": "煤炭井工开采企业单位产品能耗",
+      "name": "煤炭井工开采企业",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29445-2025.underground",
-          "name": "煤炭井工开采企业单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_29445-2025-surface",
-      "name": "煤炭露天开采企业单位产品能耗",
+      "name": "煤炭露天开采企业",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29445-2025.surface",
-          "name": "煤炭露天开采企业单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

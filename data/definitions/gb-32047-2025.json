@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_32047-2025-beer",
-      "name": "啤酒单位产品综合能耗",
+      "name": "啤酒",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_32047-2025.beer",
-          "name": "啤酒单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kL",
           "comparison": "lte",
           "input_definitions": [

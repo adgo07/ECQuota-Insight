@@ -1,1426 +1,41 @@
 {
   "schema_version": "1.0",
-  "id": "gb-30251-2024",
-  "number": "GB 30251-2024",
-  "title": "炼化行业单位产品能源消耗限额",
-  "version": "2024",
+  "id": "gb-29141-2012",
+  "number": "GB 29141-2012",
+  "title": "工业硫酸单位产品能源消耗限额",
+  "version": "2012",
   "publication_status": "published",
-  "publication_date": "2024-04-29",
-  "effective_date": "2025-05-01",
-  "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-  "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
+  "publication_date": "2012-12-31",
+  "effective_date": "2013-10-01",
+  "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+  "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
   "products": [
     {
-      "id": "gb_30251-2024-refinery",
-      "name": "炼油",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "id": "manual-candidate-1",
+      "name": "硫磺单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
-          "id": "GB_30251-2024.refinery",
-          "name": "单位能量因数能耗",
-          "unit": "kgoe/(t·能量因数)",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.refinery",
-              "label": "炼油单位能量因数能耗实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/(t·能量因数)",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.refinery",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/(t·能量因数)",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "6.85",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "7.50",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "8.50",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "6.85",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "7.50",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "8.50",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/(t·能量因数)",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 7,
-              "clause": "第4章 能耗限额等级",
-              "table": "表1",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-ethylene",
-      "name": "乙烯装置",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.ethylene",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.ethylene",
-              "label": "乙烯装置单位产品综合能耗实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.ethylene",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "580",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "590",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "640",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "580",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "590",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "640",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 7,
-              "clause": "第4章 能耗限额等级",
-              "table": "表2",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-polypropylene-gas",
-      "name": "聚丙烯（连续气相法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.polypropylene-gas",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.polypropylene-gas",
-              "label": "聚丙烯单位产品综合能耗（连续气相法）实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.polypropylene-gas",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "48",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "54",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "79",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "48",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "54",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "79",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 7,
-              "clause": "第4章 能耗限额等级",
-              "table": "表3",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-polypropylene-liquid",
-      "name": "聚丙烯（连续液相本体法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.polypropylene-liquid",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.polypropylene-liquid",
-              "label": "聚丙烯单位产品综合能耗（连续液相本体法）实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.polypropylene-liquid",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "51",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "64",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "95",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "51",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "64",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "95",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 7,
-              "clause": "第4章 能耗限额等级",
-              "table": "表3",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-styrene-dehydrogenation",
-      "name": "苯乙烯（纯乙烯法、乙苯脱氢法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.styrene-dehydrogenation",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.styrene-dehydrogenation",
-              "label": "苯乙烯单位产品综合能耗（纯乙烯法、乙苯脱氢法）实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.styrene-dehydrogenation",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "238",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "260",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "362",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "238",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "260",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "362",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 8,
-              "clause": "第4章 能耗限额等级",
-              "table": "表4",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-styrene-dry-gas",
-      "name": "苯乙烯（干气法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.styrene-dry-gas",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.styrene-dry-gas",
-              "label": "苯乙烯单位产品综合能耗（干气法）实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.styrene-dry-gas",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "424",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "480",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "545",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "424",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "480",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "545",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 8,
-              "clause": "第4章 能耗限额等级",
-              "table": "表4",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-styrene-cooxidation",
-      "name": "苯乙烯（乙苯共氧化法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.styrene-cooxidation",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.styrene-cooxidation",
-              "label": "苯乙烯单位产品综合能耗（乙苯共氧化法）实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.styrene-cooxidation",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "270",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "315",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "320",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "270",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "315",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "320",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 8,
-              "clause": "第4章 能耗限额等级",
-              "table": "表4",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-p-xylene",
-      "name": "对二甲苯",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.p-xylene",
-          "name": "单位产品综合能耗",
-          "unit": "kgoe/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.p-xylene",
-              "label": "对二甲苯单位产品综合能耗实际值",
-              "data_type": "decimal",
-              "unit": "kgoe/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.p-xylene",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgoe/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "370",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "380",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "550",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": {
-              "op": "constant",
-              "value": "370",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_2": {
-              "op": "constant",
-              "value": "380",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            },
-            "level_3": {
-              "op": "constant",
-              "value": "550",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgoe/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 8,
-              "clause": "第4章 能耗限额等级",
-              "table": "表5",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-propylene-oxide-chlorohydrin",
-      "name": "环氧丙烷（氯醇法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.propylene-oxide-chlorohydrin",
-          "name": "单位产品综合能耗",
+          "id": "GB_29141_2012.manual_candidate_1",
+          "name": "硫磺单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
             {
-              "key": "actual.propylene-oxide-chlorohydrin",
-              "label": "环氧丙烷单位产品综合能耗（氯醇法）实际值",
+              "key": "actual.GB_29141_2012.manual_1",
+              "label": "硫磺单位产品综合能耗实际值",
               "data_type": "decimal",
               "unit": "kgce/t",
               "required": true,
               "required_if": null,
               "modes": [
-                "DIRECT",
-                "DETAIL"
+                "DIRECT"
               ],
-              "minimum": "0",
+              "minimum": null,
               "maximum": null,
               "choices": [],
-              "description": null
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
             }
           ],
           "applicability": {
@@ -1434,7 +49,7 @@
             "include_maximum": true,
             "args": []
           },
-          "direct_input_key": "actual.propylene-oxide-chlorohydrin",
+          "direct_input_key": "actual.GB_29141_2012.manual_1",
           "detail_formula": {
             "op": "per_unit",
             "value": null,
@@ -1468,142 +83,197 @@
             "cases": [],
             "rows": [],
             "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgce/t",
-            "round_places": null
-          },
-          "base_thresholds": {
-            "level_1": null,
-            "level_2": null,
-            "level_3": {
-              "op": "constant",
-              "value": "380",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgce/t",
-              "round_places": null
-            }
-          },
-          "thresholds": {
-            "level_1": null,
-            "level_2": null,
-            "level_3": {
-              "op": "constant",
-              "value": "380",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kgce/t",
-              "round_places": null
-            }
-          },
-          "display_places": 2,
-          "source_references": [
-            {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 9,
-              "clause": "第4章 能耗限额等级",
-              "table": "表7",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
-            }
-          ],
-          "notes": [
-            "original_pdf_transcribed",
-            "缺级：原文1级、2级为—，保留空值",
-            "requires_independent_review"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gb_30251-2024-pta",
-      "name": "精对苯二甲酸",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
-      "indicators": [
-        {
-          "id": "GB_30251-2024.pta",
-          "name": "单位产品综合能耗",
-          "unit": "kgce/t",
-          "comparison": "lte",
-          "input_definitions": [
-            {
-              "key": "actual.pta",
-              "label": "精对苯二甲酸单位产品综合能耗实际值",
-              "data_type": "decimal",
-              "unit": "kgce/t",
-              "required": true,
-              "required_if": null,
-              "modes": [
-                "DIRECT",
-                "DETAIL"
-              ],
-              "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
-            }
-          ],
-          "applicability": {
-            "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
-            "include_minimum": true,
-            "include_maximum": true,
-            "args": []
-          },
-          "direct_input_key": "actual.pta",
-          "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
-            "args": [
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              },
-              {
-                "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
-              }
-            ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
             "unit": "kgce/t",
             "round_places": null
           },
           "base_thresholds": {
             "level_1": {
+              "op": "constant",
+              "value": "-180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-140",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-115",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-140",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-115",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-2",
+      "name": "硫磺吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_2",
+          "name": "硫磺吨酸电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_2",
+              "label": "硫磺吨酸电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_2",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
               "op": "constant",
               "value": "70",
               "input_key": null,
@@ -1612,12 +282,161 @@
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "80",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-3",
+      "name": "硫铁矿单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_3",
+          "name": "硫铁矿单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_3",
+              "label": "硫铁矿单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-135",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1625,6 +444,883 @@
               "default": null,
               "label": null,
               "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-135",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-4",
+      "name": "硫铁矿吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_4",
+          "name": "硫铁矿吨酸电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_4",
+              "label": "硫铁矿吨酸电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_4",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-5",
+      "name": "铜、镍冶炼烟气单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_5",
+          "name": "铜、镍冶炼烟气单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_5",
+              "label": "铜、镍冶炼烟气单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_5",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-6",
+      "name": "铜、镍冶炼烟气吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_6",
+          "name": "铜、镍冶炼烟气吨酸电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_6",
+              "label": "铜、镍冶炼烟气吨酸电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_6",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-7",
+      "name": "铅冶炼烟气单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_7",
+          "name": "铅冶炼烟气单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_7",
+              "label": "铅冶炼烟气单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_7",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "19",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "22",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "19",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "22",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-8",
+      "name": "铅冶炼烟气吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141_2012.manual_candidate_8",
+          "name": "铅冶炼烟气吨酸电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29141_2012.manual_8",
+              "label": "铅冶炼烟气吨酸电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_29141_2012.manual_8",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
@@ -1636,33 +1332,33 @@
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "70",
+              "value": "130",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "80",
+              "value": "150",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
@@ -1674,56 +1370,56 @@
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "display_places": 2,
           "source_references": [
             {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 8,
-              "clause": "第4章 能耗限额等级",
-              "table": "表6",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
             }
           ],
           "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
           ]
         }
       ]
     },
     {
-      "id": "gb_30251-2024-propylene-oxide-cooxidation",
-      "name": "环氧丙烷（乙苯共氧化法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "id": "manual-candidate-9",
+      "name": "锌冶炼烟气单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
-          "id": "GB_30251-2024.propylene-oxide-cooxidation",
-          "name": "单位产品综合能耗",
+          "id": "GB_29141_2012.manual_candidate_9",
+          "name": "锌冶炼烟气单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
             {
-              "key": "actual.propylene-oxide-cooxidation",
-              "label": "环氧丙烷单位产品综合能耗（乙苯共氧化法）实际值",
+              "key": "actual.GB_29141_2012.manual_9",
+              "label": "锌冶炼烟气单位产品综合能耗实际值",
               "data_type": "decimal",
               "unit": "kgce/t",
               "required": true,
               "required_if": null,
               "modes": [
-                "DIRECT",
-                "DETAIL"
+                "DIRECT"
               ],
-              "minimum": "0",
+              "minimum": null,
               "maximum": null,
               "choices": [],
-              "description": null
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
             }
           ],
           "applicability": {
@@ -1737,7 +1433,7 @@
             "include_maximum": true,
             "args": []
           },
-          "direct_input_key": "actual.propylene-oxide-cooxidation",
+          "direct_input_key": "actual.GB_29141_2012.manual_9",
           "detail_formula": {
             "op": "per_unit",
             "value": null,
@@ -1771,14 +1467,14 @@
             "cases": [],
             "rows": [],
             "default": null,
-            "label": "单位产品综合能耗",
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
             "unit": "kgce/t",
             "round_places": null
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "386",
+              "value": "-120",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1790,7 +1486,7 @@
             },
             "level_2": {
               "op": "constant",
-              "value": "450",
+              "value": "-95",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1802,7 +1498,7 @@
             },
             "level_3": {
               "op": "constant",
-              "value": "457",
+              "value": "-85",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1816,7 +1512,7 @@
           "thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "386",
+              "value": "-120",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1828,7 +1524,7 @@
             },
             "level_2": {
               "op": "constant",
-              "value": "450",
+              "value": "-95",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1840,7 +1536,7 @@
             },
             "level_3": {
               "op": "constant",
-              "value": "457",
+              "value": "-85",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -1854,49 +1550,49 @@
           "display_places": 2,
           "source_references": [
             {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 9,
-              "clause": "第4章 能耗限额等级",
-              "table": "表7",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
             }
           ],
           "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
           ]
         }
       ]
     },
     {
-      "id": "gb_30251-2024-propylene-oxide-isobutane",
-      "name": "环氧丙烷（异丁烷共氧化法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "id": "manual-candidate-10",
+      "name": "锌冶炼烟气吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
-          "id": "GB_30251-2024.propylene-oxide-isobutane",
-          "name": "单位产品综合能耗",
-          "unit": "kgce/t",
+          "id": "GB_29141_2012.manual_candidate_10",
+          "name": "锌冶炼烟气吨酸电耗",
+          "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
             {
-              "key": "actual.propylene-oxide-isobutane",
-              "label": "环氧丙烷单位产品综合能耗（异丁烷共氧化法）实际值",
+              "key": "actual.GB_29141_2012.manual_10",
+              "label": "锌冶炼烟气吨酸电耗实际值",
               "data_type": "decimal",
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "required": true,
               "required_if": null,
               "modes": [
-                "DIRECT",
-                "DETAIL"
+                "DIRECT"
               ],
-              "minimum": "0",
+              "minimum": null,
               "maximum": null,
               "choices": [],
-              "description": null
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
             }
           ],
           "applicability": {
@@ -1910,7 +1606,7 @@
             "include_maximum": true,
             "args": []
           },
-          "direct_input_key": "actual.propylene-oxide-isobutane",
+          "direct_input_key": "actual.GB_29141_2012.manual_10",
           "detail_formula": {
             "op": "per_unit",
             "value": null,
@@ -1944,132 +1640,132 @@
             "cases": [],
             "rows": [],
             "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgce/t",
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
             "round_places": null
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "280",
+              "value": "110",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "345",
+              "value": "120",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
               "op": "constant",
-              "value": "390",
+              "value": "130",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "280",
+              "value": "110",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "345",
+              "value": "120",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
               "op": "constant",
-              "value": "390",
+              "value": "130",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "display_places": 2,
           "source_references": [
             {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 9,
-              "clause": "第4章 能耗限额等级",
-              "table": "表7",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
             }
           ],
           "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
           ]
         }
       ]
     },
     {
-      "id": "gb_30251-2024-propylene-oxide-hydrogen-peroxide",
-      "name": "环氧丙烷（过氧化氢法）",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "id": "manual-candidate-11",
+      "name": "其他有色金属冶炼烟气单位产品综合能耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
-          "id": "GB_30251-2024.propylene-oxide-hydrogen-peroxide",
-          "name": "单位产品综合能耗",
+          "id": "GB_29141_2012.manual_candidate_11",
+          "name": "其他有色金属冶炼烟气单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
             {
-              "key": "actual.propylene-oxide-hydrogen-peroxide",
-              "label": "环氧丙烷单位产品综合能耗（过氧化氢法）实际值",
+              "key": "actual.GB_29141_2012.manual_11",
+              "label": "其他有色金属冶炼烟气单位产品综合能耗实际值",
               "data_type": "decimal",
               "unit": "kgce/t",
               "required": true,
               "required_if": null,
               "modes": [
-                "DIRECT",
-                "DETAIL"
+                "DIRECT"
               ],
-              "minimum": "0",
+              "minimum": null,
               "maximum": null,
               "choices": [],
-              "description": null
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
             }
           ],
           "applicability": {
@@ -2083,7 +1779,7 @@
             "include_maximum": true,
             "args": []
           },
-          "direct_input_key": "actual.propylene-oxide-hydrogen-peroxide",
+          "direct_input_key": "actual.GB_29141_2012.manual_11",
           "detail_formula": {
             "op": "per_unit",
             "value": null,
@@ -2117,14 +1813,14 @@
             "cases": [],
             "rows": [],
             "default": null,
-            "label": "单位产品综合能耗",
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
             "unit": "kgce/t",
             "round_places": null
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "480",
+              "value": "-42",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2136,7 +1832,7 @@
             },
             "level_2": {
               "op": "constant",
-              "value": "545",
+              "value": "-4",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2148,7 +1844,7 @@
             },
             "level_3": {
               "op": "constant",
-              "value": "550",
+              "value": "34",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2162,7 +1858,7 @@
           "thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "480",
+              "value": "-42",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2174,7 +1870,7 @@
             },
             "level_2": {
               "op": "constant",
-              "value": "545",
+              "value": "-4",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2186,7 +1882,7 @@
             },
             "level_3": {
               "op": "constant",
-              "value": "550",
+              "value": "34",
               "input_key": null,
               "args": [],
               "cases": [],
@@ -2200,49 +1896,49 @@
           "display_places": 2,
           "source_references": [
             {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 9,
-              "clause": "第4章 能耗限额等级",
-              "table": "表7",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
             }
           ],
           "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
           ]
         }
       ]
     },
     {
-      "id": "gb_30251-2024-phthalic-anhydride",
-      "name": "邻苯二甲酸酐",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "id": "manual-candidate-12",
+      "name": "其他有色金属冶炼烟气吨酸电耗",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
-          "id": "GB_30251-2024.phthalic-anhydride",
-          "name": "单位产品综合能耗",
-          "unit": "kgce/t",
+          "id": "GB_29141_2012.manual_candidate_12",
+          "name": "其他有色金属冶炼烟气吨酸电耗",
+          "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
             {
-              "key": "actual.phthalic-anhydride",
-              "label": "邻苯二甲酸酐单位产品综合能耗实际值",
+              "key": "actual.GB_29141_2012.manual_12",
+              "label": "其他有色金属冶炼烟气吨酸电耗实际值",
               "data_type": "decimal",
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "required": true,
               "required_if": null,
               "modes": [
-                "DIRECT",
-                "DETAIL"
+                "DIRECT"
               ],
-              "minimum": "0",
+              "minimum": null,
               "maximum": null,
               "choices": [],
-              "description": null
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
             }
           ],
           "applicability": {
@@ -2256,7 +1952,7 @@
             "include_maximum": true,
             "args": []
           },
-          "direct_input_key": "actual.phthalic-anhydride",
+          "direct_input_key": "actual.GB_29141_2012.manual_12",
           "detail_formula": {
             "op": "per_unit",
             "value": null,
@@ -2290,109 +1986,114 @@
             "cases": [],
             "rows": [],
             "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kgce/t",
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kWh/t",
             "round_places": null
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "-296",
+              "value": "210",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "-249",
+              "value": "240",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
               "op": "constant",
-              "value": "-111",
+              "value": "270",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "thresholds": {
             "level_1": {
               "op": "constant",
-              "value": "-296",
+              "value": "210",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_2": {
               "op": "constant",
-              "value": "-249",
+              "value": "240",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             },
             "level_3": {
               "op": "constant",
-              "value": "-111",
+              "value": "270",
               "input_key": null,
               "args": [],
               "cases": [],
               "rows": [],
               "default": null,
               "label": null,
-              "unit": "kgce/t",
+              "unit": "kWh/t",
               "round_places": null
             }
           },
           "display_places": 2,
           "source_references": [
             {
-              "standard_number": "GB 30251-2024",
-              "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
-              "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-              "page": 9,
-              "clause": "第4章 能耗限额等级",
-              "table": "表8",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "standard_number": "GB 29141-2012",
+              "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
+              "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
+              "page": 2,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1、表2、表3",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
             }
           ],
           "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_tables_1-3"
           ]
         }
       ]
     }
   ],
-  "corrections": [],
-  "lifecycle_status": "active",
-  "obsolete_date": null,
-  "replaced_by": [],
+  "corrections": [
+    "已由GB 29141-2024替代；本版本仅保留历史评价。"
+  ],
+  "lifecycle_status": "obsolete",
+  "obsolete_date": "2025-06-01",
+  "replaced_by": [
+    "GB 29141-2024"
+  ],
   "supersedes": []
 }

@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-1",
-          "name": "扁铸锭/熔融态铝及铝合金为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -192,7 +192,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-2",
-          "name": "扁铸锭/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -366,7 +366,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-3",
-          "name": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -540,7 +540,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-4",
-          "name": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -714,7 +714,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-5",
-          "name": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -888,7 +888,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-2-row-6",
-          "name": "扁铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1062,7 +1062,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-7",
-          "name": "实心圆铸锭/建筑型材/熔融态铝及铝合金为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1236,7 +1236,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-8",
-          "name": "实心圆铸锭/建筑型材/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1410,7 +1410,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-9",
-          "name": "实心圆铸锭/建筑型材/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1584,7 +1584,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-10",
-          "name": "实心圆铸锭/建筑型材/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1758,7 +1758,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-11",
-          "name": "实心圆铸锭/其他/熔融态铝及铝合金为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1932,7 +1932,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-12",
-          "name": "实心圆铸锭/其他/熔融态铝及铝合金为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2106,7 +2106,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-13",
-          "name": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2280,7 +2280,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-14",
-          "name": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2454,7 +2454,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-15",
-          "name": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2628,7 +2628,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-3-row-16",
-          "name": "实心圆铸锭/其他/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2802,7 +2802,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-4-row-17",
-          "name": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2976,7 +2976,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-4-row-18",
-          "name": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3150,7 +3150,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-4-row-19",
-          "name": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3324,7 +3324,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-4-row-20",
-          "name": "空心圆铸锭/重熔用铝锭及固态回收铝为主原料/熔铸+均匀化处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3498,7 +3498,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-21",
-          "name": "热轧板材/热轧（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3672,7 +3672,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-22",
-          "name": "热轧板材/热轧（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3846,7 +3846,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-23",
-          "name": "热轧板材/热轧+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4020,7 +4020,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-24",
-          "name": "热轧板材/热轧+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4194,7 +4194,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-25",
-          "name": "热轧板材/热轧+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4368,7 +4368,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-26",
-          "name": "热轧板材/热轧+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4542,7 +4542,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-27",
-          "name": "热轧板材/热轧+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4716,7 +4716,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-5-row-28",
-          "name": "热轧板材/热轧+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4890,7 +4890,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-29",
-          "name": "冷轧板材/冷轧（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5064,7 +5064,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-30",
-          "name": "冷轧板材/冷轧（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5238,7 +5238,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-31",
-          "name": "冷轧板材/冷轧+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5412,7 +5412,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-32",
-          "name": "冷轧板材/冷轧+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5586,7 +5586,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-33",
-          "name": "冷轧板材/冷轧+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5760,7 +5760,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-34",
-          "name": "冷轧板材/冷轧+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5934,7 +5934,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-35",
-          "name": "冷轧板材/冷轧+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6108,7 +6108,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-6-row-36",
-          "name": "冷轧板材/冷轧+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6282,7 +6282,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-7-row-37",
-          "name": "热轧带材/热轧（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6456,7 +6456,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-7-row-38",
-          "name": "热轧带材/热轧（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6630,7 +6630,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-7-row-39",
-          "name": "热轧带材/热轧+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6804,7 +6804,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-7-row-40",
-          "name": "热轧带材/热轧+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6978,7 +6978,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-41",
-          "name": "冷轧带材/冷轧（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7152,7 +7152,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-42",
-          "name": "冷轧带材/冷轧（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7326,7 +7326,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-43",
-          "name": "冷轧带材/冷轧+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7500,7 +7500,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-44",
-          "name": "冷轧带材/冷轧+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7674,7 +7674,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-45",
-          "name": "冷轧带材/冷轧+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7848,7 +7848,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-46",
-          "name": "冷轧带材/冷轧+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8022,7 +8022,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-47",
-          "name": "冷轧带材/冷轧+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8196,7 +8196,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-8-row-48",
-          "name": "冷轧带材/冷轧+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8370,7 +8370,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-9-row-49",
-          "name": "铸轧带材/熔融态铝及铝合金为主原料",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8544,7 +8544,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-9-row-50",
-          "name": "铸轧带材/重熔用铝锭及固态回收铝为主原料",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8718,7 +8718,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-51",
-          "name": "箔材/无零箔/冷轧",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8892,7 +8892,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-52",
-          "name": "箔材/无零箔/冷轧+退火",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9066,7 +9066,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-53",
-          "name": "箔材/单零箔/冷轧",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9240,7 +9240,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-54",
-          "name": "箔材/单零箔/冷轧+退火",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9414,7 +9414,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-55",
-          "name": "箔材/双零箔/冷轧",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9588,7 +9588,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-10-row-56",
-          "name": "箔材/双零箔/冷轧+退火",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9762,7 +9762,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-57",
-          "name": "挤压无缝管材/挤压（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9936,7 +9936,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-58",
-          "name": "挤压无缝管材/挤压（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10110,7 +10110,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-59",
-          "name": "挤压无缝管材/挤压+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10284,7 +10284,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-60",
-          "name": "挤压无缝管材/挤压+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10458,7 +10458,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-61",
-          "name": "挤压无缝管材/挤压+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10632,7 +10632,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-62",
-          "name": "挤压无缝管材/挤压+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10806,7 +10806,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-63",
-          "name": "挤压无缝管材/挤压+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10980,7 +10980,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-11-row-64",
-          "name": "挤压无缝管材/挤压+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11154,7 +11154,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-65",
-          "name": "挤压棒材、板材、线材/挤压（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11328,7 +11328,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-66",
-          "name": "挤压棒材、板材、线材/挤压（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11502,7 +11502,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-67",
-          "name": "挤压棒材、板材、线材/挤压+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11676,7 +11676,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-68",
-          "name": "挤压棒材、板材、线材/挤压+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11850,7 +11850,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-69",
-          "name": "挤压棒材、板材、线材/挤压+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12024,7 +12024,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-70",
-          "name": "挤压棒材、板材、线材/挤压+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12198,7 +12198,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-71",
-          "name": "挤压棒材、板材、线材/挤压+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12372,7 +12372,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-12-row-72",
-          "name": "挤压棒材、板材、线材/挤压+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12546,7 +12546,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-73",
-          "name": "一般工业用挤压型材/挤压（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12720,7 +12720,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-74",
-          "name": "一般工业用挤压型材/挤压（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12894,7 +12894,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-75",
-          "name": "一般工业用挤压型材/挤压+退火（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13068,7 +13068,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-76",
-          "name": "一般工业用挤压型材/挤压+退火（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13242,7 +13242,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-77",
-          "name": "一般工业用挤压型材/挤压+固溶热处理（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13416,7 +13416,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-78",
-          "name": "一般工业用挤压型材/挤压+固溶热处理（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13590,7 +13590,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-79",
-          "name": "一般工业用挤压型材/挤压+固溶热处理+人工时效（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13764,7 +13764,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-80",
-          "name": "一般工业用挤压型材/挤压+固溶热处理+人工时效（II类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13938,7 +13938,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-13-row-81",
-          "name": "建筑型材/挤压（I类）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14112,7 +14112,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-82",
-          "name": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14286,7 +14286,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-83",
-          "name": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制+固溶热处理",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14460,7 +14460,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-84",
-          "name": "拉（轧）制管材/壁厚＞3 mm/拉（轧）制+固溶热处理+人工时效",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14634,7 +14634,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-85",
-          "name": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14808,7 +14808,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-86",
-          "name": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制+固溶热处理",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14982,7 +14982,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-14-row-87",
-          "name": "拉（轧）制管材/壁厚≤3 mm/拉（轧）制+固溶热处理+人工时效",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15156,7 +15156,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-88",
-          "name": "连铸连轧线材",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15330,7 +15330,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-89",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/直径＞10 mm",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15504,7 +15504,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-90",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/5 mm＜直径≤10 mm",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15678,7 +15678,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-91",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/直径≤5 mm",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15852,7 +15852,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-92",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/5 mm＜直径≤10 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16026,7 +16026,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-93",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/3 mm＜直径≤5 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16200,7 +16200,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-94",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/1 mm＜直径≤3 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16374,7 +16374,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-95",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/0.5 mm＜直径≤1 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16548,7 +16548,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-96",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/0.25 mm＜直径≤0.5 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16722,7 +16722,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-15-row-97",
-          "name": "拉制棒材、紧固件（含钢钉）用线材/0.10 mm＜直径≤0.25 mm（其他线材）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16896,7 +16896,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-16-row-98",
-          "name": "经表面处理的管、棒、型材/阳极氧化产品",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17070,7 +17070,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-16-row-99",
-          "name": "经表面处理的管、棒、型材/电泳涂漆产品",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17244,7 +17244,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-16-row-100",
-          "name": "经表面处理的管、棒、型材/喷粉产品",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17418,7 +17418,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-16-row-101",
-          "name": "经表面处理的管、棒、型材/喷漆产品",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17592,7 +17592,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-17-row-102",
-          "name": "复合型材",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17766,7 +17766,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-18-row-103",
-          "name": "自由锻件/锻造",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18256,7 +18256,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-18-row-104",
-          "name": "自由锻件/锻造+退火",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18746,7 +18746,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-18-row-105",
-          "name": "自由锻件/锻造+固溶热处理+时效",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19236,7 +19236,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-19-row-106",
-          "name": "模锻件/锻造",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19726,7 +19726,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-19-row-107",
-          "name": "模锻件/锻造+退火",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -20216,7 +20216,7 @@
       "indicators": [
         {
           "id": "GB_21351-2023.table-19-row-108",
-          "name": "模锻件/锻造+固溶热处理+时效",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

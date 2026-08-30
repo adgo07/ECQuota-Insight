@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_21343-2023-calcium-carbide-energy",
-      "name": "电石单位产品综合能耗",
+      "name": "电石",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.calcium-carbide-energy",
-          "name": "电石单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_21343-2023-calcium-carbide-electricity",
-      "name": "电石单位产品电炉电耗",
+      "name": "电石电炉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.calcium-carbide-electricity",
-          "name": "电石单位产品电炉电耗",
+          "name": "电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_21343-2023-vinyl-acetate-acetylene",
-      "name": "乙炔法乙酸乙烯酯单位产品综合能耗",
+      "name": "乙炔法乙酸乙烯酯",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.vinyl-acetate-acetylene",
-          "name": "乙炔法乙酸乙烯酯单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_21343-2023-vinyl-acetate-ethylene",
-      "name": "乙烯法乙酸乙烯酯单位产品综合能耗",
+      "name": "乙烯法乙酸乙烯酯",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.vinyl-acetate-ethylene",
-          "name": "乙烯法乙酸乙烯酯单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_21343-2023-pva-acetylene",
-      "name": "乙炔法聚乙烯醇单位产品综合能耗",
+      "name": "乙炔法聚乙烯醇",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.pva-acetylene",
-          "name": "乙炔法聚乙烯醇单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -877,13 +877,13 @@
     },
     {
       "id": "gb_21343-2023-pva-ethylene",
-      "name": "乙烯法聚乙烯醇单位产品综合能耗",
+      "name": "乙烯法聚乙烯醇",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.pva-ethylene",
-          "name": "乙烯法聚乙烯醇单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1050,13 +1050,13 @@
     },
     {
       "id": "gb_21343-2023-bdo-acetaldehyde",
-      "name": "炔醛法1,4-丁二醇单位产品综合能耗",
+      "name": "炔醛法1,4-丁二醇",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.bdo-acetaldehyde",
-          "name": "炔醛法1,4-丁二醇单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1223,13 +1223,13 @@
     },
     {
       "id": "gb_21343-2023-bdo-maleic",
-      "name": "顺酐法1,4-丁二醇单位产品综合能耗",
+      "name": "顺酐法1,4-丁二醇",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.bdo-maleic",
-          "name": "顺酐法1,4-丁二醇单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1396,13 +1396,13 @@
     },
     {
       "id": "gb_21343-2023-bdo-allyl",
-      "name": "烯丙醇法1,4-丁二醇单位产品综合能耗",
+      "name": "烯丙醇法1,4-丁二醇",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.bdo-allyl",
-          "name": "烯丙醇法1,4-丁二醇单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1569,13 +1569,13 @@
     },
     {
       "id": "gb_21343-2023-dicyandiamide",
-      "name": "双氰胺单位产品综合能耗",
+      "name": "双氰胺",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.dicyandiamide",
-          "name": "双氰胺单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1742,13 +1742,13 @@
     },
     {
       "id": "gb_21343-2023-cyanamide-30",
-      "name": "30%单氰胺单位产品综合能耗",
+      "name": "30%单氰胺",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.cyanamide-30",
-          "name": "30%单氰胺单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1915,13 +1915,13 @@
     },
     {
       "id": "gb_21343-2023-cyanamide-50",
-      "name": "50%单氰胺单位产品综合能耗",
+      "name": "50%单氰胺",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21343-2023.cyanamide-50",
-          "name": "50%单氰胺单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

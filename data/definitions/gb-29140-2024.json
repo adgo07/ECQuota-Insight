@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_29140-2024-ammonia-light",
-      "name": "氨碱法轻质纯碱单位产品综合能耗",
+      "name": "氨碱法轻质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.ammonia-light",
-          "name": "氨碱法轻质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_29140-2024-ammonia-heavy",
-      "name": "氨碱法重质纯碱单位产品综合能耗",
+      "name": "氨碱法重质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.ammonia-heavy",
-          "name": "氨碱法重质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_29140-2024-soda-ash-light",
-      "name": "联碱法（精制工业盐为原料）轻质纯碱单位产品综合能耗",
+      "name": "联碱法（精制工业盐为原料）轻质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.soda-ash-light",
-          "name": "联碱法（精制工业盐为原料）轻质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -623,13 +623,13 @@
     },
     {
       "id": "gb_29140-2024-soda-ash-heavy",
-      "name": "联碱法（精制工业盐为原料）重质纯碱单位产品综合能耗",
+      "name": "联碱法（精制工业盐为原料）重质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.soda-ash-heavy",
-          "name": "联碱法（精制工业盐为原料）重质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -888,13 +888,13 @@
     },
     {
       "id": "gb_29140-2024-natural-carbonation-light",
-      "name": "天然碱法（碳化法）轻质纯碱单位产品综合能耗",
+      "name": "天然碱法（碳化法）轻质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.natural-carbonation-light",
-          "name": "天然碱法（碳化法）轻质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1061,13 +1061,13 @@
     },
     {
       "id": "gb_29140-2024-natural-carbonation-heavy",
-      "name": "天然碱法（碳化法）重质纯碱单位产品综合能耗",
+      "name": "天然碱法（碳化法）重质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.natural-carbonation-heavy",
-          "name": "天然碱法（碳化法）重质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1234,13 +1234,13 @@
     },
     {
       "id": "gb_29140-2024-natural-evaporation-light",
-      "name": "天然碱法（蒸发法）轻质纯碱单位产品综合能耗",
+      "name": "天然碱法（蒸发法）轻质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.natural-evaporation-light",
-          "name": "天然碱法（蒸发法）轻质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1407,13 +1407,13 @@
     },
     {
       "id": "gb_29140-2024-natural-evaporation-heavy",
-      "name": "天然碱法（蒸发法）重质纯碱单位产品综合能耗",
+      "name": "天然碱法（蒸发法）重质纯碱",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29140-2024.natural-evaporation-heavy",
-          "name": "天然碱法（蒸发法）重质纯碱单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_21344-2023-ammonia-anthracite",
-      "name": "合成氨（优质无烟块煤）单位产品综合能耗",
+      "name": "合成氨（优质无烟块煤）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonia-anthracite",
-          "name": "合成氨（优质无烟块煤）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_21344-2023-ammonia-nonpremium",
-      "name": "合成氨（非优质无烟块煤、型煤）单位产品综合能耗",
+      "name": "合成氨（非优质无烟块煤、型煤）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonia-nonpremium",
-          "name": "合成氨（非优质无烟块煤、型煤）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_21344-2023-ammonia-powder-coal",
-      "name": "合成氨（粉煤，包括无烟粉煤、烟煤）单位产品综合能耗",
+      "name": "合成氨（粉煤，包括无烟粉煤、烟煤）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonia-powder-coal",
-          "name": "合成氨（粉煤，包括无烟粉煤、烟煤）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_21344-2023-ammonia-lignite",
-      "name": "合成氨（褐煤）单位产品综合能耗",
+      "name": "合成氨（褐煤）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonia-lignite",
-          "name": "合成氨（褐煤）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_21344-2023-ammonia-natural-gas",
-      "name": "合成氨（天然气）单位产品综合能耗",
+      "name": "合成氨（天然气）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonia-natural-gas",
-          "name": "合成氨（天然气）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -877,13 +877,13 @@
     },
     {
       "id": "gb_21344-2023-urea-steam-turbine",
-      "name": "尿素（二氧化碳压缩机汽轮机驱动）单位产品综合能耗",
+      "name": "尿素（二氧化碳压缩机汽轮机驱动）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.urea-steam-turbine",
-          "name": "尿素（二氧化碳压缩机汽轮机驱动）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1050,13 +1050,13 @@
     },
     {
       "id": "gb_21344-2023-urea-electric-motor",
-      "name": "尿素（二氧化碳压缩机电动机驱动）单位产品综合能耗",
+      "name": "尿素（二氧化碳压缩机电动机驱动）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.urea-electric-motor",
-          "name": "尿素（二氧化碳压缩机电动机驱动）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1223,13 +1223,13 @@
     },
     {
       "id": "gb_21344-2023-ammonium-bicarbonate",
-      "name": "碳酸氢铵单位产品电耗",
+      "name": "碳酸氢铵",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.ammonium-bicarbonate",
-          "name": "碳酸氢铵单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1396,13 +1396,13 @@
     },
     {
       "id": "gb_21344-2023-map-traditional-granular",
-      "name": "磷酸一铵（传统法、粒状）单位产品综合能耗",
+      "name": "磷酸一铵（传统法、粒状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.map-traditional-granular",
-          "name": "磷酸一铵（传统法、粒状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1569,13 +1569,13 @@
     },
     {
       "id": "gb_21344-2023-map-traditional-powder",
-      "name": "磷酸一铵（传统法、粉状）单位产品综合能耗",
+      "name": "磷酸一铵（传统法、粉状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.map-traditional-powder",
-          "name": "磷酸一铵（传统法、粉状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1742,13 +1742,13 @@
     },
     {
       "id": "gb_21344-2023-map-slurry-granular",
-      "name": "磷酸一铵（料浆法、粒状）单位产品综合能耗",
+      "name": "磷酸一铵（料浆法、粒状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.map-slurry-granular",
-          "name": "磷酸一铵（料浆法、粒状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1915,13 +1915,13 @@
     },
     {
       "id": "gb_21344-2023-map-slurry-powder",
-      "name": "磷酸一铵（料浆法、粉状）单位产品综合能耗",
+      "name": "磷酸一铵（料浆法、粉状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.map-slurry-powder",
-          "name": "磷酸一铵（料浆法、粉状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2088,13 +2088,13 @@
     },
     {
       "id": "gb_21344-2023-dap-traditional-granular",
-      "name": "磷酸二铵（传统法、粒状）单位产品综合能耗",
+      "name": "磷酸二铵（传统法、粒状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.dap-traditional-granular",
-          "name": "磷酸二铵（传统法、粒状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2261,13 +2261,13 @@
     },
     {
       "id": "gb_21344-2023-dap-slurry-granular",
-      "name": "磷酸二铵（料浆法、粒状）单位产品综合能耗",
+      "name": "磷酸二铵（料浆法、粒状）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.dap-slurry-granular",
-          "name": "磷酸二铵（料浆法、粒状）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2434,13 +2434,13 @@
     },
     {
       "id": "gb_21344-2023-potassium-brine",
-      "name": "硫酸钾（水盐体系法、含钾卤水为原料）单位产品综合能耗",
+      "name": "硫酸钾（水盐体系法、含钾卤水为原料）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.potassium-brine",
-          "name": "硫酸钾（水盐体系法、含钾卤水为原料）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2607,13 +2607,13 @@
     },
     {
       "id": "gb_21344-2023-potassium-seawater",
-      "name": "硫酸钾（水盐体系法、海水和卤水为原料）单位产品综合能耗",
+      "name": "硫酸钾（水盐体系法、海水和卤水为原料）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.potassium-seawater",
-          "name": "硫酸钾（水盐体系法、海水和卤水为原料）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2780,13 +2780,13 @@
     },
     {
       "id": "gb_21344-2023-potassium-mirabilite",
-      "name": "硫酸钾（水盐体系法、芒硝法）单位产品综合能耗",
+      "name": "硫酸钾（水盐体系法、芒硝法）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.potassium-mirabilite",
-          "name": "硫酸钾（水盐体系法、芒硝法）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2953,13 +2953,13 @@
     },
     {
       "id": "gb_21344-2023-potassium-mannheim",
-      "name": "硫酸钾（非水盐体系法、曼海姆法）单位产品综合能耗",
+      "name": "硫酸钾（非水盐体系法、曼海姆法）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21344-2023.potassium-mannheim",
-          "name": "硫酸钾（非水盐体系法、曼海姆法）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

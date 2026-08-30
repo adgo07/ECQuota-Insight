@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_30180-2024.mto",
-          "name": "煤制烯烃（甲醇制烯烃MTO，原料用能不纳入）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -191,7 +191,7 @@
       "indicators": [
         {
           "id": "GB_30180-2024.mtp",
-          "name": "煤制烯烃（甲醇制丙烯MTP，原料用能不纳入）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_30180-2024-synthetic-natural-gas",
-      "name": "煤制天然气单位产品能耗",
+      "name": "煤制天然气",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_30180-2024.synthetic-natural-gas",
-          "name": "煤制天然气单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_30180-2024-direct-liquefaction-oil",
-      "name": "煤直接液化制油单位产品能耗",
+      "name": "煤直接液化制油",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_30180-2024.direct-liquefaction-oil",
-          "name": "煤直接液化制油单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/toe",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_30180-2024-indirect-liquefaction-oil",
-      "name": "煤间接液化制油单位产品能耗",
+      "name": "煤间接液化制油",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_30180-2024.indirect-liquefaction-oil",
-          "name": "煤间接液化制油单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/toe",
           "comparison": "lte",
           "input_definitions": [
@@ -883,7 +883,7 @@
       "indicators": [
         {
           "id": "GB_30180-2024.mto-feedstock-included",
-          "name": "煤制烯烃（甲醇制烯烃MTO，不扣除原料用能）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1056,7 +1056,7 @@
       "indicators": [
         {
           "id": "GB_30180-2024.mtp-feedstock-included",
-          "name": "煤制烯烃（甲醇制丙烯MTP，不扣除原料用能）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

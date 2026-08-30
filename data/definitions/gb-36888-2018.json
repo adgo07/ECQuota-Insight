@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_36888-2018-production",
-      "name": "预拌混凝土单位产品生产能耗",
+      "name": "预拌混凝土",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36888-2018.production",
-          "name": "预拌混凝土单位产品生产能耗",
+          "name": "单位产品生产能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_36888-2018-transport",
-      "name": "预拌混凝土单位产品运输能耗",
+      "name": "预拌混凝土",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36888-2018.transport",
-          "name": "预拌混凝土单位产品运输能耗",
+          "name": "单位产品运输能耗",
           "unit": "kgce/m³",
           "comparison": "lte",
           "input_definitions": [

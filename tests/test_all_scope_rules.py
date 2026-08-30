@@ -9,8 +9,11 @@ from tools.check_published_rules import check as check_published_rules
 
 
 def _definitions() -> list[StandardDefinition]:
+    scope = json.loads(Path("data/scope-44.json").read_text(encoding="utf-8"))
+    target = set(scope["standards"])
     return [StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
-            for path in sorted(Path("data/definitions").glob("*.json"))]
+            for path in sorted(Path("data/definitions").glob("*.json"))
+            if json.loads(path.read_text(encoding="utf-8"))["number"] in target]
 
 
 def test_every_scope_standard_has_at_least_one_source_backed_rule() -> None:
@@ -74,7 +77,7 @@ def test_scope_manifest_and_catalog_remain_exact() -> None:
 
 def test_every_published_indicator_runs_in_direct_entry_smoke() -> None:
     report = check_published_rules(Path("data/definitions"))
-    assert report["total_indicators"] == 701
+    assert report["total_indicators"] == 702
     assert report["incomplete"] == []
     assert report["boundary_errors"] == []
 
@@ -113,12 +116,12 @@ def test_original_table_batch2_values_and_missing_grade() -> None:
 
     calcium = by_number["GB 21343-2023"]
     calcium_map = {p.name: p.indicators[0] for p in calcium.products}
-    assert [str(getattr(calcium_map["电石单位产品综合能耗"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["805", "823", "940"]
-    assert [str(getattr(calcium_map["50%单氰胺单位产品综合能耗"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["600", "750", "900"]
+    assert [str(getattr(calcium_map["电石"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["805", "823", "940"]
+    assert [str(getattr(calcium_map["50%单氰胺"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["600", "750", "900"]
 
     fertilizer = by_number["GB 21344-2023"]
     fertilizer_map = {p.name: p.indicators[0] for p in fertilizer.products}
-    assert [str(getattr(fertilizer_map["硫酸钾（水盐体系法、含钾卤水为原料）单位产品综合能耗"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["300", "310", "320"]
+    assert [str(getattr(fertilizer_map["硫酸钾（水盐体系法、含钾卤水为原料）"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["300", "310", "320"]
     assert len(fertilizer.products) == 18
 
     soda = by_number["GB 29140-2024"]
@@ -132,7 +135,7 @@ def test_original_table_batch2_values_and_missing_grade() -> None:
 
     carbon = by_number["GB 29995-2024"]
     assert len(carbon.products) == 9
-    semi = next(p.indicators[0] for p in carbon.products if p.name == "兰炭单位产品能耗")
+    semi = next(p.indicators[0] for p in carbon.products if p.name == "兰炭")
     assert semi.detail_formula is not None and semi.detail_formula.op == "subtract"
 
     paper = by_number["GB 31825-2024"]
@@ -156,8 +159,8 @@ def test_original_table_batches7_and8_values_and_citations() -> None:
     carbon = by_number["GB 25324-2022"]
     carbon_map = {product.name: product.indicators[0] for product in carbon.products}
     assert len(carbon.products) == 11
-    assert [str(getattr(carbon_map["铝电解用预焙阳极煅烧工序单位产品综合能源消耗"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["190", "210", "250"]
-    assert [str(getattr(carbon_map["铝电解用石墨化阴极炭块石墨化加工工序单位产品综合能源消耗"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["460", "480", "660"]
+    assert [str(getattr(carbon_map["铝电解用预焙阳极煅烧工序"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["190", "210", "250"]
+    assert [str(getattr(carbon_map["铝电解用石墨化阴极炭块石墨化加工工序"].base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["460", "480", "660"]
     assert all(reference.table for product in carbon.products for indicator in product.indicators for reference in indicator.source_references)
 
     fibers = by_number["GB 36889-2025"]
@@ -171,11 +174,11 @@ def test_original_table_batches7_and8_values_and_citations() -> None:
 def test_original_table_batch9_copper_values_and_specification_factor() -> None:
     definition = next(item for item in _definitions() if item.number == "GB 21350-2023")
     assert len(definition.products) == 108
-    pipe = next(product.indicators[0] for product in definition.products if product.name == "表2 管材 紫铜熔铸工序单位产品综合能耗")
+    pipe = next(product.indicators[0] for product in definition.products if product.name == "管材 紫铜熔铸工序")
     assert [str(getattr(pipe.base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["55", "60", "70"]
     assert pipe.thresholds.level_1 is not None and pipe.thresholds.level_1.op == "multiply"
     assert any(item.label == "产品规格修正系数" for item in pipe.input_definitions)
-    wire = next(product.indicators[0] for product in definition.products if product.name == "表10 上引连铸法/阴极铜电工用铜线坯单位产品综合能耗")
+    wire = next(product.indicators[0] for product in definition.products if product.name == "上引连铸法/阴极铜电工用铜线坯")
     assert [str(getattr(wire.base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["45", "52", "56"]
     assert all(reference.table for product in definition.products for indicator in product.indicators for reference in indicator.source_references)
 
@@ -210,14 +213,14 @@ def test_original_table_batch12_and13_power_generation_values() -> None:
     assert len(coal.products) == 13
     ultra = next(product.indicators[0] for product in coal.products if "超高压·200及以下" in product.name)
     assert ultra.thresholds.level_1 is None and ultra.thresholds.level_2 is None
-    supercritical = next(product.indicators[0] for product in coal.products if product.name == "燃煤发电机组（超临界·600MW）供电煤耗率")
+    supercritical = next(product.indicators[0] for product in coal.products if product.name == "燃煤发电机组（超临界·600MW）" and product.indicators[0].name == "供电煤耗率")
     assert [str(getattr(supercritical.base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["286", "285", "299"]
     assert supercritical.thresholds.level_1 is not None and supercritical.thresholds.level_1.op == "add"
 
     gas = next(item for item in _definitions() if item.number == "GB 45247-2025")
     assert len(gas.products) == 10
-    power = next(product.indicators[0] for product in gas.products if "H级/500MW" in product.name and "供电" in product.name)
+    power = next(product.indicators[0] for product in gas.products if "H级/500MW" in product.name and product.indicators[0].name == "供电煤耗率")
     assert [str(getattr(power.base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["201", "210", "215"]
     assert power.thresholds.level_1 is not None and power.thresholds.level_1.op == "multiply"
-    heat = next(product.indicators[0] for product in gas.products if "H级/500MW" in product.name and "供热" in product.name)
+    heat = next(product.indicators[0] for product in gas.products if "H级/500MW" in product.name and product.indicators[0].name == "供热煤耗率")
     assert [str(getattr(heat.base_thresholds, f"level_{i}").value) for i in (1, 2, 3)] == ["38", "38.5", "39"]

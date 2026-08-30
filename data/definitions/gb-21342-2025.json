@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "top-charging-coke-oven",
-      "name": "顶装焦炉",
+      "name": "顶装焦炉焦炭",
       "description": "常规焦炉焦炭单位产品能耗，按燃料、原料、工艺和炉龄分级修正。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "top-charging-coke-oven.energy",
-          "name": "顶装焦炉焦炭单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4830,13 +4830,13 @@
     },
     {
       "id": "stamp-charging-coke-oven",
-      "name": "捣固焦炉",
+      "name": "捣固焦炉焦炭",
       "description": "常规焦炉焦炭单位产品能耗，按燃料、原料、工艺和炉龄分级修正。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "stamp-charging-coke-oven.energy",
-          "name": "捣固焦炉焦炭单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

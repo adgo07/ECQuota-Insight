@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.bleached-chemical-wood-self",
-          "name": "漂白化学木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -191,7 +191,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.bleached-chemical-wood-market",
-          "name": "漂白化学木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -364,7 +364,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.unbleached-chemical-wood-self",
-          "name": "未漂化学木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -537,7 +537,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.unbleached-chemical-wood-market",
-          "name": "未漂化学木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -710,7 +710,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.bleached-chemical-nonwood-self",
-          "name": "漂白化学非木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -883,7 +883,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.bleached-chemical-nonwood-market",
-          "name": "漂白化学非木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1056,7 +1056,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.unbleached-chemical-nonwood-self",
-          "name": "未漂化学非木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1229,7 +1229,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.unbleached-chemical-nonwood-market",
-          "name": "未漂化学非木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1402,7 +1402,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.chemical-mechanical-self",
-          "name": "化学机械浆及机械浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1575,7 +1575,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.chemical-mechanical-market",
-          "name": "化学机械浆及机械浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1748,7 +1748,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.dissolving-wood-self",
-          "name": "溶解木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -1921,7 +1921,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.dissolving-wood-market",
-          "name": "溶解木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -2094,7 +2094,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.dissolving-nonwood-self",
-          "name": "溶解非木浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -2267,7 +2267,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.dissolving-nonwood-market",
-          "name": "溶解非木浆（商品浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -2440,7 +2440,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.non-deinked-waste-self",
-          "name": "未脱墨废纸浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -2613,7 +2613,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.deinked-waste-self",
-          "name": "脱墨废纸浆（自用浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/Adt",
           "comparison": "lte",
           "input_definitions": [
@@ -2786,7 +2786,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.newsprint",
-          "name": "新闻纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3051,7 +3051,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.uncoated-printing-writing",
-          "name": "非涂布印刷书写纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3316,7 +3316,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.coated-printing",
-          "name": "涂布印刷纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3581,7 +3581,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.tissue-wood",
-          "name": "卫生纸原纸、纸巾原纸、吸水衬纸（木浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3846,7 +3846,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.tissue-nonwood",
-          "name": "卫生纸原纸、纸巾原纸、吸水衬纸（非木浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4111,7 +4111,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.wiping-wood",
-          "name": "擦拭用纸（木浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4376,7 +4376,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.wiping-nonwood",
-          "name": "擦拭用纸（非木浆）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4641,7 +4641,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.white-grey-board",
-          "name": "白纸板、灰板纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4906,7 +4906,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.liner-gypsum-board",
-          "name": "箱纸板、石膏板护面纸板",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5171,7 +5171,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.corrugating-tube-board",
-          "name": "瓦楞原纸、纸管纸板",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5436,7 +5436,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.coated-board",
-          "name": "涂布纸板",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5701,7 +5701,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.paper-bag",
-          "name": "纸袋纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5966,7 +5966,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.decorative-wallpaper-base",
-          "name": "装饰原纸、壁纸原纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6231,7 +6231,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.glassine",
-          "name": "格拉辛纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6496,7 +6496,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.cigarette",
-          "name": "卷烟纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6761,7 +6761,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.watermarked",
-          "name": "水松原纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7026,7 +7026,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.aluminum-foil-liner",
-          "name": "铝箔衬纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7291,7 +7291,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.stainless-liner",
-          "name": "不锈钢衬纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7556,7 +7556,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.thermal-carbon",
-          "name": "热敏原纸、无碳复写纸原纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7821,7 +7821,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.medical-packaging",
-          "name": "医用包装纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8086,7 +8086,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.fruit-bag",
-          "name": "育果袋纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8351,7 +8351,7 @@
       "indicators": [
         {
           "id": "GB_31825-2024.sublimation-transfer",
-          "name": "热升华转印原纸",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

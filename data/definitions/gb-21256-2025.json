@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "sintering.energy",
-          "name": "烧结工序单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -646,7 +646,7 @@
       "indicators": [
         {
           "id": "pelletizing.energy",
-          "name": "球团工序单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1274,7 +1274,7 @@
       "indicators": [
         {
           "id": "blast-furnace.energy",
-          "name": "高炉工序单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2295,7 +2295,7 @@
       "indicators": [
         {
           "id": "converter.energy",
-          "name": "转炉工序单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3017,7 +3017,7 @@
       "indicators": [
         {
           "id": "electric-arc-furnace-lt50.energy",
-          "name": "电弧炉工序（容量＜50t）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3608,7 +3608,7 @@
       "indicators": [
         {
           "id": "electric-arc-furnace-50-70.energy",
-          "name": "电弧炉工序（50t≤容量＜70t）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4199,7 +4199,7 @@
       "indicators": [
         {
           "id": "electric-arc-furnace-ge70.energy",
-          "name": "电弧炉工序（容量≥70t）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

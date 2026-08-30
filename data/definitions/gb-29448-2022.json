@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_29448-2022-sponge-titanium-full",
-      "name": "海绵钛全流程生产单位产品综合能耗",
+      "name": "海绵钛全流程生产",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29448-2022.sponge-titanium-full",
-          "name": "海绵钛全流程生产单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_29448-2022-sponge-titanium-half",
-      "name": "海绵钛半流程生产单位产品综合能耗",
+      "name": "海绵钛半流程生产",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29448-2022.sponge-titanium-half",
-          "name": "海绵钛半流程生产单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_29448-2022-titanium-ingot-two-melt",
-      "name": "钛锭二次真空自耗电弧熔炼单位产品综合能耗",
+      "name": "钛锭二次真空自耗电弧熔炼",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29448-2022.titanium-ingot-two-melt",
-          "name": "钛锭二次真空自耗电弧熔炼单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_29448-2022-titanium-ingot-three-melt",
-      "name": "钛锭三次真空自耗电弧熔炼单位产品综合能耗",
+      "name": "钛锭三次真空自耗电弧熔炼",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29448-2022.titanium-ingot-three-melt",
-          "name": "钛锭三次真空自耗电弧熔炼单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

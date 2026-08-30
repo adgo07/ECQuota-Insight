@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_31335-2024-surface-medium-plus",
-      "name": "铁矿露天开采（中型及以上矿山）单位产品可比综合能耗",
+      "name": "铁矿露天开采（中型及以上矿山）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.surface-medium-plus",
-          "name": "铁矿露天开采（中型及以上矿山）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -226,13 +226,13 @@
     },
     {
       "id": "gb_31335-2024-surface-small",
-      "name": "铁矿露天开采（小型矿山）单位产品可比综合能耗",
+      "name": "铁矿露天开采（小型矿山）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.surface-small",
-          "name": "铁矿露天开采（小型矿山）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -440,13 +440,13 @@
     },
     {
       "id": "gb_31335-2024-underground-medium-plus",
-      "name": "铁矿地下开采（中型及以上矿山）单位产品可比综合能耗",
+      "name": "铁矿地下开采（中型及以上矿山）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.underground-medium-plus",
-          "name": "铁矿地下开采（中型及以上矿山）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -654,13 +654,13 @@
     },
     {
       "id": "gb_31335-2024-underground-small",
-      "name": "铁矿地下开采（小型矿山）单位产品可比综合能耗",
+      "name": "铁矿地下开采（小型矿山）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.underground-small",
-          "name": "铁矿地下开采（小型矿山）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -868,13 +868,13 @@
     },
     {
       "id": "gb_31335-2024-beneficiation-weak-magnetic",
-      "name": "铁矿选矿（弱磁选）单位产品可比综合能耗",
+      "name": "铁矿选矿（弱磁选）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.beneficiation-weak-magnetic",
-          "name": "铁矿选矿（弱磁选）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1082,13 +1082,13 @@
     },
     {
       "id": "gb_31335-2024-beneficiation-combined",
-      "name": "铁矿选矿（联合选别）单位产品可比综合能耗",
+      "name": "铁矿选矿（联合选别）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.beneficiation-combined",
-          "name": "铁矿选矿（联合选别）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1296,13 +1296,13 @@
     },
     {
       "id": "gb_31335-2024-roasting-rotary-kiln",
-      "name": "铁矿选矿（焙烧选别，回转窑）单位产品可比综合能耗",
+      "name": "铁矿选矿（焙烧选别，回转窑）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.roasting-rotary-kiln",
-          "name": "铁矿选矿（焙烧选别，回转窑）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1470,13 +1470,13 @@
     },
     {
       "id": "gb_31335-2024-roasting-shaft-furnace",
-      "name": "铁矿选矿（焙烧选别，竖炉）单位产品可比综合能耗",
+      "name": "铁矿选矿（焙烧选别，竖炉）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.roasting-shaft-furnace",
-          "name": "铁矿选矿（焙烧选别，竖炉）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1644,13 +1644,13 @@
     },
     {
       "id": "gb_31335-2024-roasting-fluidized",
-      "name": "铁矿选矿（焙烧选别，流态化）单位产品可比综合能耗",
+      "name": "铁矿选矿（焙烧选别，流态化）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_31335-2024.roasting-fluidized",
-          "name": "铁矿选矿（焙烧选别，流态化）单位产品可比综合能耗",
+          "name": "单位产品可比综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

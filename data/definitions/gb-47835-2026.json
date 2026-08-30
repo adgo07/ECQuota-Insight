@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_47835-2026.monocrystalline-silicon.comprehensive-energy",
-          "name": "硅单晶（方棒）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/kg",
           "comparison": "lte",
           "input_definitions": [
@@ -191,7 +191,7 @@
       "indicators": [
         {
           "id": "GB_47835-2026.monocrystalline-wafer.comprehensive-energy",
-          "name": "硅单晶片单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/百万片",
           "comparison": "lte",
           "input_definitions": [

@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.ceramic-tile-abs-le-0.2",
-          "name": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率≤0.2%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -283,7 +283,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.ceramic-tile-abs-0.2-0.5",
-          "name": "陶瓷砖（干压）/陶瓷瓦（干压），0.2%＜吸水率≤0.5%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -548,7 +548,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.ceramic-tile-abs-0.5-10",
-          "name": "陶瓷砖（干压）/陶瓷瓦（干压），0.5%＜吸水率≤10%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -813,7 +813,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.ceramic-tile-abs-gt-10",
-          "name": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率＞10%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1078,7 +1078,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.ceramic-board",
-          "name": "陶瓷板",
+          "name": "单位产品综合能耗",
           "unit": "kgce/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1343,7 +1343,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.dry-hung-hollow-board-extruded-tile",
-          "name": "干挂空心陶瓷板、陶瓷瓦（挤压）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1517,7 +1517,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.sanitary-ware-abs-le-0.3",
-          "name": "卫生陶瓷，吸水率≤0.3%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1691,7 +1691,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.sanitary-ware-abs-gt-0.3",
-          "name": "卫生陶瓷，吸水率＞0.3%",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1865,7 +1865,7 @@
       "indicators": [
         {
           "id": "GB_21252-2023.alumina-grinding-ball-90-series",
-          "name": "耐磨氧化铝球（90系列）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

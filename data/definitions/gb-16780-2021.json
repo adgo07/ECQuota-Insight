@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "cement",
-      "name": "水泥产品",
+      "name": "水泥",
       "description": "水泥单位产品综合能耗；熟料比例按75%基准修正。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "cement.comprehensive_energy",
-          "name": "水泥单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -605,13 +605,13 @@
     },
     {
       "id": "clinker",
-      "name": "水泥熟料",
+      "name": "熟料",
       "description": "熟料综合能耗、综合电耗和综合煤耗分别判级。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "clinker.comprehensive",
-          "name": "熟料单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -954,7 +954,7 @@
         },
         {
           "id": "clinker.electricity",
-          "name": "熟料单位产品综合电耗",
+          "name": "单位产品综合电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1297,7 +1297,7 @@
         },
         {
           "id": "clinker.coal",
-          "name": "熟料单位产品综合煤耗",
+          "name": "单位产品综合煤耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1648,7 +1648,7 @@
       "indicators": [
         {
           "id": "cement-preparation.electricity",
-          "name": "水泥制备工段电耗",
+          "name": "电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [

@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.module-topcon.conversion-efficiency",
-          "name": "TOPCon电池晶体硅光伏组件光电转换效率",
+          "name": "光电转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -146,7 +146,7 @@
         },
         {
           "id": "GB_47834-2026.module-topcon.degradation-rate",
-          "name": "TOPCon电池晶体硅光伏组件耦合环境应力衰减率",
+          "name": "耦合环境应力衰减率",
           "unit": "%",
           "comparison": "lte",
           "input_definitions": [
@@ -275,7 +275,7 @@
         },
         {
           "id": "GB_47834-2026.module-topcon.bifaciality",
-          "name": "TOPCon电池双面晶体硅光伏组件双面率",
+          "name": "双面率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -412,7 +412,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.module-hjt.conversion-efficiency",
-          "name": "HJT电池晶体硅光伏组件光电转换效率",
+          "name": "光电转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -540,7 +540,7 @@
         },
         {
           "id": "GB_47834-2026.module-hjt.degradation-rate",
-          "name": "HJT电池晶体硅光伏组件耦合环境应力衰减率",
+          "name": "耦合环境应力衰减率",
           "unit": "%",
           "comparison": "lte",
           "input_definitions": [
@@ -669,7 +669,7 @@
         },
         {
           "id": "GB_47834-2026.module-hjt.bifaciality",
-          "name": "HJT电池双面晶体硅光伏组件双面率",
+          "name": "双面率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -806,7 +806,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.module-bc.conversion-efficiency",
-          "name": "BC电池晶体硅光伏组件光电转换效率",
+          "name": "光电转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -934,7 +934,7 @@
         },
         {
           "id": "GB_47834-2026.module-bc.degradation-rate",
-          "name": "BC电池晶体硅光伏组件耦合环境应力衰减率",
+          "name": "耦合环境应力衰减率",
           "unit": "%",
           "comparison": "lte",
           "input_definitions": [
@@ -1063,7 +1063,7 @@
         },
         {
           "id": "GB_47834-2026.module-bc.bifaciality",
-          "name": "BC电池双面晶体硅光伏组件双面率",
+          "name": "双面率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1200,7 +1200,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-20-50kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（20<P≤50）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1328,7 +1328,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-20-50kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（20<P≤50）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1464,7 +1464,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-50-100kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（50<P≤100）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1592,7 +1592,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-50-100kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（50<P≤100）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1728,7 +1728,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-100-150kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（100<P≤150）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1856,7 +1856,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-100-150kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（100<P≤150）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -1992,7 +1992,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-150-200kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（150<P≤200）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -2120,7 +2120,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-150-200kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（150<P≤200）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -2256,7 +2256,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-200-500kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（200<P≤500）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -2384,7 +2384,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-200-500kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（200<P≤500）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -2520,7 +2520,7 @@
       "indicators": [
         {
           "id": "GB_47834-2026.inverter-over-500kw.weighted-total-efficiency",
-          "name": "光伏并网逆变器（P>500）平均加权总效率",
+          "name": "平均加权总效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [
@@ -2648,7 +2648,7 @@
         },
         {
           "id": "GB_47834-2026.inverter-over-500kw.max-conversion-efficiency",
-          "name": "光伏并网逆变器（P>500）最大转换效率",
+          "name": "最大转换效率",
           "unit": "%",
           "comparison": "gte",
           "input_definitions": [

@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "manual-candidate-1",
-      "name": "普通功率石墨电极单位产品综合能耗",
+      "name": "普通功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_1",
-          "name": "普通功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "manual-candidate-2",
-      "name": "普通功率石墨电极单位产品电耗",
+      "name": "普通功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_2",
-          "name": "普通功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "manual-candidate-3",
-      "name": "高功率石墨电极单位产品综合能耗",
+      "name": "高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_3",
-          "name": "高功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "manual-candidate-4",
-      "name": "高功率石墨电极单位产品电耗",
+      "name": "高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_4",
-          "name": "高功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "manual-candidate-5",
-      "name": "超高功率石墨电极单位产品综合能耗",
+      "name": "超高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_5",
-          "name": "超高功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -877,13 +877,13 @@
     },
     {
       "id": "manual-candidate-6",
-      "name": "超高功率石墨电极单位产品电耗",
+      "name": "超高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_6",
-          "name": "超高功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1050,13 +1050,13 @@
     },
     {
       "id": "manual-candidate-7",
-      "name": "炭电极（产品直径≤1000 mm）单位产品综合能耗",
+      "name": "炭电极（产品直径≤1000 mm）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_7",
-          "name": "炭电极（产品直径≤1000 mm）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1223,13 +1223,13 @@
     },
     {
       "id": "manual-candidate-8",
-      "name": "炭电极（产品直径＞1000 mm）单位产品综合能耗",
+      "name": "炭电极（产品直径＞1000 mm）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_8",
-          "name": "炭电极（产品直径＞1000 mm）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1396,13 +1396,13 @@
     },
     {
       "id": "manual-candidate-9",
-      "name": "炭块（半石墨质炭块）单位产品综合能耗",
+      "name": "炭块（半石墨质炭块）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_9",
-          "name": "炭块（半石墨质炭块）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1569,13 +1569,13 @@
     },
     {
       "id": "manual-candidate-10",
-      "name": "炭块（微孔炭块）单位产品综合能耗",
+      "name": "炭块（微孔炭块）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_10",
-          "name": "炭块（微孔炭块）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1742,13 +1742,13 @@
     },
     {
       "id": "manual-candidate-11",
-      "name": "焙烧工序（产品直径≤500 mm）单位产品能耗",
+      "name": "焙烧工序（产品直径≤500 mm）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_11",
-          "name": "焙烧工序（产品直径≤500 mm）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1915,13 +1915,13 @@
     },
     {
       "id": "manual-candidate-12",
-      "name": "焙烧工序（500 mm＜产品直径≤1000 mm）单位产品能耗",
+      "name": "焙烧工序（500 mm＜产品直径≤1000 mm）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_12",
-          "name": "焙烧工序（500 mm＜产品直径≤1000 mm）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2088,13 +2088,13 @@
     },
     {
       "id": "manual-candidate-13",
-      "name": "焙烧工序（产品直径＞1000 mm）单位产品能耗",
+      "name": "焙烧工序（产品直径＞1000 mm）",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_13",
-          "name": "焙烧工序（产品直径＞1000 mm）单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2261,13 +2261,13 @@
     },
     {
       "id": "manual-candidate-14",
-      "name": "石墨化工序普通功率石墨电极单位产品综合能耗",
+      "name": "石墨化工序普通功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_14",
-          "name": "石墨化工序普通功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2434,13 +2434,13 @@
     },
     {
       "id": "manual-candidate-15",
-      "name": "石墨化工序普通功率石墨电极单位产品电耗",
+      "name": "石墨化工序普通功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_15",
-          "name": "石墨化工序普通功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2607,13 +2607,13 @@
     },
     {
       "id": "manual-candidate-16",
-      "name": "石墨化工序高功率石墨电极单位产品综合能耗",
+      "name": "石墨化工序高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_16",
-          "name": "石墨化工序高功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2780,13 +2780,13 @@
     },
     {
       "id": "manual-candidate-17",
-      "name": "石墨化工序高功率石墨电极单位产品电耗",
+      "name": "石墨化工序高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_17",
-          "name": "石墨化工序高功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2953,13 +2953,13 @@
     },
     {
       "id": "manual-candidate-18",
-      "name": "石墨化工序超高功率石墨电极单位产品综合能耗",
+      "name": "石墨化工序超高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_18",
-          "name": "石墨化工序超高功率石墨电极单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3126,13 +3126,13 @@
     },
     {
       "id": "manual-candidate-19",
-      "name": "石墨化工序超高功率石墨电极单位产品电耗",
+      "name": "石墨化工序超高功率石墨电极",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21370_2017.manual_candidate_19",
-          "name": "石墨化工序超高功率石墨电极单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [

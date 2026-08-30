@@ -41,6 +41,7 @@ from uebench.domain.models import (
     EvaluationRequest,
     DataType,
     Grade,
+    LifecycleStatus,
     InputMode,
     InputValue,
     StandardSelectionMode,
@@ -373,7 +374,8 @@ class MainWindow(QMainWindow):
         standards = self.context.standards.list_current(today)
         all_standards = self.context.standards.list_all()
         records = self.context.evaluations.list_recent(10)
-        self.home_standard_count.setText(f"{len(standards)}/{len(all_standards)}")
+        scoped_standards = [item for item in all_standards if item.lifecycle_status is not LifecycleStatus.OBSOLETE]
+        self.home_standard_count.setText(f"{len(standards)}/{len(scoped_standards)}")
         self.home_evaluation_count.setText(str(len(records)))
         package_rows = []
         from uebench.infrastructure.database import PackageRow
@@ -503,8 +505,13 @@ class MainWindow(QMainWindow):
         self.eval_product.blockSignals(True)
         self.eval_product.clear()
         if self.current_standard:
+            product_name_counts = Counter(product.name for product in self.current_standard.products)
             for product in self.current_standard.products:
-                self.eval_product.addItem(product.name, product.id)
+                display_name = product.name
+                if product_name_counts[product.name] > 1:
+                    indicator_names = "、".join(indicator.name for indicator in product.indicators)
+                    display_name = f"{product.name}（指标：{indicator_names}）"
+                self.eval_product.addItem(display_name, product.id)
             self.eval_date.setDate(QDate.currentDate())
             warning = self.current_standard.selection_warning(date.today())
             if warning:

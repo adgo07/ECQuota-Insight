@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "ferrosilicon.smelting_electricity",
-          "name": "硅铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -422,7 +422,7 @@
         },
         {
           "id": "ferrosilicon.comprehensive_energy",
-          "name": "硅铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -554,7 +554,7 @@
       "indicators": [
         {
           "id": "electric-high-carbon-ferromanganese.smelting_electricity",
-          "name": "电炉高碳锰铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -958,7 +958,7 @@
         },
         {
           "id": "electric-high-carbon-ferromanganese.comprehensive_energy",
-          "name": "电炉高碳锰铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1090,7 +1090,7 @@
       "indicators": [
         {
           "id": "ferromanganese-silicon.smelting_electricity",
-          "name": "锰硅合金单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1494,7 +1494,7 @@
         },
         {
           "id": "ferromanganese-silicon.comprehensive_energy",
-          "name": "锰硅合金单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1626,7 +1626,7 @@
       "indicators": [
         {
           "id": "low-carbon-ferromanganese-silicon.smelting_electricity",
-          "name": "低碳锰硅合金单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2030,7 +2030,7 @@
         },
         {
           "id": "low-carbon-ferromanganese-silicon.comprehensive_energy",
-          "name": "低碳锰硅合金单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2162,7 +2162,7 @@
       "indicators": [
         {
           "id": "micro-carbon-ferromanganese.smelting_electricity",
-          "name": "微碳锰铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2566,7 +2566,7 @@
         },
         {
           "id": "micro-carbon-ferromanganese.comprehensive_energy",
-          "name": "微碳锰铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2698,7 +2698,7 @@
       "indicators": [
         {
           "id": "high-carbon-ferrochrome.smelting_electricity",
-          "name": "高碳铬铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3119,7 +3119,7 @@
         },
         {
           "id": "high-carbon-ferrochrome.comprehensive_energy",
-          "name": "高碳铬铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3251,7 +3251,7 @@
       "indicators": [
         {
           "id": "charge-ferrochrome.smelting_electricity",
-          "name": "炉料级铬铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3672,7 +3672,7 @@
         },
         {
           "id": "charge-ferrochrome.comprehensive_energy",
-          "name": "炉料级铬铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3804,7 +3804,7 @@
       "indicators": [
         {
           "id": "medium-low-carbon-ferrochrome.smelting_electricity",
-          "name": "中（低）碳铬铁单位产品冶炼电耗",
+          "name": "单位产品冶炼电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4208,7 +4208,7 @@
         },
         {
           "id": "medium-low-carbon-ferrochrome.comprehensive_energy",
-          "name": "中（低）碳铬铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4340,7 +4340,7 @@
       "indicators": [
         {
           "id": "blast-furnace-ferromanganese.coke_consumption",
-          "name": "高炉锰铁单位产品焦炭消耗",
+          "name": "单位产品焦炭消耗",
           "unit": "kg/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4744,7 +4744,7 @@
         },
         {
           "id": "blast-furnace-ferromanganese.comprehensive_energy",
-          "name": "高炉锰铁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

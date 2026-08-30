@@ -59,15 +59,23 @@ def audit_release(root: Path) -> dict:
             errors.append(f"文件哈希不匹配：{name}")
 
     manifest_report: dict[str, object] = {}
+    expected_current_rules = None
     package = root / "initial-standard-package-published.uebench"
     if package.exists():
         try:
             with zipfile.ZipFile(package) as archive:
                 manifest = json.loads(archive.read("manifest.json"))
+                definitions = [json.loads(archive.read(name)) for name in archive.namelist() if name.startswith("definitions/") and name.endswith(".json")]
+            current_definitions = [d for d in definitions if d.get("lifecycle_status", "active") != "obsolete"]
+            history_definitions = [d for d in definitions if d.get("lifecycle_status") == "obsolete"]
+            expected_current_rules = sum(len(product.get("indicators", [])) for definition in current_definitions for product in definition.get("products", []))
             manifest_report = {
                 "standard_count": manifest.get("standard_count"),
                 "rule_count": manifest.get("rule_count"),
                 "data_version": manifest.get("data_version"),
+                "current_standard_count": len(current_definitions),
+                "historical_standard_count": len(history_definitions),
+                "current_rule_count": expected_current_rules,
             }
             if not isinstance(manifest.get("standard_count"), int) or not isinstance(manifest.get("rule_count"), int):
                 errors.append("正式标准包清单缺少有效的标准数量或规则数量")
@@ -92,14 +100,17 @@ def audit_release(root: Path) -> dict:
                 "indicator_rows": len(rows),
                 "conclusions": dict(conclusions),
                 "published_ready": (
-                    len(rows) == 701
-                    and conclusions == Counter({"同意发布": 701})
+                    expected_current_rules is not None
+                    and len(rows) == expected_current_rules
+                    and conclusions == Counter({"同意发布": expected_current_rules})
                     and all(row[headers["确认人"]].value for row in rows)
                     and all(row[headers["确认日期"]].value for row in rows)
                 ),
             }
-            if len(rows) != 701:
-                errors.append(f"规则确认表指标行数不是701：{len(rows)}")
+            if expected_current_rules is not None and len(rows) != expected_current_rules:
+                errors.append(f"规则确认表指标行数与当前标准包不一致：确认表{len(rows)}，当前规则{expected_current_rules}")
+            if not confirmation_report["published_ready"]:
+                errors.append("规则确认表尚未完成全部指标的同意发布确认，当前交付只能作为候选包")
         except Exception as exc:
             errors.append(f"规则确认表无法读取：{exc}")
 

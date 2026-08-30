@@ -39,13 +39,15 @@ def load_or_create_key(private_path: Path, public_path: Path) -> Ed25519PrivateK
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="构建含46项标准原文和规则的初始离线标准包")
+    parser = argparse.ArgumentParser(description="构建含当前46项标准及已确认历史版本原文和规则的初始离线标准包")
     parser.add_argument("source_dir", type=Path)
     parser.add_argument("--output", type=Path, default=Path("dist/standard-packages/initial-standard-package-46-candidate.uebench"))
     parser.add_argument("--data-version", default="2026.08-reviewed.1")
-    parser.add_argument("--package-id", default="initial-46-standards-reviewed-202608")
+    parser.add_argument("--package-id", default="initial-46-current-plus-history-published-202608")
     parser.add_argument("--issued-at", help="ISO时间；不填写时使用当前UTC时间")
     parser.add_argument("--scope", type=Path, default=Path("data/scope-44.json"))
+    parser.add_argument("--history-dir", type=Path, default=Path("data/history/definitions"))
+    parser.add_argument("--history-source-dir", type=Path, default=Path(r"G:\标准  规范\10_作废标准"))
     parser.add_argument("--private-key", type=Path, default=Path("work/signing/development-private-key.pem"))
     parser.add_argument(
         "--public-key",
@@ -62,9 +64,27 @@ def main() -> None:
         if json.loads(path.read_text(encoding="utf-8"))["number"] in target
     ]
     if len(definitions) != len(scope["standards"]):
-        raise ValueError(f"标准定义数量与范围不一致：{len(definitions)} != {len(scope['standards'])}")
-    source_dir = args.source_dir.resolve()
-    source_files = {definition.source_file: source_dir / definition.source_file for definition in definitions}
+        raise ValueError(f"当前标准定义数量与范围不一致：{len(definitions)} != {len(scope['standards'])}")
+    # 历史规则单独存放；只有已发布的历史版本才进入正式包，避免把草案当成可计算规则。
+    history_dir = args.history_dir.resolve()
+    current_keys = {(item.id, item.version) for item in definitions}
+    for path in sorted(history_dir.glob("*.json")) if history_dir.exists() else []:
+        definition = StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
+        if definition.publication_status.value != "published":
+            continue
+        if (definition.id, definition.version) not in current_keys:
+            definitions.append(definition)
+    source_dirs = [args.source_dir.resolve(), args.history_source_dir.resolve()]
+    source_files = {}
+    for definition in definitions:
+        candidates = []
+        for directory in source_dirs:
+            exact = directory / definition.source_file
+            if exact.exists():
+                candidates.append(exact)
+            candidates.extend(sorted(directory.glob(f"*{definition.source_file}")))
+        unique = list(dict.fromkeys(candidates))
+        source_files[definition.source_file] = unique[0] if len(unique) == 1 else (unique[0] if unique else source_dirs[0] / definition.source_file)
     missing = [name for name, path in source_files.items() if not path.exists()]
     if missing:
         raise FileNotFoundError(f"缺少标准原文：{missing}")

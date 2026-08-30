@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "manual-candidate-1",
-      "name": "聚甲醛单位产品能耗",
+      "name": "聚甲醛",
       "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29438_2012.manual_candidate_1",
-          "name": "聚甲醛单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

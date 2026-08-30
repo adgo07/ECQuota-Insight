@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_46029-2025-silver-process",
-      "name": "银法甲醛单位产品综合能耗",
+      "name": "银法甲醛",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_46029-2025.silver-process",
-          "name": "银法甲醛单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_46029-2025-iron-molybdenum-process",
-      "name": "铁钼法甲醛单位产品综合能耗",
+      "name": "铁钼法甲醛",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_46029-2025.iron-molybdenum-process",
-          "name": "铁钼法甲醛单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

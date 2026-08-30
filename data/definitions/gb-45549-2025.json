@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_45549-2025-flake-graphite",
-      "name": "鳞片石墨单位产品综合能耗",
+      "name": "鳞片石墨",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.flake-graphite",
-          "name": "鳞片石墨单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_45549-2025-microcrystalline-graphite",
-      "name": "微晶石墨单位产品综合能耗",
+      "name": "微晶石墨",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.microcrystalline-graphite",
-          "name": "微晶石墨单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_45549-2025-fluorite-lump",
-      "name": "萤石块矿单位产品综合能耗",
+      "name": "萤石块矿",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.fluorite-lump",
-          "name": "萤石块矿单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_45549-2025-fluorite-powder",
-      "name": "萤石粉矿单位产品综合能耗",
+      "name": "萤石粉矿",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.fluorite-powder",
-          "name": "萤石粉矿单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_45549-2025-fluorite-fine-two-stage",
-      "name": "萤石精粉单位产品综合能耗（两段磨矿工艺）",
+      "name": "萤石精粉（两段磨矿工艺）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.fluorite-fine-two-stage",
-          "name": "萤石精粉单位产品综合能耗（两段磨矿工艺）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -877,13 +877,13 @@
     },
     {
       "id": "gb_45549-2025-fluorite-fine-three-stage",
-      "name": "萤石精粉单位产品综合能耗（三段磨矿工艺）",
+      "name": "萤石精粉（三段磨矿工艺）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.fluorite-fine-three-stage",
-          "name": "萤石精粉单位产品综合能耗（三段磨矿工艺）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1050,13 +1050,13 @@
     },
     {
       "id": "gb_45549-2025-fluorite-fine-comprehensive",
-      "name": "萤石精粉单位产品综合能耗（综合利用工艺）",
+      "name": "萤石精粉（综合利用工艺）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_45549-2025.fluorite-fine-comprehensive",
-          "name": "萤石精粉单位产品综合能耗（综合利用工艺）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

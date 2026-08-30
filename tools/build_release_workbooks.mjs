@@ -114,9 +114,17 @@ try {
 } catch {
   // 新增标准尚未建立人工命名映射时使用可审计的通用拆分；不阻断确认表生成。
 }
+let scopeNumbers = null;
+try {
+  const scope = JSON.parse(await fs.readFile(path.join(dataRoot, "scope-44.json"), "utf8"));
+  scopeNumbers = new Set(scope.standards ?? []);
+} catch {
+  // 如果使用独立数据目录生成确认表，则默认读取其中全部正式定义。
+}
 const definitions = [];
 for (const filename of definitionFiles) {
   const definition = JSON.parse(await fs.readFile(path.join(dataRoot, "definitions", filename), "utf8"));
+  if (scopeNumbers && !scopeNumbers.has(definition.number)) continue;
   definitions.push(definition);
 }
 definitions.sort((a, b) => a.number.localeCompare(b.number, "zh-CN"));

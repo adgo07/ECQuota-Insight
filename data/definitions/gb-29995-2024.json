@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_29995-2024-columnar-activated-carbon",
-      "name": "柱状活性炭单位产品能耗（原料用能不纳入）",
+      "name": "柱状活性炭（原料用能不纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.columnar-activated-carbon",
-          "name": "柱状活性炭单位产品能耗（原料用能不纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_29995-2024-briquette-activated-carbon",
-      "name": "压块活性炭单位产品能耗（原料用能不纳入）",
+      "name": "压块活性炭（原料用能不纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.briquette-activated-carbon",
-          "name": "压块活性炭单位产品能耗（原料用能不纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_29995-2024-raw-coal-crushed-activated-carbon",
-      "name": "原煤破碎活性炭单位产品能耗（原料用能不纳入）",
+      "name": "原煤破碎活性炭（原料用能不纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.raw-coal-crushed-activated-carbon",
-          "name": "原煤破碎活性炭单位产品能耗（原料用能不纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_29995-2024-activated-coke",
-      "name": "活性焦单位产品能耗（原料用能不纳入）",
+      "name": "活性焦（原料用能不纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.activated-coke",
-          "name": "活性焦单位产品能耗（原料用能不纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_29995-2024-semi-coke",
-      "name": "兰炭单位产品能耗",
+      "name": "兰炭",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.semi-coke",
-          "name": "兰炭单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -918,13 +918,13 @@
     },
     {
       "id": "gb_29995-2024-columnar-activated-carbon-feedstock",
-      "name": "柱状活性炭单位产品能耗（原料用能纳入）",
+      "name": "柱状活性炭（原料用能纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.columnar-activated-carbon-feedstock",
-          "name": "柱状活性炭单位产品能耗（原料用能纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1091,13 +1091,13 @@
     },
     {
       "id": "gb_29995-2024-briquette-activated-carbon-feedstock",
-      "name": "压块活性炭单位产品能耗（原料用能纳入）",
+      "name": "压块活性炭（原料用能纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.briquette-activated-carbon-feedstock",
-          "name": "压块活性炭单位产品能耗（原料用能纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1264,13 +1264,13 @@
     },
     {
       "id": "gb_29995-2024-raw-coal-crushed-activated-carbon-feedstock",
-      "name": "原煤破碎活性炭单位产品能耗（原料用能纳入）",
+      "name": "原煤破碎活性炭（原料用能纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.raw-coal-crushed-activated-carbon-feedstock",
-          "name": "原煤破碎活性炭单位产品能耗（原料用能纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1437,13 +1437,13 @@
     },
     {
       "id": "gb_29995-2024-activated-coke-feedstock",
-      "name": "活性焦单位产品能耗（原料用能纳入）",
+      "name": "活性焦（原料用能纳入）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29995-2024.activated-coke-feedstock",
-          "name": "活性焦单位产品能耗（原料用能纳入）",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

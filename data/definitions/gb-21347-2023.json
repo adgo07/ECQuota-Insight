@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_21347-2023-industrial-silicon-charcoal",
-      "name": "工业硅（主还原剂为木炭）单位产品综合能耗",
+      "name": "工业硅（主还原剂为木炭）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21347-2023.industrial-silicon-charcoal",
-          "name": "工业硅（主还原剂为木炭）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_21347-2023-industrial-silicon-petcoke-coal",
-      "name": "工业硅（主还原剂为石油焦和煤混合）单位产品综合能耗",
+      "name": "工业硅（主还原剂为石油焦和煤混合）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21347-2023.industrial-silicon-petcoke-coal",
-          "name": "工业硅（主还原剂为石油焦和煤混合）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_21347-2023-industrial-silicon-coal",
-      "name": "工业硅（主还原剂为煤）单位产品综合能耗",
+      "name": "工业硅（主还原剂为煤）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21347-2023.industrial-silicon-coal",
-          "name": "工业硅（主还原剂为煤）单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_21347-2023-magnesium",
-      "name": "镁单位产品综合能耗",
+      "name": "镁",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21347-2023.magnesium",
-          "name": "镁单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

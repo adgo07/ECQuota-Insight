@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_25324-2022-prebaked-anode-calcination",
-      "name": "铝电解用预焙阳极煅烧工序单位产品综合能源消耗",
+      "name": "铝电解用预焙阳极煅烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.prebaked-anode-calcination",
-          "name": "铝电解用预焙阳极煅烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -186,13 +186,13 @@
     },
     {
       "id": "gb_25324-2022-prebaked-anode-forming",
-      "name": "铝电解用预焙阳极成型工序单位产品综合能源消耗",
+      "name": "铝电解用预焙阳极成型工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.prebaked-anode-forming",
-          "name": "铝电解用预焙阳极成型工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -360,13 +360,13 @@
     },
     {
       "id": "gb_25324-2022-prebaked-anode-roasting",
-      "name": "铝电解用预焙阳极焙烧工序单位产品综合能源消耗",
+      "name": "铝电解用预焙阳极焙烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.prebaked-anode-roasting",
-          "name": "铝电解用预焙阳极焙烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -534,13 +534,13 @@
     },
     {
       "id": "gb_25324-2022-prebaked-anode-assembly",
-      "name": "铝电解用预焙阳极组装工序单位产品综合能源消耗",
+      "name": "铝电解用预焙阳极组装工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.prebaked-anode-assembly",
-          "name": "铝电解用预焙阳极组装工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -708,13 +708,13 @@
     },
     {
       "id": "gb_25324-2022-graphitic-cathode-calcination",
-      "name": "铝电解用石墨质阴极炭块煅烧工序单位产品综合能源消耗",
+      "name": "铝电解用石墨质阴极炭块煅烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.graphitic-cathode-calcination",
-          "name": "铝电解用石墨质阴极炭块煅烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -882,13 +882,13 @@
     },
     {
       "id": "gb_25324-2022-graphitic-cathode-forming-roasting",
-      "name": "铝电解用石墨质阴极炭块成型焙烧加工工序单位产品综合能源消耗",
+      "name": "铝电解用石墨质阴极炭块成型焙烧加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.graphitic-cathode-forming-roasting",
-          "name": "铝电解用石墨质阴极炭块成型焙烧加工工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1056,13 +1056,13 @@
     },
     {
       "id": "gb_25324-2022-graphitized-cathode-calcination",
-      "name": "铝电解用石墨化阴极炭块煅烧工序单位产品综合能源消耗",
+      "name": "铝电解用石墨化阴极炭块煅烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.graphitized-cathode-calcination",
-          "name": "铝电解用石墨化阴极炭块煅烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1230,13 +1230,13 @@
     },
     {
       "id": "gb_25324-2022-graphitized-cathode-forming-roasting",
-      "name": "铝电解用石墨化阴极炭块成型焙烧工序单位产品综合能源消耗",
+      "name": "铝电解用石墨化阴极炭块成型焙烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.graphitized-cathode-forming-roasting",
-          "name": "铝电解用石墨化阴极炭块成型焙烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1404,13 +1404,13 @@
     },
     {
       "id": "gb_25324-2022-graphitized-cathode-graphitization",
-      "name": "铝电解用石墨化阴极炭块石墨化加工工序单位产品综合能源消耗",
+      "name": "铝电解用石墨化阴极炭块石墨化加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.graphitized-cathode-graphitization",
-          "name": "铝电解用石墨化阴极炭块石墨化加工工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1578,13 +1578,13 @@
     },
     {
       "id": "gb_25324-2022-cathode-paste-calcination",
-      "name": "铝电解用阴极糊煅烧工序单位产品综合能源消耗",
+      "name": "铝电解用阴极糊煅烧工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.cathode-paste-calcination",
-          "name": "铝电解用阴极糊煅烧工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1752,13 +1752,13 @@
     },
     {
       "id": "gb_25324-2022-cathode-paste-kneading",
-      "name": "铝电解用阴极糊混捏工序单位产品综合能源消耗",
+      "name": "铝电解用阴极糊混捏工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_25324-2022.cathode-paste-kneading",
-          "name": "铝电解用阴极糊混捏工序单位产品综合能源消耗",
+          "name": "单位产品综合能源消耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

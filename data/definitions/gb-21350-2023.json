@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_21350-2023-table-2-row-1",
-      "name": "表2 管材 紫铜熔铸工序单位产品综合能耗",
+      "name": "管材 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-1",
-          "name": "表2 管材 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -278,13 +278,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-2",
-      "name": "表2 管材 紫铜加工工序单位产品综合能耗",
+      "name": "管材 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-2",
-          "name": "表2 管材 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -544,13 +544,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-3",
-      "name": "表2 管材 紫铜全工序单位产品综合能耗",
+      "name": "管材 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-3",
-          "name": "表2 管材 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -810,13 +810,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-4",
-      "name": "表2 管材 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "管材 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-4",
-          "name": "表2 管材 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1076,13 +1076,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-5",
-      "name": "表2 管材 普通黄铜加工工序单位产品综合能耗",
+      "name": "管材 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-5",
-          "name": "表2 管材 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1342,13 +1342,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-6",
-      "name": "表2 管材 普通黄铜全工序单位产品综合能耗",
+      "name": "管材 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-6",
-          "name": "表2 管材 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1608,13 +1608,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-7",
-      "name": "表2 管材 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "管材 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-7",
-          "name": "表2 管材 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1874,13 +1874,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-8",
-      "name": "表2 管材 复杂黄铜加工工序单位产品综合能耗",
+      "name": "管材 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-8",
-          "name": "表2 管材 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2140,13 +2140,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-9",
-      "name": "表2 管材 复杂黄铜全工序单位产品综合能耗",
+      "name": "管材 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-9",
-          "name": "表2 管材 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2406,13 +2406,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-10",
-      "name": "表2 管材 青铜、高铜熔铸工序单位产品综合能耗",
+      "name": "管材 青铜、高铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-10",
-          "name": "表2 管材 青铜、高铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2672,13 +2672,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-11",
-      "name": "表2 管材 青铜、高铜加工工序单位产品综合能耗",
+      "name": "管材 青铜、高铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-11",
-          "name": "表2 管材 青铜、高铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -2938,13 +2938,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-12",
-      "name": "表2 管材 青铜、高铜全工序单位产品综合能耗",
+      "name": "管材 青铜、高铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-12",
-          "name": "表2 管材 青铜、高铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3204,13 +3204,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-13",
-      "name": "表2 管材 白铜熔铸工序单位产品综合能耗",
+      "name": "管材 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-13",
-          "name": "表2 管材 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3470,13 +3470,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-14",
-      "name": "表2 管材 白铜加工工序单位产品综合能耗",
+      "name": "管材 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-14",
-          "name": "表2 管材 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -3736,13 +3736,13 @@
     },
     {
       "id": "gb_21350-2023-table-2-row-15",
-      "name": "表2 管材 白铜全工序单位产品综合能耗",
+      "name": "管材 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-2-row-15",
-          "name": "表2 管材 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4002,13 +4002,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-16",
-      "name": "表3 棒材、线材（挤压法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "棒材（挤压法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-16",
-          "name": "表3 棒材、线材（挤压法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4268,13 +4268,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-17",
-      "name": "表3 棒材、线材（挤压法） 紫铜加工工序单位产品综合能耗",
+      "name": "棒材（挤压法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-17",
-          "name": "表3 棒材、线材（挤压法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4534,13 +4534,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-18",
-      "name": "表3 棒材、线材（挤压法） 紫铜全工序单位产品综合能耗",
+      "name": "棒材（挤压法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-18",
-          "name": "表3 棒材、线材（挤压法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -4800,13 +4800,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-19",
-      "name": "表3 棒材、线材（挤压法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "棒材（挤压法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-19",
-          "name": "表3 棒材、线材（挤压法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5066,13 +5066,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-20",
-      "name": "表3 棒材、线材（挤压法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "棒材（挤压法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-20",
-          "name": "表3 棒材、线材（挤压法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5332,13 +5332,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-21",
-      "name": "表3 棒材、线材（挤压法） 普通黄铜全工序单位产品综合能耗",
+      "name": "棒材（挤压法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-21",
-          "name": "表3 棒材、线材（挤压法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5598,13 +5598,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-22",
-      "name": "表3 棒材、线材（挤压法） 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "棒材（挤压法） 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-22",
-          "name": "表3 棒材、线材（挤压法） 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -5864,13 +5864,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-23",
-      "name": "表3 棒材、线材（挤压法） 复杂黄铜加工工序单位产品综合能耗",
+      "name": "棒材（挤压法） 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-23",
-          "name": "表3 棒材、线材（挤压法） 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6130,13 +6130,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-24",
-      "name": "表3 棒材、线材（挤压法） 复杂黄铜全工序单位产品综合能耗",
+      "name": "棒材（挤压法） 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-24",
-          "name": "表3 棒材、线材（挤压法） 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6396,13 +6396,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-25",
-      "name": "表3 棒材、线材（挤压法） 青铜、高铜熔铸工序单位产品综合能耗",
+      "name": "棒材（挤压法） 青铜、高铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-25",
-          "name": "表3 棒材、线材（挤压法） 青铜、高铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6662,13 +6662,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-26",
-      "name": "表3 棒材、线材（挤压法） 青铜、高铜加工工序单位产品综合能耗",
+      "name": "棒材（挤压法） 青铜、高铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-26",
-          "name": "表3 棒材、线材（挤压法） 青铜、高铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -6928,13 +6928,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-27",
-      "name": "表3 棒材、线材（挤压法） 青铜、高铜全工序单位产品综合能耗",
+      "name": "棒材（挤压法） 青铜、高铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-27",
-          "name": "表3 棒材、线材（挤压法） 青铜、高铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7194,13 +7194,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-28",
-      "name": "表3 棒材、线材（挤压法） 白铜熔铸工序单位产品综合能耗",
+      "name": "棒材（挤压法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-28",
-          "name": "表3 棒材、线材（挤压法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7460,13 +7460,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-29",
-      "name": "表3 棒材、线材（挤压法） 白铜加工工序单位产品综合能耗",
+      "name": "棒材（挤压法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-29",
-          "name": "表3 棒材、线材（挤压法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7726,13 +7726,13 @@
     },
     {
       "id": "gb_21350-2023-table-3-row-30",
-      "name": "表3 棒材、线材（挤压法） 白铜全工序单位产品综合能耗",
+      "name": "棒材（挤压法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-3-row-30",
-          "name": "表3 棒材、线材（挤压法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7992,13 +7992,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-31",
-      "name": "表4 棒材、线材（连续法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "线材（挤压法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-31",
-          "name": "表4 棒材、线材（连续法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8258,13 +8258,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-32",
-      "name": "表4 棒材、线材（连续法） 紫铜加工工序单位产品综合能耗",
+      "name": "线材（挤压法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-32",
-          "name": "表4 棒材、线材（连续法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8524,13 +8524,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-33",
-      "name": "表4 棒材、线材（连续法） 紫铜全工序单位产品综合能耗",
+      "name": "线材（挤压法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-33",
-          "name": "表4 棒材、线材（连续法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -8790,13 +8790,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-34",
-      "name": "表4 棒材、线材（连续法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "线材（挤压法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-34",
-          "name": "表4 棒材、线材（连续法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9056,13 +9056,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-35",
-      "name": "表4 棒材、线材（连续法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "线材（挤压法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-35",
-          "name": "表4 棒材、线材（连续法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9322,13 +9322,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-36",
-      "name": "表4 棒材、线材（连续法） 普通黄铜全工序单位产品综合能耗",
+      "name": "线材（挤压法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-36",
-          "name": "表4 棒材、线材（连续法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9588,13 +9588,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-37",
-      "name": "表4 棒材、线材（连续法） 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "线材（挤压法） 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-37",
-          "name": "表4 棒材、线材（连续法） 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -9854,13 +9854,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-38",
-      "name": "表4 棒材、线材（连续法） 复杂黄铜加工工序单位产品综合能耗",
+      "name": "线材（挤压法） 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-38",
-          "name": "表4 棒材、线材（连续法） 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10120,13 +10120,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-39",
-      "name": "表4 棒材、线材（连续法） 复杂黄铜全工序单位产品综合能耗",
+      "name": "线材（挤压法） 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-39",
-          "name": "表4 棒材、线材（连续法） 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10386,13 +10386,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-40",
-      "name": "表4 棒材、线材（连续法） 青铜、高铜熔铸工序单位产品综合能耗",
+      "name": "线材（挤压法） 青铜、高铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-40",
-          "name": "表4 棒材、线材（连续法） 青铜、高铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10652,13 +10652,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-41",
-      "name": "表4 棒材、线材（连续法） 青铜、高铜加工工序单位产品综合能耗",
+      "name": "线材（挤压法） 青铜、高铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-41",
-          "name": "表4 棒材、线材（连续法） 青铜、高铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -10918,13 +10918,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-42",
-      "name": "表4 棒材、线材（连续法） 青铜、高铜全工序单位产品综合能耗",
+      "name": "线材（挤压法） 青铜、高铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-42",
-          "name": "表4 棒材、线材（连续法） 青铜、高铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11184,13 +11184,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-43",
-      "name": "表4 棒材、线材（连续法） 白铜熔铸工序单位产品综合能耗",
+      "name": "线材（挤压法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-43",
-          "name": "表4 棒材、线材（连续法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11450,13 +11450,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-44",
-      "name": "表4 棒材、线材（连续法） 白铜加工工序单位产品综合能耗",
+      "name": "线材（挤压法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-44",
-          "name": "表4 棒材、线材（连续法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11716,13 +11716,13 @@
     },
     {
       "id": "gb_21350-2023-table-4-row-45",
-      "name": "表4 棒材、线材（连续法） 白铜全工序单位产品综合能耗",
+      "name": "线材（挤压法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-4-row-45",
-          "name": "表4 棒材、线材（连续法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -11982,13 +11982,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-46",
-      "name": "表5 棒材、线材（连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "棒材（连铸法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-46",
-          "name": "表5 棒材、线材（连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12248,13 +12248,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-47",
-      "name": "表5 棒材、线材（连续铸造法） 紫铜加工工序单位产品综合能耗",
+      "name": "棒材（连铸法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-47",
-          "name": "表5 棒材、线材（连续铸造法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12514,13 +12514,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-48",
-      "name": "表5 棒材、线材（连续铸造法） 紫铜全工序单位产品综合能耗",
+      "name": "棒材（连铸法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-48",
-          "name": "表5 棒材、线材（连续铸造法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -12780,13 +12780,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-49",
-      "name": "表5 棒材、线材（连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "棒材（连铸法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-49",
-          "name": "表5 棒材、线材（连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13046,13 +13046,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-50",
-      "name": "表5 棒材、线材（连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "棒材（连铸法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-50",
-          "name": "表5 棒材、线材（连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13312,13 +13312,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-51",
-      "name": "表5 棒材、线材（连续铸造法） 普通黄铜全工序单位产品综合能耗",
+      "name": "棒材（连铸法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-51",
-          "name": "表5 棒材、线材（连续铸造法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13578,13 +13578,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-52",
-      "name": "表5 棒材、线材（连续铸造法） 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "棒材（连铸法） 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-52",
-          "name": "表5 棒材、线材（连续铸造法） 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -13844,13 +13844,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-53",
-      "name": "表5 棒材、线材（连续铸造法） 复杂黄铜加工工序单位产品综合能耗",
+      "name": "棒材（连铸法） 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-53",
-          "name": "表5 棒材、线材（连续铸造法） 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14110,13 +14110,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-54",
-      "name": "表5 棒材、线材（连续铸造法） 复杂黄铜全工序单位产品综合能耗",
+      "name": "棒材（连铸法） 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-54",
-          "name": "表5 棒材、线材（连续铸造法） 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14376,13 +14376,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-55",
-      "name": "表5 棒材、线材（连续铸造法） 青铜、高铜熔铸工序单位产品综合能耗",
+      "name": "棒材（连铸法） 青铜、高铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-55",
-          "name": "表5 棒材、线材（连续铸造法） 青铜、高铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14642,13 +14642,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-56",
-      "name": "表5 棒材、线材（连续铸造法） 青铜、高铜加工工序单位产品综合能耗",
+      "name": "棒材（连铸法） 青铜、高铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-56",
-          "name": "表5 棒材、线材（连续铸造法） 青铜、高铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -14908,13 +14908,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-57",
-      "name": "表5 棒材、线材（连续铸造法） 青铜、高铜全工序单位产品综合能耗",
+      "name": "棒材（连铸法） 青铜、高铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-57",
-          "name": "表5 棒材、线材（连续铸造法） 青铜、高铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15174,13 +15174,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-58",
-      "name": "表5 棒材、线材（连续铸造法） 白铜熔铸工序单位产品综合能耗",
+      "name": "棒材（连铸法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-58",
-          "name": "表5 棒材、线材（连续铸造法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15440,13 +15440,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-59",
-      "name": "表5 棒材、线材（连续铸造法） 白铜加工工序单位产品综合能耗",
+      "name": "棒材（连铸法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-59",
-          "name": "表5 棒材、线材（连续铸造法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15706,13 +15706,13 @@
     },
     {
       "id": "gb_21350-2023-table-5-row-60",
-      "name": "表5 棒材、线材（连续铸造法） 白铜全工序单位产品综合能耗",
+      "name": "棒材（连铸法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-5-row-60",
-          "name": "表5 棒材、线材（连续铸造法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -15972,13 +15972,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-61",
-      "name": "表6 棒材、线材（连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "线材（连铸法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-61",
-          "name": "表6 棒材、线材（连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16238,13 +16238,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-62",
-      "name": "表6 棒材、线材（连续铸造法） 紫铜加工工序单位产品综合能耗",
+      "name": "线材（连铸法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-62",
-          "name": "表6 棒材、线材（连续铸造法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16504,13 +16504,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-63",
-      "name": "表6 棒材、线材（连续铸造法） 紫铜全工序单位产品综合能耗",
+      "name": "线材（连铸法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-63",
-          "name": "表6 棒材、线材（连续铸造法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -16770,13 +16770,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-64",
-      "name": "表6 棒材、线材（连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "线材（连铸法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-64",
-          "name": "表6 棒材、线材（连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17036,13 +17036,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-65",
-      "name": "表6 棒材、线材（连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "线材（连铸法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-65",
-          "name": "表6 棒材、线材（连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17302,13 +17302,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-66",
-      "name": "表6 棒材、线材（连续铸造法） 普通黄铜全工序单位产品综合能耗",
+      "name": "线材（连铸法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-66",
-          "name": "表6 棒材、线材（连续铸造法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17568,13 +17568,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-67",
-      "name": "表6 棒材、线材（连续铸造法） 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "线材（连铸法） 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-67",
-          "name": "表6 棒材、线材（连续铸造法） 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -17834,13 +17834,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-68",
-      "name": "表6 棒材、线材（连续铸造法） 复杂黄铜加工工序单位产品综合能耗",
+      "name": "线材（连铸法） 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-68",
-          "name": "表6 棒材、线材（连续铸造法） 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18100,13 +18100,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-69",
-      "name": "表6 棒材、线材（连续铸造法） 复杂黄铜全工序单位产品综合能耗",
+      "name": "线材（连铸法） 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-69",
-          "name": "表6 棒材、线材（连续铸造法） 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18366,13 +18366,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-70",
-      "name": "表6 棒材、线材（连续铸造法） 青铜熔铸工序单位产品综合能耗",
+      "name": "线材（连铸法） 青铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-70",
-          "name": "表6 棒材、线材（连续铸造法） 青铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18632,13 +18632,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-71",
-      "name": "表6 棒材、线材（连续铸造法） 青铜加工工序单位产品综合能耗",
+      "name": "线材（连铸法） 青铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-71",
-          "name": "表6 棒材、线材（连续铸造法） 青铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -18898,13 +18898,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-72",
-      "name": "表6 棒材、线材（连续铸造法） 青铜全工序单位产品综合能耗",
+      "name": "线材（连铸法） 青铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-72",
-          "name": "表6 棒材、线材（连续铸造法） 青铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19164,13 +19164,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-73",
-      "name": "表6 棒材、线材（连续铸造法） 白铜熔铸工序单位产品综合能耗",
+      "name": "线材（连铸法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-73",
-          "name": "表6 棒材、线材（连续铸造法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19430,13 +19430,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-74",
-      "name": "表6 棒材、线材（连续铸造法） 白铜加工工序单位产品综合能耗",
+      "name": "线材（连铸法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-74",
-          "name": "表6 棒材、线材（连续铸造法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19696,13 +19696,13 @@
     },
     {
       "id": "gb_21350-2023-table-6-row-75",
-      "name": "表6 棒材、线材（连续铸造法） 白铜全工序单位产品综合能耗",
+      "name": "线材（连铸法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-6-row-75",
-          "name": "表6 棒材、线材（连续铸造法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -19962,13 +19962,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-76",
-      "name": "表7 板、带、箔材（热轧法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-76",
-          "name": "表7 板、带、箔材（热轧法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -20228,13 +20228,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-77",
-      "name": "表7 板、带、箔材（热轧法） 紫铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-77",
-          "name": "表7 板、带、箔材（热轧法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -20494,13 +20494,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-78",
-      "name": "表7 板、带、箔材（热轧法） 紫铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-78",
-          "name": "表7 板、带、箔材（热轧法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -20760,13 +20760,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-79",
-      "name": "表7 板、带、箔材（热轧法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-79",
-          "name": "表7 板、带、箔材（热轧法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -21026,13 +21026,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-80",
-      "name": "表7 板、带、箔材（热轧法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-80",
-          "name": "表7 板、带、箔材（热轧法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -21292,13 +21292,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-81",
-      "name": "表7 板、带、箔材（热轧法） 普通黄铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-81",
-          "name": "表7 板、带、箔材（热轧法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -21558,13 +21558,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-82",
-      "name": "表7 板、带、箔材（热轧法） 复杂黄铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 复杂黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-82",
-          "name": "表7 板、带、箔材（热轧法） 复杂黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -21824,13 +21824,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-83",
-      "name": "表7 板、带、箔材（热轧法） 复杂黄铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 复杂黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-83",
-          "name": "表7 板、带、箔材（热轧法） 复杂黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -22090,13 +22090,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-84",
-      "name": "表7 板、带、箔材（热轧法） 复杂黄铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 复杂黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-84",
-          "name": "表7 板、带、箔材（热轧法） 复杂黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -22356,13 +22356,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-85",
-      "name": "表7 板、带、箔材（热轧法） 青铜、高铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 青铜、高铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-85",
-          "name": "表7 板、带、箔材（热轧法） 青铜、高铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -22622,13 +22622,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-86",
-      "name": "表7 板、带、箔材（热轧法） 青铜、高铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 青铜、高铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-86",
-          "name": "表7 板、带、箔材（热轧法） 青铜、高铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -22888,13 +22888,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-87",
-      "name": "表7 板、带、箔材（热轧法） 青铜、高铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 青铜、高铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-87",
-          "name": "表7 板、带、箔材（热轧法） 青铜、高铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -23154,13 +23154,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-88",
-      "name": "表7 板、带、箔材（热轧法） 白铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-88",
-          "name": "表7 板、带、箔材（热轧法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -23420,13 +23420,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-89",
-      "name": "表7 板、带、箔材（热轧法） 白铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-89",
-          "name": "表7 板、带、箔材（热轧法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -23686,13 +23686,13 @@
     },
     {
       "id": "gb_21350-2023-table-7-row-90",
-      "name": "表7 板、带、箔材（热轧法） 白铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（热轧法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-7-row-90",
-          "name": "表7 板、带、箔材（热轧法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -23952,13 +23952,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-91",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-91",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -24218,13 +24218,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-92",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-92",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -24484,13 +24484,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-93",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-93",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -24750,13 +24750,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-94",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 普通黄铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-94",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -25016,13 +25016,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-95",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 普通黄铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-95",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -25282,13 +25282,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-96",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 普通黄铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-96",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 普通黄铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -25548,13 +25548,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-97",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 青铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-97",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -25814,13 +25814,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-98",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 青铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-98",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -26080,13 +26080,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-99",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 青铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-99",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 青铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -26346,13 +26346,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-100",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 白铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-100",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -26612,13 +26612,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-101",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 白铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-101",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -26878,13 +26878,13 @@
     },
     {
       "id": "gb_21350-2023-table-8-row-102",
-      "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（水平方向连续铸造法） 白铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-8-row-102",
-          "name": "表8 板、带、箔材（水平方向连续铸造法） 白铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -27144,13 +27144,13 @@
     },
     {
       "id": "gb_21350-2023-table-9-row-103",
-      "name": "表9 板、带、箔材（连续挤压法） 紫铜熔铸工序单位产品综合能耗",
+      "name": "板、带、箔材（连续挤压法） 紫铜熔铸工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-9-row-103",
-          "name": "表9 板、带、箔材（连续挤压法） 紫铜熔铸工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -27410,13 +27410,13 @@
     },
     {
       "id": "gb_21350-2023-table-9-row-104",
-      "name": "表9 板、带、箔材（连续挤压法） 紫铜加工工序单位产品综合能耗",
+      "name": "板、带、箔材（连续挤压法） 紫铜加工工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-9-row-104",
-          "name": "表9 板、带、箔材（连续挤压法） 紫铜加工工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -27676,13 +27676,13 @@
     },
     {
       "id": "gb_21350-2023-table-9-row-105",
-      "name": "表9 板、带、箔材（连续挤压法） 紫铜全工序单位产品综合能耗",
+      "name": "板、带、箔材（连续挤压法） 紫铜全工序",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-9-row-105",
-          "name": "表9 板、带、箔材（连续挤压法） 紫铜全工序单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -27942,13 +27942,13 @@
     },
     {
       "id": "gb_21350-2023-table-10-wire-106",
-      "name": "表10 上引连铸法/阴极铜电工用铜线坯单位产品综合能耗",
+      "name": "上引连铸法/阴极铜电工用铜线坯",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-10-wire-106",
-          "name": "表10 上引连铸法/阴极铜电工用铜线坯单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -28116,13 +28116,13 @@
     },
     {
       "id": "gb_21350-2023-table-10-wire-107",
-      "name": "表10 连铸连轧法/阴极铜电工用铜线坯单位产品综合能耗",
+      "name": "连铸连轧法/阴极铜电工用铜线坯",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-10-wire-107",
-          "name": "表10 连铸连轧法/阴极铜电工用铜线坯单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -28290,13 +28290,13 @@
     },
     {
       "id": "gb_21350-2023-table-10-wire-108",
-      "name": "表10 连铸连轧法/再生铜电工用铜线坯单位产品综合能耗",
+      "name": "连铸连轧法/再生铜电工用铜线坯",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_21350-2023.table-10-wire-108",
-          "name": "表10 连铸连轧法/再生铜电工用铜线坯单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

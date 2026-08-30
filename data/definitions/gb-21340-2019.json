@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.flat-capacity-le-500",
-          "name": "平板玻璃（生产线设计生产能力≤500 t/d）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/重箱",
           "comparison": "lte",
           "input_definitions": [
@@ -275,7 +275,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.flat-capacity-500-800",
-          "name": "平板玻璃（500 t/d＜生产线设计生产能力≤800 t/d）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/重箱",
           "comparison": "lte",
           "input_definitions": [
@@ -698,7 +698,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.flat-capacity-gt-800",
-          "name": "平板玻璃（生产线设计生产能力＞800 t/d）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/重箱",
           "comparison": "lte",
           "input_definitions": [
@@ -1121,7 +1121,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-4",
-          "name": "钢化玻璃/平面普通钢化玻璃/3 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1295,7 +1295,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-5",
-          "name": "钢化玻璃/平面普通钢化玻璃/4 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1469,7 +1469,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-6",
-          "name": "钢化玻璃/平面普通钢化玻璃/5 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1643,7 +1643,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-7",
-          "name": "钢化玻璃/平面普通钢化玻璃/6 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1817,7 +1817,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-8",
-          "name": "钢化玻璃/平面普通钢化玻璃/8 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -1991,7 +1991,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-9",
-          "name": "钢化玻璃/平面普通钢化玻璃/10 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -2165,7 +2165,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-10",
-          "name": "钢化玻璃/平面普通钢化玻璃/12 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -2339,7 +2339,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-11",
-          "name": "钢化玻璃/平面普通钢化玻璃/15 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -2513,7 +2513,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-12",
-          "name": "钢化玻璃/平面普通钢化玻璃/19 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -2687,7 +2687,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-13",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/3 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -2861,7 +2861,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-14",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/4 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3035,7 +3035,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-15",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/5 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3209,7 +3209,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-16",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/6 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3383,7 +3383,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-17",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/8 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3557,7 +3557,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-18",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/10 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3731,7 +3731,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-19",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/12 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -3905,7 +3905,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-20",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/15 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4079,7 +4079,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-21",
-          "name": "钢化玻璃/平面低辐射镀膜钢化玻璃/19 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4253,7 +4253,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-22",
-          "name": "钢化玻璃/曲面普通钢化玻璃/3 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4427,7 +4427,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-23",
-          "name": "钢化玻璃/曲面普通钢化玻璃/4 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4601,7 +4601,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-24",
-          "name": "钢化玻璃/曲面普通钢化玻璃/5 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4775,7 +4775,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-25",
-          "name": "钢化玻璃/曲面普通钢化玻璃/6 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -4949,7 +4949,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-26",
-          "name": "钢化玻璃/曲面普通钢化玻璃/8 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5123,7 +5123,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-27",
-          "name": "钢化玻璃/曲面普通钢化玻璃/10 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5297,7 +5297,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-28",
-          "name": "钢化玻璃/曲面普通钢化玻璃/12 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5471,7 +5471,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-29",
-          "name": "钢化玻璃/曲面普通钢化玻璃/15 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5645,7 +5645,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-30",
-          "name": "钢化玻璃/曲面普通钢化玻璃/19 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5819,7 +5819,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-31",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/3 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -5993,7 +5993,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-32",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/4 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -6167,7 +6167,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-33",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/5 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -6341,7 +6341,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-34",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/6 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -6515,7 +6515,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-35",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/8 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -6689,7 +6689,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-36",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/10 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -6863,7 +6863,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-37",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/12 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -7037,7 +7037,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-38",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/15 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -7211,7 +7211,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.tempered-39",
-          "name": "钢化玻璃/曲面低辐射镀膜钢化玻璃/19 mm厚度",
+          "name": "电耗",
           "unit": "kW·h/m²",
           "comparison": "lte",
           "input_definitions": [
@@ -7385,7 +7385,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.rolled-solar-le-300",
-          "name": "光伏压延玻璃（生产线设计生产能力≤300 t/d）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7558,7 +7558,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.rolled-solar-gt-300",
-          "name": "光伏压延玻璃（生产线设计生产能力＞300 t/d）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -7731,7 +7731,7 @@
       "indicators": [
         {
           "id": "GB_21340-2019.cast-stone",
-          "name": "铸石",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

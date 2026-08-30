@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.caustic-liquid-30",
-          "name": "液碱（质量分数≥30.0%）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -191,7 +191,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.caustic-liquid-45",
-          "name": "液碱（质量分数≥45.0%）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -364,7 +364,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.caustic-solid",
-          "name": "固碱（质量分数≥98.0%）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -537,7 +537,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-carbide-general",
-          "name": "电石法聚氯乙烯树脂（通用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -710,7 +710,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-carbide-paste",
-          "name": "电石法聚氯乙烯树脂（糊用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -883,7 +883,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-ethylene-general",
-          "name": "乙烯法/联合法/姜钟法聚氯乙烯树脂（通用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1056,7 +1056,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-ethylene-paste",
-          "name": "乙烯法/联合法/姜钟法聚氯乙烯树脂（糊用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1229,7 +1229,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-monomer-general",
-          "name": "单体法聚氯乙烯树脂（通用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1402,7 +1402,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.pvc-monomer-paste",
-          "name": "单体法聚氯乙烯树脂（糊用型）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1575,7 +1575,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.methane-chloride-no-entry",
-          "name": "甲烷氯化物，四氯化碳转化成其他产品不进入生产系统",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1748,7 +1748,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.methane-chloride-methyl",
-          "name": "甲烷氯化物，四氯化碳转化成一氯甲烷并进入生产系统",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -1921,7 +1921,7 @@
       "indicators": [
         {
           "id": "GB_21257-2024.methane-chloride-chloroform",
-          "name": "甲烷氯化物，四氯化碳转化成三氯甲烷并进入生产系统",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

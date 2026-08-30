@@ -71,8 +71,11 @@ def _expected_grade(actual: Decimal, limits: dict[str, Decimal], direction: Comp
     return Grade.NOT_QUALIFIED
 
 
-def check(data_dir: Path) -> dict:
+def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) -> dict:
     engine = EvaluationEngine()
+    scope_numbers = None
+    if scope_path is not None and scope_path.exists():
+        scope_numbers = set(json.loads(scope_path.read_text(encoding="utf-8")).get("standards", []))
     counters = Counter()
     incomplete: list[dict[str, str]] = []
     boundary_errors: list[dict[str, str]] = []
@@ -80,6 +83,8 @@ def check(data_dir: Path) -> dict:
     for path in sorted(data_dir.glob("*.json")):
         standard = StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
         if standard.publication_status is not PublicationStatus.PUBLISHED:
+            continue
+        if scope_numbers is not None and standard.number not in scope_numbers:
             continue
         for product in standard.products:
             for indicator in product.indicators:
@@ -155,9 +160,10 @@ def check(data_dir: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, default=Path("data/definitions"))
+    parser.add_argument("--scope", type=Path, default=Path("data/scope-44.json"), help="当前范围文件；传空字符串可检查目录中全部published规则")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    report = check(args.data_dir)
+    report = check(args.data_dir, None if str(args.scope) == "" else args.scope)
     payload = json.dumps(report, ensure_ascii=False, indent=2)
     print(payload)
     if args.output:

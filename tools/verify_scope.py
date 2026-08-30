@@ -67,7 +67,9 @@ def main() -> None:
     errors: list[str] = []
     for path in sorted((data_dir / "definitions").glob("*.json")):
         try:
-            definitions.append(StandardDefinition.model_validate_json(path.read_text(encoding="utf-8")))
+            definition = StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
+            if definition.number in expected:
+                definitions.append(definition)
         except Exception as exc:
             errors.append(f"{path.name}: {exc}")
     catalog_numbers = {item["number"] for item in catalog}

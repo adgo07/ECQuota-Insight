@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "electrolytic-aluminum.aluminum-liquid-ac",
-          "name": "铝液交流电耗",
+          "name": "电耗",
           "unit": "kWh/t",
           "comparison": "lte",
           "input_definitions": [
@@ -390,7 +390,7 @@
         },
         {
           "id": "electrolytic-aluminum.aluminum-ingot-comprehensive-energy",
-          "name": "铝锭综合单耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -522,7 +522,7 @@
       "indicators": [
         {
           "id": "alumina-bayer.process-energy",
-          "name": "拜耳法氧化铝工艺能耗",
+          "name": "工艺能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -646,7 +646,7 @@
         },
         {
           "id": "alumina-bayer.comprehensive-energy",
-          "name": "拜耳法氧化铝综合能耗",
+          "name": "综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -778,7 +778,7 @@
       "indicators": [
         {
           "id": "alumina-other.process-energy",
-          "name": "其他工艺氧化铝工艺能耗",
+          "name": "工艺能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -902,7 +902,7 @@
         },
         {
           "id": "alumina-other.comprehensive-energy",
-          "name": "其他工艺氧化铝综合能耗",
+          "name": "综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

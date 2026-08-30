@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_29449-2024-all-steel-radial",
-      "name": "全钢子午线轮胎单位产品综合能耗",
+      "name": "全钢子午线轮胎",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.all-steel-radial",
-          "name": "全钢子午线轮胎单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -186,13 +186,13 @@
     },
     {
       "id": "gb_29449-2024-semi-steel-radial",
-      "name": "半钢子午线轮胎单位产品综合能耗",
+      "name": "半钢子午线轮胎",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.semi-steel-radial",
-          "name": "半钢子午线轮胎单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -360,13 +360,13 @@
     },
     {
       "id": "gb_29449-2024-earthmover",
-      "name": "工程机械轮胎单位产品综合能耗",
+      "name": "工程机械轮胎",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.earthmover",
-          "name": "工程机械轮胎单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -534,13 +534,13 @@
     },
     {
       "id": "gb_29449-2024-bias",
-      "name": "斜交轮胎单位产品综合能耗",
+      "name": "斜交轮胎",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.bias",
-          "name": "斜交轮胎单位产品综合能耗",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -665,13 +665,13 @@
     },
     {
       "id": "gb_29449-2024-carbon-black-excluding-feedstock",
-      "name": "炭黑单位产品综合能耗（扣除原料用能）",
+      "name": "炭黑（扣除原料用能）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.carbon-black-excluding-feedstock",
-          "name": "炭黑单位产品综合能耗（扣除原料用能）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -839,13 +839,13 @@
     },
     {
       "id": "gb_29449-2024-carbon-black-including-feedstock",
-      "name": "炭黑单位产品综合能耗（不扣除原料用能）",
+      "name": "炭黑（不扣除原料用能）",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_29449-2024.carbon-black-including-feedstock",
-          "name": "炭黑单位产品综合能耗（不扣除原料用能）",
+          "name": "单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

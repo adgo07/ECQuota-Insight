@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_36892-2018-brown-fused-alumina",
-      "name": "棕刚玉单位产品电耗",
+      "name": "棕刚玉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36892-2018.brown-fused-alumina",
-          "name": "棕刚玉单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_36892-2018-white-fused-alumina",
-      "name": "白刚玉单位产品电耗",
+      "name": "白刚玉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36892-2018.white-fused-alumina",
-          "name": "白刚玉单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
@@ -358,13 +358,13 @@
     },
     {
       "id": "gb_36892-2018-sub-white-fused-alumina",
-      "name": "亚白刚玉单位产品电耗",
+      "name": "亚白刚玉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36892-2018.sub-white-fused-alumina",
-          "name": "亚白刚玉单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
@@ -531,13 +531,13 @@
     },
     {
       "id": "gb_36892-2018-dense-fused-alumina",
-      "name": "致密刚玉单位产品电耗",
+      "name": "致密刚玉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36892-2018.dense-fused-alumina",
-          "name": "致密刚玉单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
@@ -704,13 +704,13 @@
     },
     {
       "id": "gb_36892-2018-sintered-corundum",
-      "name": "烧结刚玉单位产品能耗",
+      "name": "烧结刚玉",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36892-2018.sintered-corundum",
-          "name": "烧结刚玉单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [

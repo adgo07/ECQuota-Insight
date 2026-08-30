@@ -12,13 +12,13 @@
   "products": [
     {
       "id": "gb_36891-2018-sintered-mullite",
-      "name": "烧结莫来石单位产品能耗",
+      "name": "烧结莫来石",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36891-2018.sintered-mullite",
-          "name": "烧结莫来石单位产品能耗",
+          "name": "单位产品能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -185,13 +185,13 @@
     },
     {
       "id": "gb_36891-2018-fused-mullite",
-      "name": "电熔莫来石单位产品电耗",
+      "name": "电熔莫来石",
       "description": "依据强制性标准原文表格录入，待独立复核。",
       "input_definitions": [],
       "indicators": [
         {
           "id": "GB_36891-2018.fused-mullite",
-          "name": "电熔莫来石单位产品电耗",
+          "name": "单位产品电耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
