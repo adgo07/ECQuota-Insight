@@ -48,6 +48,15 @@ def test_next_scope_draft_rules_keep_source_citations() -> None:
                 assert all(reference.page >= 1 for reference in indicator.source_references)
 
 
+def test_gb21345_product_and_indicator_names_follow_confirmation_convention() -> None:
+    definition = next(item for item in _definitions() if item.number == "GB 21345-2024")
+    product = definition.products[0]
+    indicator = product.indicators[0]
+    assert product.name == "电炉法黄磷"
+    assert indicator.name == "单位产品综合能耗"
+    assert {reference.page for reference in indicator.source_references} >= {6, 8, 9}
+
+
 def test_gb21345_refined_detail_formula_uses_standard_categories_and_formula() -> None:
     definition = next(item for item in _definitions() if item.number == "GB 21345-2024")
     standard = definition.model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
@@ -63,8 +72,12 @@ def test_gb21345_refined_detail_formula_uses_standard_categories_and_formula() -
             "yellow_phosphorus.feedstock.fe2o3_pct": InputValue(value="1", unit="%"),
             "yellow_phosphorus.feedstock.co2_pct": InputValue(value="2", unit="%"),
             "yellow_phosphorus.product.qualified_t": InputValue(value="10", unit="t"),
-            "yellow_phosphorus.product.phosphoric_acid_equivalent_t": InputValue(value="0", unit="t"),
-            "yellow_phosphorus.product.other_chemical_equivalent_t": InputValue(value="0", unit="t"),
+            "yellow_phosphorus.product.phosphoric_acid_mass_fraction": InputValue(value="0", unit="fraction"),
+            "yellow_phosphorus.product.phosphoric_acid_production_t": InputValue(value="0", unit="t"),
+            "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t": InputValue(value="0", unit="t"),
+            "yellow_phosphorus.product.other_chemical_phosphorus_fraction": InputValue(value="0", unit="fraction"),
+            "yellow_phosphorus.product.other_chemical_production_t": InputValue(value="0", unit="t"),
+            "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t": InputValue(value="0", unit="t"),
             "yellow_phosphorus.product.external_mud_recovered_t": InputValue(value="0", unit="t"),
         },
         energy_lines=[
@@ -83,6 +96,46 @@ def test_gb21345_refined_detail_formula_uses_standard_categories_and_formula() -
     assert result.actual_value > Decimal("0")
     assert result.grade.value == "LEVEL_1"
     assert any(step.operation == "divide" and step.unit == "kgce/t" for step in result.calculation_trace)
+
+
+def test_gb21345_formula9_and_formula10_derive_product_output() -> None:
+    definition = next(item for item in _definitions() if item.number == "GB 21345-2024")
+    standard = definition.model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "yellow_phosphorus.feedstock.p2o5_pct": InputValue(value="10", unit="%"),
+            "yellow_phosphorus.feedstock.fe2o3_pct": InputValue(value="1", unit="%"),
+            "yellow_phosphorus.feedstock.co2_pct": InputValue(value="2", unit="%"),
+            "yellow_phosphorus.product.qualified_t": InputValue(value="10", unit="t"),
+            "yellow_phosphorus.product.phosphoric_acid_mass_fraction": InputValue(value="0.8", unit="fraction"),
+            "yellow_phosphorus.product.phosphoric_acid_production_t": InputValue(value="1", unit="t"),
+            "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t": InputValue(value="0.1", unit="t"),
+            "yellow_phosphorus.product.other_chemical_phosphorus_fraction": InputValue(value="0.5", unit="fraction"),
+            "yellow_phosphorus.product.other_chemical_production_t": InputValue(value="1", unit="t"),
+            "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t": InputValue(value="0.05", unit="t"),
+            "yellow_phosphorus.product.external_mud_recovered_t": InputValue(value="0.2", unit="t"),
+        },
+        energy_lines=[
+            EnergyLine(line_id="carbon", energy_name="炭质还原剂", category_key="carbon_reducing", amount="100", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+            EnergyLine(line_id="furnace", energy_name="电炉加热电量", category_key="furnace_electricity", amount="200000", unit="kWh", standard_coal_coefficient="1", coefficient_unit="kWh/kWh"),
+            EnergyLine(line_id="other", energy_name="生产系统其他能源", category_key="production_other", amount="50", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+            EnergyLine(line_id="aux", energy_name="辅助附属系统", category_key="auxiliary_affiliated", amount="20", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+            EnergyLine(line_id="output", energy_name="界区外输出能源", category_key="external_output", direction="output", amount="0", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        ],
+        production_lines=[ProductionLine(line_id="pp", product_name="黄磷", category_key="qualified", quantity="10", unit="t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    expected_pp = Decimal("10") + Decimal("0.3163") * Decimal("0.8") * Decimal("1") - Decimal("0.1") + Decimal("0.5") * Decimal("1") - Decimal("0.05") - Decimal("0.2")
+    assert result.grade.value == "LEVEL_1"
+    assert any(step.operation == "subtract" and step.label == "黄磷产品产量 PP（公式8）" and step.value == expected_pp for step in result.calculation_trace)
+    assert any(step.label == "泥磷制磷酸折合黄磷量 PPS（公式9）" for step in result.calculation_trace)
+    assert any(step.label == "泥磷制其他化学品折合黄磷量 PPH（公式10）" for step in result.calculation_trace)
 
 
 def test_gb29441_refined_levels_and_detail_formula() -> None:

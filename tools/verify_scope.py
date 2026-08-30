@@ -54,12 +54,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="验证标准范围、定义、原文引用和规则状态")
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
     parser.add_argument("--source-dir", type=Path, required=True)
-    parser.add_argument("--scope-file", type=Path, help="范围清单；省略时优先使用scope-65.json，再回退scope-44.json")
+    parser.add_argument("--scope-file", type=Path, help="范围清单；省略时依次使用scope-63.json、scope-65.json、scope-44.json")
     parser.add_argument("--output", type=Path, default=Path("work/verification/scope-report.json"))
     args = parser.parse_args()
     data_dir = args.data_dir.resolve()
-    scope_path = (args.scope_file.resolve() if args.scope_file else
-                  (data_dir / "scope-65.json" if (data_dir / "scope-65.json").exists() else data_dir / "scope-44.json"))
+    if args.scope_file:
+        scope_path = args.scope_file.resolve()
+    else:
+        scope_candidates = [data_dir / "scope-63.json", data_dir / "scope-65.json", data_dir / "scope-44.json"]
+        scope_path = next((candidate for candidate in scope_candidates if candidate.exists()), scope_candidates[-1])
     scope = json.loads(scope_path.read_text(encoding="utf-8"))
     expected = set(scope["standards"])
     catalog = json.loads((data_dir / "catalog.json").read_text(encoding="utf-8"))["standards"]

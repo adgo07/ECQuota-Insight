@@ -2,11 +2,12 @@ from __future__ import annotations
 
 """Prepare the next full-scope draft workspace without changing the release data.
 
-The current published 46-standard data set is deliberately kept untouched.  This
-tool creates ``work/next-scope-65/data`` by combining it with the 19 catalog
-standards that are still draft, replacing GB 29447-2022 with GB 29447-2026 and
-adding GB 47834/47835-2026.  It may add clearly labelled draft candidates from
-the extracted source tables, but never changes a rule to ``published``.
+The current published data set is deliberately kept untouched.  This tool
+creates an isolated current-plus-draft workspace from the archive catalog and
+current definitions.  Explicit replacement mappings remove superseded standards
+(for example GB 29141/29437/29441-2012) and add their replacement definition.
+It may add clearly labelled draft candidates from extracted source tables, but
+never changes a rule to ``published``.
 """
 
 import argparse
@@ -24,6 +25,16 @@ ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "work" / "archive-data-63"
 CURRENT = ROOT / "data"
 SOURCE = Path(r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本")
+
+# Standards explicitly confirmed as superseded.  The replacement is taken from
+# the current published catalog; old definitions are not copied into the active
+# isolated scope.  Keep this mapping auditable when future standards change.
+REPLACEMENTS = {
+    "GB 29447-2022": "GB 29447-2026",
+    "GB 29141-2012": "GB 29141-2024",
+    "GB 29437-2012": "GB 29141-2024",
+    "GB 29441-2012": "GB 29141-2024",
+}
 
 
 def sha256(path: Path) -> str:
@@ -200,8 +211,8 @@ MANUAL_ROWS: dict[str, list[dict]] = {
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="建立65项当前范围的隔离draft工作区")
-    parser.add_argument("--output", type=Path, default=ROOT / "work" / "next-scope-65")
+    parser = argparse.ArgumentParser(description="建立当前标准范围的隔离draft工作区")
+    parser.add_argument("--output", type=Path, default=ROOT / "work" / "next-scope-63")
     args = parser.parse_args()
     output = args.output.resolve()
     if output.exists():
@@ -215,10 +226,13 @@ def main() -> None:
     rows: list[dict] = []
     for item in archive_catalog["standards"]:
         number = item["number"]
-        if number == "GB 29447-2022":
-            rows.append(current_by_number["GB 29447-2026"])
-        else:
-            rows.append(current_by_number.get(number, item))
+        replacement = REPLACEMENTS.get(number)
+        if replacement:
+            replacement_item = current_by_number.get(replacement)
+            if replacement_item:
+                rows.append(replacement_item)
+            continue
+        rows.append(current_by_number.get(number, item))
     for number in ("GB 47834-2026", "GB 47835-2026"):
         rows.append(current_by_number[number])
     rows = sorted({item["number"]: item for item in rows}.values(), key=lambda item: item["sequence"])
@@ -228,17 +242,17 @@ def main() -> None:
         if item["number"] not in current_by_number:
             item["status"] = "draft"
     catalog = {
-        "schema_version": "1.0", "catalog_name": "当前目录及新增标准的65项工作范围",
+        "schema_version": "1.0", "catalog_name": "当前目录及新增标准的当前范围",
         "catalog_sha256": "", "generated_at": "", "standard_count": len(rows),
-        "scope_version": "65-draft", "standards": rows,
+        "scope_version": "current-draft", "standards": rows,
     }
     (data_dir / "catalog.json").write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    scope = {"schema_version": "1.0", "scope_name": "当前目录及新增标准的65项工作范围",
+    scope = {"schema_version": "1.0", "scope_name": "当前目录及新增标准的当前范围",
              "standards": [item["number"] for item in rows]}
     scope_text = json.dumps(scope, ensure_ascii=False, indent=2) + "\n"
-    # Keep the legacy filename expected by the current loaders and add an
-    # explicit 65-scope alias so the isolated workspace is self-describing.
+    # Keep loader compatibility while exposing a canonical current-scope alias.
     (data_dir / "scope-44.json").write_text(scope_text, encoding="utf-8")
+    (data_dir / "scope-63.json").write_text(scope_text, encoding="utf-8")
     (data_dir / "scope-65.json").write_text(scope_text, encoding="utf-8")
 
     archive_defs = {path.stem: path for path in (ARCHIVE / "definitions").glob("*.json")}

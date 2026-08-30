@@ -84,9 +84,18 @@ def refine(data_dir: Path) -> Path:
         "source_file": original["source_file"],
         "source_sha256": original["source_sha256"],
         "page": 8,
-        "clause": "6.2.2.1～6.2.2.10",
-        "table": "公式（1）～（10）",
+        "clause": "6.2.2.4～6.2.2.8",
+        "table": "公式（4）～（8）",
         "note": "按原文公式建模；能源分类键和产量分类键写入输入说明，不改变原文口径。",
+    }
+    formula_reference_2 = {
+        "standard_number": NUMBER,
+        "source_file": original["source_file"],
+        "source_sha256": original["source_sha256"],
+        "page": 9,
+        "clause": "6.2.2.9～6.2.2.10",
+        "table": "公式（9）～（10）",
+        "note": "泥磷制磷酸和其他化学品折合黄磷量在明细模式中由输入变量计算。",
     }
 
     carbon = inp("energy.category.carbon_reducing.net_standard_coal", "kgce", "炭质还原剂综合能耗 EPT")
@@ -98,12 +107,24 @@ def refine(data_dir: Path) -> Path:
     n2 = inp("yellow_phosphorus.feedstock.fe2o3_pct", "%", "配合炉料Fe2O3加权平均质量分数 N2")
     n3 = inp("yellow_phosphorus.feedstock.co2_pct", "%", "配合炉料CO2加权平均质量分数 N3")
     ppz = inp("yellow_phosphorus.product.qualified_t", "t", "符合GB/T 7816的黄磷量 PPZ")
-    pps = inp("yellow_phosphorus.product.phosphoric_acid_equivalent_t", "t", "泥磷制磷酸折合黄磷量 PPS")
-    pph = inp("yellow_phosphorus.product.other_chemical_equivalent_t", "t", "泥磷制其他化学品折合黄磷量 PPH")
+    ns = inp("yellow_phosphorus.product.phosphoric_acid_mass_fraction", "fraction", "泥磷制得磷酸质量分数 NS（按0~1小数输入）")
+    ps = inp("yellow_phosphorus.product.phosphoric_acid_production_t", "t", "泥磷制得磷酸产量 PS")
+    ppw_ps = inp("yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t", "t", "泥磷制磷酸外加/外购折合黄磷量 PPW")
+    nh = inp("yellow_phosphorus.product.other_chemical_phosphorus_fraction", "fraction", "其他化学品中磷质量分数 NH（按0~1小数输入）")
+    ph = inp("yellow_phosphorus.product.other_chemical_production_t", "t", "泥磷制得其他化学品产量 PH")
+    ppw_ph = inp("yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t", "t", "制备其他化学品外加/外购折合黄磷量 PPW")
     ppwn = inp("yellow_phosphorus.product.external_mud_recovered_t", "t", "外购泥磷回收量 PPWN")
 
     # EPL = {QL - [170000/(N1-0.5) + (7750/(N1-8)-76)×N2
     #        + (3200/(N1-3.5)+8)×N3 - 7234]×PP}×0.1229
+    pps = sub(
+        mul(const("0.3163"), ns, ps, unit="t", label="泥磷制磷酸折合黄磷量 PPS（公式9）"),
+        ppw_ps, unit="t", label="泥磷制磷酸折合黄磷量 PPS（公式9）",
+    )
+    pph = sub(
+        mul(nh, ph, unit="t", label="泥磷制其他化学品折合黄磷量 PPH（公式10）"),
+        ppw_ph, unit="t", label="泥磷制其他化学品折合黄磷量 PPH（公式10）",
+    )
     pp = sub(add(ppz, pps, pph, unit="t", label="黄磷产品产量 PP（公式8）"), ppwn, unit="t", label="黄磷产品产量 PP（公式8）")
     correction = sub(
         add(
@@ -148,13 +169,17 @@ def refine(data_dir: Path) -> Path:
         input_definition("yellow_phosphorus.feedstock.fe2o3_pct", "配合炉料Fe2O3加权平均质量分数 N2", "%", minimum="0"),
         input_definition("yellow_phosphorus.feedstock.co2_pct", "配合炉料CO2加权平均质量分数 N3", "%", minimum="0"),
         input_definition("yellow_phosphorus.product.qualified_t", "符合GB/T 7816的黄磷量 PPZ", "t", minimum="0"),
-        input_definition("yellow_phosphorus.product.phosphoric_acid_equivalent_t", "泥磷制磷酸折合黄磷量 PPS", "t", minimum="0"),
-        input_definition("yellow_phosphorus.product.other_chemical_equivalent_t", "泥磷制其他化学品折合黄磷量 PPH", "t", minimum="0"),
+        input_definition("yellow_phosphorus.product.phosphoric_acid_mass_fraction", "泥磷制得磷酸质量分数 NS（按0~1小数输入）", "fraction", minimum="0", maximum="1"),
+        input_definition("yellow_phosphorus.product.phosphoric_acid_production_t", "泥磷制得磷酸产量 PS", "t", minimum="0"),
+        input_definition("yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t", "泥磷制磷酸外加/外购折合黄磷量 PPW", "t", minimum="0"),
+        input_definition("yellow_phosphorus.product.other_chemical_phosphorus_fraction", "其他化学品中磷质量分数 NH（按0~1小数输入）", "fraction", minimum="0", maximum="1"),
+        input_definition("yellow_phosphorus.product.other_chemical_production_t", "泥磷制得其他化学品产量 PH", "t", minimum="0"),
+        input_definition("yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t", "制备其他化学品外加/外购折合黄磷量 PPW", "t", minimum="0"),
         input_definition("yellow_phosphorus.product.external_mud_recovered_t", "外购泥磷回收量 PPWN", "t", minimum="0"),
     ]
     indicator = {
         "id": f"{NUMBER.replace(' ', '_')}.electric-furnace.comprehensive-energy",
-        "name": "电炉法黄磷单位产品综合能耗",
+        "name": "单位产品综合能耗",
         "unit": "kgce/t",
         "comparison": "lte",
         "input_definitions": definitions,
@@ -164,7 +189,7 @@ def refine(data_dir: Path) -> Path:
         "base_thresholds": {f"level_{i}": const(value, "kgce/t") for i, value in enumerate(("2300", "2450", "2800"), 1)},
         "thresholds": {f"level_{i}": const(value, "kgce/t") for i, value in enumerate(("2300", "2450", "2800"), 1)},
         "display_places": 2,
-        "source_references": [source_reference, formula_reference],
+        "source_references": [source_reference, formula_reference, formula_reference_2],
         "notes": [
             "candidate_from_original_pdf",
             "not_for_formal_evaluation",
@@ -172,6 +197,7 @@ def refine(data_dir: Path) -> Path:
             "detail_energy_category_keys: carbon_reducing, furnace_electricity, production_other, auxiliary_affiliated, external_output",
             "EPW使用external_output分类且明细方向必须为output；引擎将其记录为负值，公式再取相反数。",
             "EPT能源明细折标系数应按各炭质还原剂固定碳质量分数×1000×1.1564录入，单位kgce/t。",
+            "公式9、10的NS、NH按质量分数小数（0~1）录入；确认表中需核对企业原始数据是否采用同一口径。",
         ],
     }
     original["products"] = [{
