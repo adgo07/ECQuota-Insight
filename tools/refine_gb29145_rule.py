@@ -78,6 +78,22 @@ def input_definition(key: str, label: str, unit: str, *, modes: list[str], minim
     }
 
 
+def text_input_definition(key: str, label: str, choices: list[str]) -> dict:
+    return {
+        "key": key,
+        "label": label,
+        "data_type": "text",
+        "unit": None,
+        "required": True,
+        "required_if": None,
+        "modes": ["DIRECT", "DETAIL"],
+        "minimum": None,
+        "maximum": None,
+        "choices": choices,
+        "description": "按GB 29145-2023第1章适用范围录入；未确认前仅作草案。",
+    }
+
+
 def lookup_mu(key: str, table: str, rows: list[tuple[str, str]]) -> dict:
     return node(
         "lookup",
@@ -147,24 +163,28 @@ def refine(data_dir: Path) -> Path:
         {
             "id": "tungsten-black", "name": "钨精矿—黑钨", "indicator": "单位产品可比能耗",
             "thresholds": ("550", "1150", "1450"), "ore_key": "gb29145.tungsten.ore_ratio",
+            "scope_key": "condition.GB29145.tungsten.mining_method", "scope_value": "地下开采", "scope_label": "钨精矿采矿方式", "scope_choices": ["地下开采", "露天开采"],
             "mu_rows": [("250", "0.89"), ("280", "1.00"), ("310", "1.11"), ("340", "1.21"), ("370", "1.32"), ("400", "1.43"), ("430", "1.54"), ("460", "1.64"), ("490", "1.75"), ("520", "1.86"), ("550", "1.96"), ("580", "2.07"), ("610", "2.18")],
             "range_note": "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。",
         },
         {
             "id": "tungsten-white", "name": "钨精矿—白钨", "indicator": "单位产品可比能耗",
             "thresholds": ("1640", "1750", "2050"), "ore_key": "gb29145.tungsten.ore_ratio",
+            "scope_key": "condition.GB29145.tungsten.mining_method", "scope_value": "地下开采", "scope_label": "钨精矿采矿方式", "scope_choices": ["地下开采", "露天开采"],
             "mu_rows": [("250", "0.89"), ("280", "1.00"), ("310", "1.11"), ("340", "1.21"), ("370", "1.32"), ("400", "1.43"), ("430", "1.54"), ("460", "1.64"), ("490", "1.75"), ("520", "1.86"), ("550", "1.96"), ("580", "2.07"), ("610", "2.18")],
             "range_note": "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。",
         },
         {
             "id": "molybdenum-three-stage", "name": "钼精矿—三段一闭路", "indicator": "单位产品可比能耗",
             "thresholds": ("1250", "1390", "1475"), "ore_key": "gb29145.molybdenum.ore_ratio",
+            "scope_key": "condition.GB29145.molybdenum.mining_method", "scope_value": "露天开采", "scope_label": "钼精矿采矿方式", "scope_choices": ["露天开采", "地下开采"],
             "mu_rows": [("330", "0.78"), ("380", "0.88"), ("430", "1.00"), ("480", "1.12"), ("530", "1.23"), ("580", "1.35"), ("630", "1.47"), ("680", "1.58"), ("730", "1.70")],
             "range_note": "适用于露天开采钼精矿的三段一闭路工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。",
         },
         {
             "id": "molybdenum-sabc", "name": "钼精矿—SABC", "indicator": "单位产品可比能耗",
             "thresholds": ("1900", "2060", "2150"), "ore_key": "gb29145.molybdenum.ore_ratio",
+            "scope_key": "condition.GB29145.molybdenum.mining_method", "scope_value": "露天开采", "scope_label": "钼精矿采矿方式", "scope_choices": ["露天开采", "地下开采"],
             "mu_rows": [("330", "0.78"), ("380", "0.88"), ("430", "1.00"), ("480", "1.12"), ("530", "1.23"), ("580", "1.35"), ("630", "1.47"), ("680", "1.58"), ("730", "1.70")],
             "range_note": "适用于露天开采钼精矿的SABC工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。",
         },
@@ -187,6 +207,11 @@ def refine(data_dir: Path) -> Path:
         ]
         if config["ore_key"]:
             definitions.append(input_definition(config["ore_key"], "选矿比 K（按附录C表内数值输入）", "ratio", modes=["DETAIL"], minimum="0"))
+        applicability = {"op": "always"}
+        product_inputs = []
+        if config.get("scope_key"):
+            product_inputs.append(text_input_definition(config["scope_key"], config["scope_label"], config["scope_choices"]))
+            applicability = {"op": "eq", "field": config["scope_key"], "value": config["scope_value"]}
         detail = energy_formula(config["name"], comparable=bool(config["ore_key"]), ore_key=config["ore_key"], mu_rows=config["mu_rows"])
         indicator = {
             "id": f"GB_29145-2023.{config['id']}.energy",
@@ -194,7 +219,7 @@ def refine(data_dir: Path) -> Path:
             "unit": "kgce/t",
             "comparison": "lte",
             "input_definitions": definitions,
-            "applicability": {"op": "always"},
+            "applicability": applicability,
             "direct_input_key": direct_key,
             "detail_formula": detail,
             "base_thresholds": {f"level_{i}": const(v, "kgce/t") for i, v in enumerate(config["thresholds"], 1)},
@@ -204,6 +229,7 @@ def refine(data_dir: Path) -> Path:
             "notes": [
                 "candidate_from_original_pdf", "not_for_formal_evaluation", "requires_independent_review",
                 config["range_note"],
+                (f"软件适用条件：{config['scope_key']}={config['scope_value']}；其他选择返回不适用。" if config.get("scope_key") else "焙烧钼精矿按产品/工序选择生产设备类型。"),
                 "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
                 "焙烧钼精矿不执行公式（2）可比能耗修正。" if not config["ore_key"] else "选矿比不等于附录C表内值时暂返回不完整；未确认前禁止插值或猜测。",
             ],
@@ -211,10 +237,11 @@ def refine(data_dir: Path) -> Path:
         products.append({
             "id": config["id"], "name": config["name"],
             "description": f"{config['range_note']}现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
-            "input_definitions": [], "indicators": [indicator],
+            "input_definitions": product_inputs, "indicators": [indicator],
         })
     definition["products"] = products
     definition["publication_status"] = "draft"
+    definition["supersedes"] = ["GB 29145-2012", "GB 29146-2012", "GB 31340-2014"]
     StandardDefinition.model_validate(definition)
     path.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return path

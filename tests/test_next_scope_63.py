@@ -28,6 +28,14 @@ def _energy_lines(*, total: str = "300") -> list[EnergyLine]:
         EnergyLine(line_id="output", energy_name="外供二次能源", category_key="external_output", direction="output", amount="0", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
     ]
 
+def _gb29145_scope_input(product_id: str, *, mining_method: str | None = None) -> dict[str, InputValue]:
+    if product_id.startswith("tungsten"):
+        return {"condition.GB29145.tungsten.mining_method": InputValue(value=mining_method or "地下开采")}
+    if product_id.startswith("molybdenum"):
+        return {"condition.GB29145.molybdenum.mining_method": InputValue(value=mining_method or "露天开采")}
+    return {}
+
+
 def test_gb29145_names_thresholds_and_citations_follow_standard() -> None:
     standard = _definition()
     assert [p.name for p in standard.products] == [
@@ -46,6 +54,7 @@ def test_gb29145_names_thresholds_and_citations_follow_standard() -> None:
         ["1900", "2060", "2150"], ["210", "230", "260"], ["170", "180", "200"],
     ]
     assert {reference.page for p in standard.products for reference in p.indicators[0].source_references} >= {4, 6, 7, 10}
+    assert standard.supersedes == ["GB 29145-2012", "GB 29146-2012", "GB 31340-2014"]
 
 
 def test_gb29145_direct_values_grade_at_level_one_boundary() -> None:
@@ -58,7 +67,7 @@ def test_gb29145_direct_values_grade_at_level_one_boundary() -> None:
             standard_id=standard.id,
             product_id=product.id,
             input_mode=InputMode.DIRECT,
-            inputs={indicator.direct_input_key: InputValue(value=indicator.thresholds.level_1.value, unit="kgce/t")},
+            inputs={indicator.direct_input_key: InputValue(value=indicator.thresholds.level_1.value, unit="kgce/t"), **_gb29145_scope_input(product.id)},
         )
         result = engine.evaluate(standard, request).results[0]
         assert result.grade is Grade.LEVEL_1
@@ -72,7 +81,7 @@ def test_gb29145_tungsten_detail_uses_appendix_c_lookup_and_formula_two() -> Non
         standard_id=standard.id,
         product_id=product.id,
         input_mode=InputMode.DETAIL,
-        inputs={"gb29145.tungsten.ore_ratio": InputValue(value="280", unit="ratio")},
+        inputs={"gb29145.tungsten.ore_ratio": InputValue(value="280", unit="ratio"), **_gb29145_scope_input(product.id)},
         energy_lines=[
             EnergyLine(line_id="production", energy_name="生产系统", category_key="production_system", amount="280", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
             EnergyLine(line_id="auxiliary", energy_name="辅助系统", category_key="auxiliary_system", amount="20", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
@@ -96,7 +105,7 @@ def test_gb29145_unknown_ore_ratio_is_incomplete_without_interpolation() -> None
         standard_id=standard.id,
         product_id=product.id,
         input_mode=InputMode.DETAIL,
-        inputs={"gb29145.tungsten.ore_ratio": InputValue(value="285", unit="ratio")},
+        inputs={"gb29145.tungsten.ore_ratio": InputValue(value="285", unit="ratio"), **_gb29145_scope_input(product.id)},
         energy_lines=_energy_lines(),
         production_lines=[ProductionLine(line_id="p", product_name="黑钨精矿", category_key="qualified", quantity="1", unit="t")],
     )
@@ -824,3 +833,37 @@ def test_gb21345_zero_formula_denominator_is_incomplete() -> None:
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.INCOMPLETE
     assert any("除零" in warning for warning in result.warnings)
+
+
+def test_gb29145_scope_condition_blocks_inapplicable_tungsten_mining_method() -> None:
+    standard = _published()
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={
+            indicator.direct_input_key: InputValue(value="550", unit="kgce/t"),
+            "condition.GB29145.tungsten.mining_method": InputValue(value="露天开采"),
+        },
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.NOT_APPLICABLE
+
+
+def test_gb29145_scope_condition_requires_mining_method_when_applicability_is_unknown() -> None:
+    standard = _published()
+    product = standard.products[2]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value="1250", unit="kgce/t")},
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("condition.GB29145.molybdenum.mining_method" in warning for warning in result.warnings)

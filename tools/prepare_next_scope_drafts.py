@@ -400,6 +400,9 @@ def main() -> None:
     if any(item["number"] == "GB 21345-2024" for item in rows):
         from refine_gb21345_rule import refine as refine_gb21345
         refine_gb21345(data_dir)
+    if any(item["number"] == "GB 29145-2023" for item in rows):
+        from refine_gb29145_rule import refine as refine_gb29145
+        refine_gb29145(data_dir)
     errors = []
     for path in sorted(definitions_dir.glob("*.json")):
         try:
