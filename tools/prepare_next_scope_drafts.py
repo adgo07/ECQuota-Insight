@@ -397,6 +397,9 @@ def main() -> None:
         target = definitions_dir / "gb-31823-2021.json"
         definition = build_gb31823_2021(item["source_file"], item["source_sha256"])
         target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if any(item["number"] == "GB 21345-2024" for item in rows):
+        from refine_gb21345_rule import refine as refine_gb21345
+        refine_gb21345(data_dir)
     errors = []
     for path in sorted(definitions_dir.glob("*.json")):
         try:

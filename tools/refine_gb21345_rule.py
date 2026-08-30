@@ -208,6 +208,7 @@ def refine(data_dir: Path) -> Path:
         "indicators": [indicator],
     }]
     original["publication_status"] = "draft"
+    original["supersedes"] = ["GB 21345-2015"]
     StandardDefinition.model_validate(original)
     path.write_text(json.dumps(original, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return path

@@ -686,3 +686,141 @@ def test_gb31823_dry_bulk_direct_to_factory_branch_uses_fixed_g() -> None:
     assert result.actual_value == Decimal("1.43")
     assert result.grade is Grade.LEVEL_1
     assert any("g=1.3" in step.label for step in result.calculation_trace)
+
+
+def _gb21345_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json(
+        (ROOT / "definitions/gb-21345-2024.json").read_text(encoding="utf-8")
+    )
+
+
+def _gb21345_published() -> StandardDefinition:
+    return _gb21345_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb21345_energy_lines(*, carbon: str = "100", furnace: str = "200000", other: str = "50", auxiliary: str = "20", exported: str = "10") -> list[EnergyLine]:
+    return [
+        EnergyLine(line_id="carbon", energy_name="炭质还原剂", category_key="carbon_reducing", amount=carbon, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="furnace", energy_name="电炉加热电量", category_key="furnace_electricity", amount=furnace, unit="kWh", standard_coal_coefficient="1", coefficient_unit="kWh/kWh"),
+        EnergyLine(line_id="other", energy_name="生产系统其他能源", category_key="production_other", amount=other, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="auxiliary", energy_name="辅助及附属系统", category_key="auxiliary_affiliated", amount=auxiliary, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="output", energy_name="界区外输出能源", category_key="external_output", direction="output", amount=exported, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+    ]
+
+
+def _gb21345_inputs(*, ns: str = "0", ps: str = "0", ppw_ps: str = "0", nh: str = "0", ph: str = "0", ppw_ph: str = "0", ppwn: str = "0", n1: str = "10") -> dict[str, InputValue]:
+    return {
+        "yellow_phosphorus.feedstock.p2o5_pct": InputValue(value=n1, unit="%"),
+        "yellow_phosphorus.feedstock.fe2o3_pct": InputValue(value="1", unit="%"),
+        "yellow_phosphorus.feedstock.co2_pct": InputValue(value="2", unit="%"),
+        "yellow_phosphorus.product.qualified_t": InputValue(value="10", unit="t"),
+        "yellow_phosphorus.product.phosphoric_acid_mass_fraction": InputValue(value=ns, unit="fraction"),
+        "yellow_phosphorus.product.phosphoric_acid_production_t": InputValue(value=ps, unit="t"),
+        "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t": InputValue(value=ppw_ps, unit="t"),
+        "yellow_phosphorus.product.other_chemical_phosphorus_fraction": InputValue(value=nh, unit="fraction"),
+        "yellow_phosphorus.product.other_chemical_production_t": InputValue(value=ph, unit="t"),
+        "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t": InputValue(value=ppw_ph, unit="t"),
+        "yellow_phosphorus.product.external_mud_recovered_t": InputValue(value=ppwn, unit="t"),
+    }
+
+
+def _gb21345_request(*, input_mode: InputMode = InputMode.DETAIL, inputs: dict[str, InputValue] | None = None, energy_lines: list[EnergyLine] | None = None, evaluation_date: date = date(2025, 5, 1)) -> EvaluationRequest:
+    standard = _gb21345_published()
+    return EvaluationRequest(
+        evaluation_date=evaluation_date,
+        standard_id=standard.id,
+        product_id=standard.products[0].id,
+        input_mode=input_mode,
+        inputs=inputs or {},
+        energy_lines=energy_lines or [],
+        production_lines=[ProductionLine(line_id="ppz", product_name="符合GB/T 7816的黄磷", category_key="qualified", quantity="10", unit="t")],
+    )
+
+
+def test_gb21345_names_effective_date_levels_and_citations_follow_standard() -> None:
+    standard = _gb21345_definition()
+    assert standard.number == "GB 21345-2024"
+    assert standard.title == "黄磷单位产品能源消耗限额"
+    assert standard.publication_date == date(2024, 4, 29)
+    assert standard.effective_date == date(2025, 5, 1)
+    assert standard.lifecycle_status.value == "active"
+    assert standard.supersedes == ["GB 21345-2015"]
+    assert [product.name for product in standard.products] == ["电炉法黄磷"]
+    assert [indicator.name for product in standard.products for indicator in product.indicators] == ["单位产品综合能耗"]
+    indicator = standard.products[0].indicators[0]
+    assert indicator.unit == "kgce/t"
+    assert [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value] == ["2300", "2450", "2800"]
+    assert {reference.page for reference in indicator.source_references} >= {6, 8, 9}
+
+
+@pytest.mark.parametrize(
+    ("actual", "expected"),
+    [("2300", Grade.LEVEL_1), ("2300.01", Grade.LEVEL_2), ("2450", Grade.LEVEL_2),
+     ("2450.01", Grade.LEVEL_3), ("2800", Grade.LEVEL_3), ("2800.01", Grade.NOT_QUALIFIED)],
+)
+def test_gb21345_direct_boundaries_are_inclusive_and_ordered(actual: str, expected: Grade) -> None:
+    standard = _gb21345_published()
+    indicator = standard.products[0].indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1),
+        standard_id=standard.id,
+        product_id=standard.products[0].id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value=actual, unit="kgce/t")},
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal(actual)
+    assert result.grade is expected
+
+
+def test_gb21345_detail_formula_calculates_epl_and_deducts_external_output() -> None:
+    standard = _gb21345_published()
+    request = _gb21345_request(inputs=_gb21345_inputs(), energy_lines=_gb21345_energy_lines())
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    n1 = Decimal("10")
+    correction = (
+        Decimal("170000") / (n1 - Decimal("0.5"))
+        + (Decimal("7750") / (n1 - Decimal("8")) - Decimal("76")) * Decimal("1")
+        + (Decimal("3200") / (n1 - Decimal("3.5")) + Decimal("8")) * Decimal("2")
+        - Decimal("7234")
+    )
+    epl = (Decimal("200000") - correction * Decimal("10")) * Decimal("0.1229")
+    expected = (Decimal("100") + epl + Decimal("50") + Decimal("20") - Decimal("10")) / Decimal("10")
+    assert result.actual_value == expected
+    assert result.grade is Grade.LEVEL_1
+    assert any(step.label == "黄磷产品电炉电耗 EPL" and step.operation == "multiply" for step in result.calculation_trace)
+    assert any(step.label == "界区外输出能源 EPW" and step.value == Decimal("10") for step in result.calculation_trace)
+    no_output = EvaluationEngine().evaluate(
+        standard,
+        request.model_copy(update={"energy_lines": _gb21345_energy_lines(exported="0")}),
+    ).results[0]
+    assert no_output.actual_value - result.actual_value == Decimal("1")
+
+
+def test_gb21345_formula9_and_formula10_derive_pp_from_byproducts() -> None:
+    standard = _gb21345_published()
+    inputs = _gb21345_inputs(ns="0.8", ps="1", ppw_ps="0.1", nh="0.5", ph="1", ppw_ph="0.05", ppwn="0.2")
+    request = _gb21345_request(inputs=inputs, energy_lines=_gb21345_energy_lines(exported="0"))
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    expected_pp = Decimal("10") + Decimal("0.3163") * Decimal("0.8") * Decimal("1") - Decimal("0.1") + Decimal("0.5") * Decimal("1") - Decimal("0.05") - Decimal("0.2")
+    assert result.grade is Grade.LEVEL_1
+    assert any(step.operation == "subtract" and step.label == "黄磷产品产量 PP（公式8）" and step.value == expected_pp for step in result.calculation_trace)
+    assert any(step.label == "泥磷制磷酸折合黄磷量 PPS（公式9）" and step.value == Decimal("0.15304") for step in result.calculation_trace)
+    assert any(step.label == "泥磷制其他化学品折合黄磷量 PPH（公式10）" and step.value == Decimal("0.45") for step in result.calculation_trace)
+
+
+def test_gb21345_missing_detail_input_is_incomplete_without_guessing() -> None:
+    standard = _gb21345_published()
+    request = _gb21345_request(inputs={}, energy_lines=_gb21345_energy_lines())
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert result.actual_value is None
+    assert any("yellow_phosphorus.feedstock.p2o5_pct" in warning for warning in result.warnings)
+
+
+def test_gb21345_zero_formula_denominator_is_incomplete() -> None:
+    standard = _gb21345_published()
+    request = _gb21345_request(inputs=_gb21345_inputs(n1="8"), energy_lines=_gb21345_energy_lines())
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("除零" in warning for warning in result.warnings)
