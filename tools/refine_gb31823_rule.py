@@ -58,10 +58,11 @@ def per_unit(total: dict[str, Any], production: dict[str, Any], unit: str, label
 
 def condition(op: str = "always", *, field: str | None = None, value: str | bool | None = None,
               minimum: str | None = None, maximum: str | None = None,
-              include_minimum: bool = True, include_maximum: bool = True) -> dict[str, Any]:
+              include_minimum: bool = True, include_maximum: bool = True,
+              args: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     return {"op": op, "field": field, "value": value, "values": [],
             "minimum": minimum, "maximum": maximum,
-            "include_minimum": include_minimum, "include_maximum": include_maximum, "args": []}
+            "include_minimum": include_minimum, "include_maximum": include_maximum, "args": args or []}
 
 
 def piecewise(cases: list[tuple[dict[str, Any], dict[str, Any], str]], *, unit: str, label: str) -> dict[str, Any]:
@@ -145,7 +146,10 @@ def dry_bulk_inputs() -> list[dict[str, Any]]:
                      data_type="boolean", required_if=condition("eq", field=portal_key, value=False),
                      description="仅在不使用门座式起重机时填写；直接卸货至后方工厂按原文取g=1.3。"),
         detail_input("condition.GB31823.dry_bulk.unloading_share", "卸货量占比 w", unit="fraction",
-                     minimum="0", maximum="1", required_if=condition("eq", field=portal_key, value=False),
+                     minimum="0", maximum="1", required_if=condition("all", args=[
+                         condition("eq", field=portal_key, value=False),
+                         condition("eq", field="condition.GB31823.dry_bulk.direct_to_factory", value=False),
+                     ]),
                      description="仅在不使用门座式起重机且非直接卸货至后方工厂时用于计算g；按0～1录入。"),
         detail_input("condition.GB31823.dry_bulk.work_line_length", "装卸作业线长度 L", unit="m",
                      minimum="0", description="按原文分段选择装卸作业线长度修正系数k。"),

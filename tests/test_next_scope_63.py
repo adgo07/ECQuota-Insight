@@ -665,3 +665,24 @@ def test_gb31823_crude_oil_missing_temperature_is_incomplete() -> None:
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.INCOMPLETE
     assert any("pipeline_heat_temperature" in warning for warning in result.warnings)
+
+
+def test_gb31823_dry_bulk_direct_to_factory_branch_uses_fixed_g() -> None:
+    standard = _gb31823_published()
+    product = standard.products[1]
+    request = EvaluationRequest(
+        evaluation_date=date(2022, 11, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "condition.GB31823.dry_bulk.portal_crane": InputValue(value=False),
+            "condition.GB31823.dry_bulk.direct_to_factory": InputValue(value=True),
+            "condition.GB31823.dry_bulk.work_line_length": InputValue(value="500", unit="m"),
+            "condition.GB31823.dry_bulk.heating_region": InputValue(value="非采暖地区"),
+        },
+        energy_lines=_gb31823_energy_lines(production="1000"),
+        production_lines=[ProductionLine(line_id="throughput", product_name="干散货吞吐量", quantity="1", unit="10^4t")],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("1.43")
+    assert result.grade is Grade.LEVEL_1
+    assert any("g=1.3" in step.label for step in result.calculation_trace)
