@@ -867,3 +867,173 @@ def test_gb29145_scope_condition_requires_mining_method_when_applicability_is_un
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.INCOMPLETE
     assert any("condition.GB29145.molybdenum.mining_method" in warning for warning in result.warnings)
+
+def _gb29450_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-29450-2012.json").read_text(encoding="utf-8"))
+
+
+def _gb29450_published() -> StandardDefinition:
+    return _gb29450_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb29450_energy_lines(total: str) -> list[EnergyLine]:
+    return [
+        EnergyLine(
+            line_id="glass-fiber-energy",
+            energy_name="玻璃纤维生产能源",
+            category_key="production_system",
+            amount=total,
+            unit="kgce",
+            standard_coal_coefficient="1",
+            coefficient_unit="kgce/kgce",
+        ),
+    ]
+
+
+def test_gb29450_names_levels_and_indicator_split_follow_source_tables() -> None:
+    standard = _gb29450_definition()
+    assert standard.number == "GB 29450-2012"
+    assert standard.title == "玻璃纤维单位产品能源消耗限额"
+    assert standard.effective_date == date(2013, 10, 1)
+    assert [product.name for product in standard.products] == [
+        "池窑法—E玻璃纤维纱（纤维直径≤9μm）",
+        "池窑法—E(ECR)玻璃纤维纱（纤维直径＞9μm）",
+        "池窑法—中碱玻璃纤维纱",
+        "坩埚法—制球—无碱玻璃球",
+        "坩埚法—制球—中碱玻璃球",
+        "坩埚法—拉丝—玻璃纤维纱",
+    ]
+    assert all(product.indicators[0].name == "单位产品综合能耗" for product in standard.products)
+    assert [
+        [None if getattr(product.indicators[0].thresholds, f"level_{level}") is None else getattr(product.indicators[0].thresholds, f"level_{level}").value for level in (1, 2, 3)]
+        for product in standard.products
+    ] == [
+        ["750", "750", "900"], ["550", "550", "700"], ["550", None, "650"],
+        ["400", None, "580"], ["300", None, "400"], ["300", None, "430"],
+    ]
+    assert all(
+        any("缺级" in note for note in product.indicators[0].notes) == (product is not standard.products[0] and product is not standard.products[1])
+        for product in standard.products
+    )
+    assert {reference.page for product in standard.products for reference in product.indicators[0].source_references} >= {3, 4, 5, 6, 7}
+
+
+def test_gb29450_direct_values_grade_at_level_one_boundary() -> None:
+    standard = _gb29450_published()
+    engine = EvaluationEngine()
+    for product in standard.products:
+        indicator = product.indicators[0]
+        request = EvaluationRequest(
+            evaluation_date=date(2025, 1, 1),
+            standard_id=standard.id,
+            product_id=product.id,
+            input_mode=InputMode.DIRECT,
+            inputs={indicator.direct_input_key: InputValue(value=indicator.thresholds.level_1.value, unit="kgce/t")},
+        )
+        result = engine.evaluate(standard, request).results[0]
+        assert result.grade is Grade.LEVEL_1
+
+
+def test_gb29450_fine_yarn_detail_formula_three() -> None:
+    standard = _gb29450_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "glass_fiber.pool.yarn_mode": InputValue(value="单纯细纱"),
+            "glass_fiber.pool.fine_yarn_gt5um_t": InputValue(value="8", unit="t"),
+            "glass_fiber.pool.fine_yarn_le5um_t": InputValue(value="2", unit="t"),
+        },
+        energy_lines=_gb29450_energy_lines("9000"),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("9000") / Decimal("11")
+    assert result.grade is Grade.LEVEL_3
+    assert any("Gyz9" in step.expression for step in result.calculation_trace)
+
+
+def test_gb29450_mixed_pool_yarn_formulas_four_and_five() -> None:
+    standard = _gb29450_published()
+    coarse = standard.products[1]
+    coarse_request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1), standard_id=standard.id, product_id=coarse.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "glass_fiber.pool.yarn_mode": InputValue(value="混合型窑（粗纱为主体）"),
+            "glass_fiber.pool.coarse_yarn_t": InputValue(value="10", unit="t"),
+            "glass_fiber.pool.fine_yarn_total_t": InputValue(value="5", unit="t"),
+        },
+        energy_lines=_gb29450_energy_lines("1700"),
+    )
+    coarse_result = EvaluationEngine().evaluate(standard, coarse_request).results[0]
+    assert coarse_result.actual_value == Decimal("100")
+    assert coarse_result.grade is Grade.LEVEL_1
+    assert any("公式4" in step.expression for step in coarse_result.calculation_trace)
+
+    fine = standard.products[0]
+    fine_request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1), standard_id=standard.id, product_id=fine.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "glass_fiber.pool.yarn_mode": InputValue(value="混合型窑（细纱为主体）"),
+            "glass_fiber.pool.fine_yarn_gt5um_t": InputValue(value="8", unit="t"),
+            "glass_fiber.pool.fine_yarn_le5um_t": InputValue(value="2", unit="t"),
+            "glass_fiber.pool.coarse_yarn_t": InputValue(value="7", unit="t"),
+        },
+        energy_lines=_gb29450_energy_lines("1500"),
+    )
+    fine_result = EvaluationEngine().evaluate(standard, fine_request).results[0]
+    assert fine_result.actual_value == Decimal("100")
+    assert fine_result.grade is Grade.LEVEL_1
+    assert any("公式5" in step.expression for step in fine_result.calculation_trace)
+
+
+def test_gb29450_crucible_yarn_uses_table_four_conversion_factor() -> None:
+    standard = _gb29450_published()
+    product = standard.products[-1]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs={}, energy_lines=_gb29450_energy_lines("300"),
+        production_lines=[
+            ProductionLine(line_id="fine", product_name="细纱", quantity="10", unit="t", conversion_factor="0.5"),
+            ProductionLine(line_id="coarse", product_name="粗纱", quantity="2", unit="t", conversion_factor="1"),
+        ],
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("300") / Decimal("7")
+    assert result.grade is Grade.LEVEL_1
+    assert any(step.operation == "production_line" and "0.5" in step.expression for step in result.calculation_trace)
+
+
+def test_gb29450_missing_pool_yarn_mode_is_incomplete() -> None:
+    standard = _gb29450_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={
+            "glass_fiber.pool.fine_yarn_gt5um_t": InputValue(value="8", unit="t"),
+            "glass_fiber.pool.fine_yarn_le5um_t": InputValue(value="2", unit="t"),
+        },
+        energy_lines=_gb29450_energy_lines("9000"),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("glass_fiber.pool.yarn_mode" in warning for warning in result.warnings)
+
+
+def test_gb29450_missing_level_two_is_preserved_in_grading() -> None:
+    standard = _gb29450_published()
+    product = standard.products[2]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 1, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value="600", unit="kgce/t")},
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.LEVEL_3
+    assert result.base_thresholds == {"LEVEL_1": Decimal("550"), "LEVEL_3": Decimal("650")}
