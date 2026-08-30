@@ -54,6 +54,38 @@ EXTRA_CATALOG_ITEMS = {
     },
 }
 
+# Replacement records are generated into every fresh isolated workspace. Keep
+# old-version dates out of the record when the old source file is not present;
+# only the new current source is authoritative here.
+REPLACEMENT_CORRECTIONS = [
+    {
+        "id": "CAT-REPLACE-29435-2025",
+        "standard_number": "GB 29435-2025",
+        "fields": ["number", "title", "publication_date", "effective_date", "remark", "scope"],
+        "original": {"number": "GB 29435-2012", "title": "稀土冶炼加工企业单位产品能源消耗限额", "publication_date": "未在本次当前目录中采用", "effective_date": "未在本次当前目录中采用", "remark": "", "scope": "当前范围包含旧版"},
+        "corrected": {"number": "GB 29435-2025", "title": "稀土冶炼企业单位产品能源消耗限额", "publication_date": "2025-12-31", "effective_date": "2027-01-01", "remark": "代替GB 29435-2012", "scope": "由GB 29435-2025替代并纳入当前范围"},
+        "reason": "按现行强制文本封面记录替代关系；新规则保留draft，确认后再发布。",
+        "source": "【2027-01-01实施】22. GB+29435-2025 稀土冶炼企业单位产品能源消耗限额.pdf",
+    },
+    {
+        "id": "CAT-REPLACE-30185-2025",
+        "standard_number": "GB 30185-2025",
+        "fields": ["number", "title", "publication_date", "effective_date", "remark", "scope"],
+        "original": {"number": "GB 30185-2013", "title": "铝塑板单位产品能源消耗限额", "publication_date": "未在本次当前目录中采用", "effective_date": "未在本次当前目录中采用", "remark": "", "scope": "旧版范围"},
+        "corrected": {"number": "GB 30185-2025", "title": "铝(塑)复合板单位产品能源消耗限额", "publication_date": "2025-02-28", "effective_date": "2026-03-01", "remark": "代替GB 30185-2013", "scope": "按新标准表1纳入铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板"},
+        "reason": "按现行强制文本封面记录替代关系；新规则保留draft，确认后再发布。",
+        "source": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+    },
+    {
+        "id": "CAT-REPLACE-30530-2024",
+        "standard_number": "GB 30530-2024",
+        "fields": ["number", "title", "publication_date", "effective_date", "remark", "scope"],
+        "original": {"number": "GB 30530-2014", "title": "有机硅环体单位产品能源消耗限额", "publication_date": "未在本次当前目录中采用", "effective_date": "未在本次当前目录中采用", "remark": "", "scope": "旧版范围"},
+        "corrected": {"number": "GB 30530-2024", "title": "二甲基硅氧烷单位产品能源消耗限额", "publication_date": "2024-04-29", "effective_date": "2025-05-01", "remark": "代替GB 30530-2014", "scope": "二甲基硅氧烷（包括水解物、环体和线性体）"},
+        "reason": "按现行强制文本封面和前言记录替代关系；新规则保留draft，确认后再发布。",
+        "source": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+    },
+]
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -236,6 +268,13 @@ def main() -> None:
         shutil.rmtree(output)
     data_dir = output / "data"
     shutil.copytree(CURRENT, data_dir)
+    correction_path = data_dir / "corrections" / "catalog-corrections.json"
+    correction_payload = json.loads(correction_path.read_text(encoding="utf-8"))
+    known_correction_ids = {item.get("id") for item in correction_payload.get("corrections", [])}
+    for correction in REPLACEMENT_CORRECTIONS:
+        if correction["id"] not in known_correction_ids:
+            correction_payload.setdefault("corrections", []).append(correction)
+    correction_path.write_text(json.dumps(correction_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     archive_catalog = json.loads((ARCHIVE / "catalog.json").read_text(encoding="utf-8"))
     current_catalog = json.loads((CURRENT / "catalog.json").read_text(encoding="utf-8"))
@@ -331,6 +370,12 @@ def main() -> None:
         item = next(item for item in rows if item["number"] == "GB 29435-2025")
         target = definitions_dir / "gb-29435-2025.json"
         definition = build_gb29435_2025(item["source_file"], item["source_sha256"])
+        target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if any(item["number"] == "GB 30530-2024" for item in rows):
+        from refine_gb30530_rule import build as build_gb30530_2024
+        item = next(item for item in rows if item["number"] == "GB 30530-2024")
+        target = definitions_dir / "gb-30530-2024.json"
+        definition = build_gb30530_2024(item["source_file"], item["source_sha256"])
         target.write_text(json.dumps(definition, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if any(item["number"] == "GB 30185-2025" for item in rows):
         from refine_gb30185_rule import build as build_gb30185_2025

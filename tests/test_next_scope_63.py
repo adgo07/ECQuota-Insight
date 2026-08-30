@@ -302,6 +302,115 @@ def test_gb30185_detail_missing_energy_system_is_incomplete() -> None:
     assert result.grade is Grade.INCOMPLETE
     assert any("energy.category.affiliated_system.net_standard_coal" in warning for warning in result.warnings)
 
+def _gb30530_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-30530-2024.json").read_text(encoding="utf-8"))
+
+
+def _gb30530_published() -> StandardDefinition:
+    return _gb30530_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def _gb30530_energy_lines(*, production: str = "600", auxiliary: str = "40", affiliated: str = "0", exported: str = "100") -> list[EnergyLine]:
+    return [
+        EnergyLine(line_id="production", energy_name="生产系统", category_key="production_system", amount=production, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="auxiliary", energy_name="辅助生产系统", category_key="auxiliary_system", amount=auxiliary, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="affiliated", energy_name="附属生产系统", category_key="affiliated_system", amount=affiliated, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        EnergyLine(line_id="external-output", energy_name="向外输出能源", category_key="external_output", direction="output", amount=exported, unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+    ]
+
+
+def _gb30530_raw_inputs(*, silicon_quantity: str = "100", chloromethane_quantity: str = "100") -> dict[str, InputValue]:
+    return {
+        "raw_material.silicon_powder.quantity": InputValue(value=silicon_quantity, unit="t"),
+        "raw_material.silicon_powder.unit_energy": InputValue(value="0.0275", unit="kgce/t"),
+        "raw_material.chloromethane.quantity": InputValue(value=chloromethane_quantity, unit="t"),
+        "raw_material.chloromethane.unit_energy": InputValue(value="0.0797", unit="kgce/t"),
+    }
+
+
+def _gb30530_production_lines(*, external_dmdcs: str = "0") -> list[ProductionLine]:
+    return [
+        ProductionLine(line_id="hydrolysate", product_name="合格水解物", quantity="1", unit="t"),
+        ProductionLine(line_id="cyclic", product_name="合格环体", quantity="0", unit="t"),
+        ProductionLine(line_id="linear", product_name="合格线性体", quantity="0", unit="t"),
+        ProductionLine(line_id="external-dmdcs", product_name="外售二甲基二氯硅烷", quantity=external_dmdcs, unit="t", conversion_factor="0.56"),
+    ]
+
+
+def test_gb30530_names_levels_and_citations_follow_standard() -> None:
+    standard = _gb30530_definition()
+    assert standard.number == "GB 30530-2024"
+    assert standard.title == "二甲基硅氧烷单位产品能源消耗限额"
+    assert standard.effective_date == date(2025, 5, 1)
+    assert standard.lifecycle_status.value == "active"
+    assert len(standard.products) == 1
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    assert product.name == "二甲基硅氧烷"
+    assert indicator.name == "单位产品能耗"
+    assert indicator.unit == "kgce/t"
+    assert [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value] == ["650", "750", "1000"]
+    assert {reference.page for reference in indicator.source_references} >= {5, 6, 7, 8, 9, 10}
+
+
+def test_gb30530_direct_value_grade_at_level_one_boundary() -> None:
+    standard = _gb30530_published()
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs={indicator.direct_input_key: InputValue(value="650", unit="kgce/t")},
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("650")
+    assert result.grade is Grade.LEVEL_1
+
+
+def test_gb30530_detail_formula_includes_raw_material_energy_and_excludes_external_output() -> None:
+    standard = _gb30530_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs=_gb30530_raw_inputs(),
+        energy_lines=_gb30530_energy_lines(), production_lines=_gb30530_production_lines(),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("650.72")
+    assert result.grade is Grade.LEVEL_2
+    assert any(step.label == "外购硅粉能耗 g₁×q₁" and step.value == Decimal("2.7500") for step in result.calculation_trace)
+    assert any(step.label == "外购氯甲烷能耗 g₂×q₂" and step.value == Decimal("7.9700") for step in result.calculation_trace)
+
+
+def test_gb30530_detail_formula_uses_external_dmdcs_conversion_factor() -> None:
+    standard = _gb30530_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs=_gb30530_raw_inputs(silicon_quantity="0", chloromethane_quantity="0"),
+        energy_lines=_gb30530_energy_lines(production="650", auxiliary="0", exported="0"),
+        production_lines=_gb30530_production_lines(external_dmdcs="1"),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == Decimal("650") / Decimal("1.56")
+    assert result.grade is Grade.LEVEL_1
+    assert any(step.operation == "production_line" and step.value == Decimal("0.56") for step in result.calculation_trace)
+
+
+def test_gb30530_missing_raw_material_input_is_incomplete() -> None:
+    standard = _gb30530_published()
+    product = standard.products[0]
+    inputs = _gb30530_raw_inputs()
+    inputs.pop("raw_material.chloromethane.unit_energy")
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1), standard_id=standard.id, product_id=product.id,
+        input_mode=InputMode.DETAIL, inputs=inputs,
+        energy_lines=_gb30530_energy_lines(), production_lines=_gb30530_production_lines(),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.grade is Grade.INCOMPLETE
+    assert any("raw_material.chloromethane.unit_energy" in warning for warning in result.warnings)
+
 def _gb30182_definition() -> StandardDefinition:
     return StandardDefinition.model_validate_json((ROOT / "definitions/gb-30182-2013.json").read_text(encoding="utf-8"))
 
