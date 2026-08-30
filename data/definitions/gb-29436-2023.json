@@ -1207,5 +1207,9 @@
   ],
   "corrections": [
     "CAT-023"
-  ]
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }

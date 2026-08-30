@@ -20699,5 +20699,9 @@
       ]
     }
   ],
-  "corrections": []
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }

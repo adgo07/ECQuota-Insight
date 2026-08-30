@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-30",
+  "source_priority": [
+    "标准修改单或勘误",
+    "强制性标准原文",
+    "现有强制性能耗限额标准目录",
+    "汇编候选数据"
+  ],
+  "replacements": [
+    {
+      "obsolete_number": "GB 29141-2012",
+      "obsolete_id": "gb-29141-2012",
+      "replacement_number": "GB 29141-2024",
+      "replacement_id": "gb-29141-2024",
+      "replacement_title": "工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额",
+      "replacement_publication_date": "2024-05-28",
+      "replacement_effective_date": "2025-06-01",
+      "replacement_source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+      "replacement_source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+      "status": "pending_rule_confirmation",
+      "note": "已核对原文首页；尚未将限额、公式和适用条件录入已发布规则，禁止猜测发布。"
+    },
+    {
+      "obsolete_number": "GB 29437-2012",
+      "obsolete_id": "gb-29437-2012",
+      "replacement_number": "GB 29141-2024",
+      "replacement_id": "gb-29141-2024",
+      "status": "pending_rule_confirmation",
+      "note": "旧版已移入作废标准；新标准统一覆盖稀硝酸。"
+    },
+    {
+      "obsolete_number": "GB 29441-2012",
+      "obsolete_id": "gb-29441-2012",
+      "replacement_number": "GB 29141-2024",
+      "replacement_id": "gb-29141-2024",
+      "status": "pending_rule_confirmation",
+      "note": "旧版已移入作废标准；新标准统一覆盖冰醋酸。"
+    },
+    {
+      "obsolete_number": "GB 29447-2022",
+      "obsolete_id": "gb-29447-2022",
+      "replacement_number": "GB 29447-2026",
+      "replacement_id": "gb-29447-2026",
+      "replacement_effective_date": "2027-01-01",
+      "status": "published_replacement",
+      "note": "新标准规则已存在；2026-08-30尚未实施，选择时显示提示。"
+    }
+  ]
+}

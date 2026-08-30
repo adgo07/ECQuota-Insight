@@ -43,6 +43,7 @@ from uebench.domain.models import (
     Grade,
     InputMode,
     InputValue,
+    StandardSelectionMode,
     ProductionLine,
     StandardDefinition,
 )
@@ -184,8 +185,14 @@ class MainWindow(QMainWindow):
         page, layout = self._page("新建评价")
         form_card, form_layout = self._card()
         form = QFormLayout()
+        self.eval_selection_mode = QComboBox()
+        self.eval_selection_mode.addItem("当前有效标准（自动）", StandardSelectionMode.CURRENT.value)
+        self.eval_selection_mode.addItem("历史标准（需提示确认）", StandardSelectionMode.HISTORICAL.value)
+        self.eval_selection_mode.addItem("尚未实施标准（仅预览）", StandardSelectionMode.FUTURE.value)
+        self.eval_selection_mode.currentIndexChanged.connect(self.refresh_standard_combo)
         self.eval_standard = QComboBox()
         self.eval_standard.currentIndexChanged.connect(self._standard_changed)
+        self.eval_standard_status = QLabel("评价日期自动读取今天")
         self.eval_product = QComboBox()
         self.eval_product.currentIndexChanged.connect(self._product_changed)
         self.eval_mode = QComboBox()
@@ -193,11 +200,15 @@ class MainWindow(QMainWindow):
         self.eval_mode.addItem("能源与产量明细计算", InputMode.DETAIL.value)
         self.eval_mode.currentIndexChanged.connect(self._refresh_input_table)
         self.eval_date = QDateEdit(QDate.currentDate())
-        self.eval_date.setCalendarPopup(True)
+        self.eval_date.setCalendarPopup(False)
+        self.eval_date.setReadOnly(True)
+        self.eval_date.setEnabled(False)
         self.eval_organization = QLineEdit()
         self.eval_project = QLineEdit()
         self.eval_notes = QLineEdit()
+        form.addRow("标准选择方式", self.eval_selection_mode)
         form.addRow("标准", self.eval_standard)
+        form.addRow("标准状态提示", self.eval_standard_status)
         form.addRow("产品/工序", self.eval_product)
         form.addRow("评价日期", self.eval_date)
         form.addRow("录入模式", self.eval_mode)
@@ -358,7 +369,8 @@ class MainWindow(QMainWindow):
         self.refresh_audit()
 
     def refresh_home(self) -> None:
-        standards = self.context.standards.list_published()
+        today = date.today()
+        standards = self.context.standards.list_current(today)
         all_standards = self.context.standards.list_all()
         records = self.context.evaluations.list_recent(10)
         self.home_standard_count.setText(f"{len(standards)}/{len(all_standards)}")
@@ -382,7 +394,7 @@ class MainWindow(QMainWindow):
 
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
-        standards = self.context.standards.list_published()
+        standards = self.context.standards.list_current(date.today())
         self.standard_table.setRowCount(0)
         for standard in standards:
             haystack = f"{standard.number} {standard.title} {' '.join(p.name for p in standard.products)}".lower()
@@ -393,7 +405,7 @@ class MainWindow(QMainWindow):
             values = [
                 standard.number,
                 standard.title,
-                standard.publication_status.value,
+                ("当前有效" if standard.is_effective_on(date.today()) else ("尚未实施" if standard.effective_date > date.today() else "历史/已替代")),
                 standard.version,
                 standard.effective_date,
                 len(standard.products),
@@ -414,7 +426,7 @@ class MainWindow(QMainWindow):
         selected_item = self.standard_table.item(row, 0) if row >= 0 else None
         standard_id = selected_item.data(Qt.ItemDataRole.UserRole) if selected_item else None
         standard = next(
-            (item for item in self.context.standards.list_published() if item.id == standard_id),
+            (item for item in self.context.standards.list_current(date.today()) if item.id == standard_id),
             None,
         )
         if standard is None:
@@ -455,11 +467,24 @@ class MainWindow(QMainWindow):
                 for column, value in enumerate(values):
                     self.standard_indicator_table.setItem(detail_row, column, _item(value))
 
+    def _selection_mode(self) -> StandardSelectionMode:
+        value = self.eval_selection_mode.currentData() if hasattr(self, "eval_selection_mode") else StandardSelectionMode.CURRENT.value
+        return StandardSelectionMode(value or StandardSelectionMode.CURRENT.value)
+
+    def _standards_for_selection(self) -> list[StandardDefinition]:
+        today = date.today()
+        mode = self._selection_mode()
+        if mode is StandardSelectionMode.HISTORICAL:
+            return self.context.standards.list_historical()
+        if mode is StandardSelectionMode.FUTURE:
+            return self.context.standards.list_future(today)
+        return self.context.standards.list_current(today)
+
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None
         self.eval_standard.blockSignals(True)
         self.eval_standard.clear()
-        for standard in self.context.standards.list_published():
+        for standard in self._standards_for_selection():
             self.eval_standard.addItem(f"{standard.number} {standard.title}", standard.id)
         if selected:
             index = self.eval_standard.findData(selected)
@@ -470,14 +495,24 @@ class MainWindow(QMainWindow):
 
     def _standard_changed(self) -> None:
         standard_id = self.eval_standard.currentData()
-        self.current_standard = self.context.standards.get_published(standard_id) if standard_id else None
+        mode = self._selection_mode()
+        self.current_standard = (
+            self.context.standards.get_for_evaluation(standard_id, date.today(), mode)
+            if standard_id else None
+        )
         self.eval_product.blockSignals(True)
         self.eval_product.clear()
         if self.current_standard:
             for product in self.current_standard.products:
                 self.eval_product.addItem(product.name, product.id)
-            effective = self.current_standard.effective_date
-            self.eval_date.setMinimumDate(QDate(effective.year, effective.month, effective.day))
+            self.eval_date.setDate(QDate.currentDate())
+            warning = self.current_standard.selection_warning(date.today())
+            if warning:
+                self.eval_standard_status.setText(f"{self.current_standard.number} {self.current_standard.title}；{warning}")
+            else:
+                self.eval_standard_status.setText(f"{self.current_standard.number} {self.current_standard.title}；当前有效")
+        else:
+            self.eval_standard_status.setText("当前选择方式下没有可用标准")
         self.eval_product.blockSignals(False)
         self._product_changed()
 
@@ -578,11 +613,11 @@ class MainWindow(QMainWindow):
                     source_note=values[7] or None,
                 )
             )
-        selected_date = self.eval_date.date()
         return EvaluationRequest(
-            evaluation_date=date(selected_date.year(), selected_date.month(), selected_date.day()),
+            evaluation_date=date.today(),
             standard_id=self.current_standard.id,
             product_id=self.eval_product.currentData(),
+            selection_mode=self._selection_mode(),
             input_mode=InputMode(self.eval_mode.currentData()),
             inputs=inputs,
             energy_lines=energy_lines,
@@ -672,9 +707,15 @@ class MainWindow(QMainWindow):
 
     def _load_request_into_form(self, request: EvaluationRequest) -> bool:
         """Populate the wizard from a saved request without changing its data."""
+        requested_mode = request.selection_mode
+        mode_index = self.eval_selection_mode.findData(requested_mode.value)
+        if mode_index < 0:
+            mode_index = self.eval_selection_mode.findData(StandardSelectionMode.HISTORICAL.value)
+        if mode_index >= 0:
+            self.eval_selection_mode.setCurrentIndex(mode_index)
         standard_index = self.eval_standard.findData(request.standard_id)
         if standard_index < 0:
-            QMessageBox.warning(self, "标准不可用", "该评价使用的标准当前未发布，无法复制或重新计算。")
+            QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法复制或重新计算。")
             return False
         self.eval_standard.setCurrentIndex(standard_index)
         product_index = self.eval_product.findData(request.product_id)

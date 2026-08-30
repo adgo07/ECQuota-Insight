@@ -274,6 +274,20 @@ class StandardPackageService:
                     errors.append(
                         "标准包包含重复标准版本：" + ", ".join(duplicate_definitions)
                     )
+                numbers = [definition.number for definition in definitions]
+                duplicate_numbers = sorted(number for number, count in Counter(numbers).items() if count > 1)
+                if duplicate_numbers:
+                    errors.append("标准包包含重复标准编号：" + ", ".join(duplicate_numbers))
+                definition_numbers = set(numbers)
+                for definition in definitions:
+                    if definition.lifecycle_status.value == "obsolete" and definition.obsolete_date is None:
+                        errors.append(f"标准 {definition.number} 标记为已替代但缺少 obsolete_date")
+                    for replacement in definition.replaced_by:
+                        if replacement not in definition_numbers:
+                            warnings.append(f"标准 {definition.number} 的替代标准 {replacement} 不在本包中；安装后仍保留历史关系")
+                    for superseded in definition.supersedes:
+                        if superseded not in definition_numbers:
+                            warnings.append(f"标准 {definition.number} 声明替代 {superseded} 不在本包中；请确认是否另包提供")
                 for definition in definitions:
                     source = source_entries.get(definition.source_file)
                     if source is None:

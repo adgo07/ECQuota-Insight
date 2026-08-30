@@ -1045,5 +1045,9 @@
   ],
   "corrections": [
     "CAT-029-REPLACE"
-  ]
+  ],
+  "lifecycle_status": "future",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }

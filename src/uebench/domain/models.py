@@ -33,6 +33,18 @@ class PublicationStatus(StrEnum):
     PUBLISHED = "published"
 
 
+class LifecycleStatus(StrEnum):
+    ACTIVE = "active"
+    FUTURE = "future"
+    OBSOLETE = "obsolete"
+
+
+class StandardSelectionMode(StrEnum):
+    CURRENT = "current"
+    HISTORICAL = "historical"
+    FUTURE = "future"
+
+
 class DataType(StrEnum):
     DECIMAL = "decimal"
     TEXT = "text"
@@ -293,6 +305,26 @@ class StandardDefinition(StrictModel):
     source_sha256: str = Field(pattern=r"^[A-Fa-f0-9]{64}$")
     products: list[ProductDefinition]
     corrections: list[str] = Field(default_factory=list)
+    lifecycle_status: LifecycleStatus = LifecycleStatus.ACTIVE
+    obsolete_date: date | None = None
+    replaced_by: list[str] = Field(default_factory=list)
+    supersedes: list[str] = Field(default_factory=list)
+
+    def is_effective_on(self, evaluation_date: date) -> bool:
+        if self.lifecycle_status is LifecycleStatus.OBSOLETE:
+            return False
+        if evaluation_date < self.effective_date:
+            return False
+        return self.obsolete_date is None or evaluation_date < self.obsolete_date
+
+    def selection_warning(self, evaluation_date: date) -> str | None:
+        if self.lifecycle_status is LifecycleStatus.OBSOLETE or (self.obsolete_date and evaluation_date >= self.obsolete_date):
+            replacement = "、".join(self.replaced_by) if self.replaced_by else "暂无替代标准信息"
+            return f"{self.number} 已作废/被替代（替代标准：{replacement}），仅建议用于历史评价。"
+        if evaluation_date < self.effective_date:
+            return f"{self.number} 尚未实施，实施日期为 {self.effective_date}；当前只能预览，不能形成正式判定。"
+        return None
+
 
     @model_validator(mode="after")
     def validate_unique_ids(self) -> StandardDefinition:
@@ -309,6 +341,8 @@ class EvaluationRequest(StrictModel):
     evaluation_date: date
     standard_id: str
     product_id: str
+    selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT
+
     input_mode: InputMode
     inputs: dict[str, InputValue]
     energy_lines: list[EnergyLine] = Field(default_factory=list)

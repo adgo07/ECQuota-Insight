@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy import desc, select
 
-from uebench.domain.models import EvaluationRequest, EvaluationResult, StandardDefinition
+from uebench.domain.models import EvaluationRequest, EvaluationResult, LifecycleStatus, StandardDefinition, StandardSelectionMode
 
 from .database import AuditRow, DatabaseManager, EvaluationRow, StandardRow
 
@@ -48,6 +48,50 @@ class SqlStandardRepository:
     def __init__(self, database: DatabaseManager, audit: AuditRepository | None = None) -> None:
         self.database = database
         self.audit = audit or AuditRepository(database)
+
+    def get_for_evaluation(
+        self,
+        standard_id: str,
+        evaluation_date: date,
+        selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
+    ) -> StandardDefinition | None:
+        with self.database.session() as session:
+            rows = session.scalars(
+                select(StandardRow)
+                .where(StandardRow.standard_id == standard_id, StandardRow.status == "published")
+                .order_by(desc(StandardRow.effective_date), desc(StandardRow.installed_at))
+            )
+            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            if selection_mode is StandardSelectionMode.CURRENT:
+                return next((item for item in definitions if item.is_effective_on(evaluation_date)), None)
+            if selection_mode is StandardSelectionMode.HISTORICAL:
+                return next((item for item in definitions if item.effective_date <= evaluation_date), definitions[0] if definitions else None)
+            return next((item for item in definitions if item.effective_date > evaluation_date), definitions[0] if definitions else None)
+
+    def list_current(self, evaluation_date: date) -> list[StandardDefinition]:
+        with self.database.session() as session:
+            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date), desc(StandardRow.installed_at)))
+            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+        result: list[StandardDefinition] = []
+        seen: set[str] = set()
+        for item in definitions:
+            if item.id in seen or not item.is_effective_on(evaluation_date):
+                continue
+            seen.add(item.id)
+            result.append(item)
+        return result
+
+    def list_historical(self) -> list[StandardDefinition]:
+        with self.database.session() as session:
+            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date)))
+            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+        return [item for item in definitions if item.lifecycle_status is LifecycleStatus.OBSOLETE or item.obsolete_date is not None]
+
+    def list_future(self, evaluation_date: date) -> list[StandardDefinition]:
+        with self.database.session() as session:
+            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, StandardRow.effective_date))
+            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+        return [item for item in definitions if item.effective_date > evaluation_date and item.lifecycle_status is not LifecycleStatus.OBSOLETE]
 
     def get_published(self, standard_id: str) -> StandardDefinition | None:
         with self.database.session() as session:
@@ -100,6 +144,10 @@ class SqlStandardRepository:
                     effective_date=definition.effective_date,
                     source_file=definition.source_file,
                     source_sha256=definition.source_sha256.lower(),
+                    lifecycle_status=definition.lifecycle_status.value,
+                    obsolete_date=definition.obsolete_date,
+                    replaced_by_json=json.dumps(definition.replaced_by, ensure_ascii=False),
+                    supersedes_json=json.dumps(definition.supersedes, ensure_ascii=False),
                     package_id=package_id,
                     definition_json=payload,
                 )
@@ -112,6 +160,10 @@ class SqlStandardRepository:
                 row.effective_date = definition.effective_date
                 row.source_file = definition.source_file
                 row.source_sha256 = definition.source_sha256.lower()
+                row.lifecycle_status = definition.lifecycle_status.value
+                row.obsolete_date = definition.obsolete_date
+                row.replaced_by_json = json.dumps(definition.replaced_by, ensure_ascii=False)
+                row.supersedes_json = json.dumps(definition.supersedes, ensure_ascii=False)
                 row.package_id = package_id
                 row.definition_json = payload
             self.audit.append(

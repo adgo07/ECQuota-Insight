@@ -16,3 +16,7 @@
 *.log
 .idea/
 .vscode/
+/outputs/
+/tmp/
+/node_modules/
+**/node_modules/

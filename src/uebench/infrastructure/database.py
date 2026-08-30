@@ -28,6 +28,10 @@ class StandardRow(Base):
     effective_date: Mapped[date] = mapped_column(Date, nullable=False)
     source_file: Mapped[str] = mapped_column(String(512), nullable=False)
     source_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    lifecycle_status: Mapped[str] = mapped_column(String(32), nullable=False, default="active")
+    obsolete_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    replaced_by_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    supersedes_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
     package_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     definition_json: Mapped[str] = mapped_column(Text, nullable=False)
     installed_at: Mapped[datetime] = mapped_column(
@@ -167,7 +171,10 @@ class DatabaseManager:
                     has_version = connection.execute(text("SELECT 1 FROM alembic_version LIMIT 1")).first()
                 needs_stamp = has_version is None
         if needs_stamp:
-            command.stamp(config, "head")
+            # 旧版无Alembic标记的完整数据库按0001接管，再执行增量迁移；
+            # 若生命周期字段已经存在，则直接标记为最新，避免重复加列。
+            standard_columns = {column["name"] for column in inspect(self.engine).get_columns("standards")}
+            command.stamp(config, "head" if "lifecycle_status" in standard_columns else "0001")
         command.upgrade(config, "head")
 
     @contextmanager

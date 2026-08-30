@@ -359,5 +359,9 @@
   ],
   "corrections": [
     "CAT-065-NEW"
-  ]
+  ],
+  "lifecycle_status": "future",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }

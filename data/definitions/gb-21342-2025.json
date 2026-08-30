@@ -9649,5 +9649,9 @@
   ],
   "corrections": [
     "CAT-008"
-  ]
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }

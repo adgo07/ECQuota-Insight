@@ -2779,5 +2779,9 @@
   ],
   "corrections": [
     "CAT-064-NEW"
-  ]
+  ],
+  "lifecycle_status": "future",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
 }
