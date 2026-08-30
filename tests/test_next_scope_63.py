@@ -180,3 +180,73 @@ def test_gb29435_missing_indirect_energy_is_incomplete() -> None:
     assert result.grade is Grade.INCOMPLETE
     assert any("indirect_aux_loss" in warning for warning in result.warnings)
 
+
+
+def _gb30182_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json((ROOT / "definitions/gb-30182-2013.json").read_text(encoding="utf-8"))
+
+
+def _gb30182_published() -> StandardDefinition:
+    return _gb30182_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+
+
+def test_gb30182_names_and_indicator_names_follow_standard() -> None:
+    standard = _gb30182_definition()
+    product = standard.products[0]
+    assert product.name == "不带钢背（或蹄铁）的模压型摩擦材料"
+    assert [indicator.name for indicator in product.indicators] == ["单位产品综合能耗", "电耗"]
+    assert [indicator.unit for indicator in product.indicators] == ["kgce/t", "kWh/t"]
+    assert [
+        [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value]
+        for indicator in product.indicators
+    ] == [["115", "135", "175"], ["800", "1000", "1300"]]
+    assert {reference.page for indicator in product.indicators for reference in indicator.source_references} >= {3, 4, 5, 7}
+
+
+def test_gb30182_direct_boundaries_and_detail_energy_match_standard_formula() -> None:
+    standard = _gb30182_published()
+    product = standard.products[0]
+    direct_inputs = {
+        indicator.direct_input_key: InputValue(value=value, unit=indicator.unit)
+        for indicator, value in zip(product.indicators, ("115", "800"), strict=True)
+    }
+    direct = EvaluationRequest(
+        evaluation_date=date(2014, 12, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DIRECT,
+        inputs=direct_inputs,
+    )
+    direct_results = EvaluationEngine().evaluate(standard, direct).results
+    assert [result.grade for result in direct_results] == [Grade.LEVEL_1, Grade.LEVEL_1]
+    detail = direct.model_copy(update={
+        "input_mode": InputMode.DETAIL,
+        "inputs": {},
+        "energy_lines": [
+            EnergyLine(line_id="fuel", energy_name="燃料折标量", amount="100", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+            EnergyLine(line_id="electricity", energy_name="直接电力", category_key="direct_electricity", amount="800", unit="kWh", standard_coal_coefficient="0.1229", coefficient_unit="kgce/kWh"),
+        ],
+        "production_lines": [ProductionLine(line_id="p", product_name="合格摩擦材料", quantity="1", unit="t")],
+    })
+    detail_results = EvaluationEngine().evaluate(standard, detail).results
+    assert detail_results[0].actual_value == Decimal("198.32")
+    assert detail_results[1].actual_value == Decimal("800")
+    assert detail_results[1].grade is Grade.LEVEL_1
+
+
+def test_gb30182_missing_direct_electricity_is_incomplete_only_for_electricity_indicator() -> None:
+    standard = _gb30182_published()
+    product = standard.products[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2014, 12, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={},
+        energy_lines=[EnergyLine(line_id="fuel", energy_name="燃料折标量", amount="100", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce")],
+        production_lines=[ProductionLine(line_id="p", product_name="合格摩擦材料", quantity="1", unit="t")],
+    )
+    results = EvaluationEngine().evaluate(standard, request).results
+    assert results[0].grade is Grade.LEVEL_1
+    assert results[1].grade is Grade.INCOMPLETE
+    assert any("direct_electricity" in warning for warning in results[1].warnings)

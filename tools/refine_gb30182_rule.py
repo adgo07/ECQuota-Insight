@@ -50,6 +50,15 @@ def indicator(number: str, source_file: str, source_sha: str, *, key_suffix: str
                 "standard_number": number,
                 "source_file": source_file,
                 "source_sha256": source_sha,
+                "page": 3,
+                "clause": "第1章",
+                "table": "范围",
+                "note": "仅适用于不带钢背（或蹄铁）的模压型摩擦材料；不适用于超出范围的产品。",
+            },
+            {
+                "standard_number": number,
+                "source_file": source_file,
+                "source_sha256": source_sha,
                 "page": 4,
                 "clause": "4.1～4.3",
                 "table": "表1、表2、表3",
@@ -64,6 +73,15 @@ def indicator(number: str, source_file: str, source_sha: str, *, key_suffix: str
                 "table": "公式（1）～（3）",
                 "note": "综合能耗或综合电耗除以合格产品产量。",
             },
+            {
+                "standard_number": number,
+                "source_file": source_file,
+                "source_sha256": source_sha,
+                "page": 7,
+                "clause": "附录A",
+                "table": "表A.1",
+                "note": "无实测低位发热量时可参考能源折标准煤系数；有实测值时以实测值为准。",
+            },
         ],
         "notes": [
             "candidate_from_original_pdf",
@@ -71,6 +89,8 @@ def indicator(number: str, source_file: str, source_sha: str, *, key_suffix: str
             "requires_independent_review",
             f"detail_input_category: {detail_label}",
             "standard_scope_excludes_steel_back_or_brake_shoe_and_testing_equipment_over_15kW",
+            "standard_mandatory_clauses_are_4.1_and_4.2;_4.3_advanced_value_is_informative_in_source_preface",
+            "energy.total_standard_coal_is_built_from_energy_lines_and_user_supplied_or_appendix_A_coefficients;_direct_electricity_line_uses_0.1229_kgce_per_kWh",
         ],
     }
 
@@ -90,13 +110,13 @@ def refine(data_dir: Path) -> Path:
         "indicators": [
             indicator(number, source_file, source_sha,
                       key_suffix="comprehensive_energy",
-                      name="摩擦材料单位产品综合能耗",
+                      name="单位产品综合能耗",
                       unit="kgce/t", threshold_values=("115", "135", "175"),
                       detail_input="energy.total_standard_coal",
                       detail_label="摩擦材料综合能耗 EZN"),
             indicator(number, source_file, source_sha,
                       key_suffix="electricity",
-                      name="摩擦材料单位产品电耗",
+                      name="电耗",
                       unit="kWh/t", threshold_values=("800", "1000", "1300"),
                       detail_input="energy.category.direct_electricity.net_amount",
                       detail_label="摩擦材料产品综合电耗 QZD（direct_electricity分类）"),
@@ -118,3 +138,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
