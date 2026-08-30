@@ -76,4 +76,4 @@ def test_history_29141_product_indicator_split() -> None:
         if product.name == "硫磺"
         for indicator in product.indicators
     ]
-    assert sulfur_indicators == ["单位产品综合能耗", "吨酸电耗"]\n
+    assert sulfur_indicators == ["单位产品综合能耗", "吨酸电耗"]
