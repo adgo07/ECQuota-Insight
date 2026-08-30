@@ -65,3 +65,15 @@ def test_scope_uses_new_standard_and_history_stays_out_of_current_rows() -> None
     assert "GB 29141-2024" in scope["standards"]
     assert "GB 29141-2012" not in scope["standards"]
 
+
+def test_history_29141_product_indicator_split() -> None:
+    history = StandardDefinition.model_validate_json(
+        Path("data/history/definitions/gb-29141-2012.json").read_text(encoding="utf-8")
+    )
+    sulfur_indicators = [
+        indicator.name
+        for product in history.products
+        if product.name == "硫磺"
+        for indicator in product.indicators
+    ]
+    assert sulfur_indicators == ["单位产品综合能耗", "吨酸电耗"]\n
