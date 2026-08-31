@@ -261,6 +261,10 @@ class StandardPackageService:
                     errors.append(
                         f"标准包要求软件版本 {manifest.minimum_app_version}，当前版本为 {__version__}"
                     )
+                if manifest.rule_engine_version != RULE_ENGINE_VERSION:
+                    errors.append(
+                        f"标准包规则引擎版本为 {manifest.rule_engine_version}，当前软件为 {RULE_ENGINE_VERSION}"
+                    )
                 listed = {item.path: item for item in manifest.files}
                 expected_names = set(listed) | {"manifest.json", "signature.ed25519"}
                 extras = set(names) - expected_names
@@ -352,6 +356,17 @@ class StandardPackageService:
                 if existing is not None:
                     errors.append("该标准包已安装")
                 latest = session.scalar(select(PackageRow).order_by(desc(PackageRow.issued_at)).limit(1))
+                if manifest.package_mode == "incremental":
+                    if not manifest.parent_package_id:
+                        errors.append("增量标准包缺少 parent_package_id")
+                    else:
+                        parent = session.get(PackageRow, manifest.parent_package_id)
+                        if parent is None:
+                            errors.append(f"增量标准包依赖的父包未安装：{manifest.parent_package_id}")
+                        elif latest is not None and latest.package_id != manifest.parent_package_id:
+                            errors.append(
+                                f"增量标准包父包不是当前最新包：要求 {manifest.parent_package_id}，当前为 {latest.package_id}"
+                            )
                 if latest is not None and _as_utc(manifest.issued_at) < _as_utc(latest.issued_at):
                     errors.append("标准包发布时间早于当前已安装版本，禁止降级")
         return PackageValidationReport(

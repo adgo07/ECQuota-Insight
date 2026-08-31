@@ -37,6 +37,8 @@ def build_package(
     corrections: list[dict] | None = None,
     level_1: str | None = None,
     rule_revision: int = 1,
+    package_mode: str = "full",
+    parent_package_id: str | None = None,
 ) -> Path:
     definition = make_standard()
     definition.rule_revision = rule_revision
@@ -58,6 +60,8 @@ def build_package(
         package_id=package_id,
         data_version="2026.1",
         issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+        package_mode=package_mode,
+        parent_package_id=parent_package_id,
         corrections=corrections,
     )
 
@@ -202,3 +206,49 @@ def test_duplicate_definition_version_is_rejected(tmp_path: Path) -> None:
             data_version="2026.1",
             issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
         )
+
+def test_incremental_package_requires_installed_parent(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    package = build_package(
+        tmp_path,
+        private_key,
+        package_id="incremental-without-parent",
+        package_mode="incremental",
+    )
+    report = service.preview(package)
+    assert not report.valid
+    assert any("缺少 parent_package_id" in error for error in report.errors)
+
+
+def test_incremental_package_must_follow_current_parent(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    first = build_package(tmp_path, private_key, package_id="parent-package")
+    service.install(first)
+    child = build_package(
+        tmp_path,
+        private_key,
+        package_id="incremental-child",
+        package_mode="incremental",
+        parent_package_id="not-installed",
+    )
+    report = service.preview(child)
+    assert not report.valid
+    assert any("父包未安装" in error for error in report.errors)
+
+
+def test_incremental_package_accepts_current_parent(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    first = build_package(tmp_path, private_key, package_id="parent-package")
+    service.install(first)
+    child = build_package(
+        tmp_path,
+        private_key,
+        package_id="incremental-child",
+        package_mode="incremental",
+        parent_package_id="parent-package",
+    )
+    report = service.preview(child)
+    assert report.valid, report.errors
