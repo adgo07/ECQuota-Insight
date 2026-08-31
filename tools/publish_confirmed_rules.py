@@ -73,6 +73,7 @@ def main() -> None:
     parser.add_argument("confirmation", type=Path)
     parser.add_argument("source_dir", type=Path)
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="规则数据目录，默认data")
+    parser.add_argument("--scope", type=Path, help="范围清单；省略时优先使用data-dir/scope-63.json或scope-44.json")
     parser.add_argument("--private-key", type=Path, default=Path("work/signing/development-private-key.pem"))
     parser.add_argument("--output", type=Path, default=Path("dist/standard-packages/initial-standard-package-published.uebench"))
     parser.add_argument("--data-version", default="2026.08-published.1", help="写入标准包清单的数据版本")
@@ -80,11 +81,32 @@ def main() -> None:
     args = parser.parse_args()
 
     data_dir = args.data_dir.resolve()
-    definition_paths = sorted((data_dir / "definitions").glob("*.json"))
-    definitions = [StandardDefinition.model_validate_json(path.read_text(encoding="utf-8")) for path in definition_paths]
+    if args.scope:
+        scope_path = args.scope.resolve()
+    else:
+        scope_candidates = [data_dir / "scope-63.json", data_dir / "scope-44.json"]
+        scope_path = next((candidate for candidate in scope_candidates if candidate.exists()), None)
+    if scope_path is None or not scope_path.exists():
+        raise ValueError(f"数据目录缺少范围清单：{data_dir}")
+    scope_numbers = set(json.loads(scope_path.read_text(encoding="utf-8")).get("standards", []))
+    if not scope_numbers:
+        raise ValueError(f"范围清单没有标准编号：{scope_path}")
+    definition_paths = []
+    definitions = []
+    for path in sorted((data_dir / "definitions").glob("*.json")):
+        definition = StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
+        if definition.number in scope_numbers:
+            definition_paths.append(path)
+            definitions.append(definition)
     if not definitions:
-        raise ValueError(f"数据目录没有规则定义：{data_dir}")
-    scope_count = len(definitions)
+        raise ValueError(f"范围内没有规则定义：{scope_path}")
+    definition_numbers = {definition.number for definition in definitions}
+    missing_numbers = sorted(scope_numbers - definition_numbers)
+    if missing_numbers:
+        raise ValueError(f"范围内缺少规则定义：{missing_numbers}")
+    if len(definition_numbers) != len(scope_numbers):
+        raise ValueError(f"范围清单存在重复或定义编号不一致：{scope_path}")
+    scope_count = len(scope_numbers)
     reviewed_ids = {
         indicator.id
         for definition in definitions
