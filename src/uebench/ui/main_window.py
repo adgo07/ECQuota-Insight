@@ -311,7 +311,7 @@ class MainWindow(QMainWindow):
         controls = QHBoxLayout()
         package = QPushButton("安装标准包")
         package.clicked.connect(self.install_standard_package)
-        package.setEnabled(self.context.package_service is not None)
+        package.setEnabled(self.context.application.has_package_service())
         backup = QPushButton("创建备份")
         backup.clicked.connect(self.create_backup)
         restore = QPushButton("恢复备份")
@@ -324,7 +324,7 @@ class MainWindow(QMainWindow):
         controls.addStretch()
         controls.addWidget(open_data)
         layout.addLayout(controls)
-        if self.context.package_service is None:
+        if not self.context.application.has_package_service():
             layout.addWidget(QLabel("未配置标准包公钥，安装标准包功能已禁用。"))
         self.audit_table = QTableWidget(0, 5)
         self.audit_table.setHorizontalHeaderLabels(["时间", "操作", "对象类型", "对象ID", "详情"])
@@ -371,20 +371,15 @@ class MainWindow(QMainWindow):
 
     def refresh_home(self) -> None:
         today = date.today()
-        standards = self.context.standards.list_current(today)
-        all_standards = self.context.standards.list_all()
-        records = self.context.evaluations.list_recent(10)
+        standards = self.context.application.list_current_standards(today)
+        all_standards = self.context.application.list_all_standards()
+        records = self.context.application.list_recent_evaluations(10)
         scoped_standards = [item for item in all_standards if item.lifecycle_status is not LifecycleStatus.OBSOLETE]
         self.home_standard_count.setText(f"{len(standards)}/{len(scoped_standards)}")
         self.home_evaluation_count.setText(str(len(records)))
-        package_rows = []
-        from uebench.infrastructure.database import PackageRow
-        from sqlalchemy import desc, select
-
-        with self.context.database.session() as session:
-            package_rows = list(session.scalars(select(PackageRow).order_by(desc(PackageRow.issued_at)).limit(1)))
+        package_manifest = self.context.application.latest_package_manifest()
         self.home_package_version.setText(
-            __import__("json").loads(package_rows[0].manifest_json).get("data_version", "未知") if package_rows else "未安装"
+            package_manifest.get("data_version", "未知") if package_manifest else "未安装"
         )
         self.home_recent.setRowCount(0)
         for record in records:
@@ -396,7 +391,7 @@ class MainWindow(QMainWindow):
 
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
-        standards = self.context.standards.list_current(date.today())
+        standards = self.context.application.list_current_standards(date.today())
         self.standard_table.setRowCount(0)
         for standard in standards:
             haystack = f"{standard.number} {standard.title} {' '.join(p.name for p in standard.products)}".lower()
@@ -428,7 +423,7 @@ class MainWindow(QMainWindow):
         selected_item = self.standard_table.item(row, 0) if row >= 0 else None
         standard_id = selected_item.data(Qt.ItemDataRole.UserRole) if selected_item else None
         standard = next(
-            (item for item in self.context.standards.list_current(date.today()) if item.id == standard_id),
+            (item for item in self.context.application.list_current_standards(date.today()) if item.id == standard_id),
             None,
         )
         if standard is None:
@@ -477,10 +472,10 @@ class MainWindow(QMainWindow):
         today = date.today()
         mode = self._selection_mode()
         if mode is StandardSelectionMode.HISTORICAL:
-            return self.context.standards.list_historical()
+            return self.context.application.list_historical_standards()
         if mode is StandardSelectionMode.FUTURE:
-            return self.context.standards.list_future(today)
-        return self.context.standards.list_current(today)
+            return self.context.application.list_future_standards(today)
+        return self.context.application.list_current_standards(today)
 
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None
@@ -499,7 +494,7 @@ class MainWindow(QMainWindow):
         standard_id = self.eval_standard.currentData()
         mode = self._selection_mode()
         self.current_standard = (
-            self.context.standards.get_for_evaluation(standard_id, date.today(), mode)
+            self.context.application.get_standard_for_evaluation(standard_id, date.today(), mode)
             if standard_id else None
         )
         self.eval_product.blockSignals(True)
@@ -637,7 +632,7 @@ class MainWindow(QMainWindow):
     def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
         try:
             request = request or self._collect_request()
-            result = self.context.evaluation_service.evaluate(request)
+            result = self.context.application.evaluate(request)
         except Exception as exc:
             QMessageBox.critical(self, "无法计算", str(exc))
             return
@@ -693,7 +688,7 @@ class MainWindow(QMainWindow):
 
     def refresh_records(self) -> None:
         self.record_table.setRowCount(0)
-        for record in self.context.evaluations.list_recent(200):
+        for record in self.context.application.list_recent_evaluations(200):
             row = self.record_table.rowCount()
             self.record_table.insertRow(row)
             values = [
@@ -770,7 +765,7 @@ class MainWindow(QMainWindow):
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
             return
-        loaded = self.context.evaluations.get(evaluation_id)
+        loaded = self.context.application.get_evaluation(evaluation_id)
         if loaded is None:
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
@@ -783,7 +778,7 @@ class MainWindow(QMainWindow):
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
             return
-        loaded = self.context.evaluations.get(evaluation_id)
+        loaded = self.context.application.get_evaluation(evaluation_id)
         if loaded is None:
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
@@ -799,7 +794,7 @@ class MainWindow(QMainWindow):
         if not path:
             return
         try:
-            self.context.export_service.export(evaluation_id, Path(path))
+            self.context.application.export_evaluation(evaluation_id, Path(path))
             QMessageBox.information(self, "导出成功", path)
         except Exception as exc:
             QMessageBox.critical(self, "导出失败", str(exc))
@@ -810,20 +805,20 @@ class MainWindow(QMainWindow):
             return
         if QMessageBox.question(self, "确认删除", "记录将被软删除并保留审计日志，是否继续？") != QMessageBox.StandardButton.Yes:
             return
-        self.context.evaluations.soft_delete(evaluation_id)
+        self.context.application.delete_evaluation(evaluation_id)
         self.refresh_all()
 
     def save_import_template(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "保存导入模板", "单位产品能耗对标导入模板.xlsx", "Excel (*.xlsx)")
         if path:
-            self.context.template_service.create_template(Path(path))
+            self.context.application.create_template(Path(path))
             QMessageBox.information(self, "模板已保存", path)
 
     def validate_import_workbook(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "选择Excel", "", "Excel (*.xlsx)")
         if not path:
             return
-        report = self.context.import_service.validate(Path(path))
+        report = self.context.application.validate_workbook(Path(path))
         self.pending_import_id = report.import_id if report.valid else None
         self.import_commit_button.setEnabled(report.valid)
         self.import_status.setText("校验通过，可提交计算。" if report.valid else "校验失败，请修正后重新导入。")
@@ -838,7 +833,7 @@ class MainWindow(QMainWindow):
         if not self.pending_import_id:
             return
         try:
-            draft = self.context.import_service.commit(self.pending_import_id)
+            draft = self.context.application.commit_workbook(self.pending_import_id)
             self.calculate_evaluation(draft.request)
             self.pending_import_id = None
             self.import_commit_button.setEnabled(False)
@@ -847,26 +842,26 @@ class MainWindow(QMainWindow):
 
     def refresh_audit(self) -> None:
         self.audit_table.setRowCount(0)
-        for entry in self.context.audit.list_recent(500):
+        for entry in self.context.application.list_audit(500):
             row = self.audit_table.rowCount()
             self.audit_table.insertRow(row)
             for column, value in enumerate((entry.created_at, entry.action, entry.entity_type, entry.entity_id, entry.details_json)):
                 self.audit_table.setItem(row, column, _item(value))
 
     def install_standard_package(self) -> None:
-        if self.context.package_service is None:
+        if not self.context.application.has_package_service():
             return
         path, _ = QFileDialog.getOpenFileName(self, "选择标准包", "", "UEBench标准包 (*.uebench)")
         if not path:
             return
-        report = self.context.package_service.preview(Path(path))
+        report = self.context.application.preview_package(Path(path))
         if not report.valid:
             QMessageBox.critical(self, "标准包无效", "\n".join(report.errors))
             return
         if QMessageBox.question(self, "确认安装", f"将安装 {len(report.definitions)} 项标准，是否继续？") != QMessageBox.StandardButton.Yes:
             return
         try:
-            result = self.context.package_service.install(Path(path))
+            result = self.context.application.install_package(Path(path))
             self.refresh_all()
             QMessageBox.information(self, "安装完成", f"已安装 {result.standards_installed} 项标准。")
         except Exception as exc:
@@ -875,7 +870,7 @@ class MainWindow(QMainWindow):
     def create_backup(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "创建备份", f"uebench-{date.today():%Y%m%d}.uebackup", "UEBench备份 (*.uebackup)")
         if path:
-            self.context.backup_service.create(Path(path))
+            self.context.application.create_backup(Path(path))
             QMessageBox.information(self, "备份完成", path)
 
     def restore_backup(self) -> None:
@@ -885,7 +880,7 @@ class MainWindow(QMainWindow):
         if QMessageBox.question(self, "确认恢复", "恢复将替换当前数据，并先自动创建恢复前备份。是否继续？") != QMessageBox.StandardButton.Yes:
             return
         try:
-            self.context.backup_service.restore(Path(path))
+            self.context.application.restore_backup(Path(path))
             self.refresh_all()
             QMessageBox.information(self, "恢复完成", "数据已恢复。")
         except Exception as exc:
@@ -896,10 +891,10 @@ class MainWindow(QMainWindow):
         if row < 0:
             return
         standard_id = self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
-        standard = self.context.standards.get_published(standard_id)
+        standard = self.context.application.get_published_standard(standard_id)
         if standard is None:
             return
-        source = next(self.context.paths.standards.rglob(standard.source_file), None)
+        source = self.context.application.find_standard_source(standard_id)
         if source is None:
             QMessageBox.warning(self, "原文缺失", "本机标准库中未找到该PDF。")
             return

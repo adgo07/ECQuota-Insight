@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from uebench.application.facade import ApplicationFacade
 from uebench.application.services import EvaluationService
 from uebench.infrastructure.backup import BackupService
 from uebench.infrastructure.database import DatabaseManager
@@ -21,6 +22,7 @@ class AppContext:
     standards: SqlStandardRepository
     evaluations: SqlEvaluationRepository
     evaluation_service: EvaluationService
+    application: ApplicationFacade
     template_service: WorkbookTemplateService
     import_service: WorkbookImportService
     export_service: WorkbookExportService
@@ -53,6 +55,18 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
             standards,
             audit,
         )
+    application = ApplicationFacade(
+        standards=standards,
+        evaluations=evaluations,
+        evaluation_service=evaluation_service,
+        template_service=template_service,
+        import_service=import_service,
+        export_service=export_service,
+        package_service=package_service,
+        backup_service=backup_service,
+        audit=audit,
+        source_root=paths.standards,
+    )
     return AppContext(
         paths=paths,
         database=database,
@@ -60,6 +74,7 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
         standards=standards,
         evaluations=evaluations,
         evaluation_service=evaluation_service,
+        application=application,
         template_service=template_service,
         import_service=import_service,
         export_service=export_service,

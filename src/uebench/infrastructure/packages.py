@@ -222,6 +222,14 @@ class StandardPackageService:
             raise StandardPackageError("更新公钥不是 Ed25519 公钥")
         return key
 
+    def latest_manifest(self) -> PackageManifest | None:
+        """返回最近一次成功安装的标准包清单，供应用层展示。"""
+        with self.database.session() as session:
+            row = session.scalar(select(PackageRow).order_by(desc(PackageRow.issued_at)).limit(1))
+        if row is None:
+            return None
+        return PackageManifest.model_validate_json(row.manifest_json)
+
     def preview(self, path: Path) -> PackageValidationReport:
         path = path.resolve()
         errors: list[str] = []
