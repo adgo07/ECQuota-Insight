@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import zipfile
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -12,7 +12,7 @@ from uebench.infrastructure.database import DatabaseManager
 from uebench.infrastructure.packages import PackageFile, PackageManifest, StandardPackageBuilder, StandardPackageError, StandardPackageService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepository
-from uebench.domain.models import PublicationStatus
+from uebench.domain.models import PublicationStatus, StandardSelectionMode
 
 from .test_engine import make_standard
 
@@ -279,3 +279,20 @@ def test_package_file_kind_and_manifest_lineage_are_rejected() -> None:
             rule_count=0,
             files=[],
         )
+
+def test_incremental_install_preserves_parent_and_selects_new_revision(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, standards, service = make_service(tmp_path, private_key)
+    parent = build_package(tmp_path, private_key, package_id="lineage-parent", rule_revision=1)
+    service.install(parent)
+    child = build_package(
+        tmp_path, private_key, package_id="lineage-child", rule_revision=2,
+        package_mode="incremental", parent_package_id="lineage-parent", level_1="11"
+    )
+    service.install(child)
+    assert len(standards.list_all()) == 2
+    selected = standards.get_for_evaluation(
+        "gb-00000-2026", date(2026, 3, 1), StandardSelectionMode.CURRENT
+    )
+    assert selected is not None
+    assert selected.rule_revision == 2
