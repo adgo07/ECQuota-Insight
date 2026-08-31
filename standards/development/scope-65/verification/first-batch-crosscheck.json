@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "verified_on": "2026-08-23",
+  "source_priority": [
+    "现行强制文本",
+    "现有强制性能耗限额标准目录（2025年9月初）",
+    "《现行主要能耗限额标准汇编》（2026年1月）"
+  ],
+  "result": "no_conflict_in_overlapping_rows",
+  "standards": [
+    {
+      "number": "GB 16780-2021",
+      "original_pages": [4, 5],
+      "compilation_pages": [60],
+      "result": "汇编所列三级限额与原文一致；汇编行不完整，完整规则仍以原文表1至表3及5.3、5.4为准。"
+    },
+    {
+      "number": "GB 29436-2023",
+      "original_pages": [4, 5, 7, 14],
+      "compilation_pages": [26],
+      "result": "汇编所列5个产品行与原文一致；其余原料路线、公式及附录折算仅从原文录入。"
+    },
+    {
+      "number": "GB 21342-2025",
+      "original_pages": [6, 7, 8],
+      "compilation_pages": [],
+      "result": "汇编无该现行版本可用行，全部按原文表1、表2录入。"
+    },
+    {
+      "number": "GB 21341-2022",
+      "original_pages": [6, 7, 8],
+      "compilation_pages": [108, 109, 110],
+      "result": "汇编所列产品指标与原文一致；汇编未覆盖的指标和入炉矿品位修正按原文表1、表2录入。"
+    },
+    {
+      "number": "GB 21346-2022",
+      "original_pages": [5, 6],
+      "compilation_pages": [118, 119],
+      "result": "汇编所列指标与原文一致；铝液交流电耗等缺失行按原文表1、表2补全。"
+    },
+    {
+      "number": "GB 21256-2025",
+      "original_pages": [6, 7, 8, 10, 11],
+      "compilation_pages": [],
+      "result": "汇编无该现行版本可用行，全部按原文表1至表5和计算公式录入；表5缺失2级保持为空。"
+    }
+  ]
+}

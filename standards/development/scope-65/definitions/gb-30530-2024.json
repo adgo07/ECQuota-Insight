@@ -1,0 +1,191 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-30530-2024",
+  "number": "GB 30530-2024",
+  "title": "二甲基硅氧烷单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+  "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+  "products": [
+    {
+      "id": "dimethylsiloxane",
+      "name": "二甲基硅氧烷（水解物、环体和线性体）",
+      "description": "GB 30530-2024表格中的二甲基硅氧烷（水解物、环体和线性体）产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30530-2024.dimethylsiloxane.comprehensive-energy",
+          "name": "二甲基硅氧烷（水解物、环体和线性体）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30530-2024.dimethylsiloxane.energy",
+              "label": "二甲基硅氧烷（水解物、环体和线性体）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 30530-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30530-2024.dimethylsiloxane.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "二甲基硅氧烷（水解物、环体和线性体）合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "二甲基硅氧烷（水解物、环体和线性体）单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 6,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

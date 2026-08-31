@@ -9,7 +9,7 @@ from pathlib import Path
 from uebench.domain.engine import EvaluationEngine, EvaluationValidationError
 from uebench.domain.models import EnergyLine, EvaluationRequest, Grade, InputMode, InputValue, ProductionLine, PublicationStatus, StandardDefinition
 
-ROOT = Path("work/next-scope-63/data")
+ROOT = Path(__file__).resolve().parents[1] / "standards" / "development" / "scope-63"
 
 
 def _definition() -> StandardDefinition:

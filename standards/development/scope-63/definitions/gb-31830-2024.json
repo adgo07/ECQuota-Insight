@@ -1,0 +1,433 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-31830-2024",
+  "number": "GB 31830-2024",
+  "title": "甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+  "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+  "products": [
+    {
+      "id": "tdi",
+      "name": "甲苯二异氰酸酯（TDI）",
+      "description": "按GB 31830-2024生产系统、辅助生产系统和附属生产系统统计；合格TDI产量以t计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_31830-2024.tdi.comprehensive-energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_31830-2024.tdi.energy",
+              "label": "甲苯二异氰酸酯（TDI）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 31830-2024第6.2节核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_31830-2024.tdi.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期产品综合能耗E",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "甲苯二异氰酸酯（TDI）合格产品产量P",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "甲苯二异氰酸酯（TDI）单位产品能耗（公式1、公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "340",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "340",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 5,
+              "clause": "第1章",
+              "table": "范围",
+              "note": "TDI以DNT、氢气、氯气和一氧化碳为原料；MDI以苯胺、甲醛、氯气和一氧化碳为原料，产品范围不得混用。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 6,
+              "clause": "4.1～5.2",
+              "table": "表1",
+              "note": "表格值依次映射为1级、2级、3级；现有企业执行3级限定值，新建或改扩建项目执行2级准入值。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 7,
+              "clause": "6.1～6.2.6",
+              "table": "公式（1）、公式（2）",
+              "note": "综合能耗包含生产、辅助和附属系统；回收并供范围外利用的能源按实际利用量扣除；单位产品能耗为E/P。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 8,
+              "clause": "附录A",
+              "table": "表A.1、表A.2",
+              "note": "能源折标准煤系数优先采用报告期实测值；无实测条件时可参考附录A。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 10,
+              "clause": "附录B",
+              "table": "表B.1",
+              "note": "耗能工质等价值按企业实际条件修正；不得把附录参考值误作不可变的固定值。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "formula_1_energy_total_equals_production_plus_auxiliary_affiliated_inputs_minus_external_recovery",
+            "formula_2_unit_energy_equals_E_divided_by_qualified_product_mass",
+            "standard_scope_excludes_construction_renovation_and_living_energy",
+            "production_boundary_includes_normal_major_overhaul_and_storage_loss",
+            "qualified_product_must_meet_GB_T_32469_for_TDI_or_GB_T_13941_for_MDI",
+            "energy.total_standard_coal_input_unit_is_kgce_and_production.total_equivalent_input_unit_is_t"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mdi",
+      "name": "二苯基甲烷二异氰酸酯（MDI）",
+      "description": "按GB 31830-2024生产系统、辅助生产系统和附属生产系统统计；合格MDI产量以t计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_31830-2024.mdi.comprehensive-energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_31830-2024.mdi.energy",
+              "label": "二苯基甲烷二异氰酸酯（MDI）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 31830-2024第6.2节核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_31830-2024.mdi.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期产品综合能耗E",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "二苯基甲烷二异氰酸酯（MDI）合格产品产量P",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "二苯基甲烷二异氰酸酯（MDI）单位产品能耗（公式1、公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "175",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "190",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "175",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "190",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 5,
+              "clause": "第1章",
+              "table": "范围",
+              "note": "TDI以DNT、氢气、氯气和一氧化碳为原料；MDI以苯胺、甲醛、氯气和一氧化碳为原料，产品范围不得混用。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 6,
+              "clause": "4.1～5.2",
+              "table": "表2",
+              "note": "表格值依次映射为1级、2级、3级；现有企业执行3级限定值，新建或改扩建项目执行2级准入值。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 7,
+              "clause": "6.1～6.2.6",
+              "table": "公式（1）、公式（2）",
+              "note": "综合能耗包含生产、辅助和附属系统；回收并供范围外利用的能源按实际利用量扣除；单位产品能耗为E/P。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 8,
+              "clause": "附录A",
+              "table": "表A.1、表A.2",
+              "note": "能源折标准煤系数优先采用报告期实测值；无实测条件时可参考附录A。"
+            },
+            {
+              "standard_number": "GB 31830-2024",
+              "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
+              "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
+              "page": 10,
+              "clause": "附录B",
+              "table": "表B.1",
+              "note": "耗能工质等价值按企业实际条件修正；不得把附录参考值误作不可变的固定值。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "formula_1_energy_total_equals_production_plus_auxiliary_affiliated_inputs_minus_external_recovery",
+            "formula_2_unit_energy_equals_E_divided_by_qualified_product_mass",
+            "standard_scope_excludes_construction_renovation_and_living_energy",
+            "production_boundary_includes_normal_major_overhaul_and_storage_loss",
+            "qualified_product_must_meet_GB_T_32469_for_TDI_or_GB_T_13941_for_MDI",
+            "energy.total_standard_coal_input_unit_is_kgce_and_production.total_equivalent_input_unit_is_t"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "supersedes": [
+    "GB 31828-2015",
+    "GB 31830-2015"
+  ]
+}

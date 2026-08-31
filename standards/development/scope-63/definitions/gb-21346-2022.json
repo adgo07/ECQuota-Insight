@@ -1,0 +1,1035 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-21346-2022",
+  "number": "GB 21346-2022",
+  "title": "电解铝和氧化铝单位产品能源消耗限额",
+  "version": "2022",
+  "publication_status": "published",
+  "publication_date": "2022-12-29",
+  "effective_date": "2024-01-01",
+  "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+  "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+  "products": [
+    {
+      "id": "electrolytic-aluminum",
+      "name": "电解铝",
+      "description": "电解铝液和铝锭的交流电耗、综合能耗分别判级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "electrolytic-aluminum.aluminum-liquid-ac",
+          "name": "电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electrolytic-aluminum.aluminum-liquid-ac",
+              "label": "铝液交流电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electrolytic-aluminum.aluminum-liquid-ac",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "13000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "13350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 5,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "electrolytic-aluminum.aluminum-liquid-comprehensive-ac",
+          "name": "铝液综合交流电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electrolytic-aluminum.aluminum-liquid-comprehensive-ac",
+              "label": "铝液综合交流电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electrolytic-aluminum.aluminum-liquid-comprehensive-ac",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "13250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "13350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "13700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 5,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "electrolytic-aluminum.aluminum-ingot-comprehensive-ac",
+          "name": "铝锭综合交流电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electrolytic-aluminum.aluminum-ingot-comprehensive-ac",
+              "label": "铝锭综合交流电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electrolytic-aluminum.aluminum-ingot-comprehensive-ac",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "13300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "13400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "13750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 5,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "electrolytic-aluminum.aluminum-ingot-comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electrolytic-aluminum.aluminum-ingot-comprehensive-energy",
+              "label": "铝锭综合单耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electrolytic-aluminum.aluminum-ingot-comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1670",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1680",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1720",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 5,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "alumina-bayer",
+      "name": "拜耳法氧化铝",
+      "description": "工艺能耗和综合能耗分别判级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "alumina-bayer.process-energy",
+          "name": "工艺能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.alumina-bayer.process_energy",
+              "label": "拜耳法氧化铝工艺能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.alumina-bayer.process_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "310",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "360",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "430",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 6,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "alumina-bayer.comprehensive-energy",
+          "name": "综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.alumina-bayer.comprehensive_energy",
+              "label": "拜耳法氧化铝综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.alumina-bayer.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "340",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "460",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 6,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "alumina-other",
+      "name": "其他工艺氧化铝",
+      "description": "工艺能耗和综合能耗分别判级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "alumina-other.process-energy",
+          "name": "工艺能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.alumina-other.process_energy",
+              "label": "其他工艺氧化铝工艺能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.alumina-other.process_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 6,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "alumina-other.comprehensive-energy",
+          "name": "综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.alumina-other.comprehensive_energy",
+              "label": "其他工艺氧化铝综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.alumina-other.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21346-2022",
+              "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+              "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+              "page": 6,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

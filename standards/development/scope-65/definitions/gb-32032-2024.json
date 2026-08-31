@@ -1,0 +1,2111 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-32032-2024",
+  "number": "GB 32032-2024",
+  "title": "金矿开采、选冶和金精炼单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+  "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+  "products": [
+    {
+      "id": "mining-open-pit",
+      "name": "金矿开采—露天开采",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.mining-open-pit.comprehensive-energy",
+          "name": "金矿开采—露天开采单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.mining-open-pit.energy",
+              "label": "金矿开采—露天开采直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.mining-open-pit.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.05",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.05",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mining-underground-small",
+      "name": "金矿开采—地下开采（<3×10^4 t/a）",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.mining-underground-small.comprehensive-energy",
+          "name": "金矿开采—地下开采（<3×10^4 t/a）单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.mining-underground-small.energy",
+              "label": "金矿开采—地下开采（<3×10^4 t/a）直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.mining-underground-small.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "6.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "14.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "16.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "6.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "14.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "16.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mining-underground-medium",
+      "name": "金矿开采—地下开采（3×10^4～6×10^4 t/a）",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.mining-underground-medium.comprehensive-energy",
+          "name": "金矿开采—地下开采（3×10^4～6×10^4 t/a）单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.mining-underground-medium.energy",
+              "label": "金矿开采—地下开采（3×10^4～6×10^4 t/a）直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.mining-underground-medium.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "10.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "12.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "10.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "12.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mining-underground-large",
+      "name": "金矿开采—地下开采（>6×10^4 t/a）",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.mining-underground-large.comprehensive-energy",
+          "name": "金矿开采—地下开采（>6×10^4 t/a）单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.mining-underground-large.energy",
+              "label": "金矿开采—地下开采（>6×10^4 t/a）直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.mining-underground-large.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-dump-leach",
+      "name": "金矿选冶—堆浸",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-dump-leach.comprehensive-energy",
+          "name": "金矿选冶—堆浸单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-dump-leach.energy",
+              "label": "金矿选冶—堆浸直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-dump-leach.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "0.95",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "0.95",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-flotation",
+      "name": "金矿选冶—浮选",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-flotation.comprehensive-energy",
+          "name": "金矿选冶—浮选单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-flotation.energy",
+              "label": "金矿选冶—浮选直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-flotation.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-ore-slurry-cyanide",
+      "name": "金矿选冶—原矿全泥氰化",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-ore-slurry-cyanide.comprehensive-energy",
+          "name": "金矿选冶—原矿全泥氰化单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-ore-slurry-cyanide.energy",
+              "label": "金矿选冶—原矿全泥氰化直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-ore-slurry-cyanide.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-concentrate-cyanide",
+      "name": "金矿选冶—金精矿氰化",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-concentrate-cyanide.comprehensive-energy",
+          "name": "金矿选冶—金精矿氰化单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-concentrate-cyanide.energy",
+              "label": "金矿选冶—金精矿氰化直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-concentrate-cyanide.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "11.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "13.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "14.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "11.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "13.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "14.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-ore-roasting",
+      "name": "金矿选冶—原矿焙烧",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-ore-roasting.comprehensive-energy",
+          "name": "金矿选冶—原矿焙烧单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-ore-roasting.energy",
+              "label": "金矿选冶—原矿焙烧直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-ore-roasting.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "22.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "27.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "30.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "22.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "27.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "30.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-concentrate-roasting",
+      "name": "金矿选冶—金精矿焙烧",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-concentrate-roasting.comprehensive-energy",
+          "name": "金矿选冶—金精矿焙烧单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-concentrate-roasting.energy",
+              "label": "金矿选冶—金精矿焙烧直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-concentrate-roasting.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "22.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "24.75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "27.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "22.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "24.75",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "27.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-matte-capture",
+      "name": "金矿选冶—造锍捕金",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-matte-capture.comprehensive-energy",
+          "name": "金矿选冶—造锍捕金单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-matte-capture.energy",
+              "label": "金矿选冶—造锍捕金直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-matte-capture.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "26.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "32.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "36.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "26.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "32.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "36.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-bio-oxidation",
+      "name": "金矿选冶—生物氧化",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-bio-oxidation.comprehensive-energy",
+          "name": "金矿选冶—生物氧化单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-bio-oxidation.energy",
+              "label": "金矿选冶—生物氧化直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-bio-oxidation.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "52.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "60.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "65.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "52.00",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "60.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "65.60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "processing-pressure-oxidation",
+      "name": "金矿选冶—压力氧化",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.processing-pressure-oxidation.comprehensive-energy",
+          "name": "金矿选冶—压力氧化单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.processing-pressure-oxidation.energy",
+              "label": "金矿选冶—压力氧化直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.processing-pressure-oxidation.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "53.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "61.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "67.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "53.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "61.15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "67.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refining-chemical",
+      "name": "金精炼—化学法",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.refining-chemical.comprehensive-energy",
+          "name": "金精炼—化学法单位产品能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.refining-chemical.energy",
+              "label": "金精炼—化学法直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.refining-chemical.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.40",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.40",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refining-extraction",
+      "name": "金精炼—萃取法",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.refining-extraction.comprehensive-energy",
+          "name": "金精炼—萃取法单位产品能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.refining-extraction.energy",
+              "label": "金精炼—萃取法直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.refining-extraction.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refining-electrolysis",
+      "name": "金精炼—电解法",
+      "description": "GB 32032-2024表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32032-2024.refining-electrolysis.comprehensive-energy",
+          "name": "金精炼—电解法单位产品能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32032-2024.refining-electrolysis.energy",
+              "label": "金精炼—电解法直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32032-2024.refining-electrolysis.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.35",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32032-2024",
+              "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
+              "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
+              "page": 7,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "开采、选冶和精炼均有工艺/规模/系数修正，未建模前明细模式必须返回不完整。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

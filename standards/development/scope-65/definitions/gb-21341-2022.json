@@ -1,0 +1,4873 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-21341-2022",
+  "number": "GB 21341-2022",
+  "title": "铁合金单位产品能源消耗限额",
+  "version": "2022",
+  "publication_status": "published",
+  "publication_date": "2022-12-29",
+  "effective_date": "2024-01-01",
+  "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+  "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+  "products": [
+    {
+      "id": "ferrosilicon",
+      "name": "硅铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "ferrosilicon.smelting_electricity",
+          "name": "硅铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ferrosilicon.smelting_electricity",
+              "label": "硅铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.ferrosilicon.grade_pct",
+              "label": "硅铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ferrosilicon.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "8050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "8050",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferrosilicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "98",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "40",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "8300",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferrosilicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "98",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "40",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "8400",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferrosilicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "98",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "40",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，硅铁单位产品冶炼电耗限额降低40 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "ferrosilicon.comprehensive_energy",
+          "name": "硅铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ferrosilicon.comprehensive_energy",
+              "label": "硅铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ferrosilicon.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1770",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1850",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "electric-high-carbon-ferromanganese",
+      "name": "电炉高碳锰铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "electric-high-carbon-ferromanganese.smelting_electricity",
+          "name": "电炉高碳锰铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electric-high-carbon-ferromanganese.smelting_electricity",
+              "label": "电炉高碳锰铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.electric-high-carbon-ferromanganese.grade_pct",
+              "label": "电炉高碳锰铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electric-high-carbon-ferromanganese.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "2100",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.electric-high-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "39",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "50",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "2400",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.electric-high-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "39",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "50",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "2550",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.electric-high-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "39",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "50",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，电炉高碳锰铁单位产品冶炼电耗限额降低50 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "electric-high-carbon-ferromanganese.comprehensive_energy",
+          "name": "电炉高碳锰铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electric-high-carbon-ferromanganese.comprehensive_energy",
+              "label": "电炉高碳锰铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electric-high-carbon-ferromanganese.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "610",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "660",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "ferromanganese-silicon",
+      "name": "锰硅合金",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "ferromanganese-silicon.smelting_electricity",
+          "name": "锰硅合金单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ferromanganese-silicon.smelting_electricity",
+              "label": "锰硅合金单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.ferromanganese-silicon.grade_pct",
+              "label": "锰硅合金入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ferromanganese-silicon.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3800",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "36",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4000",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "36",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4250",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "36",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，锰硅合金单位产品冶炼电耗限额降低100 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "ferromanganese-silicon.comprehensive_energy",
+          "name": "锰硅合金单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ferromanganese-silicon.comprehensive_energy",
+              "label": "锰硅合金单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ferromanganese-silicon.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "850",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "860",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "low-carbon-ferromanganese-silicon",
+      "name": "低碳锰硅合金",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "low-carbon-ferromanganese-silicon.smelting_electricity",
+          "name": "低碳锰硅合金单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.low-carbon-ferromanganese-silicon.smelting_electricity",
+              "label": "低碳锰硅合金单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.low-carbon-ferromanganese-silicon.grade_pct",
+              "label": "低碳锰硅合金入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.low-carbon-ferromanganese-silicon.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4990",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4650",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.low-carbon-ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "38",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4900",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.low-carbon-ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "38",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4990",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.low-carbon-ferromanganese-silicon.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "38",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "100",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，低碳锰硅合金单位产品冶炼电耗限额降低100 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "low-carbon-ferromanganese-silicon.comprehensive_energy",
+          "name": "低碳锰硅合金单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.low-carbon-ferromanganese-silicon.comprehensive_energy",
+              "label": "低碳锰硅合金单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.low-carbon-ferromanganese-silicon.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "micro-carbon-ferromanganese",
+      "name": "微碳锰铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "micro-carbon-ferromanganese.smelting_electricity",
+          "name": "微碳锰铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.micro-carbon-ferromanganese.smelting_electricity",
+              "label": "微碳锰铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.micro-carbon-ferromanganese.grade_pct",
+              "label": "微碳锰铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.micro-carbon-ferromanganese.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1140",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1050",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.micro-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "44",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1100",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.micro-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "44",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1140",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.micro-carbon-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "44",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，微碳锰铁单位产品冶炼电耗限额降低30 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "micro-carbon-ferromanganese.comprehensive_energy",
+          "name": "微碳锰铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.micro-carbon-ferromanganese.comprehensive_energy",
+              "label": "微碳锰铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.micro-carbon-ferromanganese.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "high-carbon-ferrochrome",
+      "name": "高碳铬铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "high-carbon-ferrochrome.smelting_electricity",
+          "name": "高碳铬铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.high-carbon-ferrochrome.smelting_electricity",
+              "label": "高碳铬铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.high-carbon-ferrochrome.grade_pct",
+              "label": "高碳铬铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.high-carbon-ferrochrome.chromium_iron_ratio",
+              "label": "入炉铬矿铬铁比",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "2.2",
+              "maximum": null,
+              "choices": [],
+              "description": "表1修正值仅适用于铬铁比不低于2.2。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.high-carbon-ferrochrome.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "3500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3100",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.high-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3300",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.high-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3500",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.high-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，高碳铬铁单位产品冶炼电耗限额降低80 kWh/t；降低时反向调整。",
+            "修正系数适用条件：铬铁比≥2.2。"
+          ]
+        },
+        {
+          "id": "high-carbon-ferrochrome.comprehensive_energy",
+          "name": "高碳铬铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.high-carbon-ferrochrome.comprehensive_energy",
+              "label": "高碳铬铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.high-carbon-ferrochrome.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "850",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "charge-ferrochrome",
+      "name": "炉料级铬铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "charge-ferrochrome.smelting_electricity",
+          "name": "炉料级铬铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.charge-ferrochrome.smelting_electricity",
+              "label": "炉料级铬铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.charge-ferrochrome.grade_pct",
+              "label": "炉料级铬铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.charge-ferrochrome.chromium_iron_ratio",
+              "label": "入炉铬矿铬铁比",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "1.5",
+              "maximum": null,
+              "choices": [],
+              "description": "表1修正值仅适用于铬铁比不低于1.5。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.charge-ferrochrome.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "3650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3200",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.charge-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3500",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.charge-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3650",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.charge-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "40",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "80",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，炉料级铬铁单位产品冶炼电耗限额降低80 kWh/t；降低时反向调整。",
+            "修正系数适用条件：铬铁比≥1.5。"
+          ]
+        },
+        {
+          "id": "charge-ferrochrome.comprehensive_energy",
+          "name": "炉料级铬铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.charge-ferrochrome.comprehensive_energy",
+              "label": "炉料级铬铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.charge-ferrochrome.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "830",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "910",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "940",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "medium-low-carbon-ferrochrome",
+      "name": "中（低）碳铬铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "medium-low-carbon-ferrochrome.smelting_electricity",
+          "name": "中（低）碳铬铁单位产品冶炼电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.medium-low-carbon-ferrochrome.smelting_electricity",
+              "label": "中（低）碳铬铁单位产品冶炼电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.medium-low-carbon-ferrochrome.grade_pct",
+              "label": "中（低）碳铬铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.medium-low-carbon-ferrochrome.smelting_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1650",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.medium-low-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "48",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "35",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1800",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.medium-low-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "48",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "35",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1950",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.medium-low-carbon-ferrochrome.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "48",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "35",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，中（低）碳铬铁单位产品冶炼电耗限额降低35 kWh/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "medium-low-carbon-ferrochrome.comprehensive_energy",
+          "name": "中（低）碳铬铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.medium-low-carbon-ferrochrome.comprehensive_energy",
+              "label": "中（低）碳铬铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.medium-low-carbon-ferrochrome.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "240",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "blast-furnace-ferromanganese",
+      "name": "高炉锰铁",
+      "description": "主要能耗指标分别判级，不形成总体等级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "blast-furnace-ferromanganese.coke_consumption",
+          "name": "高炉锰铁单位产品焦炭消耗",
+          "unit": "kg/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.blast-furnace-ferromanganese.coke_consumption",
+              "label": "高炉锰铁单位产品焦炭消耗实际值",
+              "data_type": "decimal",
+              "unit": "kg/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "ore.blast-furnace-ferromanganese.grade_pct",
+              "label": "高炉锰铁入炉矿实际品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.blast-furnace-ferromanganese.coke_consumption",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.coke.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kg/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1280",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1280",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.blast-furnace-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "37",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1320",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.blast-furnace-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "37",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "subtract",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "1350",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "ore.blast-furnace-ferromanganese.grade_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "37",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "30",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kg/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉矿品位每升高1个百分点，高炉锰铁单位产品焦炭消耗限额降低30 kg/t；降低时反向调整。"
+          ]
+        },
+        {
+          "id": "blast-furnace-ferromanganese.comprehensive_energy",
+          "name": "高炉锰铁单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.blast-furnace-ferromanganese.comprehensive_energy",
+              "label": "高炉锰铁单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.blast-furnace-ferromanganese.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21341-2022",
+              "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+              "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+              "page": 6,
+              "clause": "4",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

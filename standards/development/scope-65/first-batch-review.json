@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "standards": [
+    {
+      "number": "GB 16780-2021",
+      "title": "水泥单位产品能源消耗限额",
+      "product_count": 3,
+      "indicator_count": 5,
+      "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+      "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+      "status": "reviewed"
+    },
+    {
+      "number": "GB 29436-2023",
+      "title": "甲醇、乙二醇和二甲醚单位产品能源消耗限额",
+      "product_count": 9,
+      "indicator_count": 9,
+      "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
+      "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
+      "status": "reviewed"
+    },
+    {
+      "number": "GB 21342-2025",
+      "title": "焦炭单位产品能源消耗限额",
+      "product_count": 2,
+      "indicator_count": 2,
+      "source_file": "08.GB 21342-2025焦炭单位产品能源消耗限额.pdf",
+      "source_sha256": "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
+      "status": "reviewed"
+    },
+    {
+      "number": "GB 21341-2022",
+      "title": "铁合金单位产品能源消耗限额",
+      "product_count": 9,
+      "indicator_count": 18,
+      "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
+      "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
+      "status": "reviewed"
+    },
+    {
+      "number": "GB 21346-2022",
+      "title": "电解铝和氧化铝单位产品能源消耗限额",
+      "product_count": 3,
+      "indicator_count": 8,
+      "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
+      "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
+      "status": "reviewed"
+    },
+    {
+      "number": "GB 21256-2025",
+      "title": "粗钢生产主要工序单位产品能源消耗限额",
+      "product_count": 7,
+      "indicator_count": 7,
+      "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+      "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+      "status": "reviewed"
+    }
+  ]
+}

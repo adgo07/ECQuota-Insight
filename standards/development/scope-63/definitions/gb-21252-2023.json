@@ -1,0 +1,2040 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-21252-2023",
+  "number": "GB 21252-2023",
+  "title": "建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额",
+  "version": "2023",
+  "publication_status": "published",
+  "publication_date": "2023-11-27",
+  "effective_date": "2024-12-01",
+  "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+  "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+  "products": [
+    {
+      "id": "gb_21252-2023-ceramic-tile-abs-le-0-2",
+      "name": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率≤0.2%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.ceramic-tile-abs-le-0.2",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ceramic-tile-abs-le-0.2",
+              "label": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率≤0.2%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.thickness_factor",
+              "label": "厚度总体修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按表2以合格品产量占比加权计算；无15 mm及以上产品时填1.00。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ceramic-tile-abs-le-0.2",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "7.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4.5",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "5.5",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "7.0",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 5,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1、表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "thickness_factor_from_table_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-ceramic-tile-abs-0-2-0-5",
+      "name": "陶瓷砖（干压）/陶瓷瓦（干压），0.2%＜吸水率≤0.5%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.ceramic-tile-abs-0.2-0.5",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ceramic-tile-abs-0.2-0.5",
+              "label": "陶瓷砖（干压）/陶瓷瓦（干压），0.2%＜吸水率≤0.5%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.thickness_factor",
+              "label": "厚度总体修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按表2以合格品产量占比加权计算；无15 mm及以上产品时填1.00。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ceramic-tile-abs-0.2-0.5",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "4.9",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "6.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4.0",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4.9",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "6.5",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 5,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1、表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "thickness_factor_from_table_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-ceramic-tile-abs-0-5-10",
+      "name": "陶瓷砖（干压）/陶瓷瓦（干压），0.5%＜吸水率≤10%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.ceramic-tile-abs-0.5-10",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ceramic-tile-abs-0.5-10",
+              "label": "陶瓷砖（干压）/陶瓷瓦（干压），0.5%＜吸水率≤10%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.thickness_factor",
+              "label": "厚度总体修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按表2以合格品产量占比加权计算；无15 mm及以上产品时填1.00。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ceramic-tile-abs-0.5-10",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3.4",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3.7",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4.6",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 5,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1、表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "thickness_factor_from_table_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-ceramic-tile-abs-gt-10",
+      "name": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率＞10%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.ceramic-tile-abs-gt-10",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ceramic-tile-abs-gt-10",
+              "label": "陶瓷砖（干压）/陶瓷瓦（干压），吸水率＞10%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.thickness_factor",
+              "label": "厚度总体修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按表2以合格品产量占比加权计算；无15 mm及以上产品时填1.00。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ceramic-tile-abs-gt-10",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3.2",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "3.5",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "4.5",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 5,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1、表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "thickness_factor_from_table_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-ceramic-board",
+      "name": "陶瓷板",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.ceramic-board",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ceramic-board",
+              "label": "陶瓷板实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.thickness_factor",
+              "label": "厚度总体修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按表2以合格品产量占比加权计算；无15 mm及以上产品时填1.00。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ceramic-board",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "6.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "13.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "6.0",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "8.7",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "13.2",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/m²",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.thickness_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "厚度总体修正系数",
+              "unit": "kgce/m²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表3、表2",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "thickness_factor_from_table_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-dry-hung-hollow-board-extruded-tile",
+      "name": "干挂空心陶瓷板、陶瓷瓦（挤压）",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.dry-hung-hollow-board-extruded-tile",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.dry-hung-hollow-board-extruded-tile",
+              "label": "干挂空心陶瓷板、陶瓷瓦（挤压）实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.dry-hung-hollow-board-extruded-tile",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "226",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "238",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "253",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "226",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "238",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "253",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表4",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-sanitary-ware-abs-le-0-3",
+      "name": "卫生陶瓷，吸水率≤0.3%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.sanitary-ware-abs-le-0.3",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.sanitary-ware-abs-le-0.3",
+              "label": "卫生陶瓷，吸水率≤0.3%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.sanitary-ware-abs-le-0.3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "630",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "630",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表5",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-sanitary-ware-abs-gt-0-3",
+      "name": "卫生陶瓷，吸水率＞0.3%",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.sanitary-ware-abs-gt-0.3",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.sanitary-ware-abs-gt-0.3",
+              "label": "卫生陶瓷，吸水率＞0.3%实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.sanitary-ware-abs-gt-0.3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "460",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "610",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "460",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "610",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表5",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_21252-2023-alumina-grinding-ball-90-series",
+      "name": "耐磨氧化铝球（90系列）",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21252-2023.alumina-grinding-ball-90-series",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.alumina-grinding-ball-90-series",
+              "label": "耐磨氧化铝球（90系列）实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.alumina-grinding-ball-90-series",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "295",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "370",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "295",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "370",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21252-2023",
+              "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
+              "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表6",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

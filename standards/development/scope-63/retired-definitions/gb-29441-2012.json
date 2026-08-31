@@ -1,0 +1,191 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29441-2012",
+  "number": "GB 29441-2012",
+  "title": "稀硝酸单位产品能源消耗限额",
+  "version": "2012",
+  "publication_status": "draft",
+  "publication_date": "2012-12-31",
+  "effective_date": "2013-10-01",
+  "source_file": "26.GB 29441-2012稀硝酸单位产品能源消耗限额.pdf",
+  "source_sha256": "18127e918a156cda7023bc5486a4bc08a5ae02af487237d4a03a9122790e7235",
+  "products": [
+    {
+      "id": "dilute-nitric-acid",
+      "name": "稀硝酸（折HNO3 100%）",
+      "description": "以合成氨为原料的稀硝酸生产；产量按折HNO3 100%计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29441_2012.dilute-nitric-acid.comprehensive-energy",
+          "name": "稀硝酸单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29441_2012.dilute_nitric_acid_comprehensive_energy",
+              "label": "稀硝酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入已按GB 29441-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29441_2012.dilute_nitric_acid_comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "稀硝酸单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29441-2012",
+              "source_file": "26.GB 29441-2012稀硝酸单位产品能源消耗限额.pdf",
+              "source_sha256": "18127e918a156cda7023bc5486a4bc08a5ae02af487237d4a03a9122790e7235",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "正文限定值、准入值、先进值",
+              "note": "原文明确给出160、20、0 kgce/t；分别映射为3级、2级、1级。"
+            },
+            {
+              "standard_number": "GB 29441-2012",
+              "source_file": "26.GB 29441-2012稀硝酸单位产品能源消耗限额.pdf",
+              "source_sha256": "18127e918a156cda7023bc5486a4bc08a5ae02af487237d4a03a9122790e7235",
+              "page": 5,
+              "clause": "5.2.1～5.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗为输入能源折标量减输出能源折标量，单位产品值为综合能耗除以产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_uses_energy_lines_and_qualified_production_lines",
+            "standard_scope_excludes_ammonia_energy_and_sodium_nitrate_or_nitrite_energy"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

@@ -1,0 +1,540 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-40878-2021",
+  "number": "GB 40878-2021",
+  "title": "葡萄糖酸钠单位产品能源消耗限额",
+  "version": "2021",
+  "publication_status": "draft",
+  "publication_date": "2021-10-11",
+  "effective_date": "2021-10-11",
+  "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+  "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+  "products": [
+    {
+      "id": "starch-fermentation",
+      "name": "以淀粉为原料发酵法",
+      "description": "葡萄糖酸钠产品按工艺路线和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40878_2021.starch-fermentation.comprehensive-energy",
+          "name": "以淀粉为原料发酵法葡萄糖酸钠单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40878_2021.starch-fermentation.comprehensive_energy",
+              "label": "以淀粉为原料发酵法葡萄糖酸钠单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40878-2021第6.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40878_2021.starch-fermentation.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "葡萄糖酸钠单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "272",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "280",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "324",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "272",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "280",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "324",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按淀粉原料发酵、淀粉原料酶法或葡萄糖原料催化氧化工艺选择。"
+            },
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 5,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "process_route_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "starch-enzymatic",
+      "name": "以淀粉为原料酶法",
+      "description": "葡萄糖酸钠产品按工艺路线和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40878_2021.starch-enzymatic.comprehensive-energy",
+          "name": "以淀粉为原料酶法葡萄糖酸钠单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40878_2021.starch-enzymatic.comprehensive_energy",
+              "label": "以淀粉为原料酶法葡萄糖酸钠单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40878-2021第6.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40878_2021.starch-enzymatic.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "葡萄糖酸钠单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "268",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "290",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "268",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "290",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按淀粉原料发酵、淀粉原料酶法或葡萄糖原料催化氧化工艺选择。"
+            },
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 5,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "process_route_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "glucose-catalytic-oxidation",
+      "name": "以葡萄糖为原料催化氧化法",
+      "description": "葡萄糖酸钠产品按工艺路线和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40878_2021.glucose-catalytic-oxidation.comprehensive-energy",
+          "name": "以葡萄糖为原料催化氧化法葡萄糖酸钠单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40878_2021.glucose-catalytic-oxidation.comprehensive_energy",
+              "label": "以葡萄糖为原料催化氧化法葡萄糖酸钠单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40878-2021第6.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40878_2021.glucose-catalytic-oxidation.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "葡萄糖酸钠单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "156",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "156",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "156",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "156",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按淀粉原料发酵、淀粉原料酶法或葡萄糖原料催化氧化工艺选择。"
+            },
+            {
+              "standard_number": "GB 40878-2021",
+              "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
+              "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
+              "page": 5,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "process_route_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

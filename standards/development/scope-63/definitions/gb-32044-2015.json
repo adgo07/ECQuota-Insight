@@ -1,0 +1,567 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-32044-2015",
+  "number": "GB 32044-2015",
+  "title": "糖单位产品能源消耗限额",
+  "version": "2015",
+  "publication_status": "draft",
+  "publication_date": "2015-09-11",
+  "effective_date": "2016-10-01",
+  "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+  "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+  "products": [
+    {
+      "id": "sugarcane",
+      "name": "甘蔗制糖",
+      "description": "糖产品按工艺类型、合格产量和等折一级白砂糖口径计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32044_2015.sugarcane.comprehensive-energy",
+          "name": "甘蔗制糖单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32044_2015.sugarcane.comprehensive_energy",
+              "label": "甘蔗制糖单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32044-2015第5.2节核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32044_2015.sugarcane.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "糖单位产品能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "225",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "225",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 3,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "现有糖生产企业单位产品能耗限定值。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 4,
+              "clause": "4.2～4.3",
+              "table": "表2、表3",
+              "note": "新建/改扩建准入值与先进值对应1级、2级、3级。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 5,
+              "clause": "5.2.3～5.2.4",
+              "table": "公式（1）、（2）",
+              "note": "输入能源折标量减输出能源折标量后除以等折一级白砂糖产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "qualified_output_is_equivalent_first_grade_white_sugar_per_clause_5_2_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beet",
+      "name": "甜菜制糖",
+      "description": "糖产品按工艺类型、合格产量和等折一级白砂糖口径计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32044_2015.beet.comprehensive-energy",
+          "name": "甜菜制糖单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32044_2015.beet.comprehensive_energy",
+              "label": "甜菜制糖单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32044-2015第5.2节核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32044_2015.beet.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "糖单位产品能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "318",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "360",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "630",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "318",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "360",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "630",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 3,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "现有糖生产企业单位产品能耗限定值。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 4,
+              "clause": "4.2～4.3",
+              "table": "表2、表3",
+              "note": "新建/改扩建准入值与先进值对应1级、2级、3级。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 5,
+              "clause": "5.2.3～5.2.4",
+              "table": "公式（1）、（2）",
+              "note": "输入能源折标量减输出能源折标量后除以等折一级白砂糖产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "qualified_output_is_equivalent_first_grade_white_sugar_per_clause_5_2_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "refining",
+      "name": "炼糖",
+      "description": "糖产品按工艺类型、合格产量和等折一级白砂糖口径计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32044_2015.refining.comprehensive-energy",
+          "name": "炼糖单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32044_2015.refining.comprehensive_energy",
+              "label": "炼糖单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32044-2015第5.2节核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32044_2015.refining.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "糖单位产品能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 3,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "现有糖生产企业单位产品能耗限定值。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 4,
+              "clause": "4.2～4.3",
+              "table": "表2、表3",
+              "note": "新建/改扩建准入值与先进值对应1级、2级、3级。"
+            },
+            {
+              "standard_number": "GB 32044-2015",
+              "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
+              "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
+              "page": 5,
+              "clause": "5.2.3～5.2.4",
+              "table": "公式（1）、（2）",
+              "note": "输入能源折标量减输出能源折标量后除以等折一级白砂糖产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "qualified_output_is_equivalent_first_grade_white_sugar_per_clause_5_2_2"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

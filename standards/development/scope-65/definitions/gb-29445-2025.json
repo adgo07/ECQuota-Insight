@@ -1,0 +1,707 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29445-2025",
+  "number": "GB 29445-2025",
+  "title": "煤炭开采单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "published",
+  "publication_date": "2025-08-01",
+  "effective_date": "2026-08-01",
+  "source_file": "27.GB 29445-2025 煤炭开采单位产品能源消耗限额.pdf",
+  "source_sha256": "596d328b68df78dbed4d06a853101fc6ffd55985517bfd70833b775c81680233",
+  "products": [
+    {
+      "id": "gb_29445-2025-underground",
+      "name": "煤炭井工开采企业单位产品能耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29445-2025.underground",
+          "name": "煤炭井工开采企业单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.underground",
+              "label": "煤炭井工开采企业单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.k1",
+              "label": "采煤条件及工艺折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k2",
+              "label": "运输距离折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k3",
+              "label": "矿井瓦斯等级折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k4",
+              "label": "矿井涌水量折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k5",
+              "label": "单井生产能力折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.underground",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "multiply",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.total_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "1",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "1",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k1",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k2",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k3",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k4",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k5",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附录B折算系数合计",
+                    "unit": "1",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "折算后综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "煤炭开采单位产品能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "6.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "6.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29445-2025",
+              "source_file": "27.GB 29445-2025 煤炭开采单位产品能源消耗限额.pdf",
+              "source_sha256": "596d328b68df78dbed4d06a853101fc6ffd55985517bfd70833b775c81680233",
+              "page": 8,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_29445-2025-surface",
+      "name": "煤炭露天开采企业单位产品能耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29445-2025.surface",
+          "name": "煤炭露天开采企业单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.surface",
+              "label": "煤炭露天开采企业单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.k1",
+              "label": "采煤条件及工艺折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k2",
+              "label": "运输距离折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k3",
+              "label": "矿井瓦斯等级折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k4",
+              "label": "矿井涌水量折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            },
+            {
+              "key": "condition.k5",
+              "label": "单井生产能力折算系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按附录B对应区间取值。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.surface",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "multiply",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.total_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "1",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "1",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k1",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k2",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k3",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k4",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "condition.k5",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附录B折算系数合计",
+                    "unit": "1",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "折算后综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "煤炭开采单位产品能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "8.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29445-2025",
+              "source_file": "27.GB 29445-2025 煤炭开采单位产品能源消耗限额.pdf",
+              "source_sha256": "596d328b68df78dbed4d06a853101fc6ffd55985517bfd70833b775c81680233",
+              "page": 8,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

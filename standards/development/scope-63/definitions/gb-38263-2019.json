@@ -1,0 +1,1230 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-38263-2019",
+  "number": "GB 38263-2019",
+  "title": "水泥制品单位产品能源消耗限额",
+  "version": "2019",
+  "publication_status": "published",
+  "publication_date": "2019-10-14",
+  "effective_date": "2020-05-01",
+  "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+  "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+  "products": [
+    {
+      "id": "manual-candidate-1",
+      "name": "预制混凝土桩",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_1",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_1",
+              "label": "预制混凝土桩单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_1",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "32.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "56.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "32.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "56.6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-2",
+      "name": "环形混凝土电杆",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_2",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_2",
+              "label": "环形混凝土电杆单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_2",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "40.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "48.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "72.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "40.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "48.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "72.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-3",
+      "name": "混凝土和钢筋混凝土排水管",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_3",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_3",
+              "label": "混凝土和钢筋混凝土排水管单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "27.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "33.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "49.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "27.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "33.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "49.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-4",
+      "name": "预应力钢筒混凝土管",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_4",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_4",
+              "label": "预应力钢筒混凝土管单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_4",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "37.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "45.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "66.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "37.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "45.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "66.4",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-5",
+      "name": "加气混凝土",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_5",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_5",
+              "label": "加气混凝土单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_5",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "21.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "25.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "37.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "21.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "25.2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "37.3",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-6",
+      "name": "硅酸钙板",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_6",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_6",
+              "label": "硅酸钙板单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_6",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "77.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "93.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "131.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "77.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "93.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "131.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual-candidate-7",
+      "name": "预制混凝土衬砌管片",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_38263_2019.manual_candidate_7",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_38263_2019.manual_7",
+              "label": "预制混凝土衬砌管片单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_38263_2019.manual_7",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "15.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "21.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "15.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "21.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 38263-2019",
+              "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
+              "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
+              "page": 8,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

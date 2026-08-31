@@ -1,0 +1,1071 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-45246-2025",
+  "number": "GB 45246-2025",
+  "title": "人造板类主要产品单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "draft",
+  "publication_date": "2025-01-24",
+  "effective_date": "2026-02-01",
+  "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+  "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+  "products": [
+    {
+      "id": "medium-density-fiberboard",
+      "name": "中密度纤维板",
+      "description": "GB 45246-2025表格中的中密度纤维板产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.medium-density-fiberboard.comprehensive-energy",
+          "name": "中密度纤维板单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.medium-density-fiberboard.energy",
+              "label": "中密度纤维板单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.medium-density-fiberboard.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "中密度纤维板合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "中密度纤维板单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "118",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "118",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "high-density-fiberboard",
+      "name": "高密度纤维板",
+      "description": "GB 45246-2025表格中的高密度纤维板产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.high-density-fiberboard.comprehensive-energy",
+          "name": "高密度纤维板单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.high-density-fiberboard.energy",
+              "label": "高密度纤维板单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.high-density-fiberboard.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "高密度纤维板合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "高密度纤维板单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plywood-full-process",
+      "name": "普通胶合板—全工序",
+      "description": "GB 45246-2025表格中的普通胶合板—全工序产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.plywood-full-process.comprehensive-energy",
+          "name": "普通胶合板—全工序单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.plywood-full-process.energy",
+              "label": "普通胶合板—全工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.plywood-full-process.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "普通胶合板—全工序合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "普通胶合板—全工序单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "197",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "223",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "197",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "223",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plywood-front-process",
+      "name": "普通胶合板—前段工序",
+      "description": "GB 45246-2025表格中的普通胶合板—前段工序产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.plywood-front-process.comprehensive-energy",
+          "name": "普通胶合板—前段工序单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.plywood-front-process.energy",
+              "label": "普通胶合板—前段工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.plywood-front-process.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "普通胶合板—前段工序合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "普通胶合板—前段工序单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plywood-back-process",
+      "name": "普通胶合板—后段工序",
+      "description": "GB 45246-2025表格中的普通胶合板—后段工序产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.plywood-back-process.comprehensive-energy",
+          "name": "普通胶合板—后段工序单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.plywood-back-process.energy",
+              "label": "普通胶合板—后段工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.plywood-back-process.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "普通胶合板—后段工序合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "普通胶合板—后段工序单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "67",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "73",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "60",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "67",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "73",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "particleboard",
+      "name": "普通型刨花板",
+      "description": "GB 45246-2025表格中的普通型刨花板产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45246-2025.particleboard.comprehensive-energy",
+          "name": "普通型刨花板单位产品综合能耗",
+          "unit": "kgce/m3",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_45246-2025.particleboard.energy",
+              "label": "普通型刨花板单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m3",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 45246-2025第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_45246-2025.particleboard.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "普通型刨花板合格产量",
+                "unit": "m3",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "普通型刨花板单位产品综合能耗（第6章公式）",
+            "unit": "kgce/m3",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m3",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 5,
+              "clause": "第4章、表1",
+              "table": "表1",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 45246-2025",
+              "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
+              "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
+              "page": 6,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

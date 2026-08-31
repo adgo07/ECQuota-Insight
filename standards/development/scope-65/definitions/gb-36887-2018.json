@@ -1,0 +1,1065 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-36887-2018",
+  "number": "GB 36887-2018",
+  "title": "合成革单位产品能源消耗限额",
+  "version": "2018",
+  "publication_status": "draft",
+  "publication_date": "2018-11-19",
+  "effective_date": "2019-12-01",
+  "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+  "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+  "products": [
+    {
+      "id": "synthetic-leather-class-1",
+      "name": "合成革第1类",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.synthetic-leather-class-1.comprehensive-energy",
+          "name": "合成革第1类单位产品综合能耗",
+          "unit": "kgce/tsl",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.synthetic-leather-class-1.energy",
+              "label": "合成革第1类单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tsl",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tsl指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.synthetic-leather-class-1.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tsl",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tsl",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "275",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "275",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthetic-leather-class-2",
+      "name": "合成革第2类",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.synthetic-leather-class-2.comprehensive-energy",
+          "name": "合成革第2类单位产品综合能耗",
+          "unit": "kgce/tsl",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.synthetic-leather-class-2.energy",
+              "label": "合成革第2类单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tsl",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tsl指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.synthetic-leather-class-2.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tsl",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tsl",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "320",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthetic-leather-class-3",
+      "name": "合成革第3类",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.synthetic-leather-class-3.comprehensive-energy",
+          "name": "合成革第3类单位产品综合能耗",
+          "unit": "kgce/tsl",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.synthetic-leather-class-3.energy",
+              "label": "合成革第3类单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tsl",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tsl指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.synthetic-leather-class-3.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tsl",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tsl",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "55",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthetic-leather-class-4",
+      "name": "合成革第4类",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.synthetic-leather-class-4.comprehensive-energy",
+          "name": "合成革第4类单位产品综合能耗",
+          "unit": "kgce/tsl",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.synthetic-leather-class-4.energy",
+              "label": "合成革第4类单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tsl",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tsl指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.synthetic-leather-class-4.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tsl",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tsl",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "275",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "275",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthetic-leather-class-5",
+      "name": "合成革第5类",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.synthetic-leather-class-5.comprehensive-energy",
+          "name": "合成革第5类单位产品综合能耗",
+          "unit": "kgce/tsl",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.synthetic-leather-class-5.energy",
+              "label": "合成革第5类单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tsl",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tsl指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.synthetic-leather-class-5.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tsl",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tsl",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tsl",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dmf-recovery",
+      "name": "DMF回收",
+      "description": "按GB 36887-2018类别定义和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36887_2018.dmf-recovery.comprehensive-energy",
+          "name": "DMF回收单位产品综合能耗",
+          "unit": "kgce/tdmf",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_36887_2018.dmf-recovery.energy",
+              "label": "DMF回收单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tdmf",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 36887-2018第8章核算的kgce/tdmf指标。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_36887_2018.dmf-recovery.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tdmf",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "合成革/DMF单位产品综合能耗（第8章公式）",
+            "unit": "kgce/tdmf",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "380",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "380",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tdmf",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 4,
+              "clause": "4.1～4.5",
+              "table": "表1～表5",
+              "note": "按合成革类别或DMF回收产品选择相应三等级限额。"
+            },
+            {
+              "standard_number": "GB 36887-2018",
+              "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
+              "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
+              "page": 7,
+              "clause": "8.1～8.4",
+              "table": "公式（1）～（4）",
+              "note": "综合能耗按输入能源折标量减输出能源折标量，再按对应产品产量折算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_class_definition_must_be_checked_against_clause_4_and_table_1"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

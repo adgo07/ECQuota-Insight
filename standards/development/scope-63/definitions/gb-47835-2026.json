@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-47835-2026",
+  "number": "GB 47835-2026",
+  "title": "硅单晶单位产品能源消耗限额",
+  "version": "2026",
+  "publication_status": "published",
+  "publication_date": "2026-06-27",
+  "effective_date": "2027-01-01",
+  "source_file": "GB+47835-2026 硅单晶单位产品能源消耗限额.pdf",
+  "source_sha256": "b40936c6ce1f9b3349ef28bc81f4c40a83df1e854eea58fd4f531832b00454ba",
+  "products": [
+    {
+      "id": "monocrystalline-silicon",
+      "name": "硅单晶（方棒）",
+      "description": "按合格产品产量计算；硅片可比产量需按标准折标系数处理。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47835-2026.monocrystalline-silicon.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/kg",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.monocrystalline-silicon.comprehensive-energy",
+              "label": "硅单晶（方棒）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/kg",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.monocrystalline-silicon.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/kg",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.58",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.58",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/kg",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 47835-2026",
+              "source_file": "GB+47835-2026 硅单晶单位产品能源消耗限额.pdf",
+              "source_sha256": "b40936c6ce1f9b3349ef28bc81f4c40a83df1e854eea58fd4f531832b00454ba",
+              "page": 1,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "按合格硅单晶方棒产量计算",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "monocrystalline-wafer",
+      "name": "硅单晶片",
+      "description": "按合格产品产量计算；硅片可比产量需按标准折标系数处理。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_47835-2026.monocrystalline-wafer.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/百万片",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.monocrystalline-wafer.comprehensive-energy",
+              "label": "硅单晶片单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/百万片",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.monocrystalline-wafer.comprehensive-energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "unit",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际值",
+            "unit": "kgce/百万片",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7005",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9525",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "5900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "7005",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "9525",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/百万片",
+              "round_places": null
+            }
+          },
+          "display_places": 3,
+          "source_references": [
+            {
+              "standard_number": "GB 47835-2026",
+              "source_file": "GB+47835-2026 硅单晶单位产品能源消耗限额.pdf",
+              "source_sha256": "b40936c6ce1f9b3349ef28bc81f4c40a83df1e854eea58fd4f531832b00454ba",
+              "page": 1,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "按强制性标准原文录入；待规则确认表确认。"
+            }
+          ],
+          "notes": [
+            "硅片产品应按表3、表4及6.3进行产量折标",
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "CAT-065-NEW"
+  ],
+  "lifecycle_status": "future",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

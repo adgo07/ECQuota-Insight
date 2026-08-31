@@ -1,0 +1,5015 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-21256-2025",
+  "number": "GB 21256-2025",
+  "title": "粗钢生产主要工序单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "published",
+  "publication_date": "2025-06-30",
+  "effective_date": "2026-07-01",
+  "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+  "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+  "products": [
+    {
+      "id": "sintering",
+      "name": "烧结工序",
+      "description": "稀土矿、钒钛磁铁矿和红土镍矿用量按百分点修正。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "sintering.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.sintering.energy",
+              "label": "烧结工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "sintering.rare_earth_ore_pct",
+              "label": "稀土矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "sintering.vanadium_titanium_magnetite_pct",
+              "label": "钒钛磁铁矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "sintering.laterite_nickel_ore_pct",
+              "label": "红土镍矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.sintering.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "43",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "46",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "52",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "43",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "46",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "52",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "sintering.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 6,
+              "clause": "4.1",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "pelletizing",
+      "name": "球团工序",
+      "description": "稀土矿、钒钛磁铁矿和红土镍矿用量按百分点修正。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "pelletizing.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.pelletizing.energy",
+              "label": "球团工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "pelletizing.rare_earth_ore_pct",
+              "label": "稀土矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "pelletizing.vanadium_titanium_magnetite_pct",
+              "label": "钒钛磁铁矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "pelletizing.laterite_nickel_ore_pct",
+              "label": "红土镍矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.pelletizing.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "22",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "33",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "15",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "22",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "33",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "sum",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.rare_earth_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.15",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.vanadium_titanium_magnetite_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "pelletizing.laterite_nickel_ore_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.2",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 6,
+              "clause": "4.2",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    },
+    {
+      "id": "blast-furnace",
+      "name": "高炉工序",
+      "description": "矿种比例和入炉原料品位按4.3.2至4.3.5修正。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "blast-furnace.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.blast-furnace.energy",
+              "label": "高炉工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "blast-furnace.rare_earth_ore_pct",
+              "label": "稀土矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "blast-furnace.vanadium_titanium_magnetite_pct",
+              "label": "钒钛磁铁矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "blast-furnace.laterite_nickel_ore_pct",
+              "label": "红土镍矿用量比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "blast-furnace.feed_grade_pct",
+              "label": "高炉入炉原料品位",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.blast-furnace.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "361",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "370",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "415",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "361",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "sum",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.rare_earth_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.3",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.vanadium_titanium_magnetite_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.45",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.laterite_nickel_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "min",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "constant",
+                              "value": "5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "max",
+                              "value": null,
+                              "input_key": null,
+                              "args": [
+                                {
+                                  "op": "constant",
+                                  "value": "0",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                },
+                                {
+                                  "op": "subtract",
+                                  "value": null,
+                                  "input_key": null,
+                                  "args": [
+                                    {
+                                      "op": "constant",
+                                      "value": "62",
+                                      "input_key": null,
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    },
+                                    {
+                                      "op": "input",
+                                      "value": null,
+                                      "input_key": "blast-furnace.feed_grade_pct",
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    }
+                                  ],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                }
+                              ],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "3.61",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "370",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "sum",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.rare_earth_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.3",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.vanadium_titanium_magnetite_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.45",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.laterite_nickel_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "min",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "constant",
+                              "value": "5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "max",
+                              "value": null,
+                              "input_key": null,
+                              "args": [
+                                {
+                                  "op": "constant",
+                                  "value": "0",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                },
+                                {
+                                  "op": "subtract",
+                                  "value": null,
+                                  "input_key": null,
+                                  "args": [
+                                    {
+                                      "op": "constant",
+                                      "value": "62",
+                                      "input_key": null,
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    },
+                                    {
+                                      "op": "input",
+                                      "value": null,
+                                      "input_key": "blast-furnace.feed_grade_pct",
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    }
+                                  ],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                }
+                              ],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "3.61",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "415",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "sum",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.rare_earth_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.3",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.vanadium_titanium_magnetite_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.45",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "blast-furnace.laterite_nickel_ore_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "0.5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "min",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "constant",
+                              "value": "5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "max",
+                              "value": null,
+                              "input_key": null,
+                              "args": [
+                                {
+                                  "op": "constant",
+                                  "value": "0",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                },
+                                {
+                                  "op": "subtract",
+                                  "value": null,
+                                  "input_key": null,
+                                  "args": [
+                                    {
+                                      "op": "constant",
+                                      "value": "62",
+                                      "input_key": null,
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    },
+                                    {
+                                      "op": "input",
+                                      "value": null,
+                                      "input_key": "blast-furnace.feed_grade_pct",
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": null,
+                                      "unit": null,
+                                      "round_places": null
+                                    }
+                                  ],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": null,
+                                  "unit": null,
+                                  "round_places": null
+                                }
+                              ],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "3.61",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 7,
+              "clause": "4.3",
+              "table": "表3",
+              "note": null
+            }
+          ],
+          "notes": [
+            "入炉原料品位低于62%时每降低1个百分点增加3.61 kgce/t，最多按5个百分点调整；高于62%不反向扣减。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "converter",
+      "name": "转炉工序",
+      "description": "特殊用途转炉不按本指标考核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "converter.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.converter.energy",
+              "label": "转炉工序单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "converter.type",
+              "label": "转炉类型",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "普通转炉",
+                "特殊用途转炉"
+              ],
+              "description": null
+            },
+            {
+              "key": "converter.scrap_ratio_pct",
+              "label": "转炉废钢比",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "converter.steel_category",
+              "label": "主要冶炼钢种",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "普碳钢",
+                "优质碳素结构钢",
+                "优质轴承齿轮硬线工模具钢",
+                "深冲超深冲管线钢"
+              ],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "eq",
+            "field": "converter.type",
+            "value": "普通转炉",
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.converter.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-28",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-12",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "-30",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "converter.scrap_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.23",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质碳素结构钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "0.8",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质碳素结构钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质轴承齿轮硬线工模具钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.2",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质轴承齿轮硬线工模具钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "深冲超深冲管线钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.5",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "深冲超深冲管线钢"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "0",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "-28",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "converter.scrap_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.23",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质碳素结构钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "0.8",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质碳素结构钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质轴承齿轮硬线工模具钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.2",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质轴承齿轮硬线工模具钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "深冲超深冲管线钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.5",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "深冲超深冲管线钢"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "0",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "-12",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "converter.scrap_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.23",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质碳素结构钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "0.8",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质碳素结构钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "优质轴承齿轮硬线工模具钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.2",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "优质轴承齿轮硬线工模具钢"
+                        },
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "converter.steel_category",
+                            "value": "深冲超深冲管线钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "constant",
+                            "value": "1.5",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "深冲超深冲管线钢"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "0",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 7,
+              "clause": "4.4",
+              "table": "表4",
+              "note": null
+            }
+          ],
+          "notes": [
+            "负值表示工序回收能源大于消耗能源。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electric-arc-furnace-lt50",
+      "name": "电弧炉工序（容量＜50t）",
+      "description": "表5以全废钢冶炼普碳钢为基准；部分容量档标准未规定2级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "electric-arc-furnace-lt50.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electric-arc-furnace-lt50.energy",
+              "label": "电弧炉工序（容量＜50t）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.hot_metal_ratio_pct",
+              "label": "入炉铁水比",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.steel_category",
+              "label": "主要冶炼钢种",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "普碳钢",
+                "全不锈钢",
+                "优质碳素结构钢",
+                "优质轴承齿轮硬线工模具钢"
+              ],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electric-arc-furnace-lt50.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "61",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "86",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "61",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "61",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "86",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "86",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 8,
+              "clause": "4.5",
+              "table": "表5",
+              "note": null
+            }
+          ],
+          "notes": [
+            "标准表中“—”保留为缺级，不用推测值替代。",
+            "入炉铁水比每增加1个百分点，限额降低0.8 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electric-arc-furnace-50-70",
+      "name": "电弧炉工序（50t≤容量＜70t）",
+      "description": "表5以全废钢冶炼普碳钢为基准；部分容量档标准未规定2级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "electric-arc-furnace-50-70.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electric-arc-furnace-50-70.energy",
+              "label": "电弧炉工序（50t≤容量＜70t）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.hot_metal_ratio_pct",
+              "label": "入炉铁水比",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.steel_category",
+              "label": "主要冶炼钢种",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "普碳钢",
+                "全不锈钢",
+                "优质碳素结构钢",
+                "优质轴承齿轮硬线工模具钢"
+              ],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electric-arc-furnace-50-70.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "61",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "72",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "61",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "61",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "72",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "72",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 8,
+              "clause": "4.5",
+              "table": "表5",
+              "note": null
+            }
+          ],
+          "notes": [
+            "标准表中“—”保留为缺级，不用推测值替代。",
+            "入炉铁水比每增加1个百分点，限额降低0.8 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electric-arc-furnace-ge70",
+      "name": "电弧炉工序（容量≥70t）",
+      "description": "表5以全废钢冶炼普碳钢为基准；部分容量档标准未规定2级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "electric-arc-furnace-ge70.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.electric-arc-furnace-ge70.energy",
+              "label": "电弧炉工序（容量≥70t）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.hot_metal_ratio_pct",
+              "label": "入炉铁水比",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "eaf.steel_category",
+              "label": "主要冶炼钢种",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "普碳钢",
+                "全不锈钢",
+                "优质碳素结构钢",
+                "优质轴承齿轮硬线工模具钢"
+              ],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.electric-arc-furnace-ge70.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "61",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "64",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "72",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "61",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "61",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "64",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "64",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "subtract",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "piecewise",
+                      "value": null,
+                      "input_key": null,
+                      "args": [],
+                      "cases": [
+                        {
+                          "condition": {
+                            "op": "eq",
+                            "field": "eaf.steel_category",
+                            "value": "全不锈钢",
+                            "values": [],
+                            "minimum": null,
+                            "maximum": null,
+                            "include_minimum": true,
+                            "include_maximum": true,
+                            "args": []
+                          },
+                          "expression": {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "72",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "1.10",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          "label": "全不锈钢增加10%"
+                        }
+                      ],
+                      "rows": [],
+                      "default": {
+                        "op": "constant",
+                        "value": "72",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "eaf.hot_metal_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "0.8",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质碳素结构钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "8",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质碳素结构钢"
+                    },
+                    {
+                      "condition": {
+                        "op": "eq",
+                        "field": "eaf.steel_category",
+                        "value": "优质轴承齿轮硬线工模具钢",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "优质轴承齿轮硬线工模具钢"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "0",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21256-2025",
+              "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
+              "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
+              "page": 8,
+              "clause": "4.5",
+              "table": "表5",
+              "note": null
+            }
+          ],
+          "notes": [
+            "标准表中“—”保留为缺级，不用推测值替代。",
+            "入炉铁水比每增加1个百分点，限额降低0.8 kgce/t。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

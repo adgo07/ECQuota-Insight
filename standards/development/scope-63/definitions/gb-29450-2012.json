@@ -1,0 +1,1461 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29450-2012",
+  "number": "GB 29450-2012",
+  "title": "玻璃纤维单位产品能源消耗限额",
+  "version": "2012",
+  "publication_status": "draft",
+  "publication_date": "2012-12-31",
+  "effective_date": "2013-10-01",
+  "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+  "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+  "products": [
+    {
+      "id": "pool-e-fine",
+      "name": "池窑法—E玻璃纤维纱（纤维直径≤9μm）",
+      "description": "池窑法E玻璃纤维纱（纤维直径≤9μm）；单纯细纱和混合型窑按主体产量折算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.pool-e-fine.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.pool-e-fine.comprehensive_energy",
+              "label": "池窑法—E玻璃纤维纱（纤维直径≤9μm）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            },
+            {
+              "key": "glass_fiber.pool.yarn_mode",
+              "label": "池窑混合型纱生产方式",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "单纯细纱",
+                "混合型窑（细纱为主体）"
+              ],
+              "description": "按GB 29450-2012第5.2.2.1节选择；混合型窑按细纱为主体使用公式（5）。"
+            },
+            {
+              "key": "glass_fiber.pool.fine_yarn_gt5um_t",
+              "label": "合格细纱（纤维直径＞5μm）产量",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "公式（3）和（5）中的Gy9。"
+            },
+            {
+              "key": "glass_fiber.pool.fine_yarn_le5um_t",
+              "label": "合格细纱（纤维直径≤5μm）产量",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "公式（3）中的Gy5；与Gy9合计为细纱实际产量。"
+            },
+            {
+              "key": "glass_fiber.pool.coarse_yarn_t",
+              "label": "合格粗纱（纤维直径＞9μm）产量",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": {
+                "op": "eq",
+                "field": "glass_fiber.pool.yarn_mode",
+                "value": "混合型窑（细纱为主体）"
+              },
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "公式（5）中的G粗；仅混合型窑按细纱为主体时填写。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.pool-e-fine.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "piecewise",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "glass_fiber.pool.yarn_mode",
+                      "value": "单纯细纱"
+                    },
+                    "expression": {
+                      "op": "add",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "glass_fiber.pool.fine_yarn_gt5um_t",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "constant",
+                              "value": "1.5",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "glass_fiber.pool.fine_yarn_le5um_t",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": "t",
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "t",
+                      "round_places": null
+                    },
+                    "label": "单纯细纱折算产量 Gyz9（公式3）"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "glass_fiber.pool.yarn_mode",
+                      "value": "混合型窑（细纱为主体）"
+                    },
+                    "expression": {
+                      "op": "add",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "glass_fiber.pool.fine_yarn_gt5um_t",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        },
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "glass_fiber.pool.fine_yarn_le5um_t",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        },
+                        {
+                          "op": "divide",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "glass_fiber.pool.coarse_yarn_t",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": "t",
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "1.4",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "t",
+                      "round_places": null
+                    },
+                    "label": "混合型窑细纱主体折算产量 Gyz细（公式5）"
+                  }
+                ],
+                "rows": [],
+                "default": null,
+                "label": "池窑细纱合格折算产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "池窑细纱单位产品综合能耗（公式7、8）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 6,
+              "clause": "5.2.2.1",
+              "table": "公式（3）～（5）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 7,
+              "clause": "5.2.2.2～5.2.2.3",
+              "table": "公式（7）、（8）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "池窑法E玻璃纤维纱（纤维直径≤9μm）；单纯细纱和混合型窑按主体产量折算。",
+            "detail_energy_lines_are_scoped_to_the_selected_product"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pool-ecr-coarse",
+      "name": "池窑法—E(ECR)玻璃纤维纱（纤维直径＞9μm）",
+      "description": "池窑法E(ECR)玻璃纤维纱（纤维直径＞9μm）；粗纱按实际或混合型窑折算产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.pool-ecr-coarse.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.pool-ecr-coarse.comprehensive_energy",
+              "label": "池窑法—E(ECR)玻璃纤维纱（纤维直径＞9μm）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            },
+            {
+              "key": "glass_fiber.pool.yarn_mode",
+              "label": "池窑混合型纱生产方式",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "单纯粗纱",
+                "混合型窑（粗纱为主体）"
+              ],
+              "description": "按GB 29450-2012第5.2.2.1节选择；混合型窑按粗纱为主体使用公式（4）。"
+            },
+            {
+              "key": "glass_fiber.pool.coarse_yarn_t",
+              "label": "合格粗纱（纤维直径＞9μm）产量",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "公式（4）中的Gy粗；单纯粗纱或混合型窑均填写。"
+            },
+            {
+              "key": "glass_fiber.pool.fine_yarn_total_t",
+              "label": "合格细纱（纤维直径≤9μm）总产量",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": {
+                "op": "eq",
+                "field": "glass_fiber.pool.yarn_mode",
+                "value": "混合型窑（粗纱为主体）"
+              },
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "公式（4）中的G细；仅混合型窑按粗纱为主体时填写。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.pool-ecr-coarse.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "piecewise",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "glass_fiber.pool.yarn_mode",
+                      "value": "单纯粗纱"
+                    },
+                    "expression": {
+                      "op": "input",
+                      "value": null,
+                      "input_key": "glass_fiber.pool.coarse_yarn_t",
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "t",
+                      "round_places": null
+                    },
+                    "label": "单纯粗纱产量"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "glass_fiber.pool.yarn_mode",
+                      "value": "混合型窑（粗纱为主体）"
+                    },
+                    "expression": {
+                      "op": "add",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "glass_fiber.pool.coarse_yarn_t",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        },
+                        {
+                          "op": "multiply",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "constant",
+                              "value": "1.4",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "glass_fiber.pool.fine_yarn_total_t",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": "t",
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "t",
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "t",
+                      "round_places": null
+                    },
+                    "label": "混合型窑粗纱主体折算产量 Gyz粗（公式4）"
+                  }
+                ],
+                "rows": [],
+                "default": null,
+                "label": "池窑粗纱合格折算产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "池窑粗纱单位产品综合能耗（公式7、8）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 6,
+              "clause": "5.2.2.1",
+              "table": "公式（4）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 7,
+              "clause": "5.2.2.2～5.2.2.3",
+              "table": "公式（7）、（8）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "池窑法E(ECR)玻璃纤维纱（纤维直径＞9μm）；粗纱按实际或混合型窑折算产量计。",
+            "detail_energy_lines_are_scoped_to_the_selected_product"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pool-medium-alkali-yarn",
+      "name": "池窑法—中碱玻璃纤维纱",
+      "description": "池窑法中碱玻璃纤维纱；表2未列该产品准入值，2级限额保留缺级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.pool-medium-alkali-yarn.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.pool-medium-alkali-yarn.comprehensive_energy",
+              "label": "池窑法—中碱玻璃纤维纱单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.pool-medium-alkali-yarn.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "玻璃纤维纱单位产品综合能耗（公式8）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 7,
+              "clause": "5.2.2.2～5.2.2.3",
+              "table": "公式（7）、（8）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "池窑法中碱玻璃纤维纱；表2未列该产品准入值，2级限额保留缺级。",
+            "detail_energy_lines_are_scoped_to_the_selected_product",
+            "缺级：表2未列该产品的2级准入值，level_2保留为None，不得补值。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crucible-nonalkali-ball",
+      "name": "坩埚法—制球—无碱玻璃球",
+      "description": "坩埚法制球工序无碱玻璃球；表2未列该产品准入值，2级限额保留缺级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.crucible-nonalkali-ball.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.crucible-nonalkali-ball.comprehensive_energy",
+              "label": "坩埚法—制球—无碱玻璃球单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.crucible-nonalkali-ball.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "玻璃球单位产品综合能耗（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "580",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "580",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 5,
+              "clause": "5.2.1",
+              "table": "公式（1）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 6,
+              "clause": "5.2.1.2",
+              "table": "公式（2）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "坩埚法制球工序无碱玻璃球；表2未列该产品准入值，2级限额保留缺级。",
+            "detail_energy_lines_are_scoped_to_the_selected_product",
+            "缺级：表2未列该产品的2级准入值，level_2保留为None，不得补值。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crucible-medium-alkali-ball",
+      "name": "坩埚法—制球—中碱玻璃球",
+      "description": "坩埚法制球工序中碱玻璃球；表2未列该产品准入值，2级限额保留缺级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.crucible-medium-alkali-ball.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.crucible-medium-alkali-ball.comprehensive_energy",
+              "label": "坩埚法—制球—中碱玻璃球单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.crucible-medium-alkali-ball.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "玻璃球单位产品综合能耗（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 5,
+              "clause": "5.2.1",
+              "table": "公式（1）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 6,
+              "clause": "5.2.1.2",
+              "table": "公式（2）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "坩埚法制球工序中碱玻璃球；表2未列该产品准入值，2级限额保留缺级。",
+            "detail_energy_lines_are_scoped_to_the_selected_product",
+            "缺级：表2未列该产品的2级准入值，level_2保留为None，不得补值。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crucible-yarn",
+      "name": "坩埚法—拉丝—玻璃纤维纱",
+      "description": "坩埚法拉丝工序玻璃纤维纱；产量按表4线密度折算系数λ计。表2未列该产品准入值，2级限额保留缺级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29450_2012.crucible-yarn.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29450_2012.crucible-yarn.comprehensive_energy",
+              "label": "坩埚法—拉丝—玻璃纤维纱单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29450-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29450_2012.crucible-yarn.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "玻璃纤维纱单位产品综合能耗（公式8）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "430",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "430",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 3,
+              "clause": "第1章",
+              "table": "适用范围",
+              "note": "适用于中碱或无碱玻璃球、池窑法或坩埚法生产E/ECR和中碱玻璃纤维；不适用于特种玻璃纤维。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 4,
+              "clause": "4.1～4.3",
+              "table": "表1、表2、表3",
+              "note": "1级=先进值，2级=准入值，3级=现有限定值；表2未列的产品保留2级缺级。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 7,
+              "clause": "5.2.2.2～5.2.2.3",
+              "table": "公式（7）、（8）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            },
+            {
+              "standard_number": "GB 29450-2012",
+              "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
+              "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
+              "page": 7,
+              "clause": "5.2.2.1",
+              "table": "表4、公式（6）",
+              "note": "综合能耗按输入能源折标量减向外输出能源折标量，再除以合格产品折算产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "product_indicator_split_confirmed",
+            "standard_scope_excludes_special_glass_fibers",
+            "坩埚法拉丝工序玻璃纤维纱；产量按表4线密度折算系数λ计。表2未列该产品准入值，2级限额保留缺级。",
+            "detail_energy_lines_are_scoped_to_the_selected_product",
+            "缺级：表2未列该产品的2级准入值，level_2保留为None，不得补值。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

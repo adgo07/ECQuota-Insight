@@ -1,0 +1,365 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-30184-2013",
+  "number": "GB 30184-2013",
+  "title": "沥青基防水卷材单位产品能源消耗限额",
+  "version": "2013",
+  "publication_status": "published",
+  "publication_date": "2013-12-31",
+  "effective_date": "2014-12-01",
+  "source_file": "37.GB 30184-2013沥青基防水卷材单位产品能源消耗限额.pdf",
+  "source_sha256": "cddca954967ffe2dadfa4cacd11b1193221fbd56251619160b1f66649d2e2d94",
+  "products": [
+    {
+      "id": "gb_30184-2013-bituminous-with-carrier",
+      "name": "沥青基防水卷材（有胎）",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30184-2013.bituminous-with-carrier",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/km²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.bituminous-with-carrier",
+              "label": "沥青基防水卷材（有胎）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/km²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.bituminous-with-carrier",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/km²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30184-2013",
+              "source_file": "37.GB 30184-2013沥青基防水卷材单位产品能源消耗限额.pdf",
+              "source_sha256": "cddca954967ffe2dadfa4cacd11b1193221fbd56251619160b1f66649d2e2d94",
+              "page": 4,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1～表3",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_30184-2013-bituminous-without-carrier",
+      "name": "沥青基防水卷材（无胎）",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30184-2013.bituminous-without-carrier",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/km²",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.bituminous-without-carrier",
+              "label": "沥青基防水卷材（无胎）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/km²",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.bituminous-without-carrier",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/km²",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "130",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/km²",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30184-2013",
+              "source_file": "37.GB 30184-2013沥青基防水卷材单位产品能源消耗限额.pdf",
+              "source_sha256": "cddca954967ffe2dadfa4cacd11b1193221fbd56251619160b1f66649d2e2d94",
+              "page": 4,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1～表3",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}

@@ -1,0 +1,715 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29437-2012",
+  "number": "GB 29437-2012",
+  "title": "工业冰醋酸单位产品能源消耗限额",
+  "version": "2012",
+  "publication_status": "draft",
+  "publication_date": "2012-12-31",
+  "effective_date": "2013-10-01",
+  "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+  "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+  "products": [
+    {
+      "id": "carbonyl_200kt",
+      "name": "羰基法（年产20万t及以上醋酸）",
+      "description": "工业冰醋酸产品按折100%醋酸合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29437_2012.carbonyl_200kt.comprehensive-energy",
+          "name": "羰基法（年产20万t及以上醋酸）工业冰醋酸单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29437_2012.carbonyl_200kt.comprehensive_energy",
+              "label": "羰基法（年产20万t及以上醋酸）工业冰醋酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29437-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29437_2012.carbonyl_200kt.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "工业冰醋酸单位产品综合能耗 EZH（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "106",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "124",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "176",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "106",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "124",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "176",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 4,
+              "clause": "4.1、4.2",
+              "table": "表1、表2",
+              "note": "分别对应现有装置限定值和新建装置准入值。"
+            },
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 5,
+              "clause": "4.3、5.2",
+              "table": "表3、公式（1）",
+              "note": "先进值及输入能源减输出能源后除以成品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "standard_scope_excludes_raw_material_energy_and_excludes_self-produced_secondary_energy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethanol_air",
+      "name": "酒精法—空气氧化乙醛",
+      "description": "工业冰醋酸产品按折100%醋酸合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29437_2012.ethanol_air.comprehensive-energy",
+          "name": "酒精法—空气氧化乙醛工业冰醋酸单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29437_2012.ethanol_air.comprehensive_energy",
+              "label": "酒精法—空气氧化乙醛工业冰醋酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29437-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29437_2012.ethanol_air.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "工业冰醋酸单位产品综合能耗 EZH（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "418",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "418",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "418",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "418",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 4,
+              "clause": "4.1、4.2",
+              "table": "表1、表2",
+              "note": "分别对应现有装置限定值和新建装置准入值。"
+            },
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 5,
+              "clause": "4.3、5.2",
+              "table": "表3、公式（1）",
+              "note": "先进值及输入能源减输出能源后除以成品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "standard_scope_excludes_raw_material_energy_and_excludes_self-produced_secondary_energy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethanol_oxygen",
+      "name": "酒精法—氧气氧化乙醛",
+      "description": "工业冰醋酸产品按折100%醋酸合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29437_2012.ethanol_oxygen.comprehensive-energy",
+          "name": "酒精法—氧气氧化乙醛工业冰醋酸单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29437_2012.ethanol_oxygen.comprehensive_energy",
+              "label": "酒精法—氧气氧化乙醛工业冰醋酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29437-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29437_2012.ethanol_oxygen.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "工业冰醋酸单位产品综合能耗 EZH（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "505",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "505",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 4,
+              "clause": "4.1、4.2",
+              "table": "表1、表2",
+              "note": "分别对应现有装置限定值和新建装置准入值。"
+            },
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 5,
+              "clause": "4.3、5.2",
+              "table": "表3、公式（1）",
+              "note": "先进值及输入能源减输出能源后除以成品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "standard_scope_excludes_raw_material_energy_and_excludes_self-produced_secondary_energy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ethylene",
+      "name": "乙烯法",
+      "description": "工业冰醋酸产品按折100%醋酸合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29437_2012.ethylene.comprehensive-energy",
+          "name": "乙烯法工业冰醋酸单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29437_2012.ethylene.comprehensive_energy",
+              "label": "乙烯法工业冰醋酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 29437-2012第5.2节核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29437_2012.ethylene.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "工业冰醋酸单位产品综合能耗 EZH（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "429",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 4,
+              "clause": "4.1、4.2",
+              "table": "表1、表2",
+              "note": "分别对应现有装置限定值和新建装置准入值。"
+            },
+            {
+              "standard_number": "GB 29437-2012",
+              "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
+              "page": 5,
+              "clause": "4.3、5.2",
+              "table": "表3、公式（1）",
+              "note": "先进值及输入能源减输出能源后除以成品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "standard_scope_excludes_raw_material_energy_and_excludes_self-produced_secondary_energy"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

@@ -1,0 +1,801 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29145-2023",
+  "number": "GB 29145-2023",
+  "title": "钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额",
+  "version": "2023",
+  "publication_status": "draft",
+  "publication_date": "2023-11-27",
+  "effective_date": "2024-12-01",
+  "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+  "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+  "products": [
+    {
+      "id": "tungsten-black",
+      "name": "钨精矿—黑钨",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.tungsten-black.comprehensive-energy",
+          "name": "钨精矿—黑钨单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.tungsten-black.energy",
+              "label": "钨精矿—黑钨直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.tungsten-black.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tungsten-white",
+      "name": "钨精矿—白钨",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.tungsten-white.comprehensive-energy",
+          "name": "钨精矿—白钨单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.tungsten-white.energy",
+              "label": "钨精矿—白钨直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.tungsten-white.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1640",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1640",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "molybdenum-three-stage",
+      "name": "钼精矿—三段一闭路",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.molybdenum-three-stage.comprehensive-energy",
+          "name": "钼精矿—三段一闭路单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.molybdenum-three-stage.energy",
+              "label": "钼精矿—三段一闭路直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.molybdenum-three-stage.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1475",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1475",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "molybdenum-sabc",
+      "name": "钼精矿—SABC",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.molybdenum-sabc.comprehensive-energy",
+          "name": "钼精矿—SABC单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.molybdenum-sabc.energy",
+              "label": "钼精矿—SABC直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.molybdenum-sabc.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2060",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2060",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "roasted-molybdenum-multi-hearth",
+      "name": "焙烧钼精矿—多膛炉",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.roasted-molybdenum-multi-hearth.comprehensive-energy",
+          "name": "焙烧钼精矿—多膛炉单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.roasted-molybdenum-multi-hearth.energy",
+              "label": "焙烧钼精矿—多膛炉直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.roasted-molybdenum-multi-hearth.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "210",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "210",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "roasted-molybdenum-kiln",
+      "name": "焙烧钼精矿—内热式回转窑",
+      "description": "GB 29145-2023表格产品/工序行；直接模式可录入，明细模式待系数模型复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.roasted-molybdenum-kiln.comprehensive-energy",
+          "name": "焙烧钼精矿—内热式回转窑单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145-2023.roasted-molybdenum-kiln.energy",
+              "label": "焙烧钼精矿—内热式回转窑直接录入值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按标准原文统计范围和公式核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145-2023.roasted-molybdenum-kiln.energy",
+          "detail_formula": null,
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章、表1～表3",
+              "table": "表1～表3",
+              "note": "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_formula_blocked_until_factor_model_review",
+            "钨/钼精矿可比能耗还需按原矿品位折算系数修正；焙烧钼精矿按炉型选择。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

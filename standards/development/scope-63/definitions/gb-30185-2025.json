@@ -1,0 +1,1864 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-30185-2025",
+  "number": "GB 30185-2025",
+  "title": "铝(塑)复合板单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "draft",
+  "publication_date": "2025-02-28",
+  "effective_date": "2026-03-01",
+  "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+  "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+  "products": [
+    {
+      "id": "decorative-thermal",
+      "name": "铝塑复合板—热压复合装饰板",
+      "description": "铝塑复合板—热压复合装饰板；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.decorative-thermal.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.decorative-thermal.energy",
+              "label": "铝塑复合板—热压复合装饰板单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.decorative-thermal.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "铝塑复合板—热压复合装饰板单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "decorative-coating-thermal",
+      "name": "铝塑复合板—化成涂装和热压复合",
+      "description": "铝塑复合板—化成涂装和热压复合；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.decorative-coating-thermal.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.decorative-coating-thermal.energy",
+              "label": "铝塑复合板—化成涂装和热压复合单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.decorative-coating-thermal.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "铝塑复合板—化成涂装和热压复合单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "6500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "6500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "curtain-thermal",
+      "name": "铝塑复合板—幕墙板热压复合",
+      "description": "铝塑复合板—幕墙板热压复合；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.curtain-thermal.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.curtain-thermal.energy",
+              "label": "铝塑复合板—幕墙板热压复合单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.curtain-thermal.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "铝塑复合板—幕墙板热压复合单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "4800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "curtain-coating-thermal",
+      "name": "铝塑复合板—幕墙板化成涂装和热压复合",
+      "description": "铝塑复合板—幕墙板化成涂装和热压复合；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.curtain-coating-thermal.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.curtain-coating-thermal.energy",
+              "label": "铝塑复合板—幕墙板化成涂装和热压复合单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.curtain-coating-thermal.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "铝塑复合板—幕墙板化成涂装和热压复合单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "7600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "4400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "5600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "7600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "noncombustible",
+      "name": "不燃铝复合板",
+      "description": "不燃铝复合板；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.noncombustible.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.noncombustible.energy",
+              "label": "不燃铝复合板单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.noncombustible.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "不燃铝复合板单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "3200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "3900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5400",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "decorative-aluminum-powder",
+      "name": "装饰用铝单板—粉末喷涂",
+      "description": "装饰用铝单板—粉末喷涂；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.decorative-aluminum-powder.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.decorative-aluminum-powder.energy",
+              "label": "装饰用铝单板—粉末喷涂单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.decorative-aluminum-powder.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "装饰用铝单板—粉末喷涂单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "7000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "7000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "8500",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "10200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "decorative-aluminum-liquid",
+      "name": "装饰用铝单板—液体喷涂",
+      "description": "装饰用铝单板—液体喷涂；按GB 30185-2025表1和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_30185-2025.decorative-aluminum-liquid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/10^4m2",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30185-2025.decorative-aluminum-liquid.energy",
+              "label": "装饰用铝单板—液体喷涂单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/10^4m2",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30185-2025第6.2.2条核算；新规则尚未完成确认，当前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30185-2025.decorative-aluminum-liquid.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗（折标准煤）",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品产量 P",
+                "unit": "10^4m2",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "装饰用铝单板—液体喷涂单位产品综合能耗 eb（公式2）",
+            "unit": "kgce/10^4m2",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "14000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "17200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "14000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "17200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "kgce/10^4m2",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第1章；3.1～3.3",
+              "table": "范围与术语",
+              "note": "适用于铝塑复合板、不燃铝复合板和装饰用铝单板。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 5,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板三级限额。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 6,
+              "clause": "第4章；第5章5.1～5.2",
+              "table": "表1；技术要求",
+              "note": "1级能耗最低；现有企业执行3级，新建改扩建执行2级。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.1～6.1.4",
+              "table": "统计范围",
+              "note": "按生产线计量；生产、辅助、附属系统计入，生活用能不计入。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.1.5",
+              "table": "多种产品能耗分摊",
+              "note": "无法分开计量的公用能耗按比例分摊，同一统计周期内原则不变。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "公式（1）",
+              "note": "产品综合能耗 E 为各能源实物量乘折标系数之和。"
+            },
+            {
+              "standard_number": "GB 30185-2025",
+              "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
+              "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
+              "page": 8,
+              "clause": "6.2.2",
+              "table": "公式（2）",
+              "note": "单位产品综合能耗 eb=E/P，P为合格产品产量（10^4m2）。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品综合能耗”；产品/工序名称保留具体产品与工艺。",
+            "1级、2级、3级分别对应原文表1的1级、2级、3级；比较方向为实际值不大于限额。",
+            "现有企业执行表1中3级限定值；新建、改建和扩建企业执行表1中2级准入值。",
+            "明细模式只将生产系统、辅助生产系统、附属生产系统三类能源折标量相加；生活（基建、食堂、宿舍）用能不得录入。",
+            "按生产线分别计量；多种产品无法分开计量的公用能耗按比例分摊，同一统计周期内保持分摊原则不变。",
+            "能源明细中每条能源必须附带实测或GB/T2589参考折标系数；同一统计期不得重计或漏计。",
+            "表1脚注a：复合线用于铝蜂窝板、铝波纹芯复合铝板时，其产量和能耗均进行统计。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "GB 30185-2025替代GB 30185-2013；新标准范围和限额表按现行强制文本重新精化。"
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": [
+    "GB 30185-2013"
+  ]
+}

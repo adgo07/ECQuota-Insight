@@ -1,0 +1,1071 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-32051-2024",
+  "number": "GB 32051-2024",
+  "title": "钛白粉和氧化铁颜料单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+  "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+  "products": [
+    {
+      "id": "titanium-dioxide-rutile",
+      "name": "钛白粉—金红石型（硫酸法）",
+      "description": "GB 32051-2024表格中的钛白粉—金红石型（硫酸法）产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.titanium-dioxide-rutile.comprehensive-energy",
+          "name": "钛白粉—金红石型（硫酸法）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.titanium-dioxide-rutile.energy",
+              "label": "钛白粉—金红石型（硫酸法）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.titanium-dioxide-rutile.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钛白粉—金红石型（硫酸法）合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钛白粉—金红石型（硫酸法）单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "860",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "860",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "titanium-dioxide-anatase",
+      "name": "钛白粉—锐钛型（硫酸法）",
+      "description": "GB 32051-2024表格中的钛白粉—锐钛型（硫酸法）产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.titanium-dioxide-anatase.comprehensive-energy",
+          "name": "钛白粉—锐钛型（硫酸法）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.titanium-dioxide-anatase.energy",
+              "label": "钛白粉—锐钛型（硫酸法）单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.titanium-dioxide-anatase.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钛白粉—锐钛型（硫酸法）合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钛白粉—锐钛型（硫酸法）单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "titanium-dioxide-chloride",
+      "name": "钛白粉—氯化法",
+      "description": "GB 32051-2024表格中的钛白粉—氯化法产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.titanium-dioxide-chloride.comprehensive-energy",
+          "name": "钛白粉—氯化法单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.titanium-dioxide-chloride.energy",
+              "label": "钛白粉—氯化法单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.titanium-dioxide-chloride.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钛白粉—氯化法合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钛白粉—氯化法单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "700",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "950",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-oxide-red",
+      "name": "氧化铁颜料—氧化铁红",
+      "description": "GB 32051-2024表格中的氧化铁颜料—氧化铁红产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.iron-oxide-red.comprehensive-energy",
+          "name": "氧化铁颜料—氧化铁红单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.iron-oxide-red.energy",
+              "label": "氧化铁颜料—氧化铁红单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.iron-oxide-red.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "氧化铁颜料—氧化铁红合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "氧化铁颜料—氧化铁红单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "580",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "780",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "580",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "780",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-oxide-yellow",
+      "name": "氧化铁颜料—氧化铁黄",
+      "description": "GB 32051-2024表格中的氧化铁颜料—氧化铁黄产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.iron-oxide-yellow.comprehensive-energy",
+          "name": "氧化铁颜料—氧化铁黄单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.iron-oxide-yellow.energy",
+              "label": "氧化铁颜料—氧化铁黄单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.iron-oxide-yellow.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "氧化铁颜料—氧化铁黄合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "氧化铁颜料—氧化铁黄单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-oxide-black",
+      "name": "氧化铁颜料—氧化铁黑",
+      "description": "GB 32051-2024表格中的氧化铁颜料—氧化铁黑产品/工序行。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_32051-2024.iron-oxide-black.comprehensive-energy",
+          "name": "氧化铁颜料—氧化铁黑单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_32051-2024.iron-oxide-black.energy",
+              "label": "氧化铁颜料—氧化铁黑单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 32051-2024第6章核算的单位产品能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_32051-2024.iron-oxide-black.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "统计期综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "氧化铁颜料—氧化铁黑合格产量",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "氧化铁颜料—氧化铁黑单位产品综合能耗（第6章公式）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "410",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "460",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "410",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "460",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "600",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 6,
+              "clause": "第4章、表1、表2",
+              "table": "表1、表2",
+              "note": "产品/工序名称与三级限额按现行强制文本表格逐行转录。"
+            },
+            {
+              "standard_number": "GB 32051-2024",
+              "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
+              "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
+              "page": 7,
+              "clause": "第6章计算方法",
+              "table": "公式",
+              "note": "明细模式暂按统计期综合能耗除以合格产量；生产边界和特殊修正仍需独立复核。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "table_rows_transcribed_from_current_mandatory_text",
+            "special_process_boundary_or_product_conversion_requires_clause_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

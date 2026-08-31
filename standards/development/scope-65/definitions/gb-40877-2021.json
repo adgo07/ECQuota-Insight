@@ -1,0 +1,890 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-40877-2021",
+  "number": "GB 40877-2021",
+  "title": "硅酸铝纤维及制品单位产品能源消耗限额",
+  "version": "2021",
+  "publication_status": "draft",
+  "publication_date": "2021-10-11",
+  "effective_date": "2021-10-11",
+  "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+  "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+  "products": [
+    {
+      "id": "aluminosilicate-fiber-1000-1250",
+      "name": "硅酸铝纤维（1000℃、1200℃、1250℃）",
+      "description": "按GB 40877-2021表1产品类型和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40877_2021.aluminosilicate-fiber-1000-1250.comprehensive-energy",
+          "name": "硅酸铝纤维（1000℃、1200℃、1250℃）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40877_2021.aluminosilicate-fiber-1000-1250.comprehensive_energy",
+              "label": "硅酸铝纤维（1000℃、1200℃、1250℃）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40877-2021第6章核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40877_2021.aluminosilicate-fiber-1000-1250.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "硅酸铝纤维及制品单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "208",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "228",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "263",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "208",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "228",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "263",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按纤维使用温度或制品成型工艺选择三等级限额。"
+            },
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 6,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以合格产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "temperature_or_forming_process_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aluminosilicate-fiber-1350-1500",
+      "name": "硅酸铝纤维（1350℃、1400℃、1500℃）",
+      "description": "按GB 40877-2021表1产品类型和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40877_2021.aluminosilicate-fiber-1350-1500.comprehensive-energy",
+          "name": "硅酸铝纤维（1350℃、1400℃、1500℃）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40877_2021.aluminosilicate-fiber-1350-1500.comprehensive_energy",
+              "label": "硅酸铝纤维（1350℃、1400℃、1500℃）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40877-2021第6章核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40877_2021.aluminosilicate-fiber-1350-1500.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "硅酸铝纤维及制品单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "245",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "256",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "311",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "245",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "256",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "311",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按纤维使用温度或制品成型工艺选择三等级限额。"
+            },
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 6,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以合格产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "temperature_or_forming_process_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "needle-punched-blanket",
+      "name": "硅酸铝纤维制品—针刺毯",
+      "description": "按GB 40877-2021表1产品类型和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40877_2021.needle-punched-blanket.comprehensive-energy",
+          "name": "硅酸铝纤维制品—针刺毯单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40877_2021.needle-punched-blanket.comprehensive_energy",
+              "label": "硅酸铝纤维制品—针刺毯单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40877-2021第6章核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40877_2021.needle-punched-blanket.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "硅酸铝纤维及制品单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "77",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "77",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按纤维使用温度或制品成型工艺选择三等级限额。"
+            },
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 6,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以合格产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "temperature_or_forming_process_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wet-continuous-rolled",
+      "name": "硅酸铝纤维制品—湿法制品（连续轧制）",
+      "description": "按GB 40877-2021表1产品类型和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40877_2021.wet-continuous-rolled.comprehensive-energy",
+          "name": "硅酸铝纤维制品—湿法制品（连续轧制）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40877_2021.wet-continuous-rolled.comprehensive_energy",
+              "label": "硅酸铝纤维制品—湿法制品（连续轧制）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40877-2021第6章核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40877_2021.wet-continuous-rolled.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "硅酸铝纤维及制品单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "410",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "465",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "486",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "410",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "465",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "486",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按纤维使用温度或制品成型工艺选择三等级限额。"
+            },
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 6,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以合格产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "temperature_or_forming_process_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wet-vacuum-filtered",
+      "name": "硅酸铝纤维制品—湿法制品（真空吸滤）",
+      "description": "按GB 40877-2021表1产品类型和合格产量计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_40877_2021.wet-vacuum-filtered.comprehensive-energy",
+          "name": "硅酸铝纤维制品—湿法制品（真空吸滤）单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_40877_2021.wet-vacuum-filtered.comprehensive_energy",
+              "label": "硅酸铝纤维制品—湿法制品（真空吸滤）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入按GB 40877-2021第6章核算的单位产品综合能耗。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_40877_2021.wet-vacuum-filtered.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "硅酸铝纤维及制品单位产品综合能耗 e（公式1、2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "780",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "836",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "780",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "836",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 4,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "按纤维使用温度或制品成型工艺选择三等级限额。"
+            },
+            {
+              "standard_number": "GB 40877-2021",
+              "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
+              "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
+              "page": 6,
+              "clause": "6.2.1～6.2.2",
+              "table": "公式（1）、（2）",
+              "note": "综合能耗按输入能源折标量求和后除以合格产品产量。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "temperature_or_forming_process_is_encoded_in_product_name_and_must_be_confirmed"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

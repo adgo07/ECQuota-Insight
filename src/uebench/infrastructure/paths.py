@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,7 +20,12 @@ class AppPaths:
         override = os.environ.get("UEBENCH_DATA_DIR")
         if override:
             return cls.from_root(Path(override))
-        base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "UEBench"
+        if sys.platform == "win32":
+            base = Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local") / "UEBench"
+        elif sys.platform == "darwin":
+            base = Path.home() / "Library" / "Application Support" / "UEBench"
+        else:
+            base = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share") / "UEBench"
         return cls.from_root(base)
 
     @classmethod

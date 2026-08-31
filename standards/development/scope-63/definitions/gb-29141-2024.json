@@ -1,0 +1,4921 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29141-2024",
+  "number": "GB 29141-2024",
+  "title": "工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "published",
+  "publication_date": "2024-05-28",
+  "effective_date": "2025-06-01",
+  "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+  "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+  "products": [
+    {
+      "id": "sulfur-acid",
+      "name": "硫黄制酸",
+      "description": "以硫黄为原料生产工业硫酸；可选择浓硫酸或20%发烟硫酸。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        },
+        {
+          "key": "sulfur.has_low_temperature_heat_recovery",
+          "label": "是否有低温热回收",
+          "data_type": "boolean",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [],
+          "description": "硫黄制酸3级：无低温热回收≤-110；有低温热回收≤-120 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.sulfur-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.sulfur-acid.comprehensive_energy",
+              "label": "硫黄制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.sulfur-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-160",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "sulfur.has_low_temperature_heat_recovery",
+                    "value": true,
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-120",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "有低温热回收"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "sulfur.has_low_temperature_heat_recovery",
+                    "value": false,
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-110",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "无低温热回收"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "硫黄制酸3级限额按低温热回收条件选择",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-160",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-160",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-150",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-150",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "piecewise",
+                        "value": null,
+                        "input_key": null,
+                        "args": [],
+                        "cases": [
+                          {
+                            "condition": {
+                              "op": "eq",
+                              "field": "sulfur.has_low_temperature_heat_recovery",
+                              "value": true,
+                              "values": [],
+                              "minimum": null,
+                              "maximum": null,
+                              "include_minimum": true,
+                              "include_maximum": true,
+                              "args": []
+                            },
+                            "expression": {
+                              "op": "constant",
+                              "value": "-120",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": "kgce/t",
+                              "round_places": null
+                            },
+                            "label": "有低温热回收"
+                          },
+                          {
+                            "condition": {
+                              "op": "eq",
+                              "field": "sulfur.has_low_temperature_heat_recovery",
+                              "value": false,
+                              "values": [],
+                              "minimum": null,
+                              "maximum": null,
+                              "include_minimum": true,
+                              "include_maximum": true,
+                              "args": []
+                            },
+                            "expression": {
+                              "op": "constant",
+                              "value": "-110",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": "kgce/t",
+                              "round_places": null
+                            },
+                            "label": "无低温热回收"
+                          }
+                        ],
+                        "rows": [],
+                        "default": null,
+                        "label": "硫黄制酸3级限额按低温热回收条件选择",
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "piecewise",
+                    "value": null,
+                    "input_key": null,
+                    "args": [],
+                    "cases": [
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "sulfur.has_low_temperature_heat_recovery",
+                          "value": true,
+                          "values": [],
+                          "minimum": null,
+                          "maximum": null,
+                          "include_minimum": true,
+                          "include_maximum": true,
+                          "args": []
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "-120",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "kgce/t",
+                          "round_places": null
+                        },
+                        "label": "有低温热回收"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "sulfur.has_low_temperature_heat_recovery",
+                          "value": false,
+                          "values": [],
+                          "minimum": null,
+                          "maximum": null,
+                          "include_minimum": true,
+                          "include_maximum": true,
+                          "args": []
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "-110",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": "kgce/t",
+                          "round_places": null
+                        },
+                        "label": "无低温热回收"
+                      }
+                    ],
+                    "rows": [],
+                    "default": null,
+                    "label": "硫黄制酸3级限额按低温热回收条件选择",
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。",
+            "原文脚注a已结构化为低温热回收条件。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pyrite-acid",
+      "name": "硫铁矿制酸",
+      "description": "以硫铁矿为原料生产工业硫酸；发烟硫酸在对应基础上增加35 kgce/t。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.pyrite-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.pyrite-acid.comprehensive_energy",
+              "label": "硫铁矿制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.pyrite-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-110",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-110",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-110",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-100",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-100",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-90",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-90",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "copper-acid-so2-over-13",
+      "name": "铜冶炼烟气制酸（SO₂浓度＞13%）",
+      "description": "以铜冶炼烟气为原料，SO₂浓度＞13%。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.copper-acid-so2-over-13.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.copper-acid-so2-over-13.comprehensive_energy",
+              "label": "铜冶炼烟气制酸（SO₂浓度＞13%）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.copper-acid-so2-over-13.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-30",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-30",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-5",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-5",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "5",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "5",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "copper-acid-so2-up-to-13",
+      "name": "铜冶炼烟气制酸（SO₂浓度≤13%）",
+      "description": "以铜冶炼烟气为原料，SO₂浓度≤13%。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.copper-acid-so2-up-to-13.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.copper-acid-so2-up-to-13.comprehensive_energy",
+              "label": "铜冶炼烟气制酸（SO₂浓度≤13%）单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.copper-acid-so2-up-to-13.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "6",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "12",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "2",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "2",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "6",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "6",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "12",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "12",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nickel-acid",
+      "name": "镍冶炼烟气制酸",
+      "description": "以镍冶炼烟气为原料生产工业硫酸。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.nickel-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.nickel-acid.comprehensive_energy",
+              "label": "镍冶炼烟气制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.nickel-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "12",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "12",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "12",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "15",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "16",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "16",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lead-acid",
+      "name": "铅冶炼烟气制酸",
+      "description": "以铅冶炼烟气为原料生产工业硫酸。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.lead-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.lead-acid.comprehensive_energy",
+              "label": "铅冶炼烟气制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.lead-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "11",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "12",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "14",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "11",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "11",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "12",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "12",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "14",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "14",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zinc-acid",
+      "name": "锌冶炼烟气制酸",
+      "description": "以锌冶炼烟气为原料生产工业硫酸。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.zinc-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.zinc-acid.comprehensive_energy",
+              "label": "锌冶炼烟气制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.zinc-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "15",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "16",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "18",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "15",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "15",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "16",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "16",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "18",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "18",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lead-zinc-joint-acid",
+      "name": "铅锌联合冶炼烟气制酸",
+      "description": "主冶炼工艺烟气直接制酸；低浓度SO₂提浓工序另有≤960 kgce/tSO₂限值，未与单位产品综合能耗混列。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.lead-zinc-joint-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.lead-zinc-joint-acid.comprehensive_energy",
+              "label": "铅锌联合冶炼烟气制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.lead-zinc-joint-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "22",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "25",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "20",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "20",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "22",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "22",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "25",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "25",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。",
+            "脚注b的低浓度SO₂提浓工序限值保留为待独立指标复核。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gypsum-acid",
+      "name": "石膏制酸",
+      "description": "包括石膏预处理、石膏分解、烟气净化及制酸工序；不包括水泥熟料等副产品能耗。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.gypsum-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.gypsum-acid.comprehensive_energy",
+              "label": "石膏制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.gypsum-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "350",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "370",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "350",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "350",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "370",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "370",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "390",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "390",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1；发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ferrous-sulfate-acid",
+      "name": "掺烧硫酸亚铁（或废硫酸）制酸",
+      "description": "掺烧量≥25%，与硫铁矿或硫黄一起焙烧生产硫酸。",
+      "input_definitions": [
+        {
+          "key": "acid.product_type",
+          "label": "产品类型",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "浓硫酸",
+            "发烟硫酸（20%）"
+          ],
+          "description": "表1：发烟硫酸（20%）在对应原料生产工业硫酸限额基础上增加35 kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.ferrous-sulfate-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.ferrous-sulfate-acid.comprehensive_energy",
+              "label": "掺烧硫酸亚铁（或废硫酸）制酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.ferrous-sulfate-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-50",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-40",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "-30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-50",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-50",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-40",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-40",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "piecewise",
+              "value": null,
+              "input_key": null,
+              "args": [],
+              "cases": [
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "发烟硫酸（20%）",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "constant",
+                        "value": "-30",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "35",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "发烟硫酸（20%）"
+                },
+                {
+                  "condition": {
+                    "op": "eq",
+                    "field": "acid.product_type",
+                    "value": "浓硫酸",
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  "expression": {
+                    "op": "constant",
+                    "value": "-30",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": "kgce/t",
+                    "round_places": null
+                  },
+                  "label": "浓硫酸"
+                }
+              ],
+              "rows": [],
+              "default": null,
+              "label": "按产品类型执行发烟硫酸+35 kgce/t修正",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1",
+              "table": "表1",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表1脚注d；掺烧量≥25%时适用。发烟硫酸在对应基础上增加35 kgce/t。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lead-zinc-isp-so2-enrichment",
+      "name": "铅锌联合冶炼ISP低浓度SO₂烟气提浓工序",
+      "description": "铅锌联合冶炼ISP工艺低浓度二氧化硫烟气（SO₂浓度≤4%）吸收、解析提浓工序。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.lead-zinc-isp-so2-enrichment.specific-energy",
+          "name": "单位SO₂提浓能耗",
+          "unit": "kgce/tSO₂",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.lead-zinc-isp-so2-enrichment.specific_energy",
+              "label": "铅锌联合冶炼ISP低浓度SO₂烟气提浓工序实际值",
+              "data_type": "decimal",
+              "unit": "kgce/tSO₂",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024表1脚注b核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.lead-zinc-isp-so2-enrichment.specific_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "tSO₂",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "提浓工序总能耗 ÷ SO₂处理量",
+            "unit": "kgce/tSO₂",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": null,
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "960",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tSO₂",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": null,
+            "level_2": null,
+            "level_3": {
+              "op": "constant",
+              "value": "960",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/tSO₂",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.1表1脚注b",
+              "table": "表1脚注b",
+              "note": "原文仅规定提浓工序能耗≤960 kgce/tSO₂，无1级、2级分级限额。"
+            }
+          ],
+          "notes": [
+            "原文表1脚注b；仅有3级限定值，1级和2级按原文缺级保留。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dilute-nitric-acid",
+      "name": "稀硝酸",
+      "description": "以合成氨为原料生产稀硝酸；产量按折100%硝酸计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.dilute-nitric-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.dilute-nitric-acid.comprehensive_energy",
+              "label": "稀硝酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.dilute-nitric-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "-20",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "-5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.2",
+              "table": "表2",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表2；不包括生产稀硝酸所用氨的能耗。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "glacial-acetic-acid",
+      "name": "工业冰醋酸",
+      "description": "工业冰醋酸合格产品按GB/T 1628要求；产量按折100%醋酸计。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29141-2024.glacial-acetic-acid.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.glacial-acetic-acid.comprehensive_energy",
+              "label": "工业冰醋酸单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29141—2024第6章核算。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.glacial-acetic-acid.comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "总综合能耗 ÷ 合格产品产量",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "120",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29141-2024",
+              "source_file": "GB+29141-2024 工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额.pdf",
+              "source_sha256": "bec8099be5a5b96278e9f37da3a513fd0f019a2f740cda5f512d8fc7d7302094",
+              "page": 9,
+              "clause": "4.3",
+              "table": "表3",
+              "note": "依据GB 29141—2024原文逐项录入。"
+            }
+          ],
+          "notes": [
+            "原文表3；不包括生产工业冰醋酸所消耗的原材料（一氧化碳和甲醇等）的能耗。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "GB 29141-2012、GB 29437-2012、GB 29441-2012已由本标准代替"
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": [
+    "GB 29141-2012",
+    "GB 29437-2012",
+    "GB 29441-2012"
+  ]
+}

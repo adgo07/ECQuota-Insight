@@ -1,0 +1,1205 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-21345-2024",
+  "number": "GB 21345-2024",
+  "title": "黄磷单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "11.GB 21345-2024黄磷单位产品能源消耗限额.pdf",
+  "source_sha256": "f27fc8b729bad51c7deccdc4c0654ce5c05bd66e563c005ab155da5ee8393c7d",
+  "products": [
+    {
+      "id": "electric-furnace-yellow-phosphorus",
+      "name": "电炉法黄磷",
+      "description": "适用于电炉法黄磷生产；明细模式按原文第6.2.2节计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_21345-2024.electric-furnace.comprehensive-energy",
+          "name": "单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_21345_2024.electric_furnace_comprehensive_energy",
+              "label": "电炉法黄磷单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "直接录入已按GB 21345-2024核算的单位产品综合能耗。"
+            },
+            {
+              "key": "yellow_phosphorus.feedstock.p2o5_pct",
+              "label": "配合炉料P2O5加权平均质量分数 N1",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.feedstock.fe2o3_pct",
+              "label": "配合炉料Fe2O3加权平均质量分数 N2",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.feedstock.co2_pct",
+              "label": "配合炉料CO2加权平均质量分数 N3",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.qualified_t",
+              "label": "符合GB/T 7816的黄磷量 PPZ",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.phosphoric_acid_mass_fraction",
+              "label": "泥磷制得磷酸质量分数 NS（按0~1小数输入）",
+              "data_type": "decimal",
+              "unit": "fraction",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "1",
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.phosphoric_acid_production_t",
+              "label": "泥磷制得磷酸产量 PS",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t",
+              "label": "泥磷制磷酸外加/外购折合黄磷量 PPW",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.other_chemical_phosphorus_fraction",
+              "label": "其他化学品中磷质量分数 NH（按0~1小数输入）",
+              "data_type": "decimal",
+              "unit": "fraction",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "1",
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.other_chemical_production_t",
+              "label": "泥磷制得其他化学品产量 PH",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t",
+              "label": "制备其他化学品外加/外购折合黄磷量 PPW",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            },
+            {
+              "key": "yellow_phosphorus.product.external_mud_recovered_t",
+              "label": "外购泥磷回收量 PPWN",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 21345-2024第6.2.2节录入；仅明细模式使用。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_21345_2024.electric_furnace_comprehensive_energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "subtract",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "add",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.carbon_reducing.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "炭质还原剂综合能耗 EPT",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "subtract",
+                                "value": null,
+                                "input_key": null,
+                                "args": [
+                                  {
+                                    "op": "input",
+                                    "value": null,
+                                    "input_key": "energy.category.furnace_electricity.net_amount",
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": "电炉加热电量 QL",
+                                    "unit": "kWh",
+                                    "round_places": null
+                                  },
+                                  {
+                                    "op": "multiply",
+                                    "value": null,
+                                    "input_key": null,
+                                    "args": [
+                                      {
+                                        "op": "subtract",
+                                        "value": null,
+                                        "input_key": null,
+                                        "args": [
+                                          {
+                                            "op": "add",
+                                            "value": null,
+                                            "input_key": null,
+                                            "args": [
+                                              {
+                                                "op": "divide",
+                                                "value": null,
+                                                "input_key": null,
+                                                "args": [
+                                                  {
+                                                    "op": "constant",
+                                                    "value": "170000",
+                                                    "input_key": null,
+                                                    "args": [],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": null,
+                                                    "unit": null,
+                                                    "round_places": null
+                                                  },
+                                                  {
+                                                    "op": "subtract",
+                                                    "value": null,
+                                                    "input_key": null,
+                                                    "args": [
+                                                      {
+                                                        "op": "input",
+                                                        "value": null,
+                                                        "input_key": "yellow_phosphorus.feedstock.p2o5_pct",
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": "配合炉料P2O5加权平均质量分数 N1",
+                                                        "unit": "%",
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "constant",
+                                                        "value": "0.5",
+                                                        "input_key": null,
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": null,
+                                                        "round_places": null
+                                                      }
+                                                    ],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": null,
+                                                    "unit": "%",
+                                                    "round_places": null
+                                                  }
+                                                ],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": null,
+                                                "unit": "kWh/t",
+                                                "round_places": null
+                                              },
+                                              {
+                                                "op": "multiply",
+                                                "value": null,
+                                                "input_key": null,
+                                                "args": [
+                                                  {
+                                                    "op": "subtract",
+                                                    "value": null,
+                                                    "input_key": null,
+                                                    "args": [
+                                                      {
+                                                        "op": "divide",
+                                                        "value": null,
+                                                        "input_key": null,
+                                                        "args": [
+                                                          {
+                                                            "op": "constant",
+                                                            "value": "7750",
+                                                            "input_key": null,
+                                                            "args": [],
+                                                            "cases": [],
+                                                            "rows": [],
+                                                            "default": null,
+                                                            "label": null,
+                                                            "unit": null,
+                                                            "round_places": null
+                                                          },
+                                                          {
+                                                            "op": "subtract",
+                                                            "value": null,
+                                                            "input_key": null,
+                                                            "args": [
+                                                              {
+                                                                "op": "input",
+                                                                "value": null,
+                                                                "input_key": "yellow_phosphorus.feedstock.p2o5_pct",
+                                                                "args": [],
+                                                                "cases": [],
+                                                                "rows": [],
+                                                                "default": null,
+                                                                "label": "配合炉料P2O5加权平均质量分数 N1",
+                                                                "unit": "%",
+                                                                "round_places": null
+                                                              },
+                                                              {
+                                                                "op": "constant",
+                                                                "value": "8",
+                                                                "input_key": null,
+                                                                "args": [],
+                                                                "cases": [],
+                                                                "rows": [],
+                                                                "default": null,
+                                                                "label": null,
+                                                                "unit": null,
+                                                                "round_places": null
+                                                              }
+                                                            ],
+                                                            "cases": [],
+                                                            "rows": [],
+                                                            "default": null,
+                                                            "label": null,
+                                                            "unit": "%",
+                                                            "round_places": null
+                                                          }
+                                                        ],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": "kWh/t",
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "constant",
+                                                        "value": "76",
+                                                        "input_key": null,
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": null,
+                                                        "round_places": null
+                                                      }
+                                                    ],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": null,
+                                                    "unit": "kWh/t",
+                                                    "round_places": null
+                                                  },
+                                                  {
+                                                    "op": "input",
+                                                    "value": null,
+                                                    "input_key": "yellow_phosphorus.feedstock.fe2o3_pct",
+                                                    "args": [],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "配合炉料Fe2O3加权平均质量分数 N2",
+                                                    "unit": "%",
+                                                    "round_places": null
+                                                  }
+                                                ],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": null,
+                                                "unit": "kWh/t",
+                                                "round_places": null
+                                              },
+                                              {
+                                                "op": "multiply",
+                                                "value": null,
+                                                "input_key": null,
+                                                "args": [
+                                                  {
+                                                    "op": "add",
+                                                    "value": null,
+                                                    "input_key": null,
+                                                    "args": [
+                                                      {
+                                                        "op": "divide",
+                                                        "value": null,
+                                                        "input_key": null,
+                                                        "args": [
+                                                          {
+                                                            "op": "constant",
+                                                            "value": "3200",
+                                                            "input_key": null,
+                                                            "args": [],
+                                                            "cases": [],
+                                                            "rows": [],
+                                                            "default": null,
+                                                            "label": null,
+                                                            "unit": null,
+                                                            "round_places": null
+                                                          },
+                                                          {
+                                                            "op": "subtract",
+                                                            "value": null,
+                                                            "input_key": null,
+                                                            "args": [
+                                                              {
+                                                                "op": "input",
+                                                                "value": null,
+                                                                "input_key": "yellow_phosphorus.feedstock.p2o5_pct",
+                                                                "args": [],
+                                                                "cases": [],
+                                                                "rows": [],
+                                                                "default": null,
+                                                                "label": "配合炉料P2O5加权平均质量分数 N1",
+                                                                "unit": "%",
+                                                                "round_places": null
+                                                              },
+                                                              {
+                                                                "op": "constant",
+                                                                "value": "3.5",
+                                                                "input_key": null,
+                                                                "args": [],
+                                                                "cases": [],
+                                                                "rows": [],
+                                                                "default": null,
+                                                                "label": null,
+                                                                "unit": null,
+                                                                "round_places": null
+                                                              }
+                                                            ],
+                                                            "cases": [],
+                                                            "rows": [],
+                                                            "default": null,
+                                                            "label": null,
+                                                            "unit": "%",
+                                                            "round_places": null
+                                                          }
+                                                        ],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": "kWh/t",
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "constant",
+                                                        "value": "8",
+                                                        "input_key": null,
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": null,
+                                                        "round_places": null
+                                                      }
+                                                    ],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": null,
+                                                    "unit": "kWh/t",
+                                                    "round_places": null
+                                                  },
+                                                  {
+                                                    "op": "input",
+                                                    "value": null,
+                                                    "input_key": "yellow_phosphorus.feedstock.co2_pct",
+                                                    "args": [],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "配合炉料CO2加权平均质量分数 N3",
+                                                    "unit": "%",
+                                                    "round_places": null
+                                                  }
+                                                ],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": null,
+                                                "unit": "kWh/t",
+                                                "round_places": null
+                                              }
+                                            ],
+                                            "cases": [],
+                                            "rows": [],
+                                            "default": null,
+                                            "label": null,
+                                            "unit": "kWh/t",
+                                            "round_places": null
+                                          },
+                                          {
+                                            "op": "constant",
+                                            "value": "7234",
+                                            "input_key": null,
+                                            "args": [],
+                                            "cases": [],
+                                            "rows": [],
+                                            "default": null,
+                                            "label": null,
+                                            "unit": null,
+                                            "round_places": null
+                                          }
+                                        ],
+                                        "cases": [],
+                                        "rows": [],
+                                        "default": null,
+                                        "label": "电炉基准电量修正项",
+                                        "unit": "kWh/t",
+                                        "round_places": null
+                                      },
+                                      {
+                                        "op": "subtract",
+                                        "value": null,
+                                        "input_key": null,
+                                        "args": [
+                                          {
+                                            "op": "add",
+                                            "value": null,
+                                            "input_key": null,
+                                            "args": [
+                                              {
+                                                "op": "input",
+                                                "value": null,
+                                                "input_key": "yellow_phosphorus.product.qualified_t",
+                                                "args": [],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": "符合GB/T 7816的黄磷量 PPZ",
+                                                "unit": "t",
+                                                "round_places": null
+                                              },
+                                              {
+                                                "op": "subtract",
+                                                "value": null,
+                                                "input_key": null,
+                                                "args": [
+                                                  {
+                                                    "op": "multiply",
+                                                    "value": null,
+                                                    "input_key": null,
+                                                    "args": [
+                                                      {
+                                                        "op": "constant",
+                                                        "value": "0.3163",
+                                                        "input_key": null,
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": null,
+                                                        "unit": null,
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "input",
+                                                        "value": null,
+                                                        "input_key": "yellow_phosphorus.product.phosphoric_acid_mass_fraction",
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": "泥磷制得磷酸质量分数 NS（按0~1小数输入）",
+                                                        "unit": "fraction",
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "input",
+                                                        "value": null,
+                                                        "input_key": "yellow_phosphorus.product.phosphoric_acid_production_t",
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": "泥磷制得磷酸产量 PS",
+                                                        "unit": "t",
+                                                        "round_places": null
+                                                      }
+                                                    ],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "泥磷制磷酸折合黄磷量 PPS（公式9）",
+                                                    "unit": "t",
+                                                    "round_places": null
+                                                  },
+                                                  {
+                                                    "op": "input",
+                                                    "value": null,
+                                                    "input_key": "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t",
+                                                    "args": [],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "泥磷制磷酸外加/外购折合黄磷量 PPW",
+                                                    "unit": "t",
+                                                    "round_places": null
+                                                  }
+                                                ],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": "泥磷制磷酸折合黄磷量 PPS（公式9）",
+                                                "unit": "t",
+                                                "round_places": null
+                                              },
+                                              {
+                                                "op": "subtract",
+                                                "value": null,
+                                                "input_key": null,
+                                                "args": [
+                                                  {
+                                                    "op": "multiply",
+                                                    "value": null,
+                                                    "input_key": null,
+                                                    "args": [
+                                                      {
+                                                        "op": "input",
+                                                        "value": null,
+                                                        "input_key": "yellow_phosphorus.product.other_chemical_phosphorus_fraction",
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": "其他化学品中磷质量分数 NH（按0~1小数输入）",
+                                                        "unit": "fraction",
+                                                        "round_places": null
+                                                      },
+                                                      {
+                                                        "op": "input",
+                                                        "value": null,
+                                                        "input_key": "yellow_phosphorus.product.other_chemical_production_t",
+                                                        "args": [],
+                                                        "cases": [],
+                                                        "rows": [],
+                                                        "default": null,
+                                                        "label": "泥磷制得其他化学品产量 PH",
+                                                        "unit": "t",
+                                                        "round_places": null
+                                                      }
+                                                    ],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "泥磷制其他化学品折合黄磷量 PPH（公式10）",
+                                                    "unit": "t",
+                                                    "round_places": null
+                                                  },
+                                                  {
+                                                    "op": "input",
+                                                    "value": null,
+                                                    "input_key": "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t",
+                                                    "args": [],
+                                                    "cases": [],
+                                                    "rows": [],
+                                                    "default": null,
+                                                    "label": "制备其他化学品外加/外购折合黄磷量 PPW",
+                                                    "unit": "t",
+                                                    "round_places": null
+                                                  }
+                                                ],
+                                                "cases": [],
+                                                "rows": [],
+                                                "default": null,
+                                                "label": "泥磷制其他化学品折合黄磷量 PPH（公式10）",
+                                                "unit": "t",
+                                                "round_places": null
+                                              }
+                                            ],
+                                            "cases": [],
+                                            "rows": [],
+                                            "default": null,
+                                            "label": "黄磷产品产量 PP（公式8）",
+                                            "unit": "t",
+                                            "round_places": null
+                                          },
+                                          {
+                                            "op": "input",
+                                            "value": null,
+                                            "input_key": "yellow_phosphorus.product.external_mud_recovered_t",
+                                            "args": [],
+                                            "cases": [],
+                                            "rows": [],
+                                            "default": null,
+                                            "label": "外购泥磷回收量 PPWN",
+                                            "unit": "t",
+                                            "round_places": null
+                                          }
+                                        ],
+                                        "cases": [],
+                                        "rows": [],
+                                        "default": null,
+                                        "label": "黄磷产品产量 PP（公式8）",
+                                        "unit": "t",
+                                        "round_places": null
+                                      }
+                                    ],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": "电炉修正电量",
+                                    "unit": "kWh",
+                                    "round_places": null
+                                  }
+                                ],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "电炉电量差额",
+                                "unit": "kWh",
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "0.1229",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "黄磷产品电炉电耗 EPL",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_other.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统其他能源 EPE",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "黄磷生产系统综合能耗 EPS",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.auxiliary_affiliated.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助及附属系统摊入能耗 EPFF",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产及辅助附属能耗",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "negate",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.external_output.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "界区外输出能源（明细方向为output）",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "界区外输出能源 EPW",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "净综合能耗",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "subtract",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "yellow_phosphorus.product.qualified_t",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "符合GB/T 7816的黄磷量 PPZ",
+                        "unit": "t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "0.3163",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "input",
+                                "value": null,
+                                "input_key": "yellow_phosphorus.product.phosphoric_acid_mass_fraction",
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "泥磷制得磷酸质量分数 NS（按0~1小数输入）",
+                                "unit": "fraction",
+                                "round_places": null
+                              },
+                              {
+                                "op": "input",
+                                "value": null,
+                                "input_key": "yellow_phosphorus.product.phosphoric_acid_production_t",
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "泥磷制得磷酸产量 PS",
+                                "unit": "t",
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "泥磷制磷酸折合黄磷量 PPS（公式9）",
+                            "unit": "t",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "yellow_phosphorus.product.phosphoric_acid_external_yellow_phosphorus_t",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "泥磷制磷酸外加/外购折合黄磷量 PPW",
+                            "unit": "t",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "泥磷制磷酸折合黄磷量 PPS（公式9）",
+                        "unit": "t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "input",
+                                "value": null,
+                                "input_key": "yellow_phosphorus.product.other_chemical_phosphorus_fraction",
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "其他化学品中磷质量分数 NH（按0~1小数输入）",
+                                "unit": "fraction",
+                                "round_places": null
+                              },
+                              {
+                                "op": "input",
+                                "value": null,
+                                "input_key": "yellow_phosphorus.product.other_chemical_production_t",
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "泥磷制得其他化学品产量 PH",
+                                "unit": "t",
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "泥磷制其他化学品折合黄磷量 PPH（公式10）",
+                            "unit": "t",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "yellow_phosphorus.product.other_chemical_external_yellow_phosphorus_t",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "制备其他化学品外加/外购折合黄磷量 PPW",
+                            "unit": "t",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "泥磷制其他化学品折合黄磷量 PPH（公式10）",
+                        "unit": "t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "黄磷产品产量 PP（公式8）",
+                    "unit": "t",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "yellow_phosphorus.product.external_mud_recovered_t",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "外购泥磷回收量 PPWN",
+                    "unit": "t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "黄磷产品产量 PP（公式8）",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "黄磷单位产品综合能耗 EPZD（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "2300",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2800",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 21345-2024",
+              "source_file": "11.GB 21345-2024黄磷单位产品能源消耗限额.pdf",
+              "source_sha256": "f27fc8b729bad51c7deccdc4c0654ce5c05bd66e563c005ab155da5ee8393c7d",
+              "page": 6,
+              "clause": "第4章、5.1、5.2",
+              "table": "表1",
+              "note": "表1等级限额；原文第6.2.2节的统计范围和计算公式另见同一标准第7～9页。"
+            },
+            {
+              "standard_number": "GB 21345-2024",
+              "source_file": "11.GB 21345-2024黄磷单位产品能源消耗限额.pdf",
+              "source_sha256": "f27fc8b729bad51c7deccdc4c0654ce5c05bd66e563c005ab155da5ee8393c7d",
+              "page": 8,
+              "clause": "6.2.2.4～6.2.2.8",
+              "table": "公式（4）～（8）",
+              "note": "按原文公式建模；能源分类键和产量分类键写入输入说明，不改变原文口径。"
+            },
+            {
+              "standard_number": "GB 21345-2024",
+              "source_file": "11.GB 21345-2024黄磷单位产品能源消耗限额.pdf",
+              "source_sha256": "f27fc8b729bad51c7deccdc4c0654ce5c05bd66e563c005ab155da5ee8393c7d",
+              "page": 9,
+              "clause": "6.2.2.9～6.2.2.10",
+              "table": "公式（9）～（10）",
+              "note": "泥磷制磷酸和其他化学品折合黄磷量在明细模式中由输入变量计算。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "detail_energy_category_keys: carbon_reducing, furnace_electricity, production_other, auxiliary_affiliated, external_output",
+            "EPW使用external_output分类且明细方向必须为output；引擎将其记录为负值，公式再取相反数。",
+            "EPT能源明细折标系数应按各炭质还原剂固定碳质量分数×1000×1.1564录入，单位kgce/t。",
+            "公式9、10的NS、NH按质量分数小数（0~1）录入；确认表中需核对企业原始数据是否采用同一口径。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "supersedes": [
+    "GB 21345-2015"
+  ]
+}

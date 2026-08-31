@@ -1,0 +1,361 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-36888-2018",
+  "number": "GB 36888-2018",
+  "title": "预拌混凝土单位产品能源消耗限额",
+  "version": "2018",
+  "publication_status": "published",
+  "publication_date": "2018-11-19",
+  "effective_date": "2019-12-01",
+  "source_file": "52.GB 36888-2018预拌混凝土单位产品能源消耗限额.pdf",
+  "source_sha256": "28daea1c050a7b1b9c892d40a94db5e0c6c221d23b42f715d9e435855c165742",
+  "products": [
+    {
+      "id": "gb_36888-2018-production",
+      "name": "预拌混凝土单位产品生产能耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36888-2018.production",
+          "name": "预拌混凝土单位产品生产能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.production",
+              "label": "预拌混凝土单位产品生产能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.production",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.30",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.70",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1.10",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36888-2018",
+              "source_file": "52.GB 36888-2018预拌混凝土单位产品能源消耗限额.pdf",
+              "source_sha256": "28daea1c050a7b1b9c892d40a94db5e0c6c221d23b42f715d9e435855c165742",
+              "page": 4,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_36888-2018-transport",
+      "name": "预拌混凝土单位产品运输能耗",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_36888-2018.transport",
+          "name": "预拌混凝土单位产品运输能耗",
+          "unit": "kgce/m³",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.transport",
+              "label": "预拌混凝土单位产品运输能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/m³",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.transport",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/m³",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.85",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.65",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.90",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/m³",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 36888-2018",
+              "source_file": "52.GB 36888-2018预拌混凝土单位产品能源消耗限额.pdf",
+              "source_sha256": "28daea1c050a7b1b9c892d40a94db5e0c6c221d23b42f715d9e435855c165742",
+              "page": 4,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

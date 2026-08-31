@@ -1,0 +1,2295 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-45247-2025",
+  "number": "GB 45247-2025",
+  "title": "燃气-蒸汽联合循环发电机组单位产品能源消耗限额",
+  "version": "2025",
+  "publication_status": "published",
+  "publication_date": "2025-01-24",
+  "effective_date": "2025-08-01",
+  "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+  "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+  "products": [
+    {
+      "id": "gb_45247-2025-power-1",
+      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供电煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.power-1",
+          "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供电煤耗率",
+          "unit": "gce/(kW·h)",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-1",
+              "label": "燃气-蒸汽联合循环发电机组（H级/500MW）供电煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.gb45247.power_total_factor",
+              "label": "供电煤耗率影响因素总修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按5.3.1～5.3.7计算并相乘；供热机组还需包含供热修正系数。不能确定时不得猜测。"
+            },
+            {
+              "key": "condition.gb45247.air_cooling_addition",
+              "label": "空气冷却供电煤耗率增加值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "新建、扩建、改建且采用空气冷却时填5；其他情况填0。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-1",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "gce/(kW·h)",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "201",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "210",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "215",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "201",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "210",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.air_cooling_addition",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "215",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "power_correction_formula_clause_5_3",
+            "air_cooling_addition_table_5_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-heat-1",
+      "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供热煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.heat-1",
+          "name": "燃气-蒸汽联合循环发电机组（H级/500MW）供热煤耗率",
+          "unit": "kgce/GJ",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.heat-1",
+              "label": "燃气-蒸汽联合循环发电机组（H级/500MW）供热煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "kgce/GJ",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.heat-1",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/GJ",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "heating_rate_is_not_corrected_clause_5_3",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-power-2",
+      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供电煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.power-2",
+          "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供电煤耗率",
+          "unit": "gce/(kW·h)",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-2",
+              "label": "燃气-蒸汽联合循环发电机组（F级/400MW）供电煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.gb45247.power_total_factor",
+              "label": "供电煤耗率影响因素总修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按5.3.1～5.3.7计算并相乘；供热机组还需包含供热修正系数。不能确定时不得猜测。"
+            },
+            {
+              "key": "condition.gb45247.air_cooling_addition",
+              "label": "空气冷却供电煤耗率增加值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "新建、扩建、改建且采用空气冷却时填5；其他情况填0。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-2",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "gce/(kW·h)",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "203",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "215",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "223",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "203",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "215",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.air_cooling_addition",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "223",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "power_correction_formula_clause_5_3",
+            "air_cooling_addition_table_5_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-heat-2",
+      "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供热煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.heat-2",
+          "name": "燃气-蒸汽联合循环发电机组（F级/400MW）供热煤耗率",
+          "unit": "kgce/GJ",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.heat-2",
+              "label": "燃气-蒸汽联合循环发电机组（F级/400MW）供热煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "kgce/GJ",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.heat-2",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/GJ",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "heating_rate_is_not_corrected_clause_5_3",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-power-3",
+      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供电煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.power-3",
+          "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供电煤耗率",
+          "unit": "gce/(kW·h)",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-3",
+              "label": "燃气-蒸汽联合循环发电机组（F级/300MW）供电煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.gb45247.power_total_factor",
+              "label": "供电煤耗率影响因素总修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按5.3.1～5.3.7计算并相乘；供热机组还需包含供热修正系数。不能确定时不得猜测。"
+            },
+            {
+              "key": "condition.gb45247.air_cooling_addition",
+              "label": "空气冷却供电煤耗率增加值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "新建、扩建、改建且采用空气冷却时填5；其他情况填0。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "gce/(kW·h)",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "206",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "219",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "227",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "206",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "219",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.air_cooling_addition",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "227",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "power_correction_formula_clause_5_3",
+            "air_cooling_addition_table_5_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-heat-3",
+      "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供热煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.heat-3",
+          "name": "燃气-蒸汽联合循环发电机组（F级/300MW）供热煤耗率",
+          "unit": "kgce/GJ",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.heat-3",
+              "label": "燃气-蒸汽联合循环发电机组（F级/300MW）供热煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "kgce/GJ",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.heat-3",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/GJ",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "heating_rate_is_not_corrected_clause_5_3",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-power-4",
+      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供电煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.power-4",
+          "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供电煤耗率",
+          "unit": "gce/(kW·h)",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-4",
+              "label": "燃气-蒸汽联合循环发电机组（F级/100MW）供电煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.gb45247.power_total_factor",
+              "label": "供电煤耗率影响因素总修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按5.3.1～5.3.7计算并相乘；供热机组还需包含供热修正系数。不能确定时不得猜测。"
+            },
+            {
+              "key": "condition.gb45247.air_cooling_addition",
+              "label": "空气冷却供电煤耗率增加值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "新建、扩建、改建且采用空气冷却时填5；其他情况填0。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-4",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "gce/(kW·h)",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "220",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "232",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "241",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "220",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "232",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.air_cooling_addition",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "241",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "power_correction_formula_clause_5_3",
+            "air_cooling_addition_table_5_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-heat-4",
+      "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供热煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.heat-4",
+          "name": "燃气-蒸汽联合循环发电机组（F级/100MW）供热煤耗率",
+          "unit": "kgce/GJ",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.heat-4",
+              "label": "燃气-蒸汽联合循环发电机组（F级/100MW）供热煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "kgce/GJ",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.heat-4",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/GJ",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "heating_rate_is_not_corrected_clause_5_3",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-power-5",
+      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供电煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.power-5",
+          "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供电煤耗率",
+          "unit": "gce/(kW·h)",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.power-5",
+              "label": "燃气-蒸汽联合循环发电机组（E级/100MW）供电煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "condition.gb45247.power_total_factor",
+              "label": "供电煤耗率影响因素总修正系数",
+              "data_type": "decimal",
+              "unit": "1",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按5.3.1～5.3.7计算并相乘；供热机组还需包含供热修正系数。不能确定时不得猜测。"
+            },
+            {
+              "key": "condition.gb45247.air_cooling_addition",
+              "label": "空气冷却供电煤耗率增加值",
+              "data_type": "decimal",
+              "unit": "gce/(kW·h)",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "新建、扩建、改建且采用空气冷却时填5；其他情况填0。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.power-5",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "gce/(kW·h)",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "232",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "245",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "259",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "232",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "245",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.air_cooling_addition",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "259",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "gce/(kW·h)",
+                  "round_places": null
+                },
+                {
+                  "op": "input",
+                  "value": null,
+                  "input_key": "condition.gb45247.power_total_factor",
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "gce/(kW·h)",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "power_correction_formula_clause_5_3",
+            "air_cooling_addition_table_5_2",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gb_45247-2025-heat-5",
+      "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供热煤耗率",
+      "description": "依据强制性标准原文表格录入，待独立复核。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_45247-2025.heat-5",
+          "name": "燃气-蒸汽联合循环发电机组（E级/100MW）供热煤耗率",
+          "unit": "kgce/GJ",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.heat-5",
+              "label": "燃气-蒸汽联合循环发电机组（E级/100MW）供热煤耗率实际值",
+              "data_type": "decimal",
+              "unit": "kgce/GJ",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.heat-5",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品综合能耗",
+            "unit": "kgce/GJ",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "38",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "38.5",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "39",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/GJ",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 45247-2025",
+              "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
+              "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
+              "page": 6,
+              "clause": "第4章 能耗限额等级",
+              "table": "表1",
+              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+            }
+          ],
+          "notes": [
+            "original_pdf_transcribed",
+            "heating_rate_is_not_corrected_clause_5_3",
+            "requires_independent_review"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

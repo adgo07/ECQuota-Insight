@@ -1,0 +1,2832 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-29145-2023",
+  "number": "GB 29145-2023",
+  "title": "钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额",
+  "version": "2023",
+  "publication_status": "draft",
+  "publication_date": "2023-11-27",
+  "effective_date": "2024-12-01",
+  "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+  "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+  "products": [
+    {
+      "id": "tungsten-black",
+      "name": "钨精矿—黑钨",
+      "description": "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [
+        {
+          "key": "condition.GB29145.tungsten.mining_method",
+          "label": "钨精矿采矿方式",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "地下开采",
+            "露天开采"
+          ],
+          "description": "按GB 29145-2023第1章适用范围录入；未确认前仅作草案。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.tungsten-black.energy",
+          "name": "单位产品可比能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.tungsten-black.energy",
+              "label": "钨精矿—黑钨单位产品可比能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            },
+            {
+              "key": "gb29145.tungsten.ore_ratio",
+              "label": "选矿比 K（按附录C表内数值输入）",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "eq",
+            "field": "condition.GB29145.tungsten.mining_method",
+            "value": "地下开采"
+          },
+          "direct_input_key": "actual.GB_29145_2023.tungsten-black.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "divide",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "subtract",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "add",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产、辅助、附属系统能耗合计",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "negate",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.external_output.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "二次能源回收并外供量（明细方向为output）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量 E_HW",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "综合能耗分子（公式1）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "合格产品实物产量 P",
+                    "unit": "t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钨精矿—黑钨单位产品能耗 e（公式1）",
+                "unit": "kgce/t",
+                "round_places": null
+              },
+              {
+                "op": "lookup",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [],
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "250"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.89",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=250，μ=0.89"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "280"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.00",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=280，μ=1.00"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "310"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.11",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=310，μ=1.11"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "340"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.21",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=340，μ=1.21"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "370"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.32",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=370，μ=1.32"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "400"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.43",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=400，μ=1.43"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "430"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.54",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=430，μ=1.54"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "460"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.64",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=460，μ=1.64"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "490"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.75",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=490，μ=1.75"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "520"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.86",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=520，μ=1.86"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "550"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.96",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=550，μ=1.96"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "580"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "2.07",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=580，μ=2.07"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "610"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "2.18",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=610，μ=2.18"
+                  }
+                ],
+                "default": null,
+                "label": "原矿品位折算系数 μ（附录C查表）",
+                "unit": "1",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钨精矿—黑钨单位产品可比能耗 e_KB（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "550",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1450",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。",
+            "软件适用条件：condition.GB29145.tungsten.mining_method=地下开采；其他选择返回不适用。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "选矿比不等于附录C表内值时暂返回不完整；未确认前禁止插值或猜测。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tungsten-white",
+      "name": "钨精矿—白钨",
+      "description": "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [
+        {
+          "key": "condition.GB29145.tungsten.mining_method",
+          "label": "钨精矿采矿方式",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "地下开采",
+            "露天开采"
+          ],
+          "description": "按GB 29145-2023第1章适用范围录入；未确认前仅作草案。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.tungsten-white.energy",
+          "name": "单位产品可比能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.tungsten-white.energy",
+              "label": "钨精矿—白钨单位产品可比能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            },
+            {
+              "key": "gb29145.tungsten.ore_ratio",
+              "label": "选矿比 K（按附录C表内数值输入）",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "eq",
+            "field": "condition.GB29145.tungsten.mining_method",
+            "value": "地下开采"
+          },
+          "direct_input_key": "actual.GB_29145_2023.tungsten-white.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "divide",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "subtract",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "add",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产、辅助、附属系统能耗合计",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "negate",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.external_output.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "二次能源回收并外供量（明细方向为output）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量 E_HW",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "综合能耗分子（公式1）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "合格产品实物产量 P",
+                    "unit": "t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钨精矿—白钨单位产品能耗 e（公式1）",
+                "unit": "kgce/t",
+                "round_places": null
+              },
+              {
+                "op": "lookup",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [],
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "250"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.89",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=250，μ=0.89"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "280"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.00",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=280，μ=1.00"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "310"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.11",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=310，μ=1.11"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "340"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.21",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=340，μ=1.21"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "370"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.32",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=370，μ=1.32"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "400"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.43",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=400，μ=1.43"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "430"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.54",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=430，μ=1.54"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "460"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.64",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=460，μ=1.64"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "490"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.75",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=490，μ=1.75"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "520"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.86",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=520，μ=1.86"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "550"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.96",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=550，μ=1.96"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "580"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "2.07",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=580，μ=2.07"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.tungsten.ore_ratio",
+                      "value": "610"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "2.18",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=610，μ=2.18"
+                  }
+                ],
+                "default": null,
+                "label": "原矿品位折算系数 μ（附录C查表）",
+                "unit": "1",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钨精矿—白钨单位产品可比能耗 e_KB（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1640",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1640",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2050",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于地下开采钨精矿；不适用于露天开采钨精矿。按附录C表C.1查μ。",
+            "软件适用条件：condition.GB29145.tungsten.mining_method=地下开采；其他选择返回不适用。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "选矿比不等于附录C表内值时暂返回不完整；未确认前禁止插值或猜测。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "molybdenum-three-stage",
+      "name": "钼精矿—三段一闭路",
+      "description": "适用于露天开采钼精矿的三段一闭路工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [
+        {
+          "key": "condition.GB29145.molybdenum.mining_method",
+          "label": "钼精矿采矿方式",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "露天开采",
+            "地下开采"
+          ],
+          "description": "按GB 29145-2023第1章适用范围录入；未确认前仅作草案。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.molybdenum-three-stage.energy",
+          "name": "单位产品可比能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.molybdenum-three-stage.energy",
+              "label": "钼精矿—三段一闭路单位产品可比能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            },
+            {
+              "key": "gb29145.molybdenum.ore_ratio",
+              "label": "选矿比 K（按附录C表内数值输入）",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "eq",
+            "field": "condition.GB29145.molybdenum.mining_method",
+            "value": "露天开采"
+          },
+          "direct_input_key": "actual.GB_29145_2023.molybdenum-three-stage.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "divide",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "subtract",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "add",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产、辅助、附属系统能耗合计",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "negate",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.external_output.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "二次能源回收并外供量（明细方向为output）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量 E_HW",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "综合能耗分子（公式1）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "合格产品实物产量 P",
+                    "unit": "t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钼精矿—三段一闭路单位产品能耗 e（公式1）",
+                "unit": "kgce/t",
+                "round_places": null
+              },
+              {
+                "op": "lookup",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [],
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "330"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.78",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=330，μ=0.78"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "380"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.88",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=380，μ=0.88"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "430"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.00",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=430，μ=1.00"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "480"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.12",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=480，μ=1.12"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "530"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.23",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=530，μ=1.23"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "580"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.35",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=580，μ=1.35"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "630"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.47",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=630，μ=1.47"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "680"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.58",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=680，μ=1.58"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "730"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.70",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=730，μ=1.70"
+                  }
+                ],
+                "default": null,
+                "label": "原矿品位折算系数 μ（附录C查表）",
+                "unit": "1",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钼精矿—三段一闭路单位产品可比能耗 e_KB（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1475",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1250",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "1390",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1475",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于露天开采钼精矿的三段一闭路工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。",
+            "软件适用条件：condition.GB29145.molybdenum.mining_method=露天开采；其他选择返回不适用。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "选矿比不等于附录C表内值时暂返回不完整；未确认前禁止插值或猜测。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "molybdenum-sabc",
+      "name": "钼精矿—SABC",
+      "description": "适用于露天开采钼精矿的SABC工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [
+        {
+          "key": "condition.GB29145.molybdenum.mining_method",
+          "label": "钼精矿采矿方式",
+          "data_type": "text",
+          "unit": null,
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "露天开采",
+            "地下开采"
+          ],
+          "description": "按GB 29145-2023第1章适用范围录入；未确认前仅作草案。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.molybdenum-sabc.energy",
+          "name": "单位产品可比能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.molybdenum-sabc.energy",
+              "label": "钼精矿—SABC单位产品可比能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            },
+            {
+              "key": "gb29145.molybdenum.ore_ratio",
+              "label": "选矿比 K（按附录C表内数值输入）",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "eq",
+            "field": "condition.GB29145.molybdenum.mining_method",
+            "value": "露天开采"
+          },
+          "direct_input_key": "actual.GB_29145_2023.molybdenum-sabc.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "divide",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "subtract",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "add",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产、辅助、附属系统能耗合计",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "negate",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.external_output.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "二次能源回收并外供量（明细方向为output）",
+                            "unit": "kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量 E_HW",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "综合能耗分子（公式1）",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "合格产品实物产量 P",
+                    "unit": "t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "钼精矿—SABC单位产品能耗 e（公式1）",
+                "unit": "kgce/t",
+                "round_places": null
+              },
+              {
+                "op": "lookup",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [],
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "330"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.78",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=330，μ=0.78"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "380"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.88",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=380，μ=0.88"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "430"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.00",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=430，μ=1.00"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "480"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.12",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=480，μ=1.12"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "530"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.23",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=530，μ=1.23"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "580"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.35",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=580，μ=1.35"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "630"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.47",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=630，μ=1.47"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "680"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.58",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=680，μ=1.58"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "gb29145.molybdenum.ore_ratio",
+                      "value": "730"
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.70",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": "1",
+                      "round_places": null
+                    },
+                    "label": "附录C：K=730，μ=1.70"
+                  }
+                ],
+                "default": null,
+                "label": "原矿品位折算系数 μ（附录C查表）",
+                "unit": "1",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "钼精矿—SABC单位产品可比能耗 e_KB（公式2）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2060",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1900",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2060",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2150",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于露天开采钼精矿的SABC工艺；不适用于地下开采钼精矿。按附录C表C.2查μ。",
+            "软件适用条件：condition.GB29145.molybdenum.mining_method=露天开采；其他选择返回不适用。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "选矿比不等于附录C表内值时暂返回不完整；未确认前禁止插值或猜测。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "roasted-molybdenum-multi-hearth",
+      "name": "焙烧钼精矿—多膛炉",
+      "description": "适用于多膛炉焙烧钼精矿；单位产品能耗不执行附录C可比系数修正。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.roasted-molybdenum-multi-hearth.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.roasted-molybdenum-multi-hearth.energy",
+              "label": "焙烧钼精矿—多膛炉单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145_2023.roasted-molybdenum-multi-hearth.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "subtract",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.production_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.affiliated_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "附属生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产、辅助、附属系统能耗合计",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "negate",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.external_output.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量（明细方向为output）",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "二次能源回收并外供量 E_HW",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "综合能耗分子（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品实物产量 P",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "焙烧钼精矿—多膛炉单位产品能耗 e（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "210",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "210",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "230",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "260",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于多膛炉焙烧钼精矿；单位产品能耗不执行附录C可比系数修正。",
+            "焙烧钼精矿按产品/工序选择生产设备类型。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "焙烧钼精矿不执行公式（2）可比能耗修正。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "roasted-molybdenum-kiln",
+      "name": "焙烧钼精矿—内热式回转窑",
+      "description": "适用于内热式回转窑焙烧钼精矿；单位产品能耗不执行附录C可比系数修正。现有生产装置按3级限定值，新建、改建和扩建项目按2级准入值。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_29145-2023.roasted-molybdenum-kiln.energy",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_29145_2023.roasted-molybdenum-kiln.energy",
+              "label": "焙烧钼精矿—内热式回转窑单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 29145-2023第6.2节及附录C录入；尚未确认前仅作草案。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_29145_2023.roasted-molybdenum-kiln.energy",
+          "detail_formula": {
+            "op": "divide",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "subtract",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.production_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.affiliated_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "附属生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产、辅助、附属系统能耗合计",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "negate",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.external_output.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "二次能源回收并外供量（明细方向为output）",
+                        "unit": "kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "二次能源回收并外供量 E_HW",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "综合能耗分子（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "合格产品实物产量 P",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "焙烧钼精矿—内热式回转窑单位产品能耗 e（公式1）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "170",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "180",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "200",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 4,
+              "clause": "第4章4.1～4.3",
+              "table": "表1～表3",
+              "note": "三级基础限额；1级能耗最低。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.1",
+              "table": "6.1.1～6.1.5",
+              "note": "生产、辅助、附属系统统计范围、产量口径和折标系数取值原则。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 6,
+              "clause": "6.2",
+              "table": "公式（1）",
+              "note": "单位产品能耗 e 的计算。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 7,
+              "clause": "6.2",
+              "table": "公式（2）",
+              "note": "钨精矿、钼精矿单位产品可比能耗 e_KB=e/μ。"
+            },
+            {
+              "standard_number": "GB 29145-2023",
+              "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
+              "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
+              "page": 10,
+              "clause": "附录C",
+              "table": "表C.1～表C.2",
+              "note": "原矿品位折算系数μ按选矿比K查表；标准未给出表内值之间的插值规则。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "适用于内热式回转窑焙烧钼精矿；单位产品能耗不执行附录C可比系数修正。",
+            "焙烧钼精矿按产品/工序选择生产设备类型。",
+            "公式（1）按生产系统+辅助系统+附属系统−二次能源外供量计算；明细方向为output时引擎使用负值并取相反数抵扣。",
+            "焙烧钼精矿不执行公式（2）可比能耗修正。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "supersedes": [
+    "GB 29145-2012",
+    "GB 29146-2012",
+    "GB 31340-2014"
+  ]
+}

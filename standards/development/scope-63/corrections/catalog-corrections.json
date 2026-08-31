@@ -1,0 +1,225 @@
+{
+  "schema_version": "1.0",
+  "corrections": [
+    {
+      "id": "CAT-008",
+      "standard_number": "GB 21342-2025",
+      "fields": [
+        "remark"
+      ],
+      "original": {
+        "remark": "代替GB21342-2025"
+      },
+      "corrected": {
+        "title": "焦炭单位产品能源消耗限额",
+        "publication_date": "2025-04-25",
+        "effective_date": "2026-05-01",
+        "remark": "代替GB 21342-2015"
+      },
+      "reason": "目录备注误写为代替同版本；按标准原文封面订正。",
+      "source": "GB 21342-2025 原文封面"
+    },
+    {
+      "id": "CAT-023",
+      "standard_number": "GB 29436-2023",
+      "fields": [
+        "title"
+      ],
+      "original": {
+        "title": "甲醇、乙二和二甲醚单位产品能源消耗限额"
+      },
+      "corrected": {
+        "title": "甲醇、乙二醇和二甲醚单位产品能源消耗限额",
+        "publication_date": "2023-11-27",
+        "effective_date": "2024-12-01",
+        "remark": "代替GB29436.1-2012,GB29436.2-2015,GB29436.3-2015,GB29436.4-2015,GB31535-2015,GB32048-2015"
+      },
+      "reason": "目录标准名称遗漏“醇”字；按标准原文标题订正。",
+      "source": "GB 29436-2023 原文封面"
+    },
+    {
+      "id": "CAT-040",
+      "standard_number": "GB 30526-2019",
+      "fields": [
+        "publication_date",
+        "effective_date"
+      ],
+      "original": {
+        "publication_date": "2021-10-11",
+        "effective_date": "2021-10-11"
+      },
+      "corrected": {
+        "title": "烧结墙体材料和泡沫玻璃单位产品能源消耗限额",
+        "publication_date": "2019-10-14",
+        "effective_date": "2020-05-01",
+        "remark": ""
+      },
+      "reason": "目录发布日期和实施日期均误录为2021-10-11；按标准原文封面订正。",
+      "source": "GB 30526-2019 原文封面"
+    },
+    {
+      "id": "CAT-029-REPLACE",
+      "standard_number": "GB 29447-2026",
+      "fields": [
+        "number",
+        "title",
+        "publication_date",
+        "effective_date",
+        "remark"
+      ],
+      "original": {
+        "number": "GB 29447-2022",
+        "title": "多晶硅和锗单位产品能源消耗限额",
+        "publication_date": "2022-12-29",
+        "effective_date": "2024-01-01",
+        "remark": ""
+      },
+      "corrected": {
+        "number": "GB 29447-2026",
+        "title": "硅多晶和锗单位产品能源消耗限额",
+        "publication_date": "2026-06-27",
+        "effective_date": "2027-01-01",
+        "remark": "代替GB 29447-2022"
+      },
+      "reason": "用户确认GB 29447-2022已被GB 29447-2026替代，按新标准原文封面更新。",
+      "source": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf"
+    },
+    {
+      "id": "CAT-064-NEW",
+      "standard_number": "GB 47834-2026",
+      "fields": [
+        "scope"
+      ],
+      "original": {},
+      "corrected": {
+        "scope": "纳入当前强制标准范围"
+      },
+      "reason": "用户确认新增标准。",
+      "source": "GB 47834-2026 原文封面"
+    },
+    {
+      "id": "CAT-065-NEW",
+      "standard_number": "GB 47835-2026",
+      "fields": [
+        "scope"
+      ],
+      "original": {},
+      "corrected": {
+        "scope": "纳入当前强制标准范围"
+      },
+      "reason": "用户确认新增标准。",
+      "source": "GB 47835-2026 原文封面"
+    },
+    {
+      "id": "CAT-REPLACE-29141-2024",
+      "standard_number": "GB 29141-2024",
+      "fields": [
+        "number",
+        "title",
+        "scope"
+      ],
+      "original": {
+        "number": "GB 29141-2012、GB 29437-2012、GB 29441-2012",
+        "title": "工业硫酸、工业冰醋酸、稀硝酸分别列项",
+        "scope": "当前范围包含三项旧标准"
+      },
+      "corrected": {
+        "number": "GB 29141-2024",
+        "title": "工业硫酸、稀硝酸和冰醋酸单位产品能源消耗限额",
+        "scope": "由GB 29141-2024统一替代并纳入当前范围"
+      },
+      "reason": "用户确认三个旧标准已全部由GB 29141-2024替代；旧标准移入作废标准目录。",
+      "source": "GB 29141-2024原文封面及用户确认"
+    },
+    {
+      "id": "CAT-REPLACE-29435-2025",
+      "standard_number": "GB 29435-2025",
+      "fields": [
+        "number",
+        "title",
+        "publication_date",
+        "effective_date",
+        "remark",
+        "scope"
+      ],
+      "original": {
+        "number": "GB 29435-2012",
+        "title": "稀土冶炼加工企业单位产品能源消耗限额",
+        "publication_date": "2012-12-31",
+        "effective_date": "2013-10-01",
+        "remark": "",
+        "scope": "当前范围包含旧版"
+      },
+      "corrected": {
+        "number": "GB 29435-2025",
+        "title": "稀土冶炼企业单位产品能源消耗限额",
+        "publication_date": "2025-12-31",
+        "effective_date": "2027-01-01",
+        "remark": "代替GB 29435-2012",
+        "scope": "由GB 29435-2025替代并纳入当前范围"
+      },
+      "reason": "用户确认GB 29435-2012已由GB 29435-2025替代；按新标准封面更新，旧版仅保留历史记录。",
+      "source": "【2027-01-01实施】22. GB+29435-2025 稀土冶炼企业单位产品能源消耗限额.pdf"
+    },
+    {
+      "id": "CAT-REPLACE-30185-2025",
+      "standard_number": "GB 30185-2025",
+      "fields": [
+        "number",
+        "title",
+        "publication_date",
+        "effective_date",
+        "remark",
+        "scope"
+      ],
+      "original": {
+        "number": "GB 30185-2013",
+        "title": "铝塑板单位产品能源消耗限额",
+        "publication_date": "未在本次当前目录中采用",
+        "effective_date": "未在本次当前目录中采用",
+        "remark": "",
+        "scope": "旧版范围"
+      },
+      "corrected": {
+        "number": "GB 30185-2025",
+        "title": "铝(塑)复合板单位产品能源消耗限额",
+        "publication_date": "2025-02-28",
+        "effective_date": "2026-03-01",
+        "remark": "代替GB 30185-2013",
+        "scope": "按新标准表1纳入铝塑复合板、幕墙板、不燃铝复合板和装饰用铝单板"
+      },
+      "reason": "按现行强制文本封面记录GB 30185-2025替代GB 30185-2013；旧版日期本次不作为当前目录元数据，新规则先保留draft，确认后再发布。",
+      "source": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf"
+    },
+    {
+      "id": "CAT-REPLACE-30530-2024",
+      "standard_number": "GB 30530-2024",
+      "fields": [
+        "number",
+        "title",
+        "publication_date",
+        "effective_date",
+        "remark",
+        "scope"
+      ],
+      "original": {
+        "number": "GB 30530-2014",
+        "title": "有机硅环体单位产品能源消耗限额",
+        "publication_date": "未在本次当前目录中采用",
+        "effective_date": "未在本次当前目录中采用",
+        "remark": "",
+        "scope": "旧版范围"
+      },
+      "corrected": {
+        "number": "GB 30530-2024",
+        "title": "二甲基硅氧烷单位产品能源消耗限额",
+        "publication_date": "2024-04-29",
+        "effective_date": "2025-05-01",
+        "remark": "代替GB 30530-2014",
+        "scope": "二甲基硅氧烷（包括水解物、环体和线性体）"
+      },
+      "reason": "按现行强制文本封面和前言记录GB 30530-2024替代GB 30530-2014；新规则先保留draft，确认后再发布。",
+      "source": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf"
+    }
+  ]
+}

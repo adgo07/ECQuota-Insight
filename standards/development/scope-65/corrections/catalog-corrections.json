@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "corrections": [
+    {
+      "id": "CAT-008",
+      "standard_number": "GB 21342-2025",
+      "fields": [
+        "remark"
+      ],
+      "original": {
+        "remark": "代替GB21342-2025"
+      },
+      "corrected": {
+        "title": "焦炭单位产品能源消耗限额",
+        "publication_date": "2025-04-25",
+        "effective_date": "2026-05-01",
+        "remark": "代替GB 21342-2015"
+      },
+      "reason": "目录备注误写为代替同版本；按标准原文封面订正。",
+      "source": "GB 21342-2025 原文封面"
+    },
+    {
+      "id": "CAT-023",
+      "standard_number": "GB 29436-2023",
+      "fields": [
+        "title"
+      ],
+      "original": {
+        "title": "甲醇、乙二和二甲醚单位产品能源消耗限额"
+      },
+      "corrected": {
+        "title": "甲醇、乙二醇和二甲醚单位产品能源消耗限额",
+        "publication_date": "2023-11-27",
+        "effective_date": "2024-12-01",
+        "remark": "代替GB29436.1-2012,GB29436.2-2015,GB29436.3-2015,GB29436.4-2015,GB31535-2015,GB32048-2015"
+      },
+      "reason": "目录标准名称遗漏“醇”字；按标准原文标题订正。",
+      "source": "GB 29436-2023 原文封面"
+    },
+    {
+      "id": "CAT-040",
+      "standard_number": "GB 30526-2019",
+      "fields": [
+        "publication_date",
+        "effective_date"
+      ],
+      "original": {
+        "publication_date": "2021-10-11",
+        "effective_date": "2021-10-11"
+      },
+      "corrected": {
+        "title": "烧结墙体材料和泡沫玻璃单位产品能源消耗限额",
+        "publication_date": "2019-10-14",
+        "effective_date": "2020-05-01",
+        "remark": ""
+      },
+      "reason": "目录发布日期和实施日期均误录为2021-10-11；按标准原文封面订正。",
+      "source": "GB 30526-2019 原文封面"
+    },
+    {
+      "id": "CAT-029-REPLACE",
+      "standard_number": "GB 29447-2026",
+      "fields": [
+        "number",
+        "title",
+        "publication_date",
+        "effective_date",
+        "remark"
+      ],
+      "original": {
+        "number": "GB 29447-2022",
+        "title": "多晶硅和锗单位产品能源消耗限额",
+        "publication_date": "2022-12-29",
+        "effective_date": "2024-01-01",
+        "remark": ""
+      },
+      "corrected": {
+        "number": "GB 29447-2026",
+        "title": "硅多晶和锗单位产品能源消耗限额",
+        "publication_date": "2026-06-27",
+        "effective_date": "2027-01-01",
+        "remark": "代替GB 29447-2022"
+      },
+      "reason": "用户确认GB 29447-2022已被GB 29447-2026替代，按新标准原文封面更新。",
+      "source": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf"
+    },
+    {
+      "id": "CAT-064-NEW",
+      "standard_number": "GB 47834-2026",
+      "fields": [
+        "scope"
+      ],
+      "original": {},
+      "corrected": {
+        "scope": "纳入当前强制标准范围"
+      },
+      "reason": "用户确认新增标准。",
+      "source": "GB 47834-2026 原文封面"
+    },
+    {
+      "id": "CAT-065-NEW",
+      "standard_number": "GB 47835-2026",
+      "fields": [
+        "scope"
+      ],
+      "original": {},
+      "corrected": {
+        "scope": "纳入当前强制标准范围"
+      },
+      "reason": "用户确认新增标准。",
+      "source": "GB 47835-2026 原文封面"
+    }
+  ]
+}

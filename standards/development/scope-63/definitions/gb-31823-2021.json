@@ -1,0 +1,2010 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-31823-2021",
+  "number": "GB 31823-2021",
+  "title": "码头作业单位产品能源消耗限额",
+  "version": "2021",
+  "publication_status": "draft",
+  "publication_date": "2021-10-11",
+  "effective_date": "2022-11-01",
+  "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+  "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+  "products": [
+    {
+      "id": "container-terminal",
+      "name": "集装箱码头",
+      "description": "集装箱码头；按GB 31823-2021第4章和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_31823-2021.container-terminal.comparable-energy",
+          "name": "单位产品可比综合能耗",
+          "unit": "tce/10^4TEU",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_31823-2021.container-terminal.comparable_energy",
+              "label": "集装箱码头单位产品可比综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "tce/10^4TEU",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 31823-2021第6章和标准统计边界核算后录入单位产品可比综合能耗。"
+            },
+            {
+              "key": "condition.GB31823.container.adaptation_degree",
+              "label": "集装箱码头吞吐量适应程度 L",
+              "data_type": "decimal",
+              "unit": "ratio",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "L=设计通过能力/统计期实际完成吞吐量；按原文分段选择码头吞吐量适应系数a。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_31823-2021.container-terminal.comparable_energy",
+          "detail_formula": {
+            "op": "multiply",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "per_unit",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.production_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产系统能耗 Ez（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助生产系统能耗 Ef（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "附属生产系统能耗 Ef（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "Ez+Ef：码头总综合能耗",
+                    "unit": "tce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "集装箱吞吐量 T",
+                    "unit": "10^4TEU",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "（Ez+Ef）/T：集装箱码头单位能耗基础值",
+                "unit": "tce/10^4TEU",
+                "round_places": null
+              },
+              {
+                "op": "piecewise",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [
+                  {
+                    "condition": {
+                      "op": "range",
+                      "field": "condition.GB31823.container.adaptation_degree",
+                      "value": null,
+                      "values": [],
+                      "minimum": "0",
+                      "maximum": "2",
+                      "include_minimum": false,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.0",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "0＜L≤2时a=1.0",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "0＜L≤2"
+                  },
+                  {
+                    "condition": {
+                      "op": "range",
+                      "field": "condition.GB31823.container.adaptation_degree",
+                      "value": null,
+                      "values": [],
+                      "minimum": "2",
+                      "maximum": "3",
+                      "include_minimum": false,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.95",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "2＜L≤3时a=0.95",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "2＜L≤3"
+                  },
+                  {
+                    "condition": {
+                      "op": "range",
+                      "field": "condition.GB31823.container.adaptation_degree",
+                      "value": null,
+                      "values": [],
+                      "minimum": "3",
+                      "maximum": "4",
+                      "include_minimum": false,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.9",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "3＜L≤4时a=0.9",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "3＜L≤4"
+                  },
+                  {
+                    "condition": {
+                      "op": "gt",
+                      "field": "condition.GB31823.container.adaptation_degree",
+                      "value": "4",
+                      "values": [],
+                      "minimum": null,
+                      "maximum": null,
+                      "include_minimum": true,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.85",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "L＞4时a=0.85",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "L＞4"
+                  }
+                ],
+                "rows": [],
+                "default": null,
+                "label": "集装箱码头吞吐量适应系数a",
+                "unit": "ratio",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "eₖ=（Ez+Ef）/T×a（公式1）",
+            "unit": "tce/10^4TEU",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "28",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "24",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "28",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "45",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4TEU",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第1章；第3章；第4章",
+              "table": "表1",
+              "note": "专业化集装箱、干散货（煤炭/矿石）和原油码头的范围、术语与三级限额。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第5章5.1～5.2",
+              "table": "技术要求",
+              "note": "现有码头执行3级；新建、改建和扩建码头执行2级。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.1.1～6.1.3",
+              "table": "统计范围",
+              "note": "统计生产系统、辅助生产系统和附属生产系统；按标准边界核算。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.2.1.1～6.2.1.3",
+              "table": "公式（1）～（3）",
+              "note": "集装箱码头eₖ=(Ez+Ef)/T×a；Ez、Ef按能源实物量乘折标系数求和。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 6,
+              "clause": "6.2.2.1～6.2.2.2",
+              "table": "公式（4）～（5）",
+              "note": "干散货码头eₖ=(gkEz+Ef)/T×c；卸货量g、作业线长度k、采暖c修正。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 7,
+              "clause": "6.2.2.3～6.2.2.4",
+              "table": "公式（6）～（7）",
+              "note": "干散货码头生产系统和辅助/附属系统能耗求和及作业线长度修正分段。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 8,
+              "clause": "6.3.1～6.3.2.3",
+              "table": "公式（8）～（10）",
+              "note": "原油码头eₖ=(Ez+Ef)/T；管道伴热能耗按βt修正后计入Ef。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 9,
+              "clause": "附录A",
+              "table": "表A.1",
+              "note": "能源折标准煤参考系数；明细录入保留能源折标系数和来源。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 10,
+              "clause": "附录B",
+              "table": "表B.1",
+              "note": "集装箱箱型折算为TEU：48ft、45ft、40ft、35ft、20ft、10ft对应2.40、2.25、2.00、1.75、1.00、0.50。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品可比综合能耗”；产品/工序名称仅保留码头类型。",
+            "直接模式使用表1三级限额；明细模式按第6章公式计算，正式发布前必须完成复核表确认。",
+            "适用于专业化集装箱码头；自动化集装箱码头按原文范围排除时不得套用本产品行。",
+            "L为设计通过能力与实际完成吞吐量之比；a分段为0＜L≤2取1.0、2＜L≤3取0.95、3＜L≤4取0.9、L＞4取0.85。",
+            "吞吐量按附录B箱型折算为TEU；48ft、45ft、40ft、35ft、20ft、10ft分别为2.40、2.25、2.00、1.75、1.00、0.50TEU。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dry-bulk-terminal",
+      "name": "干散货码头",
+      "description": "干散货码头；按GB 31823-2021第4章和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_31823-2021.dry-bulk-terminal.comparable-energy",
+          "name": "单位产品可比综合能耗",
+          "unit": "tce/10^4t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_31823-2021.dry-bulk-terminal.comparable_energy",
+              "label": "干散货码头单位产品可比综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "tce/10^4t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 31823-2021第6章和标准统计边界核算后录入单位产品可比综合能耗。"
+            },
+            {
+              "key": "condition.GB31823.dry_bulk.portal_crane",
+              "label": "是否使用门座式起重机装卸",
+              "data_type": "boolean",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "门座式起重机装卸时，不适用卸货量修正系数g。"
+            },
+            {
+              "key": "condition.GB31823.dry_bulk.direct_to_factory",
+              "label": "是否直接卸货至后方工厂",
+              "data_type": "boolean",
+              "unit": null,
+              "required": true,
+              "required_if": {
+                "op": "eq",
+                "field": "condition.GB31823.dry_bulk.portal_crane",
+                "value": false,
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": []
+              },
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "仅在不使用门座式起重机时填写；直接卸货至后方工厂按原文取g=1.3。"
+            },
+            {
+              "key": "condition.GB31823.dry_bulk.unloading_share",
+              "label": "卸货量占比 w",
+              "data_type": "decimal",
+              "unit": "fraction",
+              "required": true,
+              "required_if": {
+                "op": "all",
+                "field": null,
+                "value": null,
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": [
+                  {
+                    "op": "eq",
+                    "field": "condition.GB31823.dry_bulk.portal_crane",
+                    "value": false,
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  },
+                  {
+                    "op": "eq",
+                    "field": "condition.GB31823.dry_bulk.direct_to_factory",
+                    "value": false,
+                    "values": [],
+                    "minimum": null,
+                    "maximum": null,
+                    "include_minimum": true,
+                    "include_maximum": true,
+                    "args": []
+                  }
+                ]
+              },
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "1",
+              "choices": [],
+              "description": "仅在不使用门座式起重机且非直接卸货至后方工厂时用于计算g；按0～1录入。"
+            },
+            {
+              "key": "condition.GB31823.dry_bulk.work_line_length",
+              "label": "装卸作业线长度 L",
+              "data_type": "decimal",
+              "unit": "m",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按原文分段选择装卸作业线长度修正系数k。"
+            },
+            {
+              "key": "condition.GB31823.dry_bulk.heating_region",
+              "label": "所在地区是否采暖地区",
+              "data_type": "text",
+              "unit": null,
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [
+                "采暖地区",
+                "非采暖地区"
+              ],
+              "description": "按GB 50189规定选择采暖修正系数c：采暖地区0.95，非采暖地区1.0。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_31823-2021.dry-bulk-terminal.comparable_energy",
+          "detail_formula": {
+            "op": "multiply",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "per_unit",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "add",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "piecewise",
+                            "value": null,
+                            "input_key": null,
+                            "args": [],
+                            "cases": [
+                              {
+                                "condition": {
+                                  "op": "eq",
+                                  "field": "condition.GB31823.dry_bulk.portal_crane",
+                                  "value": true,
+                                  "values": [],
+                                  "minimum": null,
+                                  "maximum": null,
+                                  "include_minimum": true,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "1.0",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "门座式起重机装卸，不适用g修正，取g=1.0",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "门座式起重机装卸"
+                              },
+                              {
+                                "condition": {
+                                  "op": "eq",
+                                  "field": "condition.GB31823.dry_bulk.direct_to_factory",
+                                  "value": true,
+                                  "values": [],
+                                  "minimum": null,
+                                  "maximum": null,
+                                  "include_minimum": true,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "1.3",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "直接卸货至后方工厂，取g=1.3",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "直接卸货至后方工厂"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.unloading_share",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "0.5",
+                                  "maximum": "1",
+                                  "include_minimum": true,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "divide",
+                                  "value": null,
+                                  "input_key": null,
+                                  "args": [
+                                    {
+                                      "op": "constant",
+                                      "value": "1",
+                                      "input_key": null,
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": "g分子",
+                                      "unit": "ratio",
+                                      "round_places": null
+                                    },
+                                    {
+                                      "op": "add",
+                                      "value": null,
+                                      "input_key": null,
+                                      "args": [
+                                        {
+                                          "op": "multiply",
+                                          "value": null,
+                                          "input_key": null,
+                                          "args": [
+                                            {
+                                              "op": "constant",
+                                              "value": "1.4",
+                                              "input_key": null,
+                                              "args": [],
+                                              "cases": [],
+                                              "rows": [],
+                                              "default": null,
+                                              "label": "1.4",
+                                              "unit": "ratio",
+                                              "round_places": null
+                                            },
+                                            {
+                                              "op": "input",
+                                              "value": null,
+                                              "input_key": "condition.GB31823.dry_bulk.unloading_share",
+                                              "args": [],
+                                              "cases": [],
+                                              "rows": [],
+                                              "default": null,
+                                              "label": "卸货量占比 w",
+                                              "unit": "fraction",
+                                              "round_places": null
+                                            }
+                                          ],
+                                          "cases": [],
+                                          "rows": [],
+                                          "default": null,
+                                          "label": "1.4w",
+                                          "unit": "ratio",
+                                          "round_places": null
+                                        },
+                                        {
+                                          "op": "constant",
+                                          "value": "0.04",
+                                          "input_key": null,
+                                          "args": [],
+                                          "cases": [],
+                                          "rows": [],
+                                          "default": null,
+                                          "label": "0.04",
+                                          "unit": "ratio",
+                                          "round_places": null
+                                        }
+                                      ],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": "1.4w+0.04",
+                                      "unit": "ratio",
+                                      "round_places": null
+                                    }
+                                  ],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "g=1/(1.4w+0.04)",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "50%≤w≤100%"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.unloading_share",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "0",
+                                  "maximum": "0.5",
+                                  "include_minimum": true,
+                                  "include_maximum": false,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "divide",
+                                  "value": null,
+                                  "input_key": null,
+                                  "args": [
+                                    {
+                                      "op": "constant",
+                                      "value": "1",
+                                      "input_key": null,
+                                      "args": [],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": "g分子",
+                                      "unit": "ratio",
+                                      "round_places": null
+                                    },
+                                    {
+                                      "op": "subtract",
+                                      "value": null,
+                                      "input_key": null,
+                                      "args": [
+                                        {
+                                          "op": "constant",
+                                          "value": "1",
+                                          "input_key": null,
+                                          "args": [],
+                                          "cases": [],
+                                          "rows": [],
+                                          "default": null,
+                                          "label": "1",
+                                          "unit": "ratio",
+                                          "round_places": null
+                                        },
+                                        {
+                                          "op": "multiply",
+                                          "value": null,
+                                          "input_key": null,
+                                          "args": [
+                                            {
+                                              "op": "constant",
+                                              "value": "0.53",
+                                              "input_key": null,
+                                              "args": [],
+                                              "cases": [],
+                                              "rows": [],
+                                              "default": null,
+                                              "label": "0.53",
+                                              "unit": "ratio",
+                                              "round_places": null
+                                            },
+                                            {
+                                              "op": "input",
+                                              "value": null,
+                                              "input_key": "condition.GB31823.dry_bulk.unloading_share",
+                                              "args": [],
+                                              "cases": [],
+                                              "rows": [],
+                                              "default": null,
+                                              "label": "卸货量占比 w",
+                                              "unit": "fraction",
+                                              "round_places": null
+                                            }
+                                          ],
+                                          "cases": [],
+                                          "rows": [],
+                                          "default": null,
+                                          "label": "0.53w",
+                                          "unit": "ratio",
+                                          "round_places": null
+                                        }
+                                      ],
+                                      "cases": [],
+                                      "rows": [],
+                                      "default": null,
+                                      "label": "1−0.53w",
+                                      "unit": "ratio",
+                                      "round_places": null
+                                    }
+                                  ],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "g=1/(1−0.53w)",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "0≤w＜50%"
+                              }
+                            ],
+                            "rows": [],
+                            "default": null,
+                            "label": "干散货码头卸货量修正系数g",
+                            "unit": "ratio",
+                            "round_places": null
+                          },
+                          {
+                            "op": "piecewise",
+                            "value": null,
+                            "input_key": null,
+                            "args": [],
+                            "cases": [
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "0",
+                                  "maximum": "500",
+                                  "include_minimum": true,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "1.1",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "L≤500m时k=1.1",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "L≤500m"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "500",
+                                  "maximum": "1000",
+                                  "include_minimum": false,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "1.05",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "500＜L≤1000m时k=1.05",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "500＜L≤1000m"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "1000",
+                                  "maximum": "1500",
+                                  "include_minimum": false,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "1.0",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "1000＜L≤1500m时k=1.0",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "1000＜L≤1500m"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "1500",
+                                  "maximum": "2000",
+                                  "include_minimum": false,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "0.95",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "1500＜L≤2000m时k=0.95",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "1500＜L≤2000m"
+                              },
+                              {
+                                "condition": {
+                                  "op": "range",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": null,
+                                  "values": [],
+                                  "minimum": "2000",
+                                  "maximum": "3000",
+                                  "include_minimum": false,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "0.9",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "2000＜L≤3000m时k=0.9",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "2000＜L≤3000m"
+                              },
+                              {
+                                "condition": {
+                                  "op": "gt",
+                                  "field": "condition.GB31823.dry_bulk.work_line_length",
+                                  "value": "3000",
+                                  "values": [],
+                                  "minimum": null,
+                                  "maximum": null,
+                                  "include_minimum": true,
+                                  "include_maximum": true,
+                                  "args": []
+                                },
+                                "expression": {
+                                  "op": "constant",
+                                  "value": "0.85",
+                                  "input_key": null,
+                                  "args": [],
+                                  "cases": [],
+                                  "rows": [],
+                                  "default": null,
+                                  "label": "L＞3000m时k=0.85",
+                                  "unit": "ratio",
+                                  "round_places": null
+                                },
+                                "label": "L＞3000m"
+                              }
+                            ],
+                            "rows": [],
+                            "default": null,
+                            "label": "干散货码头装卸作业线长度修正系数k",
+                            "unit": "ratio",
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "input",
+                                "value": null,
+                                "input_key": "energy.category.production_system.net_standard_coal",
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "生产系统能耗（折标准煤）",
+                                "unit": "kgce",
+                                "round_places": null
+                              },
+                              {
+                                "op": "constant",
+                                "value": "0.001",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": "kgce换算为tce",
+                                "unit": "tce/kgce",
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "生产系统能耗 Ez（kgce换算为tce）",
+                            "unit": "tce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "g×k×Ez：生产系统修正能耗",
+                        "unit": "tce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "辅助生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助生产系统能耗 Ef（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.affiliated_system.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "附属生产系统能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "附属生产系统能耗 Ef（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "g×k×Ez+Ef（公式4）",
+                    "unit": "tce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "production.total_equivalent",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "干散货吞吐量 T",
+                    "unit": "10^4t",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "（g×k×Ez+Ef）/T（公式4）",
+                "unit": "tce/10^4t",
+                "round_places": null
+              },
+              {
+                "op": "piecewise",
+                "value": null,
+                "input_key": null,
+                "args": [],
+                "cases": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "condition.GB31823.dry_bulk.heating_region",
+                      "value": "采暖地区",
+                      "values": [],
+                      "minimum": null,
+                      "maximum": null,
+                      "include_minimum": true,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.95",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "采暖地区c=0.95",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "采暖地区"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "condition.GB31823.dry_bulk.heating_region",
+                      "value": "非采暖地区",
+                      "values": [],
+                      "minimum": null,
+                      "maximum": null,
+                      "include_minimum": true,
+                      "include_maximum": true,
+                      "args": []
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.0",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": "非采暖地区c=1.0",
+                      "unit": "ratio",
+                      "round_places": null
+                    },
+                    "label": "非采暖地区"
+                  }
+                ],
+                "rows": [],
+                "default": null,
+                "label": "干散货码头采暖修正系数c",
+                "unit": "ratio",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "eₖ=（gkEz+Ef）/T×c（公式4）",
+            "unit": "tce/10^4t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "1.8",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "2.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "2.7",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第1章；第3章；第4章",
+              "table": "表1",
+              "note": "专业化集装箱、干散货（煤炭/矿石）和原油码头的范围、术语与三级限额。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第5章5.1～5.2",
+              "table": "技术要求",
+              "note": "现有码头执行3级；新建、改建和扩建码头执行2级。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.1.1～6.1.3",
+              "table": "统计范围",
+              "note": "统计生产系统、辅助生产系统和附属生产系统；按标准边界核算。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.2.1.1～6.2.1.3",
+              "table": "公式（1）～（3）",
+              "note": "集装箱码头eₖ=(Ez+Ef)/T×a；Ez、Ef按能源实物量乘折标系数求和。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 6,
+              "clause": "6.2.2.1～6.2.2.2",
+              "table": "公式（4）～（5）",
+              "note": "干散货码头eₖ=(gkEz+Ef)/T×c；卸货量g、作业线长度k、采暖c修正。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 7,
+              "clause": "6.2.2.3～6.2.2.4",
+              "table": "公式（6）～（7）",
+              "note": "干散货码头生产系统和辅助/附属系统能耗求和及作业线长度修正分段。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 8,
+              "clause": "6.3.1～6.3.2.3",
+              "table": "公式（8）～（10）",
+              "note": "原油码头eₖ=(Ez+Ef)/T；管道伴热能耗按βt修正后计入Ef。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 9,
+              "clause": "附录A",
+              "table": "表A.1",
+              "note": "能源折标准煤参考系数；明细录入保留能源折标系数和来源。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 10,
+              "clause": "附录B",
+              "table": "表B.1",
+              "note": "集装箱箱型折算为TEU：48ft、45ft、40ft、35ft、20ft、10ft对应2.40、2.25、2.00、1.75、1.00、0.50。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品可比综合能耗”；产品/工序名称仅保留码头类型。",
+            "直接模式使用表1三级限额；明细模式按第6章公式计算，正式发布前必须完成复核表确认。",
+            "适用于专业化干散货码头中的煤炭、矿石码头；是否属于原文范围由用户在评价前确认。",
+            "门座式起重机装卸时不适用g修正；直接卸货至后方工厂按g=1.3。",
+            "g按卸货量占比w分段计算，k按装卸作业线长度分段计算，c按GB 50189采暖地区取0.95、非采暖地区取1.0。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crude-oil-terminal",
+      "name": "原油码头",
+      "description": "原油码头；按GB 31823-2021第4章和第6章统计、计算。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_31823-2021.crude-oil-terminal.comparable-energy",
+          "name": "单位产品可比综合能耗",
+          "unit": "tce/10^4t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_31823-2021.crude-oil-terminal.comparable_energy",
+              "label": "原油码头单位产品可比综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "tce/10^4t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 31823-2021第6章和标准统计边界核算后录入单位产品可比综合能耗。"
+            },
+            {
+              "key": "condition.GB31823.crude_oil.pipeline_heat_temperature",
+              "label": "管道伴热温度条件（℃）",
+              "data_type": "decimal",
+              "unit": "℃",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文规定管道伴热温度修正系数βt：0℃条件取0.95，其他条件取1.0；正式发布前请对照原文边界确认。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_31823-2021.crude-oil-terminal.comparable_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.production_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "0.001",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "kgce换算为tce",
+                        "unit": "tce/kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能耗 Ez（kgce换算为tce）",
+                    "unit": "tce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "辅助生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "0.001",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "kgce换算为tce",
+                        "unit": "tce/kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能耗 Ef（kgce换算为tce）",
+                    "unit": "tce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "energy.category.affiliated_system.net_standard_coal",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "附属生产系统能耗（折标准煤）",
+                        "unit": "kgce",
+                        "round_places": null
+                      },
+                      {
+                        "op": "constant",
+                        "value": "0.001",
+                        "input_key": null,
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "kgce换算为tce",
+                        "unit": "tce/kgce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能耗 Ef（kgce换算为tce）",
+                    "unit": "tce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "piecewise",
+                        "value": null,
+                        "input_key": null,
+                        "args": [],
+                        "cases": [
+                          {
+                            "condition": {
+                              "op": "lte",
+                              "field": "condition.GB31823.crude_oil.pipeline_heat_temperature",
+                              "value": "0",
+                              "values": [],
+                              "minimum": null,
+                              "maximum": null,
+                              "include_minimum": true,
+                              "include_maximum": true,
+                              "args": []
+                            },
+                            "expression": {
+                              "op": "constant",
+                              "value": "0.95",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": "温度≤0℃时βt=0.95",
+                              "unit": "ratio",
+                              "round_places": null
+                            },
+                            "label": "温度≤0℃"
+                          },
+                          {
+                            "condition": {
+                              "op": "gt",
+                              "field": "condition.GB31823.crude_oil.pipeline_heat_temperature",
+                              "value": "0",
+                              "values": [],
+                              "minimum": null,
+                              "maximum": null,
+                              "include_minimum": true,
+                              "include_maximum": true,
+                              "args": []
+                            },
+                            "expression": {
+                              "op": "constant",
+                              "value": "1.0",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": "温度＞0℃时βt=1.0",
+                              "unit": "ratio",
+                              "round_places": null
+                            },
+                            "label": "温度＞0℃"
+                          }
+                        ],
+                        "rows": [],
+                        "default": null,
+                        "label": "原油码头管道伴热温度修正系数βt",
+                        "unit": "ratio",
+                        "round_places": null
+                      },
+                      {
+                        "op": "multiply",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "input",
+                            "value": null,
+                            "input_key": "energy.category.pipeline_heat.net_standard_coal",
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "管道伴热能耗（折标准煤）",
+                            "unit": "kgce",
+                            "round_places": null
+                          },
+                          {
+                            "op": "constant",
+                            "value": "0.001",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": "kgce换算为tce",
+                            "unit": "tce/kgce",
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "管道伴热能耗 Ebp（kgce换算为tce）",
+                        "unit": "tce",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "βt×Ebp：管道伴热修正能耗",
+                    "unit": "tce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "Ez+Ef+βt×Ebp（公式10）",
+                "unit": "tce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "原油吞吐量 T",
+                "unit": "10^4t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "eₖ=（Ez+Ef）/T（公式8）",
+            "unit": "tce/10^4t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.36",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.51",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "0.88",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "0.36",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：1级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "0.51",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：2级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "0.88",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "表1：3级",
+              "unit": "tce/10^4t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第1章；第3章；第4章",
+              "table": "表1",
+              "note": "专业化集装箱、干散货（煤炭/矿石）和原油码头的范围、术语与三级限额。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 4,
+              "clause": "第5章5.1～5.2",
+              "table": "技术要求",
+              "note": "现有码头执行3级；新建、改建和扩建码头执行2级。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.1.1～6.1.3",
+              "table": "统计范围",
+              "note": "统计生产系统、辅助生产系统和附属生产系统；按标准边界核算。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 5,
+              "clause": "6.2.1.1～6.2.1.3",
+              "table": "公式（1）～（3）",
+              "note": "集装箱码头eₖ=(Ez+Ef)/T×a；Ez、Ef按能源实物量乘折标系数求和。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 6,
+              "clause": "6.2.2.1～6.2.2.2",
+              "table": "公式（4）～（5）",
+              "note": "干散货码头eₖ=(gkEz+Ef)/T×c；卸货量g、作业线长度k、采暖c修正。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 7,
+              "clause": "6.2.2.3～6.2.2.4",
+              "table": "公式（6）～（7）",
+              "note": "干散货码头生产系统和辅助/附属系统能耗求和及作业线长度修正分段。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 8,
+              "clause": "6.3.1～6.3.2.3",
+              "table": "公式（8）～（10）",
+              "note": "原油码头eₖ=(Ez+Ef)/T；管道伴热能耗按βt修正后计入Ef。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 9,
+              "clause": "附录A",
+              "table": "表A.1",
+              "note": "能源折标准煤参考系数；明细录入保留能源折标系数和来源。"
+            },
+            {
+              "standard_number": "GB 31823-2021",
+              "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
+              "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
+              "page": 10,
+              "clause": "附录B",
+              "table": "表B.1",
+              "note": "集装箱箱型折算为TEU：48ft、45ft、40ft、35ft、20ft、10ft对应2.40、2.25、2.00、1.75、1.00、0.50。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "指标名称按原文术语统一为“单位产品可比综合能耗”；产品/工序名称仅保留码头类型。",
+            "直接模式使用表1三级限额；明细模式按第6章公式计算，正式发布前必须完成复核表确认。",
+            "适用于单一原油或原油吞吐量占总吞吐量50%以上的原油码头；不含后方储存区。",
+            "管道伴热能源单独使用pipeline_heat分类，不能与辅助或附属系统重复计入。",
+            "管道伴热温度修正系数βt当前按温度≤0℃取0.95、温度＞0℃取1.0，原文边界需在确认表中最终核对。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "GB 31823-2021替代GB 31823-2015、GB 31827-2015；旧版仅保留为历史关系记录。",
+    "本次先按现行强制文本建立三类码头的草案规则，复核确认前不得参与正式评价。"
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": [
+    "GB 31823-2015",
+    "GB 31827-2015"
+  ]
+}

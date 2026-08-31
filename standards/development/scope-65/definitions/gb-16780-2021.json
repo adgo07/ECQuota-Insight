@@ -1,0 +1,1777 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-16780-2021",
+  "number": "GB 16780-2021",
+  "title": "水泥单位产品能源消耗限额",
+  "version": "2021",
+  "publication_status": "published",
+  "publication_date": "2021-10-11",
+  "effective_date": "2022-11-01",
+  "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+  "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+  "products": [
+    {
+      "id": "cement",
+      "name": "水泥产品",
+      "description": "水泥单位产品综合能耗；熟料比例按75%基准修正。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "cement.comprehensive_energy",
+          "name": "水泥单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.cement_comprehensive_energy",
+              "label": "水泥单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "cement.clinker_ratio_pct",
+              "label": "水泥中熟料比例",
+              "data_type": "decimal",
+              "unit": "%",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": "100",
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.altitude_m",
+              "label": "厂区海拔高度",
+              "data_type": "decimal",
+              "unit": "m",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.pressure_pa",
+              "label": "厂区环境大气压",
+              "data_type": "decimal",
+              "unit": "Pa",
+              "required": true,
+              "required_if": {
+                "op": "gt",
+                "field": "site.altitude_m",
+                "value": "1500",
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": []
+              },
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "1",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.cement_comprehensive_energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "80",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "87",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "94",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "80",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "cement.clinker_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "75",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "1.10",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "add",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "87",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "multiply",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "subtract",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "input",
+                          "value": null,
+                          "input_key": "cement.clinker_ratio_pct",
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "75",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "constant",
+                      "value": "1.15",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "add",
+                  "value": null,
+                  "input_key": null,
+                  "args": [
+                    {
+                      "op": "constant",
+                      "value": "94",
+                      "input_key": null,
+                      "args": [],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    },
+                    {
+                      "op": "multiply",
+                      "value": null,
+                      "input_key": null,
+                      "args": [
+                        {
+                          "op": "subtract",
+                          "value": null,
+                          "input_key": null,
+                          "args": [
+                            {
+                              "op": "input",
+                              "value": null,
+                              "input_key": "cement.clinker_ratio_pct",
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            },
+                            {
+                              "op": "constant",
+                              "value": "75",
+                              "input_key": null,
+                              "args": [],
+                              "cases": [],
+                              "rows": [],
+                              "default": null,
+                              "label": null,
+                              "unit": null,
+                              "round_places": null
+                            }
+                          ],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        },
+                        {
+                          "op": "constant",
+                          "value": "1.20",
+                          "input_key": null,
+                          "args": [],
+                          "cases": [],
+                          "rows": [],
+                          "default": null,
+                          "label": null,
+                          "unit": null,
+                          "round_places": null
+                        }
+                      ],
+                      "cases": [],
+                      "rows": [],
+                      "default": null,
+                      "label": null,
+                      "unit": null,
+                      "round_places": null
+                    }
+                  ],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": "kgce/t",
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "gt",
+                        "field": "site.altitude_m",
+                        "value": "1500",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "constant",
+                            "value": "1.179",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "0.211",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "divide",
+                                "value": null,
+                                "input_key": null,
+                                "args": [
+                                  {
+                                    "op": "input",
+                                    "value": null,
+                                    "input_key": "site.pressure_pa",
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  },
+                                  {
+                                    "op": "constant",
+                                    "value": "101325",
+                                    "input_key": null,
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  }
+                                ],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "海拔高于1500m，按5.3式(1)修正"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "1",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 16780-2021",
+              "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+              "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+              "page": 4,
+              "clause": "4.1、5.3、5.4",
+              "table": "表1",
+              "note": null
+            }
+          ],
+          "notes": [
+            "熟料比例每偏离75%一个百分点，三级限额分别按1.10、1.15、1.20 kgce/t增减。",
+            "仅3级指标在海拔高于1500m时乘海拔修正系数。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clinker",
+      "name": "水泥熟料",
+      "description": "熟料综合能耗、综合电耗和综合煤耗分别判级。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "clinker.comprehensive",
+          "name": "熟料单位产品综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.clinker_comprehensive",
+              "label": "熟料单位产品综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.altitude_m",
+              "label": "厂区海拔高度",
+              "data_type": "decimal",
+              "unit": "m",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.pressure_pa",
+              "label": "厂区环境大气压",
+              "data_type": "decimal",
+              "unit": "Pa",
+              "required": true,
+              "required_if": {
+                "op": "gt",
+                "field": "site.altitude_m",
+                "value": "1500",
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": []
+              },
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "1",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.clinker_comprehensive",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "107",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "117",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "107",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "117",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "gt",
+                        "field": "site.altitude_m",
+                        "value": "1500",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "constant",
+                            "value": "1.179",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "0.211",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "divide",
+                                "value": null,
+                                "input_key": null,
+                                "args": [
+                                  {
+                                    "op": "input",
+                                    "value": null,
+                                    "input_key": "site.pressure_pa",
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  },
+                                  {
+                                    "op": "constant",
+                                    "value": "101325",
+                                    "input_key": null,
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  }
+                                ],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "海拔高于1500m，按5.3式(1)修正"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "1",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 16780-2021",
+              "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+              "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+              "page": 4,
+              "clause": "4.2、5.3",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": [
+            "仅3级指标在海拔高于1500m时乘海拔修正系数。"
+          ]
+        },
+        {
+          "id": "clinker.electricity",
+          "name": "熟料单位产品综合电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.clinker_electricity",
+              "label": "熟料单位产品综合电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.altitude_m",
+              "label": "厂区海拔高度",
+              "data_type": "decimal",
+              "unit": "m",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.pressure_pa",
+              "label": "厂区环境大气压",
+              "data_type": "decimal",
+              "unit": "Pa",
+              "required": true,
+              "required_if": {
+                "op": "gt",
+                "field": "site.altitude_m",
+                "value": "1500",
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": []
+              },
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "1",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.clinker_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "48",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "57",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "61",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "48",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "57",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "61",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "gt",
+                        "field": "site.altitude_m",
+                        "value": "1500",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "constant",
+                            "value": "1.179",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "0.211",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "divide",
+                                "value": null,
+                                "input_key": null,
+                                "args": [
+                                  {
+                                    "op": "input",
+                                    "value": null,
+                                    "input_key": "site.pressure_pa",
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  },
+                                  {
+                                    "op": "constant",
+                                    "value": "101325",
+                                    "input_key": null,
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  }
+                                ],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "海拔高于1500m，按5.3式(1)修正"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "1",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 16780-2021",
+              "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+              "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+              "page": 4,
+              "clause": "4.2、5.3",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": [
+            "仅3级指标在海拔高于1500m时乘海拔修正系数。"
+          ]
+        },
+        {
+          "id": "clinker.coal",
+          "name": "熟料单位产品综合煤耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.clinker_coal",
+              "label": "熟料单位产品综合煤耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.altitude_m",
+              "label": "厂区海拔高度",
+              "data_type": "decimal",
+              "unit": "m",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            },
+            {
+              "key": "site.pressure_pa",
+              "label": "厂区环境大气压",
+              "data_type": "decimal",
+              "unit": "Pa",
+              "required": true,
+              "required_if": {
+                "op": "gt",
+                "field": "site.altitude_m",
+                "value": "1500",
+                "values": [],
+                "minimum": null,
+                "maximum": null,
+                "include_minimum": true,
+                "include_maximum": true,
+                "args": []
+              },
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "minimum": "1",
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.clinker_coal",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.fuel_coal.net_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "94",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "109",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "94",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "100",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "multiply",
+              "value": null,
+              "input_key": null,
+              "args": [
+                {
+                  "op": "constant",
+                  "value": "109",
+                  "input_key": null,
+                  "args": [],
+                  "cases": [],
+                  "rows": [],
+                  "default": null,
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                },
+                {
+                  "op": "piecewise",
+                  "value": null,
+                  "input_key": null,
+                  "args": [],
+                  "cases": [
+                    {
+                      "condition": {
+                        "op": "gt",
+                        "field": "site.altitude_m",
+                        "value": "1500",
+                        "values": [],
+                        "minimum": null,
+                        "maximum": null,
+                        "include_minimum": true,
+                        "include_maximum": true,
+                        "args": []
+                      },
+                      "expression": {
+                        "op": "subtract",
+                        "value": null,
+                        "input_key": null,
+                        "args": [
+                          {
+                            "op": "constant",
+                            "value": "1.179",
+                            "input_key": null,
+                            "args": [],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          },
+                          {
+                            "op": "multiply",
+                            "value": null,
+                            "input_key": null,
+                            "args": [
+                              {
+                                "op": "constant",
+                                "value": "0.211",
+                                "input_key": null,
+                                "args": [],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              },
+                              {
+                                "op": "divide",
+                                "value": null,
+                                "input_key": null,
+                                "args": [
+                                  {
+                                    "op": "input",
+                                    "value": null,
+                                    "input_key": "site.pressure_pa",
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  },
+                                  {
+                                    "op": "constant",
+                                    "value": "101325",
+                                    "input_key": null,
+                                    "args": [],
+                                    "cases": [],
+                                    "rows": [],
+                                    "default": null,
+                                    "label": null,
+                                    "unit": null,
+                                    "round_places": null
+                                  }
+                                ],
+                                "cases": [],
+                                "rows": [],
+                                "default": null,
+                                "label": null,
+                                "unit": null,
+                                "round_places": null
+                              }
+                            ],
+                            "cases": [],
+                            "rows": [],
+                            "default": null,
+                            "label": null,
+                            "unit": null,
+                            "round_places": null
+                          }
+                        ],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": null,
+                        "unit": null,
+                        "round_places": null
+                      },
+                      "label": "海拔高于1500m，按5.3式(1)修正"
+                    }
+                  ],
+                  "rows": [],
+                  "default": {
+                    "op": "constant",
+                    "value": "1",
+                    "input_key": null,
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": null,
+                    "unit": null,
+                    "round_places": null
+                  },
+                  "label": null,
+                  "unit": null,
+                  "round_places": null
+                }
+              ],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 16780-2021",
+              "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+              "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+              "page": 4,
+              "clause": "4.2、5.3",
+              "table": "表2",
+              "note": null
+            }
+          ],
+          "notes": [
+            "仅3级指标在海拔高于1500m时乘海拔修正系数。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cement-preparation",
+      "name": "水泥制备工段",
+      "description": "从水泥熟料、石膏及混合材调配库底至水泥成品入库的工段电耗。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "cement-preparation.electricity",
+          "name": "水泥制备工段电耗",
+          "unit": "kWh/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.cement_preparation_electricity",
+              "label": "水泥制备工段电耗实际值",
+              "data_type": "decimal",
+              "unit": "kWh/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": null
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.cement_preparation_electricity",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.category.electricity.net_amount",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗",
+            "unit": "kWh/t",
+            "round_places": null
+          },
+          "base_thresholds": null,
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "26",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "29",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "34",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kWh/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 16780-2021",
+              "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+              "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+              "page": 4,
+              "clause": "4.3",
+              "table": "表3",
+              "note": null
+            }
+          ],
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "corrections": []
+}

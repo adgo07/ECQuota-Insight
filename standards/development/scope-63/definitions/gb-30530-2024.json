@@ -1,0 +1,448 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-30530-2024",
+  "number": "GB 30530-2024",
+  "title": "二甲基硅氧烷单位产品能源消耗限额",
+  "version": "2024",
+  "publication_status": "draft",
+  "publication_date": "2024-04-29",
+  "effective_date": "2025-05-01",
+  "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+  "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+  "products": [
+    {
+      "id": "dimethylsiloxane",
+      "name": "二甲基硅氧烷",
+      "description": "二甲基硅氧烷（包括水解物、环体和线性体）；按GB 30530-2024表1和第6章统计、计算。",
+      "input_definitions": [
+        {
+          "key": "raw_material.silicon_powder.quantity",
+          "label": "外购硅粉量",
+          "data_type": "decimal",
+          "unit": "t",
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DETAIL"
+          ],
+          "minimum": "0",
+          "maximum": null,
+          "choices": [],
+          "description": "外购硅粉作为有机硅单体生产原料时填写；非外购或没有该项时填0并在备注说明。"
+        },
+        {
+          "key": "raw_material.silicon_powder.unit_energy",
+          "label": "硅粉单位能源消耗",
+          "data_type": "decimal",
+          "unit": "kgce/t",
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DETAIL"
+          ],
+          "minimum": "0",
+          "maximum": null,
+          "choices": [],
+          "description": "按企业当期生产硅粉单位能源消耗填写；无实际监测时按原文参考0.0275tce/t，即27.5kgce/t。"
+        },
+        {
+          "key": "raw_material.chloromethane.quantity",
+          "label": "外购氯甲烷量",
+          "data_type": "decimal",
+          "unit": "t",
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DETAIL"
+          ],
+          "minimum": "0",
+          "maximum": null,
+          "choices": [],
+          "description": "外购氯甲烷作为有机硅单体生产原料时填写；非外购或没有该项时填0并在备注说明。"
+        },
+        {
+          "key": "raw_material.chloromethane.unit_energy",
+          "label": "氯甲烷单位能源消耗",
+          "data_type": "decimal",
+          "unit": "kgce/t",
+          "required": true,
+          "required_if": null,
+          "modes": [
+            "DETAIL"
+          ],
+          "minimum": "0",
+          "maximum": null,
+          "choices": [],
+          "description": "按企业当期生产氯甲烷单位能源消耗填写；无实际监测时按原文参考0.0797tce/t，即79.7kgce/t。"
+        }
+      ],
+      "indicators": [
+        {
+          "id": "GB_30530-2024.dimethylsiloxane.energy-per-product",
+          "name": "单位产品能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_30530-2024.dimethylsiloxane.energy",
+              "label": "二甲基硅氧烷单位产品能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "maximum": null,
+              "choices": [],
+              "description": "按GB 30530-2024第6章计算的单位产品能耗；当前规则尚未完成确认。"
+            }
+          ],
+          "applicability": {
+            "op": "always"
+          },
+          "direct_input_key": "actual.GB_30530-2024.dimethylsiloxane.energy",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "add",
+                "value": null,
+                "input_key": null,
+                "args": [
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.production_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "生产系统能源折标准煤量",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.auxiliary_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "辅助生产系统能源折标准煤量",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "input",
+                    "value": null,
+                    "input_key": "energy.category.affiliated_system.net_standard_coal",
+                    "args": [],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "附属生产系统能源折标准煤量",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "raw_material.silicon_powder.quantity",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "外购硅粉量 g₁",
+                        "unit": "t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "raw_material.silicon_powder.unit_energy",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "硅粉单位能源消耗 q₁",
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "外购硅粉能耗 g₁×q₁",
+                    "unit": "kgce",
+                    "round_places": null
+                  },
+                  {
+                    "op": "multiply",
+                    "value": null,
+                    "input_key": null,
+                    "args": [
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "raw_material.chloromethane.quantity",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "外购氯甲烷量 g₂",
+                        "unit": "t",
+                        "round_places": null
+                      },
+                      {
+                        "op": "input",
+                        "value": null,
+                        "input_key": "raw_material.chloromethane.unit_energy",
+                        "args": [],
+                        "cases": [],
+                        "rows": [],
+                        "default": null,
+                        "label": "氯甲烷单位能源消耗 q₂",
+                        "unit": "kgce/t",
+                        "round_places": null
+                      }
+                    ],
+                    "cases": [],
+                    "rows": [],
+                    "default": null,
+                    "label": "外购氯甲烷能耗 g₂×q₂",
+                    "unit": "kgce",
+                    "round_places": null
+                  }
+                ],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "二甲基硅氧烷产品综合能耗 E（公式1）",
+                "unit": "kgce",
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": "二甲基硅氧烷产品产量 M（公式2）",
+                "unit": "t",
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "二甲基硅氧烷单位产品能耗 e（公式3）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "1级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "2级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "3级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "650",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "1级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "750",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "2级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "1000",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": "3级限额",
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 5,
+              "clause": "第1章；3.1～3.6",
+              "table": "范围与术语",
+              "note": "适用于二甲基硅氧烷单位产品能耗计算、考核及新改扩建项目控制。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 6,
+              "clause": "第4章",
+              "table": "表1",
+              "note": "二甲基硅氧烷单位产品能耗1级、2级、3级限额分别为650、750、1000kgce/t。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 6,
+              "clause": "第5章5.1～5.2",
+              "table": "技术要求",
+              "note": "现有企业执行3级限定值；新（扩、改）建企业执行2级准入值。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 6,
+              "clause": "6.1.1～6.1.5",
+              "table": "统计范围",
+              "note": "生产、辅助、附属系统计入；基建、技改、回收利用及向外输出的能源量不计入。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 7,
+              "clause": "6.2.1",
+              "table": "折标方法",
+              "note": "燃料按GB/T2589收到基低位发热量折标准煤；实测或供应数据优先，无法取得时参考附录。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 7,
+              "clause": "6.2.2；公式（1）",
+              "table": "产品综合能耗",
+              "note": "生产系统、辅助/附属系统能源折标量与外购硅粉、氯甲烷原材料能耗之和。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 7,
+              "clause": "6.2.3；公式（2）",
+              "table": "产品产量",
+              "note": "合格水解物、环体、线性体产量，加外售二甲基二氯硅烷按μ折算的产量；水解物不得重复计入。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 8,
+              "clause": "6.2.4；公式（3）",
+              "table": "单位产品能耗",
+              "note": "e=E/M，单位为kgce/t。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 9,
+              "clause": "附录A",
+              "table": "各种能源折算系数",
+              "note": "柴油、天然气、电力、热力等折标准煤参考系数。"
+            },
+            {
+              "standard_number": "GB 30530-2024",
+              "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
+              "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
+              "page": 10,
+              "clause": "附录B",
+              "table": "耗能工质折算系数",
+              "note": "新水、软化水、压缩空气、氮气等耗能工质参考系数。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "requires_independent_review",
+            "产品/工序名称为“二甲基硅氧烷”，指标名称按原文术语为“单位产品能耗”；两者合并为完整指标表述。",
+            "1级、2级、3级比较方向为实际值不大于限额；1级能耗最低。",
+            "现有企业执行3级限定值；新（扩、改）建企业执行2级准入值。",
+            "明细模式能源明细按生产、辅助、附属系统分类；基建、技改、回收利用和向外输出的能源不计入。",
+            "外购硅粉和氯甲烷的数量及单位能源消耗必须单独填写；无实际监测时可按原文参考值硅粉0.0275tce/t、氯甲烷0.0797tce/t换算为27.5kgce/t和79.7kgce/t。",
+            "产量明细应分别填写合格水解物、环体、线性体和外售二甲基二氯硅烷；外售二甲基二氯硅烷行的折算系数μ按当期监测值填写，无当期数据时可取0.56。用于生产环体或线性体的水解物不得重复计入。",
+            "每条能源明细须携带实测或供应数据、GB/T2589或附录A/B的折标依据；软件保留逐步计算轨迹。"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [
+    "GB 30530-2024替代GB 30530-2014；按现行强制文本重新精化产品、原材料能耗和产量折算规则。"
+  ],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": [
+    "GB 30530-2014"
+  ]
+}

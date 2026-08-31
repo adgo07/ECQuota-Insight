@@ -1,0 +1,192 @@
+{
+  "schema_version": "1.0",
+  "id": "gb-33654-2017",
+  "number": "GB 33654-2017",
+  "title": "建筑石膏单位产品能源消耗限额",
+  "version": "2017",
+  "publication_status": "published",
+  "publication_date": "2017-05-12",
+  "effective_date": "2018-06-01",
+  "source_file": "50.GB 33654-2017建筑石膏单位产品能源消耗限额.pdf",
+  "source_sha256": "7417de1771c7ccfcd5e2a8ae5de70e4482f35d6631297a2d5a39ad71bc21c84f",
+  "products": [
+    {
+      "id": "manual-candidate-1",
+      "name": "建筑石膏",
+      "description": "已对照标准原文表格逐项复核；待用户确认后发布。",
+      "input_definitions": [],
+      "indicators": [
+        {
+          "id": "GB_33654_2017.manual_candidate_1",
+          "name": "单位产品可比综合能耗",
+          "unit": "kgce/t",
+          "comparison": "lte",
+          "input_definitions": [
+            {
+              "key": "actual.GB_33654_2017.manual_1",
+              "label": "建筑石膏单位产品可比综合能耗实际值",
+              "data_type": "decimal",
+              "unit": "kgce/t",
+              "required": true,
+              "required_if": null,
+              "modes": [
+                "DIRECT"
+              ],
+              "minimum": null,
+              "maximum": null,
+              "choices": [],
+              "description": "原文人工整理候选；需第二轮独立复核后才能发布。"
+            }
+          ],
+          "applicability": {
+            "op": "always",
+            "field": null,
+            "value": null,
+            "values": [],
+            "minimum": null,
+            "maximum": null,
+            "include_minimum": true,
+            "include_maximum": true,
+            "args": []
+          },
+          "direct_input_key": "actual.GB_33654_2017.manual_1",
+          "detail_formula": {
+            "op": "per_unit",
+            "value": null,
+            "input_key": null,
+            "args": [
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "energy.total_standard_coal",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              },
+              {
+                "op": "input",
+                "value": null,
+                "input_key": "production.total_equivalent",
+                "args": [],
+                "cases": [],
+                "rows": [],
+                "default": null,
+                "label": null,
+                "unit": null,
+                "round_places": null
+              }
+            ],
+            "cases": [],
+            "rows": [],
+            "default": null,
+            "label": "单位产品实际能耗（候选通用公式，待原文复核）",
+            "unit": "kgce/t",
+            "round_places": null
+          },
+          "base_thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "30.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "39.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "43.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "thresholds": {
+            "level_1": {
+              "op": "constant",
+              "value": "30.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_2": {
+              "op": "constant",
+              "value": "39.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            },
+            "level_3": {
+              "op": "constant",
+              "value": "43.0",
+              "input_key": null,
+              "args": [],
+              "cases": [],
+              "rows": [],
+              "default": null,
+              "label": null,
+              "unit": "kgce/t",
+              "round_places": null
+            }
+          },
+          "display_places": 2,
+          "source_references": [
+            {
+              "standard_number": "GB 33654-2017",
+              "source_file": "50.GB 33654-2017建筑石膏单位产品能源消耗限额.pdf",
+              "source_sha256": "7417de1771c7ccfcd5e2a8ae5de70e4482f35d6631297a2d5a39ad71bc21c84f",
+              "page": 4,
+              "clause": "第4章技术要求（候选）",
+              "table": "表1",
+              "note": "已对照标准原文表格复核；待用户确认后发布。"
+            }
+          ],
+          "notes": [
+            "candidate_from_original_pdf",
+            "not_for_formal_evaluation",
+            "visual_reviewed_2026-08-26_original_pdf_table_1"
+          ]
+        }
+      ]
+    }
+  ],
+  "corrections": [],
+  "lifecycle_status": "active",
+  "obsolete_date": null,
+  "replaced_by": [],
+  "supersedes": []
+}
