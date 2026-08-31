@@ -62,7 +62,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     output = build_source_zip(args.output)
-    print(f"wrote {output} files={len(zipfile.ZipFile(output).namelist())} bytes={output.stat().st_size}")
+    with zipfile.ZipFile(output) as archive:
+        file_count = len(archive.namelist())
+    print(f"wrote {output} files={file_count} bytes={output.stat().st_size}")
 
 
 if __name__ == "__main__":
