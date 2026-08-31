@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
-ROOT=Path(r'G:\Python Project\能耗限额')
+ROOT=Path(__file__).resolve().parents[1]
+APPLY="--apply" in sys.argv[1:]
 SCOPE=set(json.loads((ROOT/'data/scope-44.json').read_text(encoding='utf8'))['standards'])
 # Longest first: these are the metric terms allowed in the indicator-name column.
 METRICS=(
@@ -63,13 +65,16 @@ for path in sorted((ROOT/'data/definitions').glob('*.json')):
         # If one indicator was normalized, synchronize the product name for remaining
         # indicators in this row only when their names are already the same family.
     if changed:
-        path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+        if APPLY:
+            path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
         changed_files.append(str(path.relative_to(ROOT)))
 # Keep mappings for all existing IDs and update only normalized rows.
 overrides['mappings']=dict(sorted(all_mappings.items()))
 overrides['mapping_count']=len(overrides['mappings'])
 overrides['generated_at']='2026-08-30'
-overrides_path.write_text(json.dumps(overrides,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+if APPLY:
+    overrides_path.write_text(json.dumps(overrides,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+print('mode', 'apply' if APPLY else 'check-only')
 print('changed definition files',len(changed_files))
 for f in changed_files: print(f)
 print('mapping_count',overrides['mapping_count'])

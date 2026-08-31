@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -47,7 +47,7 @@ def main() -> None:
     parser.add_argument("--issued-at", help="ISO时间；不填写时使用当前UTC时间")
     parser.add_argument("--scope", type=Path, default=Path("data/scope-44.json"))
     parser.add_argument("--history-dir", type=Path, default=Path("data/history/definitions"))
-    parser.add_argument("--history-source-dir", type=Path, default=Path(r"G:\标准  规范\10_作废标准"))
+    parser.add_argument("--history-source-dir", type=Path, default=Path(os.environ.get("UEBENCH_HISTORY_SOURCE_DIR", r"G:\标准  规范\10_作废标准")), help="历史标准原文目录；也可用UEBENCH_HISTORY_SOURCE_DIR指定")
     parser.add_argument("--private-key", type=Path, default=Path("work/signing/development-private-key.pem"))
     parser.add_argument(
         "--public-key",

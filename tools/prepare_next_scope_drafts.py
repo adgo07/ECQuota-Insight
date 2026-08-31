@@ -13,6 +13,7 @@ never changes a rule to ``published``.
 import argparse
 import hashlib
 import json
+import os
 import re
 import shutil
 from collections import Counter
@@ -24,7 +25,7 @@ from uebench.domain.models import StandardDefinition
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "work" / "archive-data-63"
 CURRENT = ROOT / "data"
-SOURCE = Path(r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本")
+SOURCE = Path(os.environ.get("UEBENCH_SOURCE_DIR", r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本"))
 
 # Standards explicitly confirmed as superseded. Old definitions are not copied
 # into the active isolated scope; every replacement remains auditable.
@@ -270,7 +271,11 @@ MANUAL_ROWS: dict[str, list[dict]] = {
 def main() -> None:
     parser = argparse.ArgumentParser(description="建立当前标准范围的隔离draft工作区")
     parser.add_argument("--output", type=Path, default=ROOT / "work" / "next-scope-63")
+    parser.add_argument("--source-dir", type=Path, default=SOURCE, help="现行强制文本目录；也可用UEBENCH_SOURCE_DIR指定")
     args = parser.parse_args()
+    source_dir = args.source_dir.resolve()
+    if not source_dir.is_dir():
+        raise FileNotFoundError(f"找不到标准原文目录：{source_dir}")
     output = args.output.resolve()
     if output.exists():
         shutil.rmtree(output)
@@ -302,7 +307,7 @@ def main() -> None:
         rows.append(current_by_number[number])
     rows = sorted({item["number"]: item for item in rows}.values(), key=lambda item: item["sequence"])
     for item in rows:
-        source = SOURCE / item["source_file"]
+        source = source_dir / item["source_file"]
         item["source_sha256"] = sha256(source)
         if item["number"] not in current_by_number:
             item["status"] = "draft"
