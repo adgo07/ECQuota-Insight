@@ -16,7 +16,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from packaging.version import Version
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import desc, select
 
 from uebench import RULE_ENGINE_VERSION, __version__
@@ -40,6 +40,18 @@ class PackageFile(BaseModel):
     size: int = Field(ge=0)
     kind: Literal["definition", "source", "correction"]
 
+    @model_validator(mode="after")
+    def validate_path_kind(self) -> "PackageFile":
+        if self.kind == "definition" and not (
+            self.path.startswith("definitions/") and self.path.endswith(".json")
+        ):
+            raise ValueError("definition 文件必须位于 definitions/ 且为 JSON")
+        if self.kind == "source" and not self.path.startswith("sources/"):
+            raise ValueError("source 文件必须位于 sources/")
+        if self.kind == "correction" and self.path != "corrections.json":
+            raise ValueError("correction 文件必须为 corrections.json")
+        return self
+
 
 class PackageManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -55,6 +67,14 @@ class PackageManifest(BaseModel):
     standard_count: int = Field(ge=0)
     rule_count: int = Field(ge=0)
     files: list[PackageFile]
+
+    @model_validator(mode="after")
+    def validate_lineage(self) -> "PackageManifest":
+        if self.package_mode == "full" and self.parent_package_id:
+            raise ValueError("完整标准包不应包含 parent_package_id")
+        if self.package_mode == "incremental" and self.parent_package_id == self.package_id:
+            raise ValueError("增量标准包不能把自己作为父包")
+        return self
 
 
 class PackageValidationReport(BaseModel):
@@ -225,7 +245,11 @@ class StandardPackageService:
     def latest_manifest(self) -> PackageManifest | None:
         """返回最近一次成功安装的标准包清单，供应用层展示。"""
         with self.database.session() as session:
-            row = session.scalar(select(PackageRow).order_by(desc(PackageRow.issued_at)).limit(1))
+            row = session.scalar(
+                select(PackageRow)
+                .order_by(desc(PackageRow.issued_at), desc(PackageRow.installed_at))
+                .limit(1)
+            )
         if row is None:
             return None
         return PackageManifest.model_validate_json(row.manifest_json)
@@ -257,6 +281,8 @@ class StandardPackageService:
                 except InvalidSignature as exc:
                     raise StandardPackageError("标准包签名无效") from exc
                 manifest = PackageManifest.model_validate_json(manifest_bytes)
+                if not _safe_name(manifest.package_id):
+                    errors.append("标准包 package_id 包含不安全路径字符")
                 if Version(manifest.minimum_app_version) > Version(__version__):
                     errors.append(
                         f"标准包要求软件版本 {manifest.minimum_app_version}，当前版本为 {__version__}"
@@ -266,6 +292,13 @@ class StandardPackageService:
                         f"标准包规则引擎版本为 {manifest.rule_engine_version}，当前软件为 {RULE_ENGINE_VERSION}"
                     )
                 listed = {item.path: item for item in manifest.files}
+                manifest_duplicate_paths = sorted(
+                    path for path, count in Counter(item.path for item in manifest.files).items() if count > 1
+                )
+                if manifest_duplicate_paths:
+                    errors.append(
+                        "清单包含重复文件路径：" + ", ".join(manifest_duplicate_paths)
+                    )
                 expected_names = set(listed) | {"manifest.json", "signature.ed25519"}
                 extras = set(names) - expected_names
                 missing = expected_names - set(names)
@@ -355,7 +388,11 @@ class StandardPackageService:
                 existing = session.get(PackageRow, manifest.package_id)
                 if existing is not None:
                     errors.append("该标准包已安装")
-                latest = session.scalar(select(PackageRow).order_by(desc(PackageRow.issued_at)).limit(1))
+                latest = session.scalar(
+                    select(PackageRow)
+                    .order_by(desc(PackageRow.issued_at), desc(PackageRow.installed_at))
+                    .limit(1)
+                )
                 if manifest.package_mode == "incremental":
                     if not manifest.parent_package_id:
                         errors.append("增量标准包缺少 parent_package_id")
@@ -385,7 +422,9 @@ class StandardPackageService:
         manifest = report.manifest
         backup_path = self.paths.backups / f"pre-package-{datetime.now():%Y%m%d-%H%M%S}.uebackup"
         self.backup.create(backup_path)
-        destination = self.paths.standards / manifest.package_id
+        destination = (self.paths.standards / manifest.package_id).resolve()
+        if destination.parent != self.paths.standards.resolve():
+            raise StandardPackageError("标准包目标目录不安全")
         if destination.exists():
             raise StandardPackageError("标准包目标目录已存在")
         try:

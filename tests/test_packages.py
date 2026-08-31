@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from uebench.infrastructure.backup import BackupService
 from uebench.infrastructure.database import DatabaseManager
-from uebench.infrastructure.packages import StandardPackageBuilder, StandardPackageError, StandardPackageService
+from uebench.infrastructure.packages import PackageFile, PackageManifest, StandardPackageBuilder, StandardPackageError, StandardPackageService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepository
 from uebench.domain.models import PublicationStatus
@@ -263,3 +263,19 @@ def test_package_with_unknown_rule_engine_is_rejected(tmp_path: Path) -> None:
     report = service.preview(package)
     assert not report.valid
     assert any("规则引擎版本" in error for error in report.errors)
+
+def test_package_file_kind_and_manifest_lineage_are_rejected() -> None:
+    with pytest.raises(ValueError, match="definition"):
+        PackageFile(path="sources/source.pdf", sha256="0" * 64, size=1, kind="definition")
+    with pytest.raises(ValueError, match="完整标准包"):
+        PackageManifest(
+            package_id="full-with-parent",
+            data_version="2026.1",
+            issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+            minimum_app_version="0.1.0",
+            package_mode="full",
+            parent_package_id="parent-package",
+            standard_count=0,
+            rule_count=0,
+            files=[],
+        )
