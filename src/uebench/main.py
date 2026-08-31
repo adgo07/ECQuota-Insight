@@ -8,6 +8,7 @@ from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtWidgets import QApplication
 
 from .bootstrap import create_context
+from .infrastructure.logging import close_logging
 from .ui.main_window import create_main_window
 
 
@@ -27,14 +28,14 @@ def configure_application_font(application: QApplication) -> None:
 
 
 def install_bundled_package(context) -> None:
-    if context.package_service is None or context.standards.list_all():
+    if not context.application.has_package_service() or context.application.list_all_standards():
         return
     resource_directory = Path(__file__).resolve().parent / "resources"
     packages = sorted(resource_directory.glob("initial-standard-package-*.uebench"))
     if not packages:
         return
     try:
-        context.package_service.install(packages[-1])
+        context.application.install_package(packages[-1])
     except Exception:
         logging.getLogger(__name__).exception("内置初始标准包安装失败")
 
@@ -46,13 +47,14 @@ def main() -> int:
     configure_application_font(application)
     resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
     context = create_context(public_key_path=resource_key)
-    install_bundled_package(context)
-    window = create_main_window(context)
-    window.show()
-    code = application.exec()
-    context.database.dispose()
-    return code
-
+    try:
+        install_bundled_package(context)
+        window = create_main_window(context)
+        window.show()
+        return application.exec()
+    finally:
+        context.database.dispose()
+        close_logging()
 
 if __name__ == "__main__":
     raise SystemExit(main())
