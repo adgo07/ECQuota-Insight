@@ -19,7 +19,7 @@ from packaging.version import Version
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import desc, select
 
-from uebench import __version__
+from uebench import RULE_ENGINE_VERSION, __version__
 from uebench.domain.models import PublicationStatus, StandardDefinition
 
 from .backup import BackupService
@@ -50,6 +50,8 @@ class PackageManifest(BaseModel):
     issued_at: datetime
     minimum_app_version: str
     package_mode: Literal["full", "incremental"] = "full"
+    rule_engine_version: str = RULE_ENGINE_VERSION
+    parent_package_id: str | None = None
     standard_count: int = Field(ge=0)
     rule_count: int = Field(ge=0)
     files: list[PackageFile]
@@ -130,6 +132,8 @@ class StandardPackageBuilder:
         data_version: str,
         minimum_app_version: str = "0.1.0",
         package_mode: Literal["full", "incremental"] = "full",
+        rule_engine_version: str = RULE_ENGINE_VERSION,
+        parent_package_id: str | None = None,
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
@@ -140,15 +144,16 @@ class StandardPackageBuilder:
         issued_at = issued_at or datetime.now(timezone.utc)
         entries: dict[str, bytes] = {}
         rule_count = 0
-        definition_keys: set[tuple[str, str]] = set()
+        definition_keys: set[tuple[str, str, int]] = set()
         for definition in definitions:
-            definition_key = (definition.id, definition.version)
+            definition_key = (definition.id, definition.version, definition.rule_revision)
             if definition_key in definition_keys:
                 raise StandardPackageError(
-                    f"标准包包含重复标准版本：{definition.id}@{definition.version}"
+                    f"标准包包含重复标准版本：{definition.id}@{definition.version}/r{definition.rule_revision}"
                 )
             definition_keys.add(definition_key)
-            path = f"definitions/{definition.id}-{definition.version}.json"
+            revision_suffix = "" if definition.rule_revision == 1 else f"-r{definition.rule_revision}"
+            path = f"definitions/{definition.id}-{definition.version}{revision_suffix}.json"
             data = _canonical_json(definition.model_dump(mode="json"))
             entries[path] = data
             rule_count += sum(len(product.indicators) for product in definition.products)
@@ -177,6 +182,8 @@ class StandardPackageBuilder:
             issued_at=issued_at,
             minimum_app_version=minimum_app_version,
             package_mode=package_mode,
+            rule_engine_version=rule_engine_version,
+            parent_package_id=parent_package_id,
             standard_count=len(definitions),
             rule_count=rule_count,
             files=package_files,
@@ -277,11 +284,11 @@ class StandardPackageService:
                     PurePosixPath(item.path).name: item for item in manifest.files if item.kind == "source"
                 }
                 definition_keys = [
-                    (definition.id, definition.version) for definition in definitions
+                    (definition.id, definition.version, definition.rule_revision) for definition in definitions
                 ]
                 duplicate_definitions = sorted(
-                    f"{standard_id}@{version}"
-                    for (standard_id, version), count in Counter(definition_keys).items()
+                    f"{standard_id}@{version}/r{rule_revision}"
+                    for (standard_id, version, rule_revision), count in Counter(definition_keys).items()
                     if count > 1
                 )
                 if duplicate_definitions:
@@ -318,6 +325,7 @@ class StandardPackageService:
                         select(StandardRow).where(
                             StandardRow.standard_id == definition.id,
                             StandardRow.version == definition.version,
+                            StandardRow.rule_revision == definition.rule_revision,
                         )
                     )
                     if existing_version is not None and not _definition_matches(
@@ -382,7 +390,7 @@ class StandardPackageService:
                     "STANDARD_PACKAGE_INSTALL",
                     "standard_package",
                     manifest.package_id,
-                    {"data_version": manifest.data_version, "standard_count": manifest.standard_count},
+                    {"data_version": manifest.data_version, "package_mode": manifest.package_mode, "rule_engine_version": manifest.rule_engine_version, "parent_package_id": manifest.parent_package_id, "standard_count": manifest.standard_count},
                     session=session,
                 )
         except Exception:

@@ -298,6 +298,8 @@ class StandardDefinition(StrictModel):
     number: str
     title: str
     version: str
+    standard_family_id: str | None = None
+    rule_revision: int = Field(default=1, ge=1)
     publication_status: PublicationStatus
     publication_date: date
     effective_date: date
@@ -309,6 +311,12 @@ class StandardDefinition(StrictModel):
     obsolete_date: date | None = None
     replaced_by: list[str] = Field(default_factory=list)
     supersedes: list[str] = Field(default_factory=list)
+    @property
+    def family_id(self) -> str:
+        """Return the stable family identifier, deriving it for legacy JSON."""
+        return self.standard_family_id or self.number.rsplit("-", 1)[0]
+
+
 
     def is_effective_on(self, evaluation_date: date) -> bool:
         if self.lifecycle_status is LifecycleStatus.OBSOLETE:
@@ -382,6 +390,8 @@ class EvaluationResult(StrictModel):
     standard_title: str
     standard_version: str
     product_id: str
+    standard_family_id: str | None = None
+    rule_revision: int = Field(default=1, ge=1)
     product_name: str
     results: list[IndicatorResult]
     rule_snapshot_sha256: str

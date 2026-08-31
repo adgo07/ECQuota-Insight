@@ -23,6 +23,8 @@ class StandardRow(Base):
     number: Mapped[str] = mapped_column(String(64), nullable=False)
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     version: Mapped[str] = mapped_column(String(64), nullable=False)
+    standard_family_id: Mapped[str] = mapped_column(String(128), nullable=False, default="")
+    rule_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     publication_date: Mapped[date] = mapped_column(Date, nullable=False)
     effective_date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -39,7 +41,7 @@ class StandardRow(Base):
     )
 
     __table_args__ = (
-        Index("ux_standards_id_version", "standard_id", "version", unique=True),
+        Index("ux_standards_id_version_revision", "standard_id", "version", "rule_revision", unique=True),
         Index("ix_standards_number", "number"),
     )
 

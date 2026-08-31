@@ -129,12 +129,15 @@ class SqlStandardRepository:
         def upsert(target_session) -> None:
             statement = select(StandardRow).where(
                 StandardRow.standard_id == definition.id,
+                StandardRow.rule_revision == definition.rule_revision,
                 StandardRow.version == definition.version,
             )
             row = target_session.scalar(statement)
             payload = definition.model_dump_json()
             if row is None:
                 row = StandardRow(
+                    standard_family_id=definition.family_id,
+                    rule_revision=definition.rule_revision,
                     standard_id=definition.id,
                     number=definition.number,
                     title=definition.title,
@@ -153,6 +156,8 @@ class SqlStandardRepository:
                 )
                 target_session.add(row)
             else:
+                row.standard_family_id = definition.family_id
+                row.rule_revision = definition.rule_revision
                 row.number = definition.number
                 row.title = definition.title
                 row.status = definition.publication_status.value
@@ -169,7 +174,7 @@ class SqlStandardRepository:
             self.audit.append(
                 "STANDARD_INSTALL",
                 "standard",
-                f"{definition.id}:{definition.version}",
+                f"{definition.id}:{definition.version}:r{definition.rule_revision}",
                 {"number": definition.number, "package_id": package_id},
                 session=target_session,
             )

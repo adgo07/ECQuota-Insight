@@ -281,6 +281,8 @@ class EvaluationEngine:
             standard_number=standard.number,
             standard_title=standard.title,
             standard_version=standard.version,
+            standard_family_id=standard.family_id,
+            rule_revision=standard.rule_revision,
             product_id=product.id,
             product_name=product.name,
             results=results,
@@ -307,6 +309,8 @@ class EvaluationEngine:
             standard_number=standard.number,
             standard_title=standard.title,
             standard_version=standard.version,
+            standard_family_id=standard.family_id,
+            rule_revision=standard.rule_revision,
             product_id=product.id,
             product_name=product.name,
             results=[

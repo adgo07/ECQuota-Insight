@@ -62,7 +62,7 @@ def test_initialize_adopts_complete_pre_alembic_database(tmp_path: Path) -> None
     migrated = DatabaseManager(paths.database)
     migrated.initialize()
     with migrated.engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "0002"
+        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "0003"
     migrated.dispose()
 
 

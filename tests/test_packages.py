@@ -36,8 +36,10 @@ def build_package(
     package_id: str = "package-1",
     corrections: list[dict] | None = None,
     level_1: str | None = None,
+    rule_revision: int = 1,
 ) -> Path:
     definition = make_standard()
+    definition.rule_revision = rule_revision
     if level_1 is not None:
         threshold = definition.products[0].indicators[0].thresholds.level_1
         assert threshold is not None
@@ -68,6 +70,9 @@ def test_signed_package_preview_and_install(tmp_path: Path) -> None:
     assert report.valid, report.errors
     result = service.install(package)
     assert result.standards_installed == 1
+    assert report.manifest is not None
+    assert report.manifest.package_mode == "full"
+    assert report.manifest.rule_engine_version == "1.0"
     assert standards.get_published("gb-00000-2026") is not None
 
 
@@ -136,6 +141,18 @@ def test_same_standard_version_with_changed_content_is_rejected(tmp_path: Path) 
     report = service.preview(second)
     assert not report.valid
     assert any("标准版本已存在" in error for error in report.errors)
+
+
+def test_same_standard_version_with_new_rule_revision_is_allowed(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, standards, service = make_service(tmp_path, private_key)
+    first = build_package(tmp_path, private_key, package_id="package-first", rule_revision=1)
+    second = build_package(tmp_path, private_key, package_id="package-second", rule_revision=2, level_1="11")
+    service.install(first)
+    report = service.preview(second)
+    assert report.valid, report.errors
+    service.install(second)
+    assert len(standards.list_all()) == 2
 
 
 def test_unpublished_definition_is_rejected(tmp_path: Path) -> None:
