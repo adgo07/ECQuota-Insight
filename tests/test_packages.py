@@ -35,8 +35,13 @@ def build_package(
     *,
     package_id: str = "package-1",
     corrections: list[dict] | None = None,
+    level_1: str | None = None,
 ) -> Path:
     definition = make_standard()
+    if level_1 is not None:
+        threshold = definition.products[0].indicators[0].thresholds.level_1
+        assert threshold is not None
+        threshold.value = level_1
     source = tmp_path / definition.source_file
     source.write_bytes(b"placeholder")
     definition.source_sha256 = __import__("hashlib").sha256(source.read_bytes()).hexdigest()
@@ -110,11 +115,23 @@ def test_duplicate_package_is_rejected(tmp_path: Path) -> None:
         service.install(package)
 
 
-def test_same_standard_version_in_new_package_is_rejected(tmp_path: Path) -> None:
+def test_same_standard_version_with_identical_content_is_allowed(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()
     _, _, _, service = make_service(tmp_path, private_key)
     first = build_package(tmp_path, private_key, package_id="package-first")
     second = build_package(tmp_path, private_key, package_id="package-second")
+    service.install(first)
+    report = service.preview(second)
+    assert report.valid, report.errors
+    assert any("内容一致" in warning for warning in report.warnings)
+    service.install(second)
+
+
+def test_same_standard_version_with_changed_content_is_rejected(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    first = build_package(tmp_path, private_key, package_id="package-first")
+    second = build_package(tmp_path, private_key, package_id="package-second", level_1="11")
     service.install(first)
     report = service.preview(second)
     assert not report.valid

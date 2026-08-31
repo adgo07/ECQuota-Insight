@@ -49,6 +49,7 @@ class PackageManifest(BaseModel):
     data_version: str
     issued_at: datetime
     minimum_app_version: str
+    package_mode: Literal["full", "incremental"] = "full"
     standard_count: int = Field(ge=0)
     rule_count: int = Field(ge=0)
     files: list[PackageFile]
@@ -101,6 +102,17 @@ def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+def _definition_matches(payload: str, incoming: StandardDefinition) -> bool:
+    """Return true only when an installed rule has identical canonical JSON."""
+    try:
+        installed = StandardDefinition.model_validate_json(payload)
+    except ValueError:
+        return False
+    return _sha256_bytes(_canonical_json(installed.model_dump(mode="json"))) == _sha256_bytes(
+        _canonical_json(incoming.model_dump(mode="json"))
+    )
+
+
 
 
 class StandardPackageBuilder:
@@ -117,6 +129,7 @@ class StandardPackageBuilder:
         *,
         data_version: str,
         minimum_app_version: str = "0.1.0",
+        package_mode: Literal["full", "incremental"] = "full",
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
@@ -163,6 +176,7 @@ class StandardPackageBuilder:
             data_version=data_version,
             issued_at=issued_at,
             minimum_app_version=minimum_app_version,
+            package_mode=package_mode,
             standard_count=len(definitions),
             rule_count=rule_count,
             files=package_files,
@@ -306,10 +320,17 @@ class StandardPackageService:
                             StandardRow.version == definition.version,
                         )
                     )
-                    if existing_version is not None:
+                    if existing_version is not None and not _definition_matches(
+                        existing_version.definition_json, definition
+                    ):
                         errors.append(
                             f"标准版本已存在：{definition.number} {definition.version}，"
                             "如需变更必须递增标准包/规则版本"
+                        )
+                    elif existing_version is not None:
+                        warnings.append(
+                            f"标准版本已存在且内容一致：{definition.number} {definition.version}，"
+                            "安装时将保留同一规则内容"
                         )
                 existing = session.get(PackageRow, manifest.package_id)
                 if existing is not None:
