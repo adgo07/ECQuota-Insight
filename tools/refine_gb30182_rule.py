@@ -28,7 +28,7 @@ def direct_definition(key: str, label: str, unit: str) -> dict:
 
 def indicator(number: str, source_file: str, source_sha: str, *, key_suffix: str,
               name: str, unit: str, threshold_values: tuple[str, str, str],
-              detail_input: str, detail_label: str) -> dict:
+              detail_input: str, detail_input_unit: str, detail_label: str) -> dict:
     actual_key = f"actual.GB_30182_2013.{key_suffix}"
     return {
         "id": f"GB_30182_2013.friction-material.{key_suffix}",
@@ -39,7 +39,7 @@ def indicator(number: str, source_file: str, source_sha: str, *, key_suffix: str
         "applicability": {"op": "always"},
         "direct_input_key": actual_key,
         "detail_formula": node("per_unit", args=[
-            node("input", input_key=detail_input, unit=unit),
+            node("input", input_key=detail_input, unit=detail_input_unit),
             node("input", input_key="production.total_equivalent", unit="t"),
         ], unit=unit, label=detail_label),
         "base_thresholds": {f"level_{i}": node("constant", value=value, unit=unit) for i, value in enumerate(threshold_values, 1)},
@@ -112,13 +112,13 @@ def refine(data_dir: Path) -> Path:
                       key_suffix="comprehensive_energy",
                       name="单位产品综合能耗",
                       unit="kgce/t", threshold_values=("115", "135", "175"),
-                      detail_input="energy.total_standard_coal",
+                      detail_input="energy.total_standard_coal", detail_input_unit="kgce",
                       detail_label="摩擦材料综合能耗 EZN"),
             indicator(number, source_file, source_sha,
                       key_suffix="electricity",
                       name="电耗",
                       unit="kWh/t", threshold_values=("800", "1000", "1300"),
-                      detail_input="energy.category.direct_electricity.net_amount",
+                      detail_input="energy.category.direct_electricity.net_amount", detail_input_unit="kWh",
                       detail_label="摩擦材料产品综合电耗 QZD（direct_electricity分类）"),
         ],
     }]
@@ -131,7 +131,7 @@ def refine(data_dir: Path) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="精化GB 30182-2013草案规则（仍为draft）")
-    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-65/data"))
+    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-63/data"))
     args = parser.parse_args()
     print(f"已精化GB 30182-2013草案规则：{refine(args.data_dir.resolve())}")
 

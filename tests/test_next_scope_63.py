@@ -492,6 +492,15 @@ def test_gb30182_missing_direct_electricity_is_incomplete_only_for_electricity_i
 
 
 
+def test_gb30182_detail_formula_input_nodes_keep_total_units() -> None:
+    standard = _gb30182_definition()
+    comprehensive, electricity = standard.products[0].indicators
+    assert comprehensive.detail_formula.args[0].unit == "kgce"
+    assert comprehensive.detail_formula.unit == "kgce/t"
+    assert electricity.detail_formula.args[0].unit == "kWh"
+    assert electricity.detail_formula.unit == "kWh/t"
+
+
 def test_gb29435_replacement_is_reflected_in_active_scope() -> None:
     scope = json.loads((ROOT / "scope-63.json").read_text(encoding="utf-8"))
     assert "GB 29435-2025" in scope["standards"]
