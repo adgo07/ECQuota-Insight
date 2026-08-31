@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-30",
+  "generated_at": "2026-08-31",
   "source_priority": [
     "标准修改单或勘误",
     "强制性标准原文",
@@ -45,6 +45,19 @@
       "replacement_effective_date": "2027-01-01",
       "status": "published_replacement",
       "note": "新标准规则已存在；2026-08-30尚未实施，选择时显示提示。"
+    },
+    {
+      "obsolete_number": "GB 29435-2012",
+      "obsolete_id": "gb-29435-2012",
+      "replacement_number": "GB 29435-2025",
+      "replacement_id": "gb-29435-2025",
+      "replacement_title": "稀土冶炼企业单位产品能源消耗限额",
+      "replacement_publication_date": "2025-12-31",
+      "replacement_effective_date": "2027-01-01",
+      "replacement_source_file": "【2027-01-01实施】22. GB+29435-2025 稀土冶炼企业单位产品能源消耗限额.pdf",
+      "replacement_source_sha256": "7fe37d8710c4639c63fdc47e51afda0de20fa683a0dfd62877f7aa5cfde95f54",
+      "status": "published_replacement",
+      "note": "GB 29435-2025已替代GB 29435-2012；新标准尚未实施，选择时显示提示。"
     }
   ]
 }
