@@ -50,11 +50,37 @@ def _confirmation_rows(path: Path) -> tuple[dict[str, dict[str, object]], list[s
     return rows, errors
 
 
-def promote(path: Path, data_dir: Path, *, apply: bool) -> dict[str, object]:
-    definition_paths = sorted((data_dir / "definitions").glob("*.json"))
-    definitions = [StandardDefinition.model_validate_json(item.read_text(encoding="utf-8")) for item in definition_paths]
-    if not definitions:
+def _load_scope_numbers(data_dir: Path, scope_path: Path | None) -> set[str]:
+    if scope_path is None:
+        candidates = (data_dir / "scope-63.json", data_dir / "scope-44.json", data_dir / "scope-65.json")
+        scope_path = next((candidate for candidate in candidates if candidate.exists()), None)
+    if scope_path is None or not scope_path.exists():
+        raise ValueError(f"找不到当前范围清单：{data_dir}")
+    payload = json.loads(scope_path.read_text(encoding="utf-8"))
+    raw_numbers = [str(item).strip() for item in payload.get("standards", []) if str(item).strip()]
+    if not raw_numbers:
+        raise ValueError(f"范围清单没有标准编号：{scope_path}")
+    if len(raw_numbers) != len(set(raw_numbers)):
+        raise ValueError(f"范围清单存在重复标准编号：{scope_path}")
+    return set(raw_numbers)
+
+
+def promote(path: Path, data_dir: Path, *, apply: bool, scope_path: Path | None = None) -> dict[str, object]:
+    scope_numbers = _load_scope_numbers(data_dir, scope_path)
+    all_paths = sorted((data_dir / "definitions").glob("*.json"))
+    all_definitions = [StandardDefinition.model_validate_json(item.read_text(encoding="utf-8")) for item in all_paths]
+    if not all_definitions:
         raise ValueError(f"数据目录没有规则定义：{data_dir}")
+    selected = [(definition_path, definition) for definition_path, definition in zip(all_paths, all_definitions, strict=True) if definition.number in scope_numbers]
+    found_numbers = {definition.number for _, definition in selected}
+    missing_numbers = sorted(scope_numbers - found_numbers)
+    if missing_numbers:
+        missing_text = ", ".join(missing_numbers)
+        raise ValueError(f"范围清单中的标准缺少规则定义：{missing_text}")
+    if len(selected) != len(found_numbers):
+        raise ValueError("当前范围内存在重复标准编号的规则定义")
+    definition_paths = [definition_path for definition_path, _ in selected]
+    definitions = [definition for _, definition in selected]
     by_id = {indicator.id: (definition, path) for definition, path in zip(definitions, definition_paths, strict=True) for product in definition.products for indicator in product.indicators}
     draft_ids = {indicator_id for indicator_id, (definition, _) in by_id.items() if definition.publication_status is PublicationStatus.DRAFT}
     rows, errors = _confirmation_rows(path)
@@ -84,7 +110,7 @@ def promote(path: Path, data_dir: Path, *, apply: bool) -> dict[str, object]:
     reviewed_numbers = sorted({definition.number for indicator_id in confirmed_drafts for definition, _ in [by_id[indicator_id]]})
     result = {
         "data_dir": str(data_dir),
-        "scope_count": len(definitions),
+        "scope_count": len(scope_numbers),
         "draft_indicator_count": len(draft_ids),
         "confirmed_draft_indicator_count": len(confirmed_drafts),
         "reviewed_standards": reviewed_numbers,
@@ -126,10 +152,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="核验确认表并将完整draft标准提升为reviewed（不生成标准包）")
     parser.add_argument("confirmation", type=Path)
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
+    parser.add_argument("--scope", type=Path, help="当前范围清单；省略时优先使用data-dir下的scope-63.json、scope-44.json或scope-65.json")
     parser.add_argument("--apply", action="store_true", help="验证通过后实际写入reviewed状态")
     args = parser.parse_args()
     try:
-        report = promote(args.confirmation.resolve(), args.data_dir.resolve(), apply=args.apply)
+        report = promote(args.confirmation.resolve(), args.data_dir.resolve(), apply=args.apply, scope_path=args.scope.resolve() if args.scope else None)
     except (OSError, ValueError) as exc:
         lines = str(exc).splitlines()
         preview = lines[:20]
