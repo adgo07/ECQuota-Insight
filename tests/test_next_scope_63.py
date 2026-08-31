@@ -1046,3 +1046,65 @@ def test_gb29450_missing_level_two_is_preserved_in_grading() -> None:
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.LEVEL_3
     assert result.base_thresholds == {"LEVEL_1": Decimal("550"), "LEVEL_3": Decimal("650")}
+
+def _gb31830_definition() -> StandardDefinition:
+    return StandardDefinition.model_validate_json(
+        (ROOT / "definitions/gb-31830-2024.json").read_text(encoding="utf-8")
+    )
+
+
+def test_gb31830_draft_has_two_products_and_source_backed_levels() -> None:
+    standard = _gb31830_definition()
+    assert standard.publication_status is PublicationStatus.DRAFT
+    assert [product.name for product in standard.products] == [
+        "甲苯二异氰酸酯（TDI）",
+        "二苯基甲烷二异氰酸酯（MDI）",
+    ]
+    assert [
+        [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value]
+        for product in standard.products
+        for indicator in product.indicators
+    ] == [["340", "500", "950"], ["175", "180", "190"]]
+    assert {reference.page for product in standard.products for indicator in product.indicators for reference in indicator.source_references} >= {5, 6, 7, 8, 10}
+    assert standard.supersedes == ["GB 31828-2015", "GB 31830-2015"]
+
+
+def test_gb31830_direct_boundaries_for_tdi_and_mdi() -> None:
+    standard = _gb31830_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+    engine = EvaluationEngine()
+    for product in standard.products:
+        indicator = product.indicators[0]
+        thresholds = [indicator.thresholds.level_1.value, indicator.thresholds.level_2.value, indicator.thresholds.level_3.value]
+        for value, expected in zip(thresholds, (Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3), strict=True):
+            request = EvaluationRequest(
+                evaluation_date=date(2025, 5, 1),
+                standard_id=standard.id,
+                product_id=product.id,
+                input_mode=InputMode.DIRECT,
+                inputs={indicator.direct_input_key: InputValue(value=value, unit=indicator.unit)},
+            )
+            assert engine.evaluate(standard, request).results[0].grade is expected
+
+
+def test_gb31830_detail_formula_subtracts_external_energy() -> None:
+    standard = _gb31830_definition().model_copy(update={"publication_status": PublicationStatus.PUBLISHED})
+    product = standard.products[0]
+    indicator = product.indicators[0]
+    request = EvaluationRequest(
+        evaluation_date=date(2025, 5, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        input_mode=InputMode.DETAIL,
+        inputs={},
+        energy_lines=[
+            EnergyLine(line_id="in", energy_name="生产及辅助系统", amount="400", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+            EnergyLine(line_id="out", energy_name="范围外回收能源", direction="output", amount="60", unit="kgce", standard_coal_coefficient="1", coefficient_unit="kgce/kgce"),
+        ],
+        production_lines=[ProductionLine(line_id="p", product_name=product.name, quantity="1", unit="t")],
+    )
+    engine = EvaluationEngine()
+    result = engine.evaluate(standard, request).results[0]
+    assert result.indicator_id == indicator.id
+    assert result.actual_value == Decimal("340")
+    assert result.grade is Grade.LEVEL_1
+    assert any(step.operation == "per_unit" and step.unit == "kgce/t" for step in result.calculation_trace)
