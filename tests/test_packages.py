@@ -37,6 +37,7 @@ def build_package(
     corrections: list[dict] | None = None,
     level_1: str | None = None,
     rule_revision: int = 1,
+    rule_engine_version: str = "1.0",
     package_mode: str = "full",
     parent_package_id: str | None = None,
 ) -> Path:
@@ -59,6 +60,7 @@ def build_package(
         {definition.source_file: source},
         package_id=package_id,
         data_version="2026.1",
+        rule_engine_version=rule_engine_version,
         issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
         package_mode=package_mode,
         parent_package_id=parent_package_id,
@@ -252,3 +254,12 @@ def test_incremental_package_accepts_current_parent(tmp_path: Path) -> None:
     )
     report = service.preview(child)
     assert report.valid, report.errors
+
+
+def test_package_with_unknown_rule_engine_is_rejected(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    package = build_package(tmp_path, private_key, rule_engine_version="999.0")
+    report = service.preview(package)
+    assert not report.valid
+    assert any("规则引擎版本" in error for error in report.errors)
