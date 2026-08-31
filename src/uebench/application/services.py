@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Protocol
+from typing import Any, Protocol
 
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import EvaluationRequest, EvaluationResult, StandardDefinition, StandardSelectionMode
@@ -11,6 +11,8 @@ class StandardRepository(Protocol):
     def get_published(self, standard_id: str) -> StandardDefinition | None: ...
 
     def list_published(self) -> list[StandardDefinition]: ...
+
+    def list_all(self) -> list[StandardDefinition]: ...
 
     def list_current(self, evaluation_date: date) -> list[StandardDefinition]: ...
 
@@ -33,6 +35,14 @@ class EvaluationRepository(Protocol):
         result: EvaluationResult,
         standard_snapshot: StandardDefinition,
     ) -> None: ...
+
+    def list_recent(self, limit: int = 100) -> list[Any]: ...
+
+    def get(
+        self, evaluation_id: str
+    ) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None: ...
+
+    def soft_delete(self, evaluation_id: str) -> bool: ...
 
 
 class StandardCatalogService:

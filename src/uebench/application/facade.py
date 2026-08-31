@@ -12,7 +12,7 @@ from uebench.domain.models import (
     StandardSelectionMode,
 )
 
-from .services import EvaluationService, StandardCatalogService
+from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
 
 
 class ApplicationFacade:
@@ -21,8 +21,8 @@ class ApplicationFacade:
     def __init__(
         self,
         *,
-        standards: Any,
-        evaluations: Any,
+        standards: StandardRepository,
+        evaluations: EvaluationRepository,
         evaluation_service: EvaluationService,
         template_service: Any | None = None,
         import_service: Any | None = None,
