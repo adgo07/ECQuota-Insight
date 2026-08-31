@@ -58,3 +58,23 @@ def test_same_product_name_can_have_multiple_indicator_rules() -> None:
     assert len(updated.products[0].indicators) == 2
     assert updated.products[0].name == "测试产品"
     assert len({item.id for item in updated.products[0].indicators}) == 2
+def test_future_selection_never_falls_back_to_current(tmp_path: Path) -> None:
+    paths = AppPaths.from_root(tmp_path / "appdata")
+    paths.ensure()
+    database = DatabaseManager(paths.database)
+    database.initialize()
+    audit = AuditRepository(database)
+    standards = SqlStandardRepository(database, audit)
+    current = make_standard().model_copy(update={"id": "gb-current-test", "number": "GB 00002-2020"})
+    future = make_standard().model_copy(update={
+        "id": "gb-future-test",
+        "number": "GB 00002-2027",
+        "effective_date": date(2027, 1, 1),
+    })
+    standards.install(current)
+    standards.install(future)
+
+    assert standards.get_for_evaluation("gb-current-test", date(2026, 8, 31), StandardSelectionMode.FUTURE) is None
+    selected = standards.get_for_evaluation("gb-future-test", date(2026, 8, 31), StandardSelectionMode.FUTURE)
+    assert selected is not None and selected.number == "GB 00002-2027"
+    database.dispose()

@@ -65,8 +65,17 @@ class SqlStandardRepository:
             if selection_mode is StandardSelectionMode.CURRENT:
                 return next((item for item in definitions if item.is_effective_on(evaluation_date)), None)
             if selection_mode is StandardSelectionMode.HISTORICAL:
-                return next((item for item in definitions if item.effective_date <= evaluation_date), definitions[0] if definitions else None)
-            return next((item for item in definitions if item.effective_date > evaluation_date), definitions[0] if definitions else None)
+                historical = [
+                    item for item in definitions
+                    if item.effective_date <= evaluation_date
+                    and (item.lifecycle_status is LifecycleStatus.OBSOLETE or item.obsolete_date is not None)
+                ]
+                return max(historical, key=lambda item: item.effective_date, default=None)
+            future = [
+                item for item in definitions
+                if item.effective_date > evaluation_date and item.lifecycle_status is not LifecycleStatus.OBSOLETE
+            ]
+            return min(future, key=lambda item: item.effective_date, default=None)
 
     def list_current(self, evaluation_date: date) -> list[StandardDefinition]:
         with self.database.session() as session:
