@@ -42,6 +42,17 @@ class PackageFile(BaseModel):
 
     @model_validator(mode="after")
     def validate_path_kind(self) -> "PackageFile":
+        pure = PurePosixPath(self.path)
+        if (
+            not self.path
+            or self.path.endswith("/")
+            or pure.is_absolute()
+            or "\\" in self.path
+            or ":" in self.path
+            or ".." in pure.parts
+            or pure.name in {"", ".", ".."}
+        ):
+            raise ValueError("标准包文件路径不安全或为空")
         if self.kind == "definition" and not (
             self.path.startswith("definitions/") and self.path.endswith(".json")
         ):
@@ -183,7 +194,13 @@ class StandardPackageBuilder:
             source_data = source.read_bytes()
             if _sha256_bytes(source_data) != definition.source_sha256.lower():
                 raise StandardPackageError(f"标准原文哈希与定义不一致：{definition.source_file}")
-            entries[f"sources/{definition.source_file}"] = source_data
+            source_path = f"sources/{definition.source_file}"
+            if not _safe_name(definition.source_file):
+                raise StandardPackageError(f"标准原文文件名不安全：{definition.source_file}")
+            existing_source = entries.get(source_path)
+            if existing_source is not None and existing_source != source_data:
+                raise StandardPackageError(f"不同标准使用同一原文文件名但内容不同：{definition.source_file}")
+            entries[source_path] = source_data
         corrections_data = _canonical_json({"corrections": corrections or []})
         entries["corrections.json"] = corrections_data
 
@@ -328,6 +345,14 @@ class StandardPackageService:
                 source_entries = {
                     PurePosixPath(item.path).name: item for item in manifest.files if item.kind == "source"
                 }
+                source_names = [PurePosixPath(item.path).name for item in manifest.files if item.kind == "source"]
+                duplicate_source_names = sorted(
+                    name for name, count in Counter(source_names).items() if count > 1
+                )
+                if duplicate_source_names:
+                    errors.append(
+                        "标准包原文文件名冲突，安装时会覆盖：" + ", ".join(duplicate_source_names)
+                    )
                 definition_keys = [
                     (definition.id, definition.version, definition.rule_revision) for definition in definitions
                 ]

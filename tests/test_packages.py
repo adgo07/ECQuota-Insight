@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -296,3 +297,51 @@ def test_incremental_install_preserves_parent_and_selects_new_revision(tmp_path:
     )
     assert selected is not None
     assert selected.rule_revision == 2
+
+def test_package_file_rejects_unsafe_archive_paths() -> None:
+    with pytest.raises(ValueError, match="路径"):
+        PackageFile(path="sources/", sha256="0" * 64, size=0, kind="source")
+    with pytest.raises(ValueError, match="路径"):
+        PackageFile(path="sources/../source.pdf", sha256="0" * 64, size=1, kind="source")
+
+
+def test_builder_rejects_unsafe_source_filename(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    definition = make_standard()
+    definition.source_file = "../escape.pdf"
+    source = tmp_path / "escape.pdf"
+    source.write_bytes(b"placeholder")
+    definition.source_sha256 = __import__("hashlib").sha256(source.read_bytes()).hexdigest()
+    with pytest.raises(StandardPackageError, match="文件名不安全"):
+        StandardPackageBuilder(private_key).build(
+            tmp_path / "unsafe.uebench",
+            [definition],
+            {definition.source_file: source},
+            package_id="unsafe-package",
+            data_version="2026.1",
+        )
+
+def test_preview_rejects_source_basename_collision(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    package = build_package(tmp_path, private_key, package_id="collision-base")
+    collision = tmp_path / "collision.uebench"
+    with zipfile.ZipFile(package, "r") as archive:
+        entries = {name: archive.read(name) for name in archive.namelist()}
+    manifest = json.loads(entries["manifest.json"].decode("utf-8"))
+    source_item = next(item for item in manifest["files"] if item["kind"] == "source")
+    source_name = source_item["path"].split("/")[-1]
+    duplicate_path = "sources/sub/" + source_name
+    duplicate_item = dict(source_item)
+    duplicate_item["path"] = duplicate_path
+    manifest["files"].append(duplicate_item)
+    entries[duplicate_path] = entries[source_item["path"]]
+    manifest_bytes = json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    entries["manifest.json"] = manifest_bytes
+    entries["signature.ed25519"] = private_key.sign(manifest_bytes)
+    with zipfile.ZipFile(collision, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, data in entries.items():
+            archive.writestr(name, data)
+    report = service.preview(collision)
+    assert not report.valid
+    assert any("原文文件名冲突" in error for error in report.errors)
