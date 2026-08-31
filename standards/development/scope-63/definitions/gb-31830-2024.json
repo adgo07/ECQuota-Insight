@@ -18,7 +18,7 @@
       "indicators": [
         {
           "id": "GB_31830-2024.tdi.comprehensive-energy",
-          "name": "单位产品能耗",
+          "name": "甲苯二异氰酸酯（TDI）单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
@@ -225,7 +225,7 @@
       "indicators": [
         {
           "id": "GB_31830-2024.mdi.comprehensive-energy",
-          "name": "单位产品能耗",
+          "name": "二苯基甲烷二异氰酸酯（MDI）单位产品综合能耗",
           "unit": "kgce/t",
           "comparison": "lte",
           "input_definitions": [
