@@ -10,3 +10,6 @@
 - `work` 只用于可随时删除并重新生成的中间文件。
 
 后续标准开发、确认表和规则包生成均以 `scope-63` 为入口。新增或替代标准先更新该基线的范围清单，再更新对应 JSON；不得从 `scope-65` 复制旧版定义覆盖当前定义。
+
+- 每个定义包含 `standard_family_id`、`version` 和 `rule_revision`：版本号代表标准年代，家族ID通过替代链稳定归并，规则修订号用于同一标准版本的规则变更。
+- 新增或替代标准后先运行 `python tools/normalize_standard_identity.py --check`；需要写入快照时再去掉 `--check`。该工具只改身份字段，不改限额、公式或发布状态。
