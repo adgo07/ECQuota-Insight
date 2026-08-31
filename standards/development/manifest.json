@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "canonical_scope": "scope-63",
+  "legacy_scopes": ["scope-65"],
+  "canonical_reason": "scope-63已同步GB 29141-2024、GB 29435-2025及用户确认的替代关系；scope-65保留旧版标准，仅供历史对照。",
+  "formal_runtime_source": "data",
+  "formal_publish_requires": [
+    "reviewed_confirmation_workbook",
+    "published_status",
+    "source_page_or_clause",
+    "automated_boundary_tests"
+  ]
+}
