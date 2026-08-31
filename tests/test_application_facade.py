@@ -64,3 +64,10 @@ def test_facade_reports_optional_services_cleanly():
         assert "Excel模板服务未配置" in str(exc)
     else:
         raise AssertionError("未配置模板服务时应明确报错")
+
+def test_facade_uses_application_standard_selection_service():
+    facade, standards, _evaluations, _evaluation = _facade()
+    standards.list_future.return_value = ["future"]
+
+    assert facade.list_standards_for_selection(date(2026, 8, 31), StandardSelectionMode.FUTURE) == ["future"]
+    standards.list_future.assert_called_once_with(date(2026, 8, 31))

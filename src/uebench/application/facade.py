@@ -12,7 +12,7 @@ from uebench.domain.models import (
     StandardSelectionMode,
 )
 
-from .services import EvaluationService
+from .services import EvaluationService, StandardCatalogService
 
 
 class ApplicationFacade:
@@ -42,6 +42,7 @@ class ApplicationFacade:
         self._backup = backup_service
         self._audit = audit
         self._source_root = source_root
+        self._catalog = StandardCatalogService(standards)
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.evaluate(request)
@@ -64,7 +65,14 @@ class ApplicationFacade:
         evaluation_date: date,
         selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
     ) -> StandardDefinition | None:
-        return self._standards.get_for_evaluation(standard_id, evaluation_date, selection_mode)
+        return self._catalog.resolve(standard_id, evaluation_date, selection_mode)
+
+    def list_standards_for_selection(
+        self,
+        evaluation_date: date,
+        selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
+    ) -> list[StandardDefinition]:
+        return self._catalog.list_for_selection(evaluation_date, selection_mode)
 
     def get_published_standard(self, standard_id: str) -> StandardDefinition | None:
         return self._standards.get_published(standard_id)

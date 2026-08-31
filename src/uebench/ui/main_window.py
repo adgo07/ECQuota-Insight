@@ -469,13 +469,7 @@ class MainWindow(QMainWindow):
         return StandardSelectionMode(value or StandardSelectionMode.CURRENT.value)
 
     def _standards_for_selection(self) -> list[StandardDefinition]:
-        today = date.today()
-        mode = self._selection_mode()
-        if mode is StandardSelectionMode.HISTORICAL:
-            return self.context.application.list_historical_standards()
-        if mode is StandardSelectionMode.FUTURE:
-            return self.context.application.list_future_standards(today)
-        return self.context.application.list_current_standards(today)
+        return self.context.application.list_standards_for_selection(date.today(), self._selection_mode())
 
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None

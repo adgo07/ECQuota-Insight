@@ -29,6 +29,32 @@ class EvaluationRepository(Protocol):
     ) -> None: ...
 
 
+class StandardCatalogService:
+    """Application-layer standard selection shared by every UI adapter."""
+
+    def __init__(self, standards: StandardRepository) -> None:
+        self.standards = standards
+
+    def list_for_selection(
+        self,
+        evaluation_date: date,
+        selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
+    ) -> list[StandardDefinition]:
+        if selection_mode is StandardSelectionMode.HISTORICAL:
+            return self.standards.list_historical()
+        if selection_mode is StandardSelectionMode.FUTURE:
+            return self.standards.list_future(evaluation_date)
+        return self.standards.list_current(evaluation_date)
+
+    def resolve(
+        self,
+        standard_id: str,
+        evaluation_date: date,
+        selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
+    ) -> StandardDefinition | None:
+        return self.standards.get_for_evaluation(standard_id, evaluation_date, selection_mode)
+
+
 class EvaluationService:
     def __init__(
         self,
