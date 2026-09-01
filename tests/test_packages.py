@@ -345,3 +345,25 @@ def test_preview_rejects_source_basename_collision(tmp_path: Path) -> None:
     report = service.preview(collision)
     assert not report.valid
     assert any("原文文件名冲突" in error for error in report.errors)
+
+
+def test_package_source_reference_mismatch_is_rejected(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    definition = make_standard()
+    source = tmp_path / definition.source_file
+    source.write_bytes(b"placeholder")
+    digest = __import__("hashlib").sha256(source.read_bytes()).hexdigest()
+    definition.source_sha256 = digest
+    definition.products[0].indicators[0].source_references[0].source_sha256 = digest
+    definition.products[0].indicators[0].source_references[0].standard_number = "GB 00001-2026"
+    package = StandardPackageBuilder(private_key).build(
+        tmp_path / "bad-reference.uebench",
+        [definition],
+        {definition.source_file: source},
+        package_id="bad-reference-package",
+        data_version="2026.1",
+    )
+    report = service.preview(package)
+    assert not report.valid
+    assert any("来源标准号不一致" in error for error in report.errors)

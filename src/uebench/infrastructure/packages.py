@@ -330,6 +330,26 @@ class StandardPackageService:
                     if item.kind == "definition":
                         definition = StandardDefinition.model_validate_json(data)
                         definitions.append(definition)
+                        for product in definition.products:
+                            for indicator in product.indicators:
+                                if not indicator.source_references:
+                                    errors.append(f"标准 {definition.number}/{indicator.id} 缺少原文依据")
+                                for reference in indicator.source_references:
+                                    if reference.standard_number != definition.number:
+                                        errors.append(
+                                            f"标准 {definition.number}/{indicator.id} 的来源标准号不一致："
+                                            f"{reference.standard_number}"
+                                        )
+                                    if reference.source_file != definition.source_file:
+                                        errors.append(
+                                            f"标准 {definition.number}/{indicator.id} 的来源文件不一致："
+                                            f"{reference.source_file}"
+                                        )
+                                    if reference.source_sha256.lower() != definition.source_sha256.lower():
+                                        errors.append(
+                                            f"标准 {definition.number}/{indicator.id} 的来源哈希不一致："
+                                            f"{reference.source_file}"
+                                        )
                         if definition.publication_status is not PublicationStatus.PUBLISHED:
                             errors.append(
                                 f"标准 {definition.number} 的规则状态为 {definition.publication_status.value}，"
