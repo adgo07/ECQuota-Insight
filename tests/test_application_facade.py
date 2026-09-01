@@ -71,3 +71,13 @@ def test_facade_uses_application_standard_selection_service():
 
     assert facade.list_standards_for_selection(date(2026, 8, 31), StandardSelectionMode.FUTURE) == ["future"]
     standards.list_future.assert_called_once_with(date(2026, 8, 31))
+
+
+def test_facade_exposes_preview_evaluation():
+    facade, _standards, _evaluations, evaluation = _facade()
+    request = object()
+    expected = object()
+    evaluation.preview.return_value = expected
+
+    assert facade.preview_evaluation(request) is expected
+    evaluation.preview.assert_called_once_with(request)
