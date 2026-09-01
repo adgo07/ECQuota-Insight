@@ -71,6 +71,22 @@ def build_package(
     )
 
 
+def test_discover_package_paths_supports_root_and_recursive_shared_directories(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    root = tmp_path / "packages"
+    nested = root / "archive"
+    nested.mkdir(parents=True)
+    (root / "b.uebench").write_bytes(b"b")
+    (root / "ignore.txt").write_bytes(b"ignore")
+    (nested / "A.UEBENCH").write_bytes(b"a")
+
+    assert [path.name for path in service.discover(root)] == ["b.uebench"]
+    assert [path.name for path in service.discover(root, recursive=True)] == ["A.UEBENCH", "b.uebench"]
+
+    with pytest.raises(FileNotFoundError):
+        service.discover(root / "missing")
+
 def test_signed_package_preview_and_install(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()
     _, _, standards, service = make_service(tmp_path, private_key)

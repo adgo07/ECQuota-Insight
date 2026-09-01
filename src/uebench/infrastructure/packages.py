@@ -283,6 +283,22 @@ class StandardPackageService:
             raise StandardPackageError("更新公钥不是 Ed25519 公钥")
         return key
 
+    def discover(self, directory: Path, *, recursive: bool = False) -> list[Path]:
+        """List candidate .uebench files from a local or mounted shared directory.
+
+        Discovery never verifies or installs a package. Call ``preview`` for
+        each returned path before showing it as an update or passing it to
+        ``install``. A mounted NAS/UNC path is treated like any other Path.
+        """
+        directory = directory.expanduser().resolve()
+        if not directory.exists():
+            raise FileNotFoundError(f"标准包目录不存在：{directory}")
+        if not directory.is_dir():
+            raise NotADirectoryError(f"标准包路径不是目录：{directory}")
+        candidates = directory.rglob("*") if recursive else directory.iterdir()
+        paths = [path.resolve() for path in candidates if path.is_file() and path.suffix.lower() == ".uebench"]
+        return sorted(paths, key=lambda path: (path.name.casefold(), str(path).casefold()))
+
     def latest_manifest(self) -> PackageManifest | None:
         """返回最近一次成功安装的标准包清单，供应用层展示。"""
         with self.database.session() as session:

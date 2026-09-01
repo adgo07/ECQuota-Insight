@@ -81,3 +81,12 @@ def test_facade_exposes_preview_evaluation():
 
     assert facade.preview_evaluation(request) is expected
     evaluation.preview.assert_called_once_with(request)
+
+def test_facade_discovers_standard_packages_without_installing():
+    package = Mock()
+    package.discover.return_value = [Path("/share/a.uebench")]
+    facade, _standards, _evaluations, _evaluation = _facade(package=package)
+
+    directory = Path("/share")
+    assert facade.discover_package_paths(directory, recursive=True) == [Path("/share/a.uebench")]
+    package.discover.assert_called_once_with(directory, recursive=True)

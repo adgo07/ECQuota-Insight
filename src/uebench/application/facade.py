@@ -130,6 +130,14 @@ class ApplicationFacade:
             return []
         return self._audit.list_recent(limit)
 
+    def discover_package_paths(self, directory: Path, *, recursive: bool = False) -> list[Path]:
+        if self._package is None:
+            raise RuntimeError("标准包服务未配置")
+        discover = getattr(self._package, "discover", None)
+        if discover is None:
+            return []
+        return list(discover(directory, recursive=recursive))
+
     def preview_package(self, path: Path) -> Any:
         if self._package is None:
             raise RuntimeError("标准包服务未配置")

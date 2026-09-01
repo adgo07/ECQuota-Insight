@@ -312,6 +312,9 @@ class MainWindow(QMainWindow):
         package = QPushButton("安装标准包")
         package.clicked.connect(self.install_standard_package)
         package.setEnabled(self.context.application.has_package_service())
+        scan_packages = QPushButton("扫描标准包目录")
+        scan_packages.clicked.connect(self.discover_standard_packages)
+        scan_packages.setEnabled(self.context.application.has_package_service())
         backup = QPushButton("创建备份")
         backup.clicked.connect(self.create_backup)
         restore = QPushButton("恢复备份")
@@ -319,6 +322,7 @@ class MainWindow(QMainWindow):
         open_data = QPushButton("打开数据目录")
         open_data.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.context.paths.root))))
         controls.addWidget(package)
+        controls.addWidget(scan_packages)
         controls.addWidget(backup)
         controls.addWidget(restore)
         controls.addStretch()
@@ -844,6 +848,37 @@ class MainWindow(QMainWindow):
             self.audit_table.insertRow(row)
             for column, value in enumerate((entry.created_at, entry.action, entry.entity_type, entry.entity_id, entry.details_json)):
                 self.audit_table.setItem(row, column, _item(value))
+
+    def discover_standard_packages(self) -> None:
+        """Scan a selected local/NAS directory without installing anything."""
+        if not self.context.application.has_package_service():
+            return
+        directory = QFileDialog.getExistingDirectory(self, "选择标准包目录")
+        if not directory:
+            return
+        try:
+            paths = self.context.application.discover_package_paths(Path(directory), recursive=True)
+        except Exception as exc:
+            QMessageBox.critical(self, "扫描失败", str(exc))
+            return
+        if not paths:
+            QMessageBox.information(self, "扫描结果", "目录中没有找到 .uebench 标准包。")
+            return
+        lines = [f"扫描到 {len(paths)} 个候选包（仅扫描，未安装）："]
+        for path in paths:
+            try:
+                report = self.context.application.preview_package(path)
+            except Exception as exc:
+                lines.append(f"{path.name}：无法读取（{exc}）")
+                continue
+            if report.valid and report.manifest is not None:
+                manifest = report.manifest
+                lines.append(f"{path.name}：可安装；数据版本 {manifest.data_version}；{manifest.package_mode}；{manifest.standard_count} 项标准")
+                if report.warnings:
+                    lines.append("  提示：" + "；".join(report.warnings))
+            else:
+                lines.append(f"{path.name}：拒绝；" + "；".join(report.errors))
+        QMessageBox.information(self, "标准包扫描结果", "\n".join(lines))
 
     def install_standard_package(self) -> None:
         if not self.context.application.has_package_service():
