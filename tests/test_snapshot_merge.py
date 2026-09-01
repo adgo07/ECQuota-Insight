@@ -16,3 +16,12 @@ def test_development_snapshots_have_a_single_canonical_scope() -> None:
     assert report["comparison"]["canonical_only"] == ["GB 29141-2024", "GB 29435-2025"]
     assert report["comparison"]["unresolved_legacy_only"] == []
     assert report["merge_decision"].startswith("scope-63是唯一开发基线")
+
+def test_canonical_snapshot_does_not_embed_legacy_scope_manifest() -> None:
+    root = Path(__file__).resolve().parents[1] / "standards" / "development"
+    canonical = root / "scope-63"
+    legacy = root / "scope-65"
+
+    assert not (canonical / "scope-65.json").exists()
+    assert (legacy / "scope-65.json").exists()
+    assert any((canonical / "retired-definitions").glob("*.json"))

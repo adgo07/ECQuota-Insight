@@ -13,3 +13,4 @@
 
 - 每个定义包含 `standard_family_id`、`version` 和 `rule_revision`：版本号代表标准年代，家族ID通过替代链稳定归并，规则修订号用于同一标准版本的规则变更。
 - 新增或替代标准后先运行 `python tools/normalize_standard_identity.py --check`；需要写入快照时再去掉 `--check`。该工具只改身份字段，不改限额、公式或发布状态。
+目录约束：scope-63 只保留 canonical 范围清单、当前定义和 retired-definitions；scope-65 只保留在同级独立目录中。禁止把 scope-65.json 复制到 scope-63 内。
