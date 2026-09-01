@@ -40,6 +40,7 @@ from uebench.domain.models import (
     EnergyLine,
     EvaluationRequest,
     DataType,
+    GRADE_LABELS,
     Grade,
     LifecycleStatus,
     InputMode,
@@ -48,7 +49,6 @@ from uebench.domain.models import (
     ProductionLine,
     StandardDefinition,
 )
-from uebench.infrastructure.excel import GRADE_LABELS
 
 
 APP_STYLE = """

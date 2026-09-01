@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 from uebench.domain.models import (
     EnergyLine,
+    GRADE_LABELS,
     EvaluationRequest,
     Grade,
     InputMode,
@@ -450,17 +451,6 @@ class WorkbookImportService:
         except ValueError as exc:
             issues.append(ImportIssue(severity="error", sheet="工作簿", cell="-", message=str(exc)))
             return None
-
-
-GRADE_LABELS = {
-    Grade.LEVEL_1: "1级",
-    Grade.LEVEL_2: "2级",
-    Grade.LEVEL_3: "3级",
-    Grade.NOT_QUALIFIED: "未达标",
-    Grade.INCOMPLETE: "不完整",
-    Grade.NOT_APPLICABLE: "不适用",
-}
-
 
 class WorkbookExportService:
     def __init__(self, evaluations: SqlEvaluationRepository, audit: AuditRepository | None = None) -> None:

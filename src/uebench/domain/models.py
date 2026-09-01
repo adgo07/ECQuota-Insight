@@ -17,6 +17,16 @@ class Grade(StrEnum):
     NOT_APPLICABLE = "NOT_APPLICABLE"
 
 
+GRADE_LABELS = {
+    Grade.LEVEL_1: "1级",
+    Grade.LEVEL_2: "2级",
+    Grade.LEVEL_3: "3级",
+    Grade.NOT_QUALIFIED: "未达标",
+    Grade.INCOMPLETE: "不完整",
+    Grade.NOT_APPLICABLE: "不适用",
+}
+
+
 class InputMode(StrEnum):
     DIRECT = "DIRECT"
     DETAIL = "DETAIL"
