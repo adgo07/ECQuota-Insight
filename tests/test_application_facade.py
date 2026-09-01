@@ -90,3 +90,12 @@ def test_facade_discovers_standard_packages_without_installing():
     directory = Path("/share")
     assert facade.discover_package_paths(directory, recursive=True) == [Path("/share/a.uebench")]
     package.discover.assert_called_once_with(directory, recursive=True)
+
+
+def test_facade_scans_standard_package_directory():
+    package = Mock()
+    package.discover.return_value = []
+    facade, _standards, _evaluations, _evaluation = _facade(package=package)
+
+    assert facade.scan_package_directory(Path("/share"), recursive=True) == []
+    package.discover.assert_called_once_with(Path("/share"), recursive=True)

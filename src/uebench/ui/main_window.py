@@ -850,36 +850,31 @@ class MainWindow(QMainWindow):
                 self.audit_table.setItem(row, column, _item(value))
 
     def discover_standard_packages(self) -> None:
-        """Scan a selected local/NAS directory without installing anything."""
+        """Scan a selected local/NAS directory through the application use case."""
         if not self.context.application.has_package_service():
             return
         directory = QFileDialog.getExistingDirectory(self, "选择标准包目录")
         if not directory:
             return
         try:
-            paths = self.context.application.discover_package_paths(Path(directory), recursive=True)
+            items = self.context.application.scan_package_directory(Path(directory), recursive=True)
         except Exception as exc:
             QMessageBox.critical(self, "扫描失败", str(exc))
             return
-        if not paths:
+        if not items:
             QMessageBox.information(self, "扫描结果", "目录中没有找到 .uebench 标准包。")
             return
-        lines = [f"扫描到 {len(paths)} 个候选包（仅扫描，未安装）："]
-        for path in paths:
-            try:
-                report = self.context.application.preview_package(path)
-            except Exception as exc:
-                lines.append(f"{path.name}：无法读取（{exc}）")
-                continue
-            if report.valid and report.manifest is not None:
-                manifest = report.manifest
-                lines.append(f"{path.name}：可安装；数据版本 {manifest.data_version}；{manifest.package_mode}；{manifest.standard_count} 项标准")
-                if report.warnings:
-                    lines.append("  提示：" + "；".join(report.warnings))
+        lines = [f"扫描到 {len(items)} 个候选包（仅扫描，未安装）："]
+        for item in items:
+            filename = Path(item.path).name
+            if item.valid:
+                detail = f"可安装；数据版本 {item.data_version}；{item.package_mode}；{item.standard_count} 项标准"
+                lines.append(f"{filename}：{detail}")
+                if item.warnings:
+                    lines.append("  提示：" + "；".join(item.warnings))
             else:
-                lines.append(f"{path.name}：拒绝；" + "；".join(report.errors))
+                lines.append(f"{filename}：拒绝；" + "；".join(item.errors))
         QMessageBox.information(self, "标准包扫描结果", "\n".join(lines))
-
     def install_standard_package(self) -> None:
         if not self.context.application.has_package_service():
             return

@@ -23,6 +23,7 @@ from .ports import (
     WorkbookImportPort,
 )
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
+from .package_updates import PackageDirectoryService, PackageScanItem
 
 
 class ApplicationFacade:
@@ -49,6 +50,7 @@ class ApplicationFacade:
         self._import = import_service
         self._export = export_service
         self._package = package_service
+        self._package_updates = PackageDirectoryService(package_service) if package_service is not None else None
         self._backup = backup_service
         self._audit = audit
         self._source_root = source_root
@@ -129,6 +131,11 @@ class ApplicationFacade:
         if self._audit is None:
             return []
         return self._audit.list_recent(limit)
+
+    def scan_package_directory(self, directory: Path, *, recursive: bool = False) -> list[PackageScanItem]:
+        if self._package_updates is None:
+            raise RuntimeError('标准包服务未配置')
+        return self._package_updates.scan(directory, recursive=recursive)
 
     def discover_package_paths(self, directory: Path, *, recursive: bool = False) -> list[Path]:
         if self._package is None:
