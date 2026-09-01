@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 from pathlib import Path
 from typing import Any
@@ -12,7 +13,7 @@ from uebench.domain.models import StandardDefinition
 
 NUMBER = "GB 31823-2021"
 TITLE = "码头作业单位产品能源消耗限额"
-SOURCE_DIR = Path(r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本")
+SOURCE_DIR = Path(os.environ.get("UEBENCH_SOURCE_DIR", r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本"))
 SOURCE_FILE_HINT = "31823-2021"
 
 

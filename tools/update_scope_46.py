@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import json
 import shutil
 from datetime import datetime, timezone
@@ -10,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 DEFINITIONS = DATA / "definitions"
-SOURCE = Path(r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本")
+SOURCE = Path(os.environ.get("UEBENCH_SOURCE_DIR", r"G:\标准  规范\02_能耗限额_终端产品\单位产品限额\现行强制文本"))
 
 
 def sha256(path: Path) -> str:
