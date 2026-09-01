@@ -61,6 +61,16 @@ def standard_id(number: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", number.lower()).strip("-")
 
 
+def standard_family_id(number: str) -> str:
+    """Return the stable family key shared by editions of one standard."""
+    return number.rsplit("-", 1)[0].strip()
+
+
+def standard_version(number: str) -> str:
+    """Return the edition year recorded in a GB standard number."""
+    return number.rsplit("-", 1)[-1].strip()
+
+
 def find_pdf(source_dir: Path, sequence: int) -> Path:
     prefix_pattern = re.compile(rf"^0*{sequence}(?:\.|\s)")
     matches = [path for path in source_dir.glob("*.pdf") if prefix_pattern.match(path.name)]
@@ -137,11 +147,16 @@ def build(catalog_path: Path, source_dir: Path, output_dir: Path, scope_path: Pa
             )
         digest = sha256(pdf_path)
         sid = standard_id(number)
+        family_id = standard_family_id(number)
+        version = standard_version(number)
         item = {
             "sequence": sequence,
             "id": sid,
             "number": number,
             "title": title,
+            "version": version,
+            "standard_family_id": family_id,
+            "rule_revision": 1,
             "publication_date": publication.isoformat(),
             "effective_date": effective.isoformat(),
             "remark": remark_text,
@@ -155,7 +170,9 @@ def build(catalog_path: Path, source_dir: Path, output_dir: Path, scope_path: Pa
             "id": sid,
             "number": number,
             "title": title,
-            "version": number.split("-")[-1],
+            "version": version,
+            "standard_family_id": family_id,
+            "rule_revision": 1,
             "publication_status": "draft",
             "publication_date": publication.isoformat(),
             "effective_date": effective.isoformat(),

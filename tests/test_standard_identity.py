@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tools.build_catalog import standard_family_id, standard_version
 from tools.normalize_standard_identity import IdentityError, normalize_root, resolve_family_id
 
 
@@ -44,3 +45,7 @@ def test_normalize_root_is_idempotent_and_does_not_change_rule_values(tmp_path: 
     second = normalize_root(root, replacements, apply=False, include_retired=False)
     assert second["changed_count"] == 0
     assert second["already_normalized_count"] == 2
+
+def test_catalog_identity_helpers_keep_family_and_edition_year_separate() -> None:
+    assert standard_family_id("GB 29141-2024") == "GB 29141"
+    assert standard_version("GB 29141-2024") == "2024"
