@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "generated_on": "2026-09-01",
+  "generated_by": "tools/compare_development_snapshots.py",
+  "canonical_scope": "scope-63",
+  "legacy_scope": "scope-65",
+  "valid": true,
+  "merge_decision": "scope-63是唯一开发基线；scope-65仅保留用于历史追溯，旧版标准必须通过替代关系进入历史目录。",
+  "comparison": {
+    "common_count": 61,
+    "identical_definition_count": 8,
+    "different_definition_count": 53,
+    "canonical_only": [
+      "GB 29141-2024",
+      "GB 29435-2025"
+    ],
+    "legacy_only": [
+      "GB 29141-2012",
+      "GB 29435-2012",
+      "GB 29437-2012",
+      "GB 29441-2012"
+    ],
+    "unresolved_legacy_only": [],
+    "legacy_mappings": [
+      {
+        "obsolete_number": "GB 29141-2012",
+        "replacement_number": "GB 29141-2024",
+        "replacement_in_canonical_scope": true,
+        "status": "published_replacement"
+      },
+      {
+        "obsolete_number": "GB 29435-2012",
+        "replacement_number": "GB 29435-2025",
+        "replacement_in_canonical_scope": true,
+        "status": "published_replacement"
+      },
+      {
+        "obsolete_number": "GB 29437-2012",
+        "replacement_number": "GB 29141-2024",
+        "replacement_in_canonical_scope": true,
+        "status": "published_replacement"
+      },
+      {
+        "obsolete_number": "GB 29441-2012",
+        "replacement_number": "GB 29141-2024",
+        "replacement_in_canonical_scope": true,
+        "status": "published_replacement"
+      }
+    ],
+    "changed_top_level_fields": {
+      "corrections": 3,
+      "lifecycle_status": 48,
+      "products": 52,
+      "replaced_by": 48,
+      "supersedes": 51
+    }
+  }
+}
