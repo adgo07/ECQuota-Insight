@@ -12,6 +12,14 @@ from uebench.domain.models import (
     StandardSelectionMode,
 )
 
+from .ports import (
+    AuditPort,
+    BackupPort,
+    StandardPackagePort,
+    TemplatePort,
+    WorkbookExportPort,
+    WorkbookImportPort,
+)
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
 
 
@@ -24,12 +32,12 @@ class ApplicationFacade:
         standards: StandardRepository,
         evaluations: EvaluationRepository,
         evaluation_service: EvaluationService,
-        template_service: Any | None = None,
-        import_service: Any | None = None,
-        export_service: Any | None = None,
-        package_service: Any | None = None,
-        backup_service: Any | None = None,
-        audit: Any | None = None,
+        template_service: TemplatePort | None = None,
+        import_service: WorkbookImportPort | None = None,
+        export_service: WorkbookExportPort | None = None,
+        package_service: StandardPackagePort | None = None,
+        backup_service: BackupPort | None = None,
+        audit: AuditPort | None = None,
         source_root: Path | None = None,
     ) -> None:
         self._standards = standards
