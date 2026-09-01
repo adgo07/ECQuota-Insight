@@ -10,6 +10,7 @@ from uebench.domain.models import (
     EvaluationRequest,
     EvaluationResult,
     EvaluationSummary,
+    PackageHistoryEntry,
     StandardDefinition,
     StandardSelectionMode,
 )
@@ -184,9 +185,16 @@ class ApplicationFacade:
             return manifest
         return json.loads(manifest)
 
+    def list_package_history(self, limit: int = 50) -> list[PackageHistoryEntry]:
+        """Return installed package history without exposing database rows to the UI."""
+        if self._package is None:
+            return []
+        loader = getattr(self._package, "list_history", None)
+        if loader is None:
+            return []
+        return list(loader(limit))
     def find_standard_source(self, standard_id: str) -> Path | None:
         standard = self.get_published_standard(standard_id)
         if standard is None or self._source_root is None:
             return None
         return next(self._source_root.rglob(standard.source_file), None)
-

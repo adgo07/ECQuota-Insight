@@ -406,6 +406,20 @@ class EvaluationSummary(StrictModel):
     project_name: str | None = None
 
 
+class PackageHistoryEntry(StrictModel):
+    """UI-neutral record of one successfully installed standard package."""
+
+    package_id: str
+    data_version: str
+    package_mode: str
+    issued_at: datetime
+    installed_at: datetime
+    parent_package_id: str | None = None
+    standard_count: int = Field(ge=0)
+    rule_count: int = Field(ge=0)
+    package_sha256: str = Field(pattern=r"^[A-Fa-f0-9]{64}$")
+
+
 class AuditEntry(StrictModel):
     """UI-neutral audit event; SQLAlchemy rows must not cross the application boundary."""
 

@@ -12,6 +12,7 @@ from .models import (
     IndicatorDefinition,
     IndicatorResult,
     InputMode,
+    PackageHistoryEntry,
     StandardDefinition,
 )
 
@@ -28,6 +29,7 @@ __all__ = [
     "IndicatorDefinition",
     "IndicatorResult",
     "InputMode",
+    "PackageHistoryEntry",
     "StandardDefinition",
 ]
 

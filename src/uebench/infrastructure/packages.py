@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import desc, select
 
 from uebench import RULE_ENGINE_VERSION, __version__
-from uebench.domain.models import PublicationStatus, StandardDefinition
+from uebench.domain.models import PackageHistoryEntry, PublicationStatus, StandardDefinition
 
 from .backup import BackupService
 from .database import DatabaseManager, PackageRow, StandardRow
@@ -311,6 +311,34 @@ class StandardPackageService:
             return None
         return PackageManifest.model_validate_json(row.manifest_json)
 
+    def list_history(self, limit: int = 50) -> list[PackageHistoryEntry]:
+        """Return successful package installs newest first as domain DTOs."""
+        if limit < 1:
+            return []
+        limit = min(limit, 1000)
+        with self.database.session() as session:
+            rows = session.scalars(
+                select(PackageRow)
+                .order_by(desc(PackageRow.installed_at), desc(PackageRow.issued_at))
+                .limit(limit)
+            ).all()
+        entries: list[PackageHistoryEntry] = []
+        for row in rows:
+            manifest = PackageManifest.model_validate_json(row.manifest_json)
+            entries.append(
+                PackageHistoryEntry(
+                    package_id=manifest.package_id,
+                    data_version=manifest.data_version,
+                    package_mode=manifest.package_mode,
+                    issued_at=manifest.issued_at,
+                    installed_at=row.installed_at,
+                    parent_package_id=manifest.parent_package_id,
+                    standard_count=manifest.standard_count,
+                    rule_count=manifest.rule_count,
+                    package_sha256=row.package_sha256,
+                )
+            )
+        return entries
     def preview(self, path: Path) -> PackageValidationReport:
         path = path.resolve()
         errors: list[str] = []

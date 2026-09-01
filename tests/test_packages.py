@@ -101,6 +101,36 @@ def test_signed_package_preview_and_install(tmp_path: Path) -> None:
     assert standards.get_published("gb-00000-2026") is not None
 
 
+def test_package_history_returns_installs_newest_first_as_domain_records(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    parent = build_package(
+        tmp_path,
+        private_key,
+        package_id="history-parent",
+        data_version="2026.1",
+        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+    )
+    child = build_package(
+        tmp_path,
+        private_key,
+        package_id="history-child",
+        data_version="2026.2",
+        issued_at=datetime(2026, 8, 24, tzinfo=timezone.utc),
+    )
+    service.install(parent)
+    service.install(child)
+
+    history = service.list_history()
+    assert [entry.package_id for entry in history[:2]] == ["history-child", "history-parent"]
+    assert history[0].data_version == "2026.2"
+    assert history[0].package_mode == "full"
+    assert history[0].standard_count == 1
+    assert history[0].rule_count >= 1
+    assert len(history[0].package_sha256) == 64
+    assert service.list_history(1)[0].package_id == "history-child"
+    assert service.list_history(0) == []
+
 def test_package_install_retains_correction_record(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()
     paths, _, _, service = make_service(tmp_path, private_key)

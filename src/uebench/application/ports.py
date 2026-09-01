@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Protocol
 
-from uebench.domain.models import AuditEntry, EvaluationRequest, StandardDefinition
+from uebench.domain.models import AuditEntry, EvaluationRequest, PackageHistoryEntry, StandardDefinition
 
 
 class TemplatePort(Protocol):
@@ -84,6 +84,8 @@ class StandardPackagePort(PackageDiscoveryPort, Protocol):
     def install(self, path: Path) -> PackageInstallResultPort: ...
 
     def latest_manifest(self) -> PackageManifestPort | None: ...
+
+    def list_history(self, limit: int = 50) -> list[PackageHistoryEntry]: ...
 
 
 class BackupPort(Protocol):

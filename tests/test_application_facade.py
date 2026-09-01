@@ -99,3 +99,10 @@ def test_facade_scans_standard_package_directory():
 
     assert facade.scan_package_directory(Path("/share"), recursive=True) == []
     package.discover.assert_called_once_with(Path("/share"), recursive=True)
+def test_facade_lists_package_history_through_application_port():
+    package = Mock()
+    package.list_history.return_value = [{"package_id": "pkg-1"}]
+    facade, _standards, _evaluations, _evaluation = _facade(package=package)
+
+    assert facade.list_package_history(12) == [{"package_id": "pkg-1"}]
+    package.list_history.assert_called_once_with(12)
