@@ -41,6 +41,8 @@ def build_package(
     rule_engine_version: str = "1.0",
     package_mode: str = "full",
     parent_package_id: str | None = None,
+    data_version: str = "2026.1",
+    issued_at: datetime | None = None,
 ) -> Path:
     definition = make_standard()
     definition.rule_revision = rule_revision
@@ -60,9 +62,9 @@ def build_package(
         [definition],
         {definition.source_file: source},
         package_id=package_id,
-        data_version="2026.1",
+        data_version=data_version,
         rule_engine_version=rule_engine_version,
-        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+        issued_at=issued_at or datetime(2026, 8, 23, tzinfo=timezone.utc),
         package_mode=package_mode,
         parent_package_id=parent_package_id,
         corrections=corrections,
@@ -367,3 +369,22 @@ def test_package_source_reference_mismatch_is_rejected(tmp_path: Path) -> None:
     report = service.preview(package)
     assert not report.valid
     assert any("来源标准号不一致" in error for error in report.errors)
+
+
+def test_package_data_version_rollback_is_rejected_even_with_newer_issue_time(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    first = build_package(
+        tmp_path, private_key, package_id="version-first",
+        data_version="2026.08-published.4",
+        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+    )
+    second = build_package(
+        tmp_path, private_key, package_id="version-rollback",
+        data_version="2026.08-published.3",
+        issued_at=datetime(2026, 8, 24, tzinfo=timezone.utc),
+    )
+    service.install(first)
+    report = service.preview(second)
+    assert not report.valid
+    assert any("数据版本早于" in error for error in report.errors)

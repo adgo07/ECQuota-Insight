@@ -53,7 +53,7 @@ def make_standard(*, comparison: ComparisonDirection = ComparisonDirection.LTE) 
             args=[Expression(op="input", input_key="total"), Expression(op="input", input_key="production")],
         ),
         thresholds=ThresholdSet(level_1=constant("10"), level_2=constant("20"), level_3=constant("30")),
-        source_references=[SOURCE],
+        source_references=[SOURCE.model_copy(deep=True)],
     )
     product = ProductDefinition(
         id="product",

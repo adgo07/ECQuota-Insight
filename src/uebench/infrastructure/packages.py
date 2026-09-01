@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import tempfile
 import zipfile
@@ -135,6 +136,29 @@ def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def _data_version_key(value: str) -> tuple[int, int, int, int] | None:
+    """Parse the package's sortable YYYY.MM-channel.revision convention."""
+    match = re.fullmatch(
+        r"(?P<year>\d{4})\.(?P<minor>\d+)(?:-(?P<channel>[A-Za-z][A-Za-z0-9_-]*))?(?:\.(?P<revision>\d+))?",
+        value.strip(),
+    )
+    if match is None:
+        return None
+    channel = (match.group("channel") or "").lower()
+    channel_rank = {"draft": 0, "reviewed": 1, "published": 2}.get(channel)
+    if channel_rank is None:
+        channel_rank = 1 if not channel else None
+    if channel_rank is None:
+        return None
+    return (
+        int(match.group("year")),
+        int(match.group("minor")),
+        channel_rank,
+        int(match.group("revision") or 0),
+    )
+
 def _definition_matches(payload: str, incoming: StandardDefinition) -> bool:
     """Return true only when an installed rule has identical canonical JSON."""
     try:
@@ -449,8 +473,19 @@ class StandardPackageService:
                             errors.append(
                                 f"增量标准包父包不是当前最新包：要求 {manifest.parent_package_id}，当前为 {latest.package_id}"
                             )
-                if latest is not None and _as_utc(manifest.issued_at) < _as_utc(latest.issued_at):
-                    errors.append("标准包发布时间早于当前已安装版本，禁止降级")
+                if latest is not None:
+                    if _as_utc(manifest.issued_at) < _as_utc(latest.issued_at):
+                        errors.append("标准包发布时间早于当前已安装版本，禁止降级")
+                    try:
+                        latest_manifest = PackageManifest.model_validate_json(latest.manifest_json)
+                    except ValueError:
+                        latest_manifest = None
+                    incoming_key = _data_version_key(manifest.data_version)
+                    latest_key = _data_version_key(latest_manifest.data_version) if latest_manifest else None
+                    if incoming_key is not None and latest_key is not None and incoming_key < latest_key:
+                        errors.append("标准包数据版本早于当前已安装版本，禁止降级")
+                    elif manifest.data_version != (latest_manifest.data_version if latest_manifest else None) and (incoming_key is None or latest_key is None):
+                        warnings.append("标准包数据版本格式无法排序，将仅按发布时间防止降级")
         return PackageValidationReport(
             valid=not errors,
             manifest=manifest,
