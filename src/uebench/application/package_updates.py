@@ -2,32 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class PackageManifestLike(Protocol):
-    package_id: str
-    data_version: str
-    issued_at: datetime
-    package_mode: str
-    parent_package_id: str | None
-    standard_count: int
-    rule_count: int
-
-
-class PackagePreviewLike(Protocol):
-    valid: bool
-    manifest: PackageManifestLike | None
-    errors: list[str]
-    warnings: list[str]
-
-
-class PackageDiscoveryPort(Protocol):
-    def discover(self, directory: Path, *, recursive: bool = False) -> list[Path]: ...
-
-    def preview(self, path: Path) -> PackagePreviewLike: ...
+from .ports import PackageDiscoveryPort, PackageManifestPort, PackageValidationReportPort
 
 
 class PackageScanItem(BaseModel):
@@ -62,11 +40,11 @@ class PackageDirectoryService:
         items: list[PackageScanItem] = []
         for path in self.packages.discover(directory, recursive=recursive):
             try:
-                report = self.packages.preview(path)
+                report: PackageValidationReportPort = self.packages.preview(path)
             except Exception as exc:  # preview adapters may reject a malformed file
                 items.append(PackageScanItem(path=str(path), valid=False, errors=[str(exc)]))
                 continue
-            manifest = report.manifest
+            manifest: PackageManifestPort | None = report.manifest
             items.append(
                 PackageScanItem(
                     path=str(path),

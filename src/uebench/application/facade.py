@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable
 
 from uebench.domain.models import (
     AuditEntry,
@@ -17,6 +17,10 @@ from uebench.domain.models import (
 from .ports import (
     AuditPort,
     BackupPort,
+    EvaluationDraftPort,
+    ImportReportPort,
+    PackageInstallResultPort,
+    PackageValidationReportPort,
     StandardPackagePort,
     TemplatePort,
     WorkbookExportPort,
@@ -109,12 +113,12 @@ class ApplicationFacade:
             raise RuntimeError("Excel模板服务未配置")
         return self._template.create_template(path)
 
-    def validate_workbook(self, path: Path) -> Any:
+    def validate_workbook(self, path: Path) -> ImportReportPort:
         if self._import is None:
             raise RuntimeError("Excel导入服务未配置")
         return self._import.validate(path)
 
-    def commit_workbook(self, import_id: str) -> Any:
+    def commit_workbook(self, import_id: str) -> EvaluationDraftPort:
         if self._import is None:
             raise RuntimeError("Excel导入服务未配置")
         return self._import.commit(import_id)
@@ -145,12 +149,12 @@ class ApplicationFacade:
             return []
         return list(discover(directory, recursive=recursive))
 
-    def preview_package(self, path: Path) -> Any:
+    def preview_package(self, path: Path) -> PackageValidationReportPort:
         if self._package is None:
             raise RuntimeError("标准包服务未配置")
         return self._package.preview(path)
 
-    def install_package(self, path: Path) -> Any:
+    def install_package(self, path: Path) -> PackageInstallResultPort:
         if self._package is None:
             raise RuntimeError("标准包服务未配置")
         return self._package.install(path)
@@ -165,10 +169,10 @@ class ApplicationFacade:
             raise RuntimeError("备份服务未配置")
         self._backup.restore(path)
 
-    def latest_package_manifest(self) -> dict[str, Any] | None:
+    def latest_package_manifest(self) -> dict[str, object] | None:
         if self._package is None:
             return None
-        loader: Callable[[], Any] | None = getattr(self._package, "latest_manifest", None)
+        loader: Callable[[], object] | None = getattr(self._package, "latest_manifest", None)
         if loader is None:
             return None
         manifest = loader()
