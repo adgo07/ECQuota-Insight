@@ -75,7 +75,12 @@ foreach ($Document in @(
     "验收记录.md",
     "README.md"
 )) {
-    $Source = Join-Path $ProjectRoot "docs\$Document"
+    $Source = if ($Document -eq "README.md") {
+        Join-Path $ProjectRoot $Document
+    }
+    else {
+        Join-Path $ProjectRoot "docs\$Document"
+    }
     if (Test-Path -LiteralPath $Source) {
         Copy-Item -LiteralPath $Source -Destination (Join-Path $Release $Document) -Force
     }
