@@ -75,7 +75,7 @@ def refine(data_dir: Path) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="精化GB 40877-2021草案规则（仍为draft）")
-    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-65/data"))
+    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-63/data"))
     args = parser.parse_args()
     print(f"已精化GB 40877-2021草案规则：{refine(args.data_dir.resolve())}")
 

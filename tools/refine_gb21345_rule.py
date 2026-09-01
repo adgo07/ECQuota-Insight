@@ -216,7 +216,7 @@ def refine(data_dir: Path) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="精化GB 21345-2024草案规则（仍为draft）")
-    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-65/data"))
+    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-63/data"))
     args = parser.parse_args()
     path = refine(args.data_dir.resolve())
     print(f"已精化 {NUMBER} 草案规则：{path}")

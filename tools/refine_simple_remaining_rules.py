@@ -116,7 +116,7 @@ def refine_one(data_dir: Path, number: str) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="精化表格型草案标准（仍为draft）")
-    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-65/data"))
+    parser.add_argument("--data-dir", type=Path, default=Path("work/next-scope-63/data"))
     parser.add_argument("--standard", choices=sorted(CONFIG), action="append")
     args = parser.parse_args()
     for number in args.standard or sorted(CONFIG):
