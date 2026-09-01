@@ -626,11 +626,12 @@ class MainWindow(QMainWindow):
     def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
         try:
             request = request or self._collect_request()
-            result = self.context.application.evaluate(request)
+            is_preview = request.selection_mode is StandardSelectionMode.FUTURE
+            result = self.context.application.preview_evaluation(request) if is_preview else self.context.application.evaluate(request)
         except Exception as exc:
             QMessageBox.critical(self, "无法计算", str(exc))
             return
-        self.last_result_id = result.evaluation_id
+        self.last_result_id = None if is_preview else result.evaluation_id
         self.eval_results.setRowCount(0)
         counts = Counter(item.grade for item in result.results)
         summary = "；".join(
@@ -677,8 +678,10 @@ class MainWindow(QMainWindow):
                     cell.setBackground(Qt.GlobalColor.red)
                 self.eval_results.setItem(row, column, cell)
         self.refresh_home()
-        self.refresh_records()
-        QMessageBox.information(self, "计算完成", "单项判级已完成并保存。")
+        if not is_preview:
+            self.refresh_records()
+        message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
+        QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
 
     def refresh_records(self) -> None:
         self.record_table.setRowCount(0)

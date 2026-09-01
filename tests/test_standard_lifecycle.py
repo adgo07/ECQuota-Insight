@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 from uebench.application.services import EvaluationService
 from uebench.domain.models import EvaluationRequest, InputMode, InputValue, LifecycleStatus, StandardSelectionMode
 from uebench.infrastructure.database import DatabaseManager
@@ -77,4 +79,33 @@ def test_future_selection_never_falls_back_to_current(tmp_path: Path) -> None:
     assert standards.get_for_evaluation("gb-current-test", date(2026, 8, 31), StandardSelectionMode.FUTURE) is None
     selected = standards.get_for_evaluation("gb-future-test", date(2026, 8, 31), StandardSelectionMode.FUTURE)
     assert selected is not None and selected.number == "GB 00002-2027"
+    database.dispose()
+def test_future_evaluation_is_preview_only(tmp_path: Path) -> None:
+    paths = AppPaths.from_root(tmp_path / "appdata")
+    paths.ensure()
+    database = DatabaseManager(paths.database)
+    database.initialize()
+    audit = AuditRepository(database)
+    standards = SqlStandardRepository(database, audit)
+    evaluations = SqlEvaluationRepository(database, audit)
+    future = make_standard().model_copy(update={
+        "id": "gb-future-preview",
+        "number": "GB 00003-2027",
+        "effective_date": date(2027, 1, 1),
+    })
+    standards.install(future)
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 8, 31),
+        standard_id=future.id,
+        product_id="product",
+        selection_mode=StandardSelectionMode.FUTURE,
+        input_mode=InputMode.DIRECT,
+        inputs={"actual": InputValue(value="20", unit="kgce/t")},
+    )
+    service = EvaluationService(standards, evaluations)
+    with pytest.raises(ValueError, match="只能预览"):
+        service.evaluate(request)
+    preview = service.preview(request)
+    assert preview.results[0].grade.value == "LEVEL_2"
+    assert evaluations.list_recent() == []
     database.dispose()

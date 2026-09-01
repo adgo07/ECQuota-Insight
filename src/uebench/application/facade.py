@@ -55,6 +55,9 @@ class ApplicationFacade:
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.evaluate(request)
 
+    def preview_evaluation(self, request: EvaluationRequest) -> EvaluationResult:
+        return self._evaluation.preview(request)
+
     def list_current_standards(self, evaluation_date: date) -> list[StandardDefinition]:
         return self._standards.list_current(evaluation_date)
 

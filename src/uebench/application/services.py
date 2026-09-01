@@ -82,7 +82,7 @@ class EvaluationService:
         self.evaluations = evaluations
         self.engine = engine or EvaluationEngine()
 
-    def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
+    def _resolve_standard(self, request: EvaluationRequest) -> StandardDefinition:
         standard = self.standards.get_for_evaluation(
             request.standard_id,
             request.evaluation_date,
@@ -93,13 +93,31 @@ class EvaluationService:
             if fallback is None:
                 raise LookupError(f"未找到已发布标准：{request.standard_id}")
             raise ValueError(fallback.selection_warning(request.evaluation_date) or "所选标准不适用于当前评价日期。")
-        result = self.engine.evaluate(standard, request)
+        return standard
+
+    def _calculate(self, request: EvaluationRequest, standard: StandardDefinition) -> EvaluationResult:
+        result = self.engine.evaluate(
+            standard,
+            request,
+            allow_pre_effective=request.selection_mode is StandardSelectionMode.FUTURE,
+        )
         selection_warning = standard.selection_warning(request.evaluation_date)
         if selection_warning and selection_warning not in result.warnings:
             result.warnings.append(selection_warning)
             for indicator_result in result.results:
                 if selection_warning not in indicator_result.warnings:
                     indicator_result.warnings.append(selection_warning)
-        self.evaluations.save(request, result, standard)
         return result
 
+    def preview(self, request: EvaluationRequest) -> EvaluationResult:
+        """Calculate a result without creating a formal evaluation record."""
+        standard = self._resolve_standard(request)
+        return self._calculate(request, standard)
+
+    def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
+        if request.selection_mode is StandardSelectionMode.FUTURE:
+            raise ValueError("尚未实施标准只能预览，不能形成正式判定或保存评价记录。")
+        standard = self._resolve_standard(request)
+        result = self._calculate(request, standard)
+        self.evaluations.save(request, result, standard)
+        return result

@@ -238,12 +238,18 @@ class EvaluationEngine:
         self.expressions = ExpressionEvaluator()
         self.conditions = ConditionEvaluator()
 
-    def evaluate(self, standard: StandardDefinition, request: EvaluationRequest) -> EvaluationResult:
+    def evaluate(
+        self,
+        standard: StandardDefinition,
+        request: EvaluationRequest,
+        *,
+        allow_pre_effective: bool = False,
+    ) -> EvaluationResult:
         if standard.publication_status is not PublicationStatus.PUBLISHED:
             raise EvaluationValidationError("只有 published 标准规则可以正式计算")
         if request.standard_id != standard.id:
             raise EvaluationValidationError("评价请求与标准 ID 不一致")
-        if request.evaluation_date < standard.effective_date:
+        if request.evaluation_date < standard.effective_date and not allow_pre_effective:
             raise EvaluationValidationError(
                 f"评价日期 {request.evaluation_date} 早于标准实施日期 {standard.effective_date}"
             )

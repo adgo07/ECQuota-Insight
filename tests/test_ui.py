@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from datetime import date
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -9,7 +10,7 @@ from PySide6.QtWidgets import QApplication
 
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
-from uebench.domain.models import EvaluationRequest, InputMode, InputValue
+from uebench.domain.models import EvaluationRequest, InputMode, InputValue, StandardSelectionMode
 
 from .test_engine import make_standard
 
@@ -104,5 +105,30 @@ def test_duplicate_product_names_show_indicator_hint(tmp_path: Path) -> None:
     assert any("测试产品（指标：单位产品能耗）" == label for label in labels)
     assert any("测试产品（指标：单位产品电耗）" == label for label in labels)
     assert [window.eval_product.itemData(index) for index in range(window.eval_product.count())] == ["product", "product-2"]
+    window.close()
+    context.database.dispose()
+def test_future_standard_calculation_is_preview_only(tmp_path: Path, monkeypatch) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    future = make_standard().model_copy(update={
+        "id": "gb-future-ui",
+        "number": "GB 00004-2027",
+        "effective_date": date(2027, 1, 1),
+    })
+    context.standards.install(future)
+    window = MainWindow(context)
+    monkeypatch.setattr("uebench.ui.main_window.QMessageBox.information", lambda *args, **kwargs: None)
+    request = EvaluationRequest(
+        evaluation_date=date(2026, 9, 1),
+        standard_id=future.id,
+        product_id="product",
+        selection_mode=StandardSelectionMode.FUTURE,
+        input_mode=InputMode.DIRECT,
+        inputs={"actual": InputValue(value="20", unit="kgce/t")},
+    )
+    window.calculate_evaluation(request)
+    assert window.last_result_id is None
+    assert context.application.list_recent_evaluations() == []
+    assert window.eval_results.rowCount() == 1
     window.close()
     context.database.dispose()
