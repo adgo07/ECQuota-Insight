@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Protocol
+from typing import Protocol
 
 from uebench.domain.engine import EvaluationEngine
-from uebench.domain.models import EvaluationRequest, EvaluationResult, StandardDefinition, StandardSelectionMode
+from uebench.domain.models import (
+    EvaluationRequest,
+    EvaluationResult,
+    EvaluationSummary,
+    StandardDefinition,
+    StandardSelectionMode,
+)
 
 
 class StandardRepository(Protocol):
@@ -36,7 +42,7 @@ class EvaluationRepository(Protocol):
         standard_snapshot: StandardDefinition,
     ) -> None: ...
 
-    def list_recent(self, limit: int = 100) -> list[Any]: ...
+    def list_recent(self, limit: int = 100) -> list[EvaluationSummary]: ...
 
     def get(
         self, evaluation_id: str

@@ -11,6 +11,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Protocol
 
+from uebench.domain.models import AuditEntry
+
 
 class TemplatePort(Protocol):
     def create_template(self, path: Path) -> Path: ...
@@ -41,4 +43,4 @@ class BackupPort(Protocol):
 
 
 class AuditPort(Protocol):
-    def list_recent(self, limit: int = 200) -> list[Any]: ...
+    def list_recent(self, limit: int = 200) -> list[AuditEntry]: ...

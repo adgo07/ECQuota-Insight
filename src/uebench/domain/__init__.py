@@ -2,9 +2,11 @@
 
 from .engine import EvaluationEngine, EvaluationValidationError
 from .models import (
+    AuditEntry,
     ComparisonDirection,
     EvaluationRequest,
     EvaluationResult,
+    EvaluationSummary,
     Grade,
     IndicatorDefinition,
     IndicatorResult,
@@ -13,10 +15,12 @@ from .models import (
 )
 
 __all__ = [
+    "AuditEntry",
     "ComparisonDirection",
     "EvaluationEngine",
     "EvaluationRequest",
     "EvaluationResult",
+    "EvaluationSummary",
     "EvaluationValidationError",
     "Grade",
     "IndicatorDefinition",

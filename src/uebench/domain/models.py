@@ -382,6 +382,32 @@ class IndicatorResult(StrictModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+
+class EvaluationSummary(StrictModel):
+    """UI-neutral summary of a saved evaluation record."""
+
+    evaluation_id: str
+    created_at: datetime
+    evaluation_date: date
+    standard_id: str
+    standard_number: str
+    product_id: str
+    organization_name: str | None = None
+    project_name: str | None = None
+
+
+class AuditEntry(StrictModel):
+    """UI-neutral audit event; SQLAlchemy rows must not cross the application boundary."""
+
+    id: int
+    created_at: datetime
+    actor: str
+    action: str
+    entity_type: str
+    entity_id: str | None = None
+    details_json: str
+
+
 class EvaluationResult(StrictModel):
     evaluation_id: str
     evaluated_at: datetime

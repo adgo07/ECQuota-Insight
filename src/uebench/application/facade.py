@@ -6,8 +6,10 @@ from pathlib import Path
 from typing import Any, Callable
 
 from uebench.domain.models import (
+    AuditEntry,
     EvaluationRequest,
     EvaluationResult,
+    EvaluationSummary,
     StandardDefinition,
     StandardSelectionMode,
 )
@@ -88,7 +90,7 @@ class ApplicationFacade:
     def get_published_standard(self, standard_id: str) -> StandardDefinition | None:
         return self._standards.get_published(standard_id)
 
-    def list_recent_evaluations(self, limit: int = 100) -> list[Any]:
+    def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)
 
     def get_evaluation(
@@ -123,7 +125,7 @@ class ApplicationFacade:
     def has_package_service(self) -> bool:
         return self._package is not None
 
-    def list_audit(self, limit: int = 200) -> list[Any]:
+    def list_audit(self, limit: int = 200) -> list[AuditEntry]:
         if self._audit is None:
             return []
         return self._audit.list_recent(limit)

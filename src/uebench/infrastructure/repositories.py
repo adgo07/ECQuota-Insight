@@ -5,7 +5,15 @@ from datetime import date, datetime, timezone
 
 from sqlalchemy import desc, select
 
-from uebench.domain.models import EvaluationRequest, EvaluationResult, LifecycleStatus, StandardDefinition, StandardSelectionMode
+from uebench.domain.models import (
+    AuditEntry,
+    EvaluationRequest,
+    EvaluationResult,
+    EvaluationSummary,
+    LifecycleStatus,
+    StandardDefinition,
+    StandardSelectionMode,
+)
 
 from .database import AuditRow, DatabaseManager, EvaluationRow, StandardRow
 
@@ -39,9 +47,21 @@ class AuditRepository:
         with self.database.session() as own_session:
             own_session.add(row)
 
-    def list_recent(self, limit: int = 200) -> list[AuditRow]:
+    def list_recent(self, limit: int = 200) -> list[AuditEntry]:
         with self.database.session() as session:
-            return list(session.scalars(select(AuditRow).order_by(desc(AuditRow.created_at)).limit(limit)))
+            rows = session.scalars(select(AuditRow).order_by(desc(AuditRow.created_at)).limit(limit))
+            return [
+                AuditEntry(
+                    id=row.id,
+                    created_at=row.created_at,
+                    actor=row.actor,
+                    action=row.action,
+                    entity_type=row.entity_type,
+                    entity_id=row.entity_id,
+                    details_json=row.details_json,
+                )
+                for row in rows
+            ]
 
 
 class SqlStandardRepository:
@@ -241,7 +261,7 @@ class SqlEvaluationRepository:
                 StandardDefinition.model_validate_json(row.rule_snapshot_json),
             )
 
-    def list_recent(self, limit: int = 100) -> list[EvaluationRow]:
+    def list_recent(self, limit: int = 100) -> list[EvaluationSummary]:
         with self.database.session() as session:
             statement = (
                 select(EvaluationRow)
@@ -249,7 +269,20 @@ class SqlEvaluationRepository:
                 .order_by(desc(EvaluationRow.created_at))
                 .limit(limit)
             )
-            return list(session.scalars(statement))
+            rows = session.scalars(statement)
+            return [
+                EvaluationSummary(
+                    evaluation_id=row.evaluation_id,
+                    created_at=row.created_at,
+                    evaluation_date=row.evaluation_date,
+                    standard_id=row.standard_id,
+                    standard_number=row.standard_number,
+                    product_id=row.product_id,
+                    organization_name=row.organization_name,
+                    project_name=row.project_name,
+                )
+                for row in rows
+            ]
 
     def soft_delete(self, evaluation_id: str) -> bool:
         with self.database.session() as session:

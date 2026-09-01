@@ -7,7 +7,7 @@ import pytest
 from sqlalchemy import text
 
 from uebench.application.services import EvaluationService
-from uebench.domain.models import EvaluationRequest, Grade, InputMode, InputValue
+from uebench.domain.models import AuditEntry, EvaluationRequest, EvaluationSummary, Grade, InputMode, InputValue
 from uebench.infrastructure.backup import BackupService, BackupValidationError
 from uebench.infrastructure.database import DatabaseManager
 from uebench.infrastructure.paths import AppPaths
@@ -48,7 +48,11 @@ def test_standard_and_evaluation_round_trip(tmp_path: Path) -> None:
     assert loaded is not None
     assert loaded[1].results[0].grade is Grade.LEVEL_2
     assert loaded[2].source_sha256 == standard.source_sha256
-    assert len(audit.list_recent()) >= 2
+    summaries = evaluations.list_recent()
+    assert summaries and isinstance(summaries[0], EvaluationSummary)
+    audit_entries = audit.list_recent()
+    assert audit_entries and isinstance(audit_entries[0], AuditEntry)
+    assert len(audit_entries) >= 2
 
 
 def test_initialize_adopts_complete_pre_alembic_database(tmp_path: Path) -> None:
