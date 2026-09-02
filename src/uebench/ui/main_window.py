@@ -330,6 +330,14 @@ class MainWindow(QMainWindow):
         layout.addLayout(controls)
         if not self.context.application.has_package_service():
             layout.addWidget(QLabel("未配置标准包公钥，安装标准包功能已禁用。"))
+        layout.addWidget(QLabel("已安装标准包历史"))
+        self.package_history_table = QTableWidget(0, 8)
+        self.package_history_table.setHorizontalHeaderLabels(
+            ["安装时间", "数据版本", "包类型", "父包", "标准数", "规则数", "包ID", "SHA-256"]
+        )
+        self._configure_table(self.package_history_table)
+        layout.addWidget(self.package_history_table, 1)
+        layout.addWidget(QLabel("审计日志"))
         self.audit_table = QTableWidget(0, 5)
         self.audit_table.setHorizontalHeaderLabels(["时间", "操作", "对象类型", "对象ID", "详情"])
         self._configure_table(self.audit_table)
@@ -364,6 +372,7 @@ class MainWindow(QMainWindow):
         elif index == 3:
             self.refresh_records()
         elif index == 5:
+            self.refresh_package_history()
             self.refresh_audit()
 
     def refresh_all(self) -> None:
@@ -371,6 +380,7 @@ class MainWindow(QMainWindow):
         self.refresh_standards()
         self.refresh_standard_combo()
         self.refresh_records()
+        self.refresh_package_history()
         self.refresh_audit()
 
     def refresh_home(self) -> None:
@@ -841,6 +851,27 @@ class MainWindow(QMainWindow):
         except Exception as exc:
             QMessageBox.critical(self, "导入失败", str(exc))
 
+    def refresh_package_history(self) -> None:
+        self.package_history_table.setRowCount(0)
+        mode_labels = {"full": "完整包", "incremental": "增量包"}
+        for entry in self.context.application.list_package_history(100):
+            row = self.package_history_table.rowCount()
+            self.package_history_table.insertRow(row)
+            values = (
+                entry.installed_at.strftime("%Y-%m-%d %H:%M:%S"),
+                entry.data_version,
+                mode_labels.get(entry.package_mode, entry.package_mode),
+                entry.parent_package_id or "—",
+                entry.standard_count,
+                entry.rule_count,
+                entry.package_id,
+                entry.package_sha256,
+            )
+            for column, value in enumerate(values):
+                item = _item(value)
+                if column == 7:
+                    item.setToolTip(entry.package_sha256)
+                self.package_history_table.setItem(row, column, item)
     def refresh_audit(self) -> None:
         self.audit_table.setRowCount(0)
         for entry in self.context.application.list_audit(500):

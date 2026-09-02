@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication
 
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
-from uebench.domain.models import EvaluationRequest, InputMode, InputValue, StandardSelectionMode
+from uebench.domain.models import EvaluationRequest, InputMode, InputValue, PackageHistoryEntry, StandardSelectionMode
 
 from .test_engine import make_standard
 
@@ -130,5 +130,30 @@ def test_future_standard_calculation_is_preview_only(tmp_path: Path, monkeypatch
     assert window.last_result_id is None
     assert context.application.list_recent_evaluations() == []
     assert window.eval_results.rowCount() == 1
+    window.close()
+    context.database.dispose()
+
+def test_maintenance_page_shows_package_history_from_application_layer(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    entry = PackageHistoryEntry(
+        package_id="pkg-history",
+        data_version="2026.09-published.1",
+        package_mode="incremental",
+        issued_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
+        installed_at=datetime(2026, 9, 2, 12, 34, 56, tzinfo=timezone.utc),
+        parent_package_id="pkg-parent",
+        standard_count=63,
+        rule_count=900,
+        package_sha256="a" * 64,
+    )
+    context.application.list_package_history = lambda limit=50: [entry]
+    window = MainWindow(context)
+    window.navigation.setCurrentRow(5)
+    assert window.package_history_table.rowCount() == 1
+    assert window.package_history_table.item(0, 1).text() == "2026.09-published.1"
+    assert window.package_history_table.item(0, 2).text() == "增量包"
+    assert window.package_history_table.item(0, 3).text() == "pkg-parent"
+    assert window.package_history_table.item(0, 7).text() == "a" * 64
     window.close()
     context.database.dispose()
