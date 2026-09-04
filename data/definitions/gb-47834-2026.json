@@ -4,6 +4,8 @@
   "number": "GB 47834-2026",
   "title": "晶体硅光伏组件和逆变器能效限定值及能效等级",
   "version": "2026",
+  "standard_family_id": "GB 47834",
+  "rule_revision": 1,
   "publication_status": "published",
   "publication_date": "2026-06-27",
   "effective_date": "2027-01-01",

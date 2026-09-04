@@ -16,7 +16,9 @@
       "remark": "",
       "source_file": "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
       "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 16780",
+      "rule_revision": 1
     },
     {
       "sequence": 2,
@@ -28,7 +30,9 @@
       "remark": "代替GB21252-2013,GB30181-2013",
       "source_file": "02.GB 21252-2023建筑卫生陶瓷和耐磨氧化铝球单位产品能源消耗限额.pdf",
       "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21252",
+      "rule_revision": 1
     },
     {
       "sequence": 3,
@@ -40,7 +44,9 @@
       "remark": "代替GB21256-2013,GB32050-2015",
       "source_file": "03.GB 21256-2025 粗钢生产主要工序单位产品能源消耗限额.pdf",
       "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21256",
+      "rule_revision": 1
     },
     {
       "sequence": 4,
@@ -52,7 +58,9 @@
       "remark": "代替GB21257-2014,GB30527-2014",
       "source_file": "04.GB 21257-2024烧碱、聚氯乙烯树脂和甲烷氯化物单位产品能源消耗限额.pdf",
       "source_sha256": "df55d3b081db152c40daf92f4d04996091b4cd0786727b4e4c9bfc65e0bdc171",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21257",
+      "rule_revision": 1
     },
     {
       "sequence": 5,
@@ -64,7 +72,9 @@
       "remark": "代替GB21258-2017,GB35574-2017",
       "source_file": "05.GB 21258-2024燃煤发电机组单位产品能源消耗限额.pdf",
       "source_sha256": "fd411f6cc35f2cb6fc42746618b1000630710116abb67aaa09166748476908b9",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21258",
+      "rule_revision": 1
     },
     {
       "sequence": 6,
@@ -76,7 +86,9 @@
       "remark": "",
       "source_file": "06.GB 21340-2019玻璃和铸石单位产品能源消耗限额.pdf",
       "source_sha256": "24de163b6f308962b8d98e05d1ade6f9c51456bdd59686611cc34294a79b683c",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21340",
+      "rule_revision": 1
     },
     {
       "sequence": 7,
@@ -88,7 +100,9 @@
       "remark": "",
       "source_file": "07.GB 21341-2022铁合金单位产品能源消耗限额.pdf",
       "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21341",
+      "rule_revision": 1
     },
     {
       "sequence": 8,
@@ -100,7 +114,9 @@
       "remark": "代替GB 21342-2015",
       "source_file": "08.GB 21342-2025焦炭单位产品能源消耗限额.pdf",
       "source_sha256": "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21342",
+      "rule_revision": 1
     },
     {
       "sequence": 9,
@@ -112,7 +128,9 @@
       "remark": "代替GB21343-2015,GB30528-2014,GB30529-2014,GB31824-2015",
       "source_file": "09.GB 21343-2023电石、乙酸乙烯酯、聚乙烯醇、1,4-丁二醇、双氰胺和单氰胺单位产品能源消耗限额.pdf",
       "source_sha256": "f88981676ef7c895a54af5c00526d7a7f6769a6afadfbb8772ba3008e3d9e8e9",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21343",
+      "rule_revision": 1
     },
     {
       "sequence": 10,
@@ -124,7 +142,9 @@
       "remark": "代替GB21344-2015,GB29138-2012,GB29139-2012,GB29439-2012,GB31829-2015,GB32035-2015",
       "source_file": "10.GB 21344-2023化肥行业单位产品能源消耗限额.pdf",
       "source_sha256": "f8f6f3eac564f70916c50d6741464ef4a69c89ed679c905ca718c8f16d0e4b62",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21344",
+      "rule_revision": 1
     },
     {
       "sequence": 11,
@@ -136,7 +156,9 @@
       "remark": "代替GB21345-2015",
       "source_file": "11.GB 21345-2024黄磷单位产品能源消耗限额.pdf",
       "source_sha256": "f27fc8b729bad51c7deccdc4c0654ce5c05bd66e563c005ab155da5ee8393c7d",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 21345",
+      "rule_revision": 1
     },
     {
       "sequence": 12,
@@ -148,7 +170,9 @@
       "remark": "",
       "source_file": "12.GB 21346-2022电解铝和氧化铝单位产品能源消耗限额.pdf",
       "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21346",
+      "rule_revision": 1
     },
     {
       "sequence": 13,
@@ -160,7 +184,9 @@
       "remark": "代替GB21347-2012,GB31338-2014",
       "source_file": "13.GB 21347-2023工业硅和镁单位产品能源消耗限额.pdf",
       "source_sha256": "a3333b66a75379363202e530f74dabfa8312a9e877b2a5d69788dc8803a34d00",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21347",
+      "rule_revision": 1
     },
     {
       "sequence": 14,
@@ -172,7 +198,9 @@
       "remark": "代替GB21350-2013,GB29137-2012,GB29443-2012,GB29442-2012GB32046-2015",
       "source_file": "14.GB 21350-2023铜及铜合金加工材单位产品能源消耗限额.pdf",
       "source_sha256": "9d199c95ec19deb1876292e3fdd597726a2cc07ba3fd67adf55d54c35f46d327",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21350",
+      "rule_revision": 1
     },
     {
       "sequence": 15,
@@ -184,7 +212,9 @@
       "remark": "代替GB21351-2014,GB25326-2010,GB26756-2011,GB31339-2014",
       "source_file": "15.GB 21351-2023变形铝及铝合金单位产品能源消耗限额.pdf",
       "source_sha256": "b5cf90fc409e34926e6bd99c3b4215dac6c50c4f38ca61c7a82ae7c97afd1b10",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21351",
+      "rule_revision": 1
     },
     {
       "sequence": 16,
@@ -196,7 +226,9 @@
       "remark": "",
       "source_file": "16.GB 21370-2017炭素单位产品能源消耗限额.pdf",
       "source_sha256": "ee5425852c262f6bb3338b71421812b9741b6f22c084507a35c5d536a70d7fc5",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 21370",
+      "rule_revision": 1
     },
     {
       "sequence": 17,
@@ -208,7 +240,9 @@
       "remark": "GB21248-2014,GB21249-2014,GB21250-2014,GB21251-2014,GB21348-2014,GB21349-2014,GB25323-2010",
       "source_file": "17.GB 25323-2023有色重金属冶炼企业单位产品能源消耗限额.pdf",
       "source_sha256": "cf36bf458465b7ebbaa74a086e1c4c9da816b4c2c2e35321659f42c16fc025c2",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 25323",
+      "rule_revision": 1
     },
     {
       "sequence": 18,
@@ -220,7 +254,9 @@
       "remark": "",
       "source_file": "18.GB 25324-2022铝用炭素单位产品能源消耗限额.pdf",
       "source_sha256": "e92ec9e51655a0fbdfa7970f731783b2a86a0bfa462cfe0f5137c09698c1d270",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 25324",
+      "rule_revision": 1
     },
     {
       "sequence": 19,
@@ -232,7 +268,9 @@
       "remark": "代替GB29140-2012",
       "source_file": "19.GB 29140-2024纯碱单位产品能源消耗限额.pdf",
       "source_sha256": "802663e224c8516df014fc994b25cebd8ae71c3ba0ba3b285c0d4e0832682f4a",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29140",
+      "rule_revision": 1
     },
     {
       "sequence": 20,
@@ -244,7 +282,9 @@
       "remark": "",
       "source_file": "20.GB 29141-2012工业硫酸单位产品能源消耗限额.pdf",
       "source_sha256": "96b494bda0aaa5f1acf1102c557ab36acaf9f3577a52b71c22d5fe7488759f0b",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "sequence": 21,
@@ -256,7 +296,9 @@
       "remark": "代替GB29145-2012,GB29146-2012,GB31340-2014",
       "source_file": "21.GB 29145-2023钨精矿、钼精矿和焙烧钼精矿单位产品能源消耗限额.pdf",
       "source_sha256": "9bc66e3f236255a8dad4aa82a0f4f826527c1f760ce9fc58343b9f970505bf70",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 29145",
+      "rule_revision": 1
     },
     {
       "sequence": 22,
@@ -268,7 +310,9 @@
       "remark": "",
       "source_file": "22.GB 29435-2012稀土冶炼加工企业单位产品能源消耗限额.pdf",
       "source_sha256": "f90ab3ab97b4f218eb33b770b98614e6b75c62483ad8a2ae10914ef7fe2e0906",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 29435",
+      "rule_revision": 1
     },
     {
       "sequence": 23,
@@ -280,7 +324,9 @@
       "remark": "代替GB29436.1-2012,GB29436.2-2015,GB29436.3-2015,GB29436.4-2015,GB31535-2015,GB32048-2015",
       "source_file": "23.GB 29436-2023甲醇、乙二醇和二甲醚单位产品能源消耗限额.pdf",
       "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29436",
+      "rule_revision": 1
     },
     {
       "sequence": 24,
@@ -292,7 +338,9 @@
       "remark": "",
       "source_file": "24.GB 29437-2012工业冰醋酸单位产品能源消耗限额.pdf",
       "source_sha256": "2cfc40167969de02c737124601676d8bc63940991952f45da3513a076ea448c9",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "sequence": 25,
@@ -304,7 +352,9 @@
       "remark": "",
       "source_file": "25.GB 29438-2012聚甲醛单位产品能源消耗限额.pdf",
       "source_sha256": "75abf68dd2f74b82c8e12576f93396b913879d13c25d3896dd4dd84ad3b050a1",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29438",
+      "rule_revision": 1
     },
     {
       "sequence": 26,
@@ -316,7 +366,9 @@
       "remark": "",
       "source_file": "26.GB 29441-2012稀硝酸单位产品能源消耗限额.pdf",
       "source_sha256": "18127e918a156cda7023bc5486a4bc08a5ae02af487237d4a03a9122790e7235",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "sequence": 27,
@@ -328,7 +380,9 @@
       "remark": "代替GB29444-2012,GB29445-2012",
       "source_file": "27.GB 29445-2025 煤炭开采单位产品能源消耗限额.pdf",
       "source_sha256": "596d328b68df78dbed4d06a853101fc6ffd55985517bfd70833b775c81680233",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29445",
+      "rule_revision": 1
     },
     {
       "sequence": 28,
@@ -340,7 +394,9 @@
       "remark": "",
       "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
       "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29446",
+      "rule_revision": 1
     },
     {
       "sequence": 29,
@@ -352,7 +408,9 @@
       "remark": "代替GB 29447-2022",
       "source_file": "GB+29447-2026 硅多晶和锗单位产品能源消耗限额.pdf",
       "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29447",
+      "rule_revision": 1
     },
     {
       "sequence": 30,
@@ -364,7 +422,9 @@
       "remark": "",
       "source_file": "30.GB 29448-2022海绵钛和钛锭单位产品能源消耗限额.pdf",
       "source_sha256": "c8e998e9815d9f29f9e62b17348acf9a7dfda2a652ff9cf6d5d8f47ea6f9075d",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29448",
+      "rule_revision": 1
     },
     {
       "sequence": 31,
@@ -376,7 +436,9 @@
       "remark": "代替GB29449-2012,GB29440-2012",
       "source_file": "31.GB 29449-2024轮胎和炭黑单位产品能源消耗限额.pdf",
       "source_sha256": "17934166d8decaff5d06889699ab5e601721ad73bc448dac0e8baf93c54fb02e",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29449",
+      "rule_revision": 1
     },
     {
       "sequence": 32,
@@ -388,7 +450,9 @@
       "remark": "",
       "source_file": "32.GB 29450-2012玻璃纤维单位产品能源消耗限额.pdf",
       "source_sha256": "0f6e10370a8b791d7d6a5e3ea03b668443200225a0a8bff91be1bcf59e920a19",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 29450",
+      "rule_revision": 1
     },
     {
       "sequence": 33,
@@ -400,7 +464,9 @@
       "remark": "代替GB29994-2013,GB29995-2013,GB29996-2013",
       "source_file": "33.GB 29995-2024煤基活性炭和兰炭单位产品能源消耗限额.pdf",
       "source_sha256": "5323e5028c48aa7aafa5e2766e496d4acb542c994ce25a3ca4e0e3c634138ef6",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 29995",
+      "rule_revision": 1
     },
     {
       "sequence": 34,
@@ -412,7 +478,9 @@
       "remark": "代替GB30178-2013,GB30179-2013,GB30180-2013",
       "source_file": "34.GB 30180-2024煤制烯烃、煤制天然气和煤制油单位产品能源消耗限额.pdf",
       "source_sha256": "6f02fb7c43d5d69211bf95cf3fa4f9221c04d378c0f93aa4dc34e7f5a669bdf2",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 30180",
+      "rule_revision": 1
     },
     {
       "sequence": 35,
@@ -424,7 +492,9 @@
       "remark": "",
       "source_file": "35.GB 30182-2013摩擦材料单位产品能源消耗限额.pdf",
       "source_sha256": "ef70821861ffd7ba9ab19ce3c1efed55a82be8daa3cae59e7cf7da28fb7764a0",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 30182",
+      "rule_revision": 1
     },
     {
       "sequence": 36,
@@ -436,7 +506,9 @@
       "remark": "",
       "source_file": "36.GB 30183-2013岩棉、矿渣棉及其制品单位产品能源消耗限额.pdf",
       "source_sha256": "967c3f1b0531430b0149e55de6e4ef69fac1e6fd2f726a4a77d282213d931c90",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 30183",
+      "rule_revision": 1
     },
     {
       "sequence": 37,
@@ -448,7 +520,9 @@
       "remark": "",
       "source_file": "37.GB 30184-2013沥青基防水卷材单位产品能源消耗限额.pdf",
       "source_sha256": "cddca954967ffe2dadfa4cacd11b1193221fbd56251619160b1f66649d2e2d94",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 30184",
+      "rule_revision": 1
     },
     {
       "sequence": 38,
@@ -460,7 +534,9 @@
       "remark": "代替GB30185-2013",
       "source_file": "38.GB 30185-2025 铝（塑）复合板单位产品能源消耗限额.pdf",
       "source_sha256": "df17399c4a348be26fa0ed57f6f02e3a8869cd4116202668d35d02ad467021f7",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 30185",
+      "rule_revision": 1
     },
     {
       "sequence": 39,
@@ -472,7 +548,9 @@
       "remark": "代替GB30250-2013,GB30251-2013,GB31533-2015,GB31534-2015,GB31826-2015,GB32053-2015已发布《第1号修改单》",
       "source_file": "39.GB 30251-2024炼化行业单位产品能源消耗限额.pdf",
       "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 30251",
+      "rule_revision": 1
     },
     {
       "sequence": 40,
@@ -484,7 +562,9 @@
       "remark": "",
       "source_file": "40.GB 30526-2019烧结墙体材料和泡沫玻璃单位产品能源消耗限额.pdf",
       "source_sha256": "0df733ccd602bb7e413d66daee314b7401394f0927dfd3d485e958885e411d07",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 30526",
+      "rule_revision": 1
     },
     {
       "sequence": 41,
@@ -496,7 +576,9 @@
       "remark": "代替GB30530-2014",
       "source_file": "41.GB 30530-2024二甲基硅氧烷单位产品能源消耗限额.pdf",
       "source_sha256": "55947318e7f2e2621721232dee49e7d99595319be38cf6634d691bdfc8854fca",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 30530",
+      "rule_revision": 1
     },
     {
       "sequence": 42,
@@ -508,7 +590,9 @@
       "remark": "代替GB31335-2014,GB31336-2014,GB31337-2014",
       "source_file": "42.GB 31335-2024铁矿开采和选矿单位产品能源消耗限额.pdf",
       "source_sha256": "1c7ff273148f2ebc48b38b022a6f950b14beaf68362f3f0e7ab246c426590146",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 31335",
+      "rule_revision": 1
     },
     {
       "sequence": 43,
@@ -520,7 +604,9 @@
       "remark": "",
       "source_file": "43.GB 31823-2021码头作业单位产品能源消耗限额.pdf",
       "source_sha256": "4184feaa584a5287f0f84a723c5b6dcb75725c0262f27138609bead315216634",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 31823",
+      "rule_revision": 1
     },
     {
       "sequence": 44,
@@ -532,7 +618,9 @@
       "remark": "代替GB31825-2015",
       "source_file": "44.GB 31825-2024制浆造纸单位产品能源消耗限额.pdf",
       "source_sha256": "c8c9ccaaf6c2f0cfe35b2d8e2c371c698c37a9c8a6761e58f5ceaa0fa5591b8d",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 31825",
+      "rule_revision": 1
     },
     {
       "sequence": 45,
@@ -544,7 +632,9 @@
       "remark": "代替GB31828-2015,GB31830-2015",
       "source_file": "45.GB 31830-2024甲苯二异氰酸酯和二苯基甲烷二异氰酸酯单位产品能源消耗限额.pdf",
       "source_sha256": "ad73d5019ec18ef5ff103c29013cbddfb08a1455bde6c84fa7076c6dc4f0896b",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 31830",
+      "rule_revision": 1
     },
     {
       "sequence": 46,
@@ -556,7 +646,9 @@
       "remark": "代替GB32032-2015,GB32033-2015,GB32034-2015",
       "source_file": "46.GB 32032-2024金矿开采、选冶和金精炼单位产品能源消耗限额.pdf",
       "source_sha256": "8d856c98e8d456faf0f06f577dfc998f4aa74eac03eedd9ae9a851c83b8882f6",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 32032",
+      "rule_revision": 1
     },
     {
       "sequence": 47,
@@ -568,7 +660,9 @@
       "remark": "",
       "source_file": "47.GB 32044-2015糖单位产品能耗限额.pdf",
       "source_sha256": "cd23495739c1fbd73a6b424698c8ca73a337c69b6cfcecfbaccdc960430177d5",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 32044",
+      "rule_revision": 1
     },
     {
       "sequence": 48,
@@ -580,7 +674,9 @@
       "remark": "代替GB32047-2015",
       "source_file": "48.GB 32047-2025啤酒单位产品能源消耗限额.pdf",
       "source_sha256": "cca2e587cbff0120698c200e6d66d197b04c1d47284110c201ff62d0a4d47bb5",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 32047",
+      "rule_revision": 1
     },
     {
       "sequence": 49,
@@ -592,7 +688,9 @@
       "remark": "代替GB32051-2015",
       "source_file": "49.GB 32051-2024钛白粉和氧化铁颜料单位产品能源消耗限额.pdf",
       "source_sha256": "7fd1d6a66022639276f9e425365f40400760b009e93d11319091d1dad996cb23",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 32051",
+      "rule_revision": 1
     },
     {
       "sequence": 50,
@@ -604,7 +702,9 @@
       "remark": "",
       "source_file": "50.GB 33654-2017建筑石膏单位产品能源消耗限额.pdf",
       "source_sha256": "7417de1771c7ccfcd5e2a8ae5de70e4482f35d6631297a2d5a39ad71bc21c84f",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 33654",
+      "rule_revision": 1
     },
     {
       "sequence": 51,
@@ -616,7 +716,9 @@
       "remark": "",
       "source_file": "51.GB 36887-2018合成革单位产品能源消耗限额.pdf",
       "source_sha256": "958d9b2cd637add0dd694721cc92ddb476e84ddf3b448da9c96a67c697b5a11a",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 36887",
+      "rule_revision": 1
     },
     {
       "sequence": 52,
@@ -628,7 +730,9 @@
       "remark": "",
       "source_file": "52.GB 36888-2018预拌混凝土单位产品能源消耗限额.pdf",
       "source_sha256": "28daea1c050a7b1b9c892d40a94db5e0c6c221d23b42f715d9e435855c165742",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 36888",
+      "rule_revision": 1
     },
     {
       "sequence": 53,
@@ -640,7 +744,9 @@
       "remark": "代替GB36889-2018",
       "source_file": "53.GB 36889-2025 化学纤维单位产品能源消耗限额.pdf",
       "source_sha256": "3f271d29a2b5d8f19757ed875222c5b4849b72e22f68e57f835e69bfc1dc17a7",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 36889",
+      "rule_revision": 1
     },
     {
       "sequence": 54,
@@ -652,7 +758,9 @@
       "remark": "",
       "source_file": "54.GB 36890-2018日用陶瓷单位产品能源消耗限额.pdf",
       "source_sha256": "0ac7a2aadf0a367aebf24c317145813affe9bcf45814110289a350b2599bd4ae",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 36890",
+      "rule_revision": 1
     },
     {
       "sequence": 55,
@@ -664,7 +772,9 @@
       "remark": "",
       "source_file": "55.GB 36891-2018莫来石单位产品能源消耗限额.pdf",
       "source_sha256": "2ce2df86a28d0283cac5585ec95d78c6323f3eba87a4ada1e4e545d1f43855f3",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 36891",
+      "rule_revision": 1
     },
     {
       "sequence": 56,
@@ -676,7 +786,9 @@
       "remark": "",
       "source_file": "56.GB 36892-2018刚玉单位产品能源消耗限额.pdf",
       "source_sha256": "a0b12f0ceb0d2d1268c68d5893f8a729a467f24506fac2bb1fc681a7345b38f3",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 36892",
+      "rule_revision": 1
     },
     {
       "sequence": 57,
@@ -688,7 +800,9 @@
       "remark": "",
       "source_file": "57.GB 38263-2019水泥制品单位产品能源消耗限额.pdf",
       "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 38263",
+      "rule_revision": 1
     },
     {
       "sequence": 58,
@@ -700,7 +814,9 @@
       "remark": "",
       "source_file": "58.GB 40877-2021硅酸铝纤维及制品单位产品能源消耗限额.pdf",
       "source_sha256": "da10896a9559ccd18aed0d95dfcd8d9e468e1a00075a3be4de0e7bc6d574d2c7",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 40877",
+      "rule_revision": 1
     },
     {
       "sequence": 59,
@@ -712,7 +828,9 @@
       "remark": "",
       "source_file": "59.GB 40878-2021葡萄糖酸钠单位产品能源消耗限额.pdf",
       "source_sha256": "939ce3ec0fa8991133fca871804e075441ff07d8fc7551c3294f30ef99c7a9b7",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 40878",
+      "rule_revision": 1
     },
     {
       "sequence": 60,
@@ -724,7 +842,9 @@
       "remark": "",
       "source_file": "60.GB 45246-2025人造板类主要产品单位产品能源消耗限额.pdf",
       "source_sha256": "c33114be53bbae592ade7049964266fec34cb8cefbc1521affc463a07bdb7be3",
-      "status": "draft"
+      "status": "draft",
+      "standard_family_id": "GB 45246",
+      "rule_revision": 1
     },
     {
       "sequence": 61,
@@ -736,7 +856,9 @@
       "remark": "",
       "source_file": "61.GB 45247-2025燃气-蒸汽联合循环发电机组单位产品能源消耗限额.pdf",
       "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 45247",
+      "rule_revision": 1
     },
     {
       "sequence": 62,
@@ -748,7 +870,9 @@
       "remark": "",
       "source_file": "62.GB 45549-2025 石墨和萤石单位产品能源消耗限额.pdf",
       "source_sha256": "4f456f5c18d6ea52e49eb0db338ca32c7c282a5f7a84939199b0619704d4ac62",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 45549",
+      "rule_revision": 1
     },
     {
       "sequence": 63,
@@ -760,7 +884,9 @@
       "remark": "新发布",
       "source_file": "63 46029-2025 甲醛单位产品能源消耗限额.pdf",
       "source_sha256": "3809133f4d2ebd345b9b5fd2d41cd06e6a64866e36d1984860623e0e7323da7c",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 46029",
+      "rule_revision": 1
     },
     {
       "sequence": 64,
@@ -772,7 +898,9 @@
       "remark": "新发布",
       "source_file": "GB+47834-2026 晶体硅光伏组件和逆变器能效限定值及能效等级.pdf",
       "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 47834",
+      "rule_revision": 1
     },
     {
       "sequence": 65,
@@ -784,7 +912,9 @@
       "remark": "新发布",
       "source_file": "GB+47835-2026 硅单晶单位产品能源消耗限额.pdf",
       "source_sha256": "b40936c6ce1f9b3349ef28bc81f4c40a83df1e854eea58fd4f531832b00454ba",
-      "status": "published"
+      "status": "published",
+      "standard_family_id": "GB 47835",
+      "rule_revision": 1
     }
   ]
 }

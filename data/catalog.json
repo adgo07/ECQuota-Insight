@@ -17,7 +17,9 @@
       "source_sha256": "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 16780",
+      "rule_revision": 1
     },
     {
       "sequence": 2,
@@ -31,7 +33,9 @@
       "source_sha256": "5d622387f85d8a0432d6d372e4e5954ddc9dbaf396221b1c967a3cb0153e461c",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21252",
+      "rule_revision": 1
     },
     {
       "sequence": 3,
@@ -45,7 +49,9 @@
       "source_sha256": "e2182fd042626296ba5ca3445030252eb6825a25839390060346766c834b3620",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21256",
+      "rule_revision": 1
     },
     {
       "sequence": 4,
@@ -59,7 +65,9 @@
       "source_sha256": "df55d3b081db152c40daf92f4d04996091b4cd0786727b4e4c9bfc65e0bdc171",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21257",
+      "rule_revision": 1
     },
     {
       "sequence": 5,
@@ -73,7 +81,9 @@
       "source_sha256": "fd411f6cc35f2cb6fc42746618b1000630710116abb67aaa09166748476908b9",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21258",
+      "rule_revision": 1
     },
     {
       "sequence": 6,
@@ -87,7 +97,9 @@
       "source_sha256": "24de163b6f308962b8d98e05d1ade6f9c51456bdd59686611cc34294a79b683c",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21340",
+      "rule_revision": 1
     },
     {
       "sequence": 7,
@@ -101,7 +113,9 @@
       "source_sha256": "2e2047c96119fbc574839b92f34c796d7df8f4127b50ab51b6a4fbcfe98012f5",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21341",
+      "rule_revision": 1
     },
     {
       "sequence": 8,
@@ -115,7 +129,9 @@
       "source_sha256": "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21342",
+      "rule_revision": 1
     },
     {
       "sequence": 9,
@@ -129,7 +145,9 @@
       "source_sha256": "f88981676ef7c895a54af5c00526d7a7f6769a6afadfbb8772ba3008e3d9e8e9",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21343",
+      "rule_revision": 1
     },
     {
       "sequence": 10,
@@ -143,7 +161,9 @@
       "source_sha256": "f8f6f3eac564f70916c50d6741464ef4a69c89ed679c905ca718c8f16d0e4b62",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21344",
+      "rule_revision": 1
     },
     {
       "sequence": 12,
@@ -157,7 +177,9 @@
       "source_sha256": "496cce74bafe815bd031f878b014ba3fa2f306e4e51d8bf564ef924ece644ca4",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21346",
+      "rule_revision": 1
     },
     {
       "sequence": 13,
@@ -171,7 +193,9 @@
       "source_sha256": "a3333b66a75379363202e530f74dabfa8312a9e877b2a5d69788dc8803a34d00",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21347",
+      "rule_revision": 1
     },
     {
       "sequence": 14,
@@ -185,7 +209,9 @@
       "source_sha256": "9d199c95ec19deb1876292e3fdd597726a2cc07ba3fd67adf55d54c35f46d327",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21350",
+      "rule_revision": 1
     },
     {
       "sequence": 15,
@@ -199,7 +225,9 @@
       "source_sha256": "b5cf90fc409e34926e6bd99c3b4215dac6c50c4f38ca61c7a82ae7c97afd1b10",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21351",
+      "rule_revision": 1
     },
     {
       "sequence": 16,
@@ -213,7 +241,9 @@
       "source_sha256": "ee5425852c262f6bb3338b71421812b9741b6f22c084507a35c5d536a70d7fc5",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 21370",
+      "rule_revision": 1
     },
     {
       "sequence": 17,
@@ -227,7 +257,9 @@
       "source_sha256": "cf36bf458465b7ebbaa74a086e1c4c9da816b4c2c2e35321659f42c16fc025c2",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 25323",
+      "rule_revision": 1
     },
     {
       "sequence": 18,
@@ -241,7 +273,9 @@
       "source_sha256": "e92ec9e51655a0fbdfa7970f731783b2a86a0bfa462cfe0f5137c09698c1d270",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 25324",
+      "rule_revision": 1
     },
     {
       "sequence": 19,
@@ -255,7 +289,9 @@
       "source_sha256": "802663e224c8516df014fc994b25cebd8ae71c3ba0ba3b285c0d4e0832682f4a",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29140",
+      "rule_revision": 1
     },
     {
       "sequence": 20,
@@ -274,7 +310,9 @@
         "GB 29141-2012",
         "GB 29437-2012",
         "GB 29441-2012"
-      ]
+      ],
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "sequence": 23,
@@ -288,7 +326,9 @@
       "source_sha256": "ad97a97d5de07e4853cd68d4630d4fa4d321b8eaaa740e965f05102e10feced4",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29436",
+      "rule_revision": 1
     },
     {
       "sequence": 25,
@@ -302,7 +342,9 @@
       "source_sha256": "75abf68dd2f74b82c8e12576f93396b913879d13c25d3896dd4dd84ad3b050a1",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29438",
+      "rule_revision": 1
     },
     {
       "sequence": 27,
@@ -316,7 +358,9 @@
       "source_sha256": "596d328b68df78dbed4d06a853101fc6ffd55985517bfd70833b775c81680233",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29445",
+      "rule_revision": 1
     },
     {
       "sequence": 28,
@@ -330,7 +374,9 @@
       "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29446",
+      "rule_revision": 1
     },
     {
       "sequence": 29,
@@ -344,7 +390,9 @@
       "source_sha256": "4c52423b3ed397c6c9387f3004bb875b4f958939ed905fecd84a191d9a42b5a9",
       "status": "published",
       "lifecycle_status": "future",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29447",
+      "rule_revision": 1
     },
     {
       "sequence": 30,
@@ -358,7 +406,9 @@
       "source_sha256": "c8e998e9815d9f29f9e62b17348acf9a7dfda2a652ff9cf6d5d8f47ea6f9075d",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29448",
+      "rule_revision": 1
     },
     {
       "sequence": 31,
@@ -372,7 +422,9 @@
       "source_sha256": "17934166d8decaff5d06889699ab5e601721ad73bc448dac0e8baf93c54fb02e",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29449",
+      "rule_revision": 1
     },
     {
       "sequence": 33,
@@ -386,7 +438,9 @@
       "source_sha256": "5323e5028c48aa7aafa5e2766e496d4acb542c994ce25a3ca4e0e3c634138ef6",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 29995",
+      "rule_revision": 1
     },
     {
       "sequence": 34,
@@ -400,7 +454,9 @@
       "source_sha256": "6f02fb7c43d5d69211bf95cf3fa4f9221c04d378c0f93aa4dc34e7f5a669bdf2",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 30180",
+      "rule_revision": 1
     },
     {
       "sequence": 36,
@@ -414,7 +470,9 @@
       "source_sha256": "967c3f1b0531430b0149e55de6e4ef69fac1e6fd2f726a4a77d282213d931c90",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 30183",
+      "rule_revision": 1
     },
     {
       "sequence": 37,
@@ -428,7 +486,9 @@
       "source_sha256": "cddca954967ffe2dadfa4cacd11b1193221fbd56251619160b1f66649d2e2d94",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 30184",
+      "rule_revision": 1
     },
     {
       "sequence": 39,
@@ -442,7 +502,9 @@
       "source_sha256": "c7db39b4946eef9832f8d8374dbf27a5a3ce1f7f8a0f74e6f323d6e70ead05bd",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 30251",
+      "rule_revision": 1
     },
     {
       "sequence": 40,
@@ -456,7 +518,9 @@
       "source_sha256": "0df733ccd602bb7e413d66daee314b7401394f0927dfd3d485e958885e411d07",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 30526",
+      "rule_revision": 1
     },
     {
       "sequence": 42,
@@ -470,7 +534,9 @@
       "source_sha256": "1c7ff273148f2ebc48b38b022a6f950b14beaf68362f3f0e7ab246c426590146",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 31335",
+      "rule_revision": 1
     },
     {
       "sequence": 44,
@@ -484,7 +550,9 @@
       "source_sha256": "c8c9ccaaf6c2f0cfe35b2d8e2c371c698c37a9c8a6761e58f5ceaa0fa5591b8d",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 31825",
+      "rule_revision": 1
     },
     {
       "sequence": 48,
@@ -498,7 +566,9 @@
       "source_sha256": "cca2e587cbff0120698c200e6d66d197b04c1d47284110c201ff62d0a4d47bb5",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 32047",
+      "rule_revision": 1
     },
     {
       "sequence": 50,
@@ -512,7 +582,9 @@
       "source_sha256": "7417de1771c7ccfcd5e2a8ae5de70e4482f35d6631297a2d5a39ad71bc21c84f",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 33654",
+      "rule_revision": 1
     },
     {
       "sequence": 52,
@@ -526,7 +598,9 @@
       "source_sha256": "28daea1c050a7b1b9c892d40a94db5e0c6c221d23b42f715d9e435855c165742",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 36888",
+      "rule_revision": 1
     },
     {
       "sequence": 53,
@@ -540,7 +614,9 @@
       "source_sha256": "3f271d29a2b5d8f19757ed875222c5b4849b72e22f68e57f835e69bfc1dc17a7",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 36889",
+      "rule_revision": 1
     },
     {
       "sequence": 55,
@@ -554,7 +630,9 @@
       "source_sha256": "2ce2df86a28d0283cac5585ec95d78c6323f3eba87a4ada1e4e545d1f43855f3",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 36891",
+      "rule_revision": 1
     },
     {
       "sequence": 56,
@@ -568,7 +646,9 @@
       "source_sha256": "a0b12f0ceb0d2d1268c68d5893f8a729a467f24506fac2bb1fc681a7345b38f3",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 36892",
+      "rule_revision": 1
     },
     {
       "sequence": 57,
@@ -582,7 +662,9 @@
       "source_sha256": "df4c032befc5f73e4cd01a537c77a11fd36a2f2bbe4a2a49396cff6820054816",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 38263",
+      "rule_revision": 1
     },
     {
       "sequence": 61,
@@ -596,7 +678,9 @@
       "source_sha256": "6c88d94764717dcb19fbad9e2fb9c5f8281ade7b5ff069df05fa01db2289e2c2",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 45247",
+      "rule_revision": 1
     },
     {
       "sequence": 62,
@@ -610,7 +694,9 @@
       "source_sha256": "4f456f5c18d6ea52e49eb0db338ca32c7c282a5f7a84939199b0619704d4ac62",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 45549",
+      "rule_revision": 1
     },
     {
       "sequence": 63,
@@ -624,7 +710,9 @@
       "source_sha256": "3809133f4d2ebd345b9b5fd2d41cd06e6a64866e36d1984860623e0e7323da7c",
       "status": "published",
       "lifecycle_status": "active",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 46029",
+      "rule_revision": 1
     },
     {
       "sequence": 64,
@@ -638,7 +726,9 @@
       "source_sha256": "71957a48d81c861d9798e72e84bf4e794e3ee8a13c64476b7421b4c107834815",
       "status": "published",
       "lifecycle_status": "future",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 47834",
+      "rule_revision": 1
     },
     {
       "sequence": 65,
@@ -652,7 +742,9 @@
       "source_sha256": "b40936c6ce1f9b3349ef28bc81f4c40a83df1e854eea58fd4f531832b00454ba",
       "status": "published",
       "lifecycle_status": "future",
-      "replaced_by": []
+      "replaced_by": [],
+      "standard_family_id": "GB 47835",
+      "rule_revision": 1
     }
   ],
   "scope_version": "46",
@@ -664,7 +756,9 @@
       "status": "obsolete",
       "replaced_by": [
         "GB 29141-2024"
-      ]
+      ],
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "id": "gb-29437-2012",
@@ -672,7 +766,9 @@
       "status": "obsolete",
       "replaced_by": [
         "GB 29141-2024"
-      ]
+      ],
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     },
     {
       "id": "gb-29441-2012",
@@ -680,7 +776,9 @@
       "status": "obsolete",
       "replaced_by": [
         "GB 29141-2024"
-      ]
+      ],
+      "standard_family_id": "GB 29141",
+      "rule_revision": 1
     }
   ]
 }

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-"""Normalize stable standard-family identities in development snapshots.
+"""Normalize stable standard-family identities and rule revisions.
 
-A standard number identifies one published edition (for example,
-``GB 29141-2024``), while ``standard_family_id`` groups editions and explicit
-replacement chains.  This tool is deliberately separate from the formal
-``data`` directory: it can update development snapshots, and it never changes
-publication status or any rule values.
+A standard number identifies one published edition, while standard_family_id groups editions and explicit replacement chains.
+Missing rule_revision values are initialized to 1 and existing positive values are preserved.
+The tool can update formal data and development snapshots; it never changes publication status or rule values.
 """
 
 import argparse
@@ -83,6 +81,60 @@ def definition_paths(root: Path, *, include_retired: bool) -> list[Path]:
     return paths
 
 
+def normalize_catalog(
+    path: Path,
+    replacements: dict[str, str],
+    *,
+    apply: bool,
+) -> dict[str, Any]:
+    """Normalize family and revision fields in a catalog JSON file."""
+    path = path.resolve()
+    if not path.exists():
+        raise IdentityError(f"目录文件不存在：{path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    changed: list[str] = []
+    for collection_name in ("standards", "historical_standards"):
+        collection = data.get(collection_name, [])
+        if not isinstance(collection, list):
+            raise IdentityError(f"{path} 的{collection_name}必须是数组")
+        for index, item in enumerate(collection):
+            if not isinstance(item, dict):
+                raise IdentityError(f"{path} 的{collection_name}[{index}]不是对象")
+            number = normalize_number(item.get("number"))
+            expected = resolve_family_id(number, replacements)
+            existing = item.get("standard_family_id")
+            if existing and normalize_number(existing) != expected:
+                raise IdentityError(
+                    f"{path} 的{collection_name}[{index}] family_id={existing!r}，应为 {expected!r}"
+                )
+            existing_revision = item.get("rule_revision")
+            if existing_revision is not None:
+                try:
+                    revision = int(existing_revision)
+                except (TypeError, ValueError) as exc:
+                    raise IdentityError(
+                        f"{path} 的{collection_name}[{index}] rule_revision不是整数：{existing_revision!r}"
+                    ) from exc
+                if revision < 1:
+                    raise IdentityError(
+                        f"{path} 的{collection_name}[{index}] rule_revision必须大于等于1：{revision}"
+                    )
+            if existing and existing_revision is not None:
+                continue
+            item["standard_family_id"] = existing or expected
+            item["rule_revision"] = 1 if existing_revision is None else int(existing_revision)
+            changed.append(f"{collection_name}[{index}]")
+    if apply and changed:
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return {
+        "path": str(path),
+        "item_count": sum(len(data.get(name, [])) for name in ("standards", "historical_standards")),
+        "changed_count": len(changed),
+        "changed": changed,
+        "applied": apply,
+    }
+
+
 def normalize_root(
     root: Path,
     replacements: dict[str, str],
@@ -102,7 +154,17 @@ def normalize_root(
         existing = data.get("standard_family_id")
         if existing and normalize_number(existing) != expected:
             raise IdentityError(f"{path} 的standard_family_id={existing!r}，应为 {expected!r}")
-        if existing and normalize_number(existing) == expected:
+        existing_revision = data.get("rule_revision")
+        if existing_revision is not None:
+            try:
+                revision = int(existing_revision)
+            except (TypeError, ValueError) as exc:
+                raise IdentityError(f"{path} 的rule_revision不是整数：{existing_revision!r}") from exc
+            if revision < 1:
+                raise IdentityError(f"{path} 的rule_revision必须大于等于1：{revision}")
+        needs_family = not existing
+        needs_revision = existing_revision is None
+        if not needs_family and not needs_revision:
             already_normalized.append(str(path))
             continue
         updated: dict[str, Any] = {}
@@ -110,10 +172,16 @@ def normalize_root(
         for key, value in data.items():
             updated[key] = value
             if key == "version":
-                updated["standard_family_id"] = expected
+                if needs_family:
+                    updated["standard_family_id"] = expected
+                if needs_revision:
+                    updated["rule_revision"] = 1
                 inserted = True
         if not inserted:
-            updated["standard_family_id"] = expected
+            if needs_family:
+                updated["standard_family_id"] = expected
+            if needs_revision:
+                updated["rule_revision"] = 1
         changed.append(str(path))
         if apply:
             path.write_text(json.dumps(updated, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -129,13 +197,15 @@ def normalize_root(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="为开发标准快照补全稳定standard_family_id")
+    parser = argparse.ArgumentParser(description="补全标准家族ID和规则修订号（适用于正式库或开发快照）")
     parser.add_argument("--root", dest="roots", action="append", type=Path, help="快照目录；可重复指定")
+    parser.add_argument("--catalog", dest="catalogs", action="append", type=Path, help="目录JSON文件；可重复指定")
     parser.add_argument("--replacements", type=Path, default=DEFAULT_REPLACEMENTS)
     parser.add_argument("--check", action="store_true", help="只检查，不写文件；发现未补全时返回1")
     parser.add_argument("--include-retired", action="store_true", help="同时处理scope-63/retired-definitions")
     args = parser.parse_args()
     roots = [root.resolve() for root in (args.roots or DEFAULT_ROOTS)]
+    catalogs = [path.resolve() for path in (args.catalogs or [])]
     try:
         replacements = load_replacements(args.replacements.resolve())
         reports = [
@@ -147,12 +217,16 @@ def main() -> int:
             )
             for root in roots
         ]
+        catalog_reports = [
+            normalize_catalog(path, replacements, apply=not args.check)
+            for path in catalogs
+        ]
     except (OSError, json.JSONDecodeError, IdentityError) as exc:
         print(f"标准家族ID处理失败：{exc}", file=sys.stderr)
         return 2
-    print(json.dumps({"replacements": replacements, "reports": reports}, ensure_ascii=False, indent=2))
+    print(json.dumps({"replacements": replacements, "reports": reports, "catalog_reports": catalog_reports}, ensure_ascii=False, indent=2))
     if args.check:
-        return 0 if all(report["changed_count"] == 0 for report in reports) else 1
+        return 0 if all(report["changed_count"] == 0 for report in reports + catalog_reports) else 1
     return 0
 
 
