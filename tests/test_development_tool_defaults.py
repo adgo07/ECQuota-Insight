@@ -56,3 +56,7 @@ def test_draft_generator_replays_all_remaining_specialized_refinements() -> None
     }
     for number, marker in expected.items():
         assert marker in text, f"{number} 的专项精化脚本未接入草案生成器"
+def test_release_build_checks_unified_development_library() -> None:
+    text = (ROOT / "scripts" / "build_release.ps1").read_text(encoding="utf-8")
+    assert "tools\\build_development_manifest.py" in text
+    assert "--check" in text

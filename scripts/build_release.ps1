@@ -10,6 +10,11 @@ if (-not (Test-Path -LiteralPath $PythonExe)) {
     throw "未找到项目虚拟环境：$PythonExe"
 }
 
+# 发布前确认Git中的统一开发标准库索引仍与scope-63定义一致。
+& $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
+if ($LASTEXITCODE -ne 0) {
+    throw "统一开发标准库索引校验失败，停止构建。"
+}
 if (-not $SkipTests) {
     # 使用项目内临时目录，避免构建机系统 TEMP 权限异常。
     $TestBase = Join-Path $ProjectRoot ("work\pytest-release-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
