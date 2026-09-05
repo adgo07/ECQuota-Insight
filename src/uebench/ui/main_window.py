@@ -4,6 +4,7 @@ from collections import Counter
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from PySide6.QtCore import QDate, Qt, QUrl
@@ -35,7 +36,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from uebench.bootstrap import AppContext
+if TYPE_CHECKING:
+    from uebench.bootstrap import AppContext
+
 from uebench.domain.models import (
     EnergyLine,
     EvaluationRequest,
