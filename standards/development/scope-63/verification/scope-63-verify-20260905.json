@@ -75,20 +75,24 @@
     "GB 47834-2026": null,
     "GB 47835-2026": null
   },
-  "draft_quality_warning_count": 11,
-  "draft_quality_warnings": [
-    "GB 21256-2025/electric-arc-furnace-lt50.energy: 原文存在缺级或未录入等级，需复核",
-    "GB 21256-2025/electric-arc-furnace-50-70.energy: 原文存在缺级或未录入等级，需复核",
-    "GB 21258-2024/GB_21258-2024.power-7: 原文存在缺级或未录入等级，需复核",
-    "GB 21340-2019/GB_21340-2019.flat-capacity-le-500: 原文存在缺级或未录入等级，需复核",
-    "GB 29141-2024/GB_29141-2024.lead-zinc-isp-so2-enrichment.specific-energy: 原文存在缺级或未录入等级，需复核",
-    "GB 29449-2024/GB_29449-2024.bias: 原文存在缺级或未录入等级，需复核",
-    "GB 29450-2012/GB_29450_2012.pool-medium-alkali-yarn.comprehensive-energy: 原文存在缺级或未录入等级，需复核",
-    "GB 29450-2012/GB_29450_2012.crucible-nonalkali-ball.comprehensive-energy: 原文存在缺级或未录入等级，需复核",
-    "GB 29450-2012/GB_29450_2012.crucible-medium-alkali-ball.comprehensive-energy: 原文存在缺级或未录入等级，需复核",
-    "GB 29450-2012/GB_29450_2012.crucible-yarn.comprehensive-energy: 原文存在缺级或未录入等级，需复核",
-    "GB 30251-2024/GB_30251-2024.propylene-oxide-chlorohydrin: 原文存在缺级或未录入等级，需复核"
+  "draft_quality_warning_count": 0,
+  "draft_quality_warnings": [],
+  "source_confirmed_gap_count": 11,
+  "source_confirmed_gaps": [
+    "GB 21256-2025/electric-arc-furnace-lt50.energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 21256-2025/electric-arc-furnace-50-70.energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 21258-2024/GB_21258-2024.power-7: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 21340-2019/GB_21340-2019.flat-capacity-le-500: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29141-2024/GB_29141-2024.lead-zinc-isp-so2-enrichment.specific-energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29449-2024/GB_29449-2024.bias: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29450-2012/GB_29450_2012.pool-medium-alkali-yarn.comprehensive-energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29450-2012/GB_29450_2012.crucible-nonalkali-ball.comprehensive-energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29450-2012/GB_29450_2012.crucible-medium-alkali-ball.comprehensive-energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 29450-2012/GB_29450_2012.crucible-yarn.comprehensive-energy: 原文存在缺级或未录入等级（已按原文保留）",
+    "GB 30251-2024/GB_30251-2024.propylene-oxide-chlorohydrin: 原文存在缺级或未录入等级（已按原文保留）"
   ],
+  "source_confirmed_anomaly_count": 0,
+  "source_confirmed_anomalies": [],
   "valid": true,
   "errors": []
 }

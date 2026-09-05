@@ -61,6 +61,25 @@ def _expression_input_keys(value) -> set[str]:
     return set()
 
 
+def _source_confirms_gap(indicator) -> bool:
+    """Return whether a missing grade is explicitly preserved from the source.
+
+    A dash in a mandatory-standard table is not the same as an untranscribed
+    value. Rule notes are the auditable, human-readable record that the dash
+    was checked against the source and intentionally kept as a gap.
+    """
+    notes = "；".join(indicator.notes)
+    explicit_source_markers = ("原文为—", "标准表中", "表2未列", "仅有3级", "保留空值")
+    return (
+        "缺级" in notes
+        and any(marker in notes for marker in explicit_source_markers)
+    ) or "missing_grade_preserved" in indicator.notes
+
+
+def _source_confirms_non_monotonic(indicator) -> bool:
+    return "non_monotonic_source_values_preserved" in indicator.notes
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="验证标准范围、定义、原文引用和规则状态")
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
@@ -110,6 +129,8 @@ def main() -> None:
     indicators = [indicator for definition in definitions for product in definition.products for indicator in product.indicators]
     status = Counter(definition.publication_status.value for definition in definitions)
     draft_warnings: list[str] = []
+    source_confirmed_gaps: list[str] = []
+    source_confirmed_anomalies: list[str] = []
     for definition in definitions:
         product_ids = [product.id for product in definition.products]
         if len(product_ids) != len(set(product_ids)):
@@ -151,11 +172,19 @@ def main() -> None:
                         )
                 levels = [indicator.thresholds.level_1, indicator.thresholds.level_2, indicator.thresholds.level_3]
                 if any(level is None for level in levels):
-                    draft_warnings.append(f"{definition.number}/{indicator.id}: 原文存在缺级或未录入等级，需复核")
+                    message = f"{definition.number}/{indicator.id}: 原文存在缺级或未录入等级"
+                    if _source_confirms_gap(indicator):
+                        source_confirmed_gaps.append(message + "（已按原文保留）")
+                    else:
+                        draft_warnings.append(message + "，需复核")
                 if all(level is not None and level.op == "constant" for level in levels):
                     values = [Decimal(str(level.value)) for level in levels]
                     if indicator.comparison.value == "lte" and not values[0] <= values[1] <= values[2]:
-                        draft_warnings.append(f"{definition.number}/{indicator.id}: 候选等级限额非单调 {values}")
+                        message = f"{definition.number}/{indicator.id}: 候选等级限额非单调 {values}"
+                        if _source_confirms_non_monotonic(indicator):
+                            source_confirmed_anomalies.append(message + "（已按原文保留）")
+                        else:
+                            draft_warnings.append(message)
                 if definition.publication_status.value == "draft" and "not_for_formal_evaluation" not in indicator.notes:
                     draft_warnings.append(f"{definition.number}/{indicator.id}: draft规则缺少禁止正式评价标记")
     report = {
@@ -173,6 +202,10 @@ def main() -> None:
         },
         "draft_quality_warning_count": len(draft_warnings),
         "draft_quality_warnings": draft_warnings,
+        "source_confirmed_gap_count": len(source_confirmed_gaps),
+        "source_confirmed_gaps": source_confirmed_gaps,
+        "source_confirmed_anomaly_count": len(source_confirmed_anomalies),
+        "source_confirmed_anomalies": source_confirmed_anomalies,
         "valid": not errors,
         "errors": errors,
     }
