@@ -172,7 +172,7 @@ def _definition_matches(payload: str, incoming: StandardDefinition) -> bool:
 
 
 
-def _load_parent_package(path: Path) -> tuple[PackageManifest, list[StandardDefinition]]:
+def _load_parent_package(path: Path) -> tuple[PackageManifest, list[StandardDefinition], bytes | None]:
     """Load definitions from a previously built package for developer-side diffing.
 
     This helper is intentionally used only while creating a new package. The
@@ -189,13 +189,15 @@ def _load_parent_package(path: Path) -> tuple[PackageManifest, list[StandardDefi
                 raise StandardPackageError("父标准包包含重复文件")
             manifest = PackageManifest.model_validate_json(archive.read("manifest.json"))
             definitions: list[StandardDefinition] = []
+            corrections_data: bytes | None = None
             for item in manifest.files:
-                if item.kind != "definition":
-                    continue
-                definitions.append(StandardDefinition.model_validate_json(archive.read(item.path)))
+                if item.kind == "definition":
+                    definitions.append(StandardDefinition.model_validate_json(archive.read(item.path)))
+                elif item.kind == "correction":
+                    corrections_data = archive.read(item.path)
             if len(definitions) != manifest.standard_count:
                 raise StandardPackageError("父标准包定义数量与清单不一致")
-            return manifest, definitions
+            return manifest, definitions, corrections_data
     except (zipfile.BadZipFile, KeyError, json.JSONDecodeError, ValueError) as exc:
         raise StandardPackageError(f"无法读取父标准包：{path}") from exc
 
@@ -226,7 +228,7 @@ class StandardPackageBuilder:
         The parent package id is copied from the inspected manifest so callers
         cannot accidentally attach the diff to another lineage.
         """
-        parent_manifest, parent_definitions = _load_parent_package(parent_package)
+        parent_manifest, parent_definitions, parent_corrections_data = _load_parent_package(parent_package)
         parent_by_key = {
             (definition.id, definition.version, definition.rule_revision): _canonical_json(
                 definition.model_dump(mode="json")
@@ -237,7 +239,14 @@ class StandardPackageBuilder:
             (definition.id, definition.version, definition.rule_revision)
             for definition in definitions
         }
-        removed = sorted(set(parent_by_key) - current_keys)
+        removed = sorted(
+            parent_key
+            for parent_key in set(parent_by_key) - current_keys
+            if not any(
+                current_key[:2] == parent_key[:2] and current_key[2] > parent_key[2]
+                for current_key in current_keys
+            )
+        )
         if removed:
             removed_text = "、".join(
                 f"{standard_id}@{version}/r{revision}"
@@ -252,7 +261,10 @@ class StandardPackageBuilder:
             if parent_by_key.get((definition.id, definition.version, definition.rule_revision))
             != _canonical_json(definition.model_dump(mode="json"))
         ]
-        if not changed:
+        correction_changed = False
+        if corrections is not None:
+            correction_changed = _canonical_json({"corrections": corrections}) != (parent_corrections_data or b"")
+        if not changed and not correction_changed:
             raise StandardPackageError("当前规则与父标准包完全相同，无需生成增量包")
         return self.build(
             output,

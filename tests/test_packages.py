@@ -384,7 +384,7 @@ def test_builder_incremental_contains_only_changed_definition_and_binds_parent(t
 
     child = StandardPackageBuilder(private_key).build_incremental(
         tmp_path / "builder-child.uebench",
-        [parent_definition, changed],
+        [changed],
         {changed.source_file: source},
         parent_package=parent,
         package_id="builder-child",
@@ -428,6 +428,47 @@ def test_builder_incremental_contains_only_changed_definition_and_binds_parent(t
             package_id="removed",
             data_version="2026.4",
         )
+
+def test_builder_incremental_allows_correction_only_update(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    paths, _, standards, service = make_service(tmp_path, private_key)
+    parent = build_package(
+        tmp_path,
+        private_key,
+        package_id="correction-parent",
+        corrections=[{"id": "old", "note": "旧勘误"}],
+        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+    )
+    with zipfile.ZipFile(parent, "r") as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+        definition_name = next(
+            item["path"] for item in manifest["files"] if item["kind"] == "definition"
+        )
+        parent_definition = StandardDefinition.model_validate_json(archive.read(definition_name))
+    source = tmp_path / parent_definition.source_file
+    child = StandardPackageBuilder(private_key).build_incremental(
+        tmp_path / "correction-child.uebench",
+        [parent_definition],
+        {parent_definition.source_file: source},
+        parent_package=parent,
+        package_id="correction-child",
+        data_version="2026.2",
+        corrections=[{"id": "new", "note": "新勘误"}],
+        issued_at=datetime(2026, 8, 24, tzinfo=timezone.utc),
+    )
+
+    with zipfile.ZipFile(child, "r") as archive:
+        child_manifest = json.loads(archive.read("manifest.json"))
+        assert json.loads(archive.read("corrections.json")) == {
+            "corrections": [{"id": "new", "note": "新勘误"}]
+        }
+    assert child_manifest["package_mode"] == "incremental"
+    assert child_manifest["standard_count"] == 0
+    service.install(parent)
+    result = service.install(child)
+    assert result.standards_installed == 0
+    assert len(standards.list_all()) == 1
+    assert "新勘误" in (paths.standards / "correction-child" / "corrections.json").read_text(encoding="utf-8")
 
 def test_incremental_install_preserves_parent_and_selects_new_revision(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()
