@@ -13,7 +13,7 @@ from uebench.infrastructure.database import DatabaseManager, PackageRow
 from uebench.infrastructure.packages import PackageFile, PackageManifest, StandardPackageBuilder, StandardPackageError, StandardPackageService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepository
-from uebench.domain.models import PublicationStatus, StandardSelectionMode
+from uebench.domain.models import PublicationStatus, StandardDefinition, StandardSelectionMode
 
 from .test_engine import make_standard
 
@@ -361,6 +361,73 @@ def test_full_package_new_revision_selects_new_rule_and_keeps_history(tmp_path: 
         "full-revision-2",
         "full-parent",
     ]
+
+def test_builder_incremental_contains_only_changed_definition_and_binds_parent(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    paths, _, standards, service = make_service(tmp_path, private_key)
+    parent = build_package(
+        tmp_path,
+        private_key,
+        package_id="builder-parent",
+        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+    )
+    with zipfile.ZipFile(parent, "r") as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+        definition_name = next(
+            item["path"] for item in manifest["files"] if item["kind"] == "definition"
+        )
+        parent_definition = StandardDefinition.model_validate_json(archive.read(definition_name))
+    changed = parent_definition.model_copy(deep=True)
+    changed.rule_revision = 2
+    changed.products[0].indicators[0].thresholds.level_1.value = "11"
+    source = tmp_path / changed.source_file
+
+    child = StandardPackageBuilder(private_key).build_incremental(
+        tmp_path / "builder-child.uebench",
+        [parent_definition, changed],
+        {changed.source_file: source},
+        parent_package=parent,
+        package_id="builder-child",
+        data_version="2026.2",
+        issued_at=datetime(2026, 8, 24, tzinfo=timezone.utc),
+    )
+
+    with zipfile.ZipFile(child, "r") as archive:
+        child_manifest = json.loads(archive.read("manifest.json"))
+        child_definitions = [
+            name for name in archive.namelist() if name.startswith("definitions/")
+        ]
+    assert child_manifest["package_mode"] == "incremental"
+    assert child_manifest["parent_package_id"] == "builder-parent"
+    assert child_manifest["standard_count"] == 1
+    assert len(child_definitions) == 1
+
+    service.install(parent)
+    service.install(child)
+    selected = standards.get_for_evaluation(
+        "gb-00000-2026", date(2026, 8, 31), StandardSelectionMode.CURRENT
+    )
+    assert selected is not None and selected.rule_revision == 2
+
+    with pytest.raises(StandardPackageError, match="完全相同"):
+        StandardPackageBuilder(private_key).build_incremental(
+            tmp_path / "no-change.uebench",
+            [parent_definition],
+            {parent_definition.source_file: source},
+            parent_package=parent,
+            package_id="no-change",
+            data_version="2026.3",
+        )
+
+    with pytest.raises(StandardPackageError, match="不能删除父包已有规则"):
+        StandardPackageBuilder(private_key).build_incremental(
+            tmp_path / "removed.uebench",
+            [],
+            {},
+            parent_package=parent,
+            package_id="removed",
+            data_version="2026.4",
+        )
 
 def test_incremental_install_preserves_parent_and_selects_new_revision(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()

@@ -172,12 +172,101 @@ def _definition_matches(payload: str, incoming: StandardDefinition) -> bool:
 
 
 
+def _load_parent_package(path: Path) -> tuple[PackageManifest, list[StandardDefinition]]:
+    """Load definitions from a previously built package for developer-side diffing.
+
+    This helper is intentionally used only while creating a new package. The
+    runtime installation path still verifies the incoming package signature and
+    every listed file independently.
+    """
+    path = path.resolve()
+    if not path.exists() or not path.is_file():
+        raise StandardPackageError(f"父标准包不存在或不是文件：{path}")
+    try:
+        with zipfile.ZipFile(path, "r") as archive:
+            names = archive.namelist()
+            if len(names) != len(set(names)):
+                raise StandardPackageError("父标准包包含重复文件")
+            manifest = PackageManifest.model_validate_json(archive.read("manifest.json"))
+            definitions: list[StandardDefinition] = []
+            for item in manifest.files:
+                if item.kind != "definition":
+                    continue
+                definitions.append(StandardDefinition.model_validate_json(archive.read(item.path)))
+            if len(definitions) != manifest.standard_count:
+                raise StandardPackageError("父标准包定义数量与清单不一致")
+            return manifest, definitions
+    except (zipfile.BadZipFile, KeyError, json.JSONDecodeError, ValueError) as exc:
+        raise StandardPackageError(f"无法读取父标准包：{path}") from exc
+
 class StandardPackageBuilder:
     """Developer-side package builder; the private key is never shipped with the app."""
 
     def __init__(self, private_key: Ed25519PrivateKey) -> None:
         self.private_key = private_key
 
+    def build_incremental(
+        self,
+        output: Path,
+        definitions: list[StandardDefinition],
+        source_files: dict[str, Path],
+        *,
+        parent_package: Path,
+        data_version: str,
+        minimum_app_version: str = "0.1.0",
+        rule_engine_version: str = RULE_ENGINE_VERSION,
+        corrections: list[dict] | None = None,
+        package_id: str | None = None,
+        issued_at: datetime | None = None,
+    ) -> Path:
+        """Build a signed package containing only definitions changed from parent.
+
+        Incremental packages cannot remove a definition; publishing a removed
+        or replaced complete catalogue must use the full build method.
+        The parent package id is copied from the inspected manifest so callers
+        cannot accidentally attach the diff to another lineage.
+        """
+        parent_manifest, parent_definitions = _load_parent_package(parent_package)
+        parent_by_key = {
+            (definition.id, definition.version, definition.rule_revision): _canonical_json(
+                definition.model_dump(mode="json")
+            )
+            for definition in parent_definitions
+        }
+        current_keys = {
+            (definition.id, definition.version, definition.rule_revision)
+            for definition in definitions
+        }
+        removed = sorted(set(parent_by_key) - current_keys)
+        if removed:
+            removed_text = "、".join(
+                f"{standard_id}@{version}/r{revision}"
+                for standard_id, version, revision in removed
+            )
+            raise StandardPackageError(
+                "增量包不能删除父包已有规则：" + removed_text + "；请生成完整包"
+            )
+        changed = [
+            definition
+            for definition in definitions
+            if parent_by_key.get((definition.id, definition.version, definition.rule_revision))
+            != _canonical_json(definition.model_dump(mode="json"))
+        ]
+        if not changed:
+            raise StandardPackageError("当前规则与父标准包完全相同，无需生成增量包")
+        return self.build(
+            output,
+            changed,
+            source_files,
+            data_version=data_version,
+            minimum_app_version=minimum_app_version,
+            package_mode="incremental",
+            rule_engine_version=rule_engine_version,
+            parent_package_id=parent_manifest.package_id,
+            corrections=corrections,
+            package_id=package_id,
+            issued_at=issued_at,
+        )
     def build(
         self,
         output: Path,
