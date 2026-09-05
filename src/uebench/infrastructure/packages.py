@@ -345,11 +345,15 @@ class StandardPackageService:
         warnings: list[str] = []
         definitions: list[StandardDefinition] = []
         manifest: PackageManifest | None = None
-        package_sha256 = _sha256_path(path) if path.exists() else None
+        if path.exists() and not path.is_file():
+            errors.append("标准包路径不是文件")
+        package_sha256 = _sha256_path(path) if path.is_file() else None
         if path.suffix.lower() != ".uebench":
             errors.append("标准包扩展名必须为 .uebench")
         if not path.exists():
             errors.append("标准包文件不存在")
+            return PackageValidationReport(valid=False, errors=errors)
+        if not path.is_file():
             return PackageValidationReport(valid=False, errors=errors)
         try:
             with zipfile.ZipFile(path, "r") as archive:

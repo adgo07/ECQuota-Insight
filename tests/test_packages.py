@@ -9,7 +9,7 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from uebench.infrastructure.backup import BackupService
-from uebench.infrastructure.database import DatabaseManager
+from uebench.infrastructure.database import DatabaseManager, PackageRow
 from uebench.infrastructure.packages import PackageFile, PackageManifest, StandardPackageBuilder, StandardPackageError, StandardPackageService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepository
@@ -434,3 +434,34 @@ def test_package_data_version_rollback_is_rejected_even_with_newer_issue_time(tm
     report = service.preview(second)
     assert not report.valid
     assert any("数据版本早于" in error for error in report.errors)
+
+def test_preview_rejects_directory_named_as_package_without_crashing(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, _, service = make_service(tmp_path, private_key)
+    package_directory = tmp_path / "not-a-package.uebench"
+    package_directory.mkdir()
+
+    report = service.preview(package_directory)
+
+    assert not report.valid
+    assert "标准包路径不是文件" in report.errors
+
+
+def test_install_rolls_back_directory_and_database_when_repository_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    paths, database, standards, service = make_service(tmp_path, private_key)
+    package = build_package(tmp_path, private_key, package_id="rollback-package")
+
+    def fail_install(*args, **kwargs):
+        raise RuntimeError("模拟数据库写入失败")
+
+    monkeypatch.setattr(standards, "install", fail_install)
+
+    with pytest.raises(RuntimeError, match="模拟数据库写入失败"):
+        service.install(package)
+
+    assert not (paths.standards / "rollback-package").exists()
+    with database.session() as session:
+        assert session.query(PackageRow).count() == 0
