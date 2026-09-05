@@ -99,14 +99,25 @@ class SqlStandardRepository:
 
     def list_current(self, evaluation_date: date) -> list[StandardDefinition]:
         with self.database.session() as session:
-            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date), desc(StandardRow.installed_at)))
+            rows = session.scalars(
+                select(StandardRow)
+                .where(StandardRow.status == "published")
+                .order_by(
+                    StandardRow.standard_family_id,
+                    desc(StandardRow.effective_date),
+                    desc(StandardRow.installed_at),
+                )
+            )
             definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
         result: list[StandardDefinition] = []
-        seen: set[str] = set()
+        seen_families: set[str] = set()
         for item in definitions:
-            if item.id in seen or not item.is_effective_on(evaluation_date):
+            # A family can temporarily contain overlapping editions during an
+            # update. The ordered query makes the first effective edition the
+            # newest one; only one current edition is shown to the user.
+            if not item.is_effective_on(evaluation_date) or item.family_id in seen_families:
                 continue
-            seen.add(item.id)
+            seen_families.add(item.family_id)
             result.append(item)
         return result
 
@@ -138,15 +149,20 @@ class SqlStandardRepository:
             rows = session.scalars(
                 select(StandardRow)
                 .where(StandardRow.status == "published")
-                .order_by(StandardRow.number, desc(StandardRow.effective_date), desc(StandardRow.installed_at))
+                .order_by(
+                    StandardRow.standard_family_id,
+                    desc(StandardRow.effective_date),
+                    desc(StandardRow.installed_at),
+                )
             )
             definitions: list[StandardDefinition] = []
-            seen: set[str] = set()
+            seen_families: set[str] = set()
             for row in rows:
-                if row.standard_id in seen:
+                item = StandardDefinition.model_validate_json(row.definition_json)
+                if item.family_id in seen_families:
                     continue
-                seen.add(row.standard_id)
-                definitions.append(StandardDefinition.model_validate_json(row.definition_json))
+                seen_families.add(item.family_id)
+                definitions.append(item)
             return definitions
 
     def list_all(self) -> list[StandardDefinition]:

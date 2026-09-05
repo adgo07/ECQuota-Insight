@@ -74,7 +74,7 @@ def test_list_published_returns_latest_version_per_standard(tmp_path: Path) -> N
     _, database, audit = setup_database(tmp_path)
     standards = SqlStandardRepository(database, audit)
     first = make_standard()
-    newer = first.model_copy(update={"version": "2027", "effective_date": date(2027, 1, 1)})
+    newer = first.model_copy(update={"number": "GB 00000-2027", "version": "2027", "effective_date": date(2027, 1, 1)})
     standards.install(first, "package-old")
     standards.install(newer, "package-new")
     published = standards.list_published()

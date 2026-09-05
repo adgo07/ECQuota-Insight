@@ -113,6 +113,7 @@ def test_future_standard_calculation_is_preview_only(tmp_path: Path, monkeypatch
     future = make_standard().model_copy(update={
         "id": "gb-future-ui",
         "number": "GB 00004-2027",
+        "version": "2027",
         "effective_date": date(2027, 1, 1),
     })
     context.standards.install(future)

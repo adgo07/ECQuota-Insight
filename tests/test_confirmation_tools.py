@@ -56,6 +56,7 @@ def test_review_promote_ignores_out_of_scope_historical_definition(tmp_path: Pat
     historical = current.model_copy(update={
         "id": "gb-old",
         "number": "GB 00000-2012",
+        "version": "2012",
         "publication_status": PublicationStatus.DRAFT,
     })
     (definitions_dir / "current.json").write_text(current.model_dump_json(), encoding="utf-8")
