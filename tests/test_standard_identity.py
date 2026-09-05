@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tools.build_catalog import standard_family_id, standard_version
+from .test_engine import make_standard
 from tools.normalize_standard_identity import IdentityError, normalize_catalog, normalize_root, resolve_family_id
 
 
@@ -85,3 +86,10 @@ def test_normalize_catalog_adds_family_and_revision_without_changing_numbers(tmp
     assert payload["standards"][0]["standard_family_id"] == "GB 29141"
     assert payload["historical_standards"][0]["rule_revision"] == 1
     assert payload["standards"][0]["title"] == "keep"
+
+
+def test_standard_definition_rejects_version_year_mismatch() -> None:
+    payload = make_standard().model_dump(mode="json")
+    payload["version"] = "2025"
+    with pytest.raises(ValueError, match="版本年份"):
+        make_standard().__class__.model_validate(payload)

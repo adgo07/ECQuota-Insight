@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
@@ -342,6 +343,16 @@ class StandardDefinition(StrictModel):
         if evaluation_date < self.effective_date:
             return f"{self.number} 尚未实施，实施日期为 {self.effective_date}；当前只能预览，不能形成正式判定。"
         return None
+
+
+    @model_validator(mode="after")
+    def validate_edition_year(self) -> StandardDefinition:
+        match = re.search(r"-(\d{4})$", self.number.strip())
+        if match and self.version != match.group(1):
+            raise ValueError(
+                f"标准版本年份与标准编号不一致：{self.number} version={self.version}"
+            )
+        return self
 
 
     @model_validator(mode="after")
