@@ -320,10 +320,10 @@ def main() -> None:
     scope = {"schema_version": "1.0", "scope_name": "当前目录及新增标准的当前范围",
              "standards": [item["number"] for item in rows]}
     scope_text = json.dumps(scope, ensure_ascii=False, indent=2) + "\n"
-    # Keep loader compatibility while exposing a canonical current-scope alias.
+    # Keep the legacy scope-44 loader alias, while scope-63 remains canonical.
     (data_dir / "scope-44.json").write_text(scope_text, encoding="utf-8")
     (data_dir / "scope-63.json").write_text(scope_text, encoding="utf-8")
-    (data_dir / "scope-65.json").write_text(scope_text, encoding="utf-8")
+    # The temporary workspace has one canonical current-scope manifest only.
 
     archive_defs = {path.stem: path for path in (ARCHIVE / "definitions").glob("*.json")}
     definitions_dir = data_dir / "definitions"

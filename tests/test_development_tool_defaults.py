@@ -18,6 +18,7 @@ def test_refinement_tools_do_not_default_to_historical_scope() -> None:
 def test_draft_generator_defaults_to_canonical_rebuild_workspace() -> None:
     text = (ROOT / "tools" / "prepare_next_scope_drafts.py").read_text(encoding="utf-8")
     assert 'default=ROOT / "work" / "next-scope-63"' in text
+    assert 'data_dir / "scope-65.json"' not in text
 
 def test_source_extractors_allow_a_configured_source_directory() -> None:
     source_scripts = [
