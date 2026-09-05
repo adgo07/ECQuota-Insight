@@ -13,9 +13,17 @@ if (-not (Test-Path -LiteralPath $PythonExe)) {
 if (-not $SkipTests) {
     # 使用项目内临时目录，避免构建机系统 TEMP 权限异常。
     $TestBase = Join-Path $ProjectRoot ("work\pytest-release-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-    & $PythonExe -m pytest -q -p no:cacheprovider --basetemp $TestBase
-    if ($LASTEXITCODE -ne 0) {
-        throw "自动测试失败，停止构建。"
+    try {
+        & $PythonExe -m pytest -q -p no:cacheprovider --basetemp $TestBase
+        if ($LASTEXITCODE -ne 0) {
+            throw "自动测试失败，停止构建。"
+        }
+    }
+    finally {
+        # 只清理本次创建的测试目录，不触碰已有 work 文件。
+        if (Test-Path -LiteralPath $TestBase) {
+            Remove-Item -LiteralPath $TestBase -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 
