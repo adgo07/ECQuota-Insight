@@ -34,3 +34,8 @@ def test_source_extractors_allow_a_configured_source_directory() -> None:
     for path in source_scripts:
         text = path.read_text(encoding="utf-8")
         assert "UEBENCH_SOURCE_DIR" in text, path.name
+
+def test_review_tool_never_defaults_to_historical_scope() -> None:
+    text = (ROOT / "tools" / "review_confirmed_rules.py").read_text(encoding="utf-8")
+    assert 'data_dir / "scope-65.json"' not in text
+    assert "不会默认使用历史scope-65.json" in text

@@ -52,7 +52,7 @@ def _confirmation_rows(path: Path) -> tuple[dict[str, dict[str, object]], list[s
 
 def _load_scope_numbers(data_dir: Path, scope_path: Path | None) -> set[str]:
     if scope_path is None:
-        candidates = (data_dir / "scope-63.json", data_dir / "scope-44.json", data_dir / "scope-65.json")
+        candidates = (data_dir / "scope-63.json", data_dir / "scope-44.json")
         scope_path = next((candidate for candidate in candidates if candidate.exists()), None)
     if scope_path is None or not scope_path.exists():
         raise ValueError(f"找不到当前范围清单：{data_dir}")
@@ -152,7 +152,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="核验确认表并将完整draft标准提升为reviewed（不生成标准包）")
     parser.add_argument("confirmation", type=Path)
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
-    parser.add_argument("--scope", type=Path, help="当前范围清单；省略时优先使用data-dir下的scope-63.json、scope-44.json或scope-65.json")
+    parser.add_argument("--scope", type=Path, help="当前范围清单；省略时优先使用data-dir下的scope-63.json或scope-44.json；不会默认使用历史scope-65.json")
     parser.add_argument("--apply", action="store_true", help="验证通过后实际写入reviewed状态")
     args = parser.parse_args()
     try:
