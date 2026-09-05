@@ -60,3 +60,7 @@ def test_release_build_checks_unified_development_library() -> None:
     text = (ROOT / "scripts" / "build_release.ps1").read_text(encoding="utf-8")
     assert "tools\\build_development_manifest.py" in text
     assert "--check" in text
+def test_release_sync_checks_unified_development_library() -> None:
+    text = (ROOT / "scripts" / "sync_release.ps1").read_text(encoding="utf-8")
+    assert "tools\\build_development_manifest.py" in text
+    assert "--check" in text

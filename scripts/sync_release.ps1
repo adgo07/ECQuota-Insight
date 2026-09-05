@@ -21,6 +21,12 @@ if (-not $Release.StartsWith($ProjectPrefix, [StringComparison]::OrdinalIgnoreCa
     throw "交付目录必须位于项目目录内：$Release"
 }
 New-Item -ItemType Directory -Path $Release -Force | Out-Null
+# 同步源码交付包前确认统一开发标准库索引与scope-63一致。
+& $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
+if ($LASTEXITCODE -ne 0) {
+    throw "统一开发标准库索引校验失败，停止同步。"
+}
+
 
 $PortableDir = Join-Path $ProjectRoot "dist\UEBench"
 $Installer = Join-Path $ProjectRoot "dist\installer\UEBench-Setup-0.1.0-x64.exe"
