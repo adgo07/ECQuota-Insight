@@ -25,6 +25,7 @@ def test_obsolete_standard_is_excluded_from_current_but_available_for_history(tm
     old = make_standard().model_copy(update={
         "id": "gb-old-test",
         "number": "GB 00001-2012",
+        "version": "2012",
         "lifecycle_status": LifecycleStatus.OBSOLETE,
         "obsolete_date": date(2025, 6, 1),
         "replaced_by": ["GB 00001-2026"],
@@ -67,10 +68,11 @@ def test_future_selection_never_falls_back_to_current(tmp_path: Path) -> None:
     database.initialize()
     audit = AuditRepository(database)
     standards = SqlStandardRepository(database, audit)
-    current = make_standard().model_copy(update={"id": "gb-current-test", "number": "GB 00002-2020"})
+    current = make_standard().model_copy(update={"id": "gb-current-test", "number": "GB 00002-2020", "version": "2020"})
     future = make_standard().model_copy(update={
         "id": "gb-future-test",
         "number": "GB 00002-2027",
+        "version": "2027",
         "effective_date": date(2027, 1, 1),
     })
     standards.install(current)
@@ -91,6 +93,7 @@ def test_future_evaluation_is_preview_only(tmp_path: Path) -> None:
     future = make_standard().model_copy(update={
         "id": "gb-future-preview",
         "number": "GB 00003-2027",
+        "version": "2027",
         "effective_date": date(2027, 1, 1),
     })
     standards.install(future)
