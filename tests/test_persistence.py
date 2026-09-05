@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 import json
 from pathlib import Path
 import zipfile
@@ -9,7 +9,7 @@ from sqlalchemy import text
 from uebench.application.services import EvaluationService
 from uebench.domain.models import AuditEntry, EvaluationRequest, EvaluationSummary, Grade, InputMode, InputValue
 from uebench.infrastructure.backup import BackupService, BackupValidationError
-from uebench.infrastructure.database import DatabaseManager
+from uebench.infrastructure.database import DatabaseManager, StandardRow
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import (
     AuditRepository,
@@ -158,3 +158,24 @@ def test_backup_rejects_duplicate_members(tmp_path: Path) -> None:
         archive.writestr("uebench.sqlite3", b"two")
     with pytest.raises(BackupValidationError, match="重复文件"):
         service.validate(malicious)
+
+
+def test_same_edition_prefers_higher_rule_revision_when_install_times_tie(tmp_path: Path) -> None:
+    _, database, audit = setup_database(tmp_path)
+    standards = SqlStandardRepository(database, audit)
+    first = make_standard()
+    second = first.model_copy(deep=True, update={"rule_revision": 2})
+    second.products[0].indicators[0].thresholds.level_1.value = "11"
+    standards.install(first, "package-r1")
+    standards.install(second, "package-r2")
+
+    tied_time = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    with database.session() as session:
+        for row in session.query(StandardRow).all():
+            row.installed_at = tied_time
+
+    selected = standards.get_for_evaluation(first.id, date(2026, 8, 2))
+    assert selected is not None
+    assert selected.rule_revision == 2
+    assert standards.list_current(date(2026, 8, 2))[0].rule_revision == 2
+    assert standards.list_published()[0].rule_revision == 2

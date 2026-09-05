@@ -79,7 +79,7 @@ class SqlStandardRepository:
             rows = session.scalars(
                 select(StandardRow)
                 .where(StandardRow.standard_id == standard_id, StandardRow.status == "published")
-                .order_by(desc(StandardRow.effective_date), desc(StandardRow.installed_at))
+                .order_by(desc(StandardRow.effective_date), desc(StandardRow.rule_revision), desc(StandardRow.installed_at))
             )
             definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
             if selection_mode is StandardSelectionMode.CURRENT:
@@ -105,6 +105,7 @@ class SqlStandardRepository:
                 .order_by(
                     StandardRow.standard_family_id,
                     desc(StandardRow.effective_date),
+                    desc(StandardRow.rule_revision),
                     desc(StandardRow.installed_at),
                 )
             )
@@ -123,13 +124,13 @@ class SqlStandardRepository:
 
     def list_historical(self) -> list[StandardDefinition]:
         with self.database.session() as session:
-            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date)))
+            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date), desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
             definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
         return [item for item in definitions if item.lifecycle_status is LifecycleStatus.OBSOLETE or item.obsolete_date is not None]
 
     def list_future(self, evaluation_date: date) -> list[StandardDefinition]:
         with self.database.session() as session:
-            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, StandardRow.effective_date))
+            rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, StandardRow.effective_date, desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
             definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
         return [item for item in definitions if item.effective_date > evaluation_date and item.lifecycle_status is not LifecycleStatus.OBSOLETE]
 
@@ -138,7 +139,7 @@ class SqlStandardRepository:
             statement = (
                 select(StandardRow)
                 .where(StandardRow.standard_id == standard_id, StandardRow.status == "published")
-                .order_by(desc(StandardRow.effective_date), desc(StandardRow.installed_at))
+                .order_by(desc(StandardRow.effective_date), desc(StandardRow.rule_revision), desc(StandardRow.installed_at))
                 .limit(1)
             )
             row = session.scalar(statement)
@@ -152,6 +153,7 @@ class SqlStandardRepository:
                 .order_by(
                     StandardRow.standard_family_id,
                     desc(StandardRow.effective_date),
+                    desc(StandardRow.rule_revision),
                     desc(StandardRow.installed_at),
                 )
             )
@@ -167,7 +169,7 @@ class SqlStandardRepository:
 
     def list_all(self) -> list[StandardDefinition]:
         with self.database.session() as session:
-            rows = session.scalars(select(StandardRow).order_by(StandardRow.number, StandardRow.effective_date))
+            rows = session.scalars(select(StandardRow).order_by(StandardRow.number, StandardRow.effective_date, desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
             return [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
 
     def install(self, definition: StandardDefinition, package_id: str | None = None, *, session=None) -> None:
