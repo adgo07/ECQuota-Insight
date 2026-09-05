@@ -11,6 +11,7 @@ from uebench.infrastructure.logging import configure_logging
 from uebench.infrastructure.excel import WorkbookExportService, WorkbookImportService, WorkbookTemplateService
 from uebench.infrastructure.packages import StandardPackageService
 from uebench.infrastructure.paths import AppPaths
+from uebench.infrastructure.sources import StandardSourceService
 from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRepository, SqlStandardRepository
 
 
@@ -44,6 +45,7 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
     import_service = WorkbookImportService(database, audit, standards)
     export_service = WorkbookExportService(evaluations, audit)
     backup_service = BackupService(paths, database, audit)
+    source_service = StandardSourceService(paths.standards)
     package_service = None
     if public_key_path is not None and public_key_path.exists():
         public_key = StandardPackageService.load_public_key(public_key_path)
@@ -65,7 +67,7 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
         package_service=package_service,
         backup_service=backup_service,
         audit=audit,
-        source_root=paths.standards,
+        source_service=source_service,
     )
     return AppContext(
         paths=paths,

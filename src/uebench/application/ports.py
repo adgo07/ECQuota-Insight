@@ -48,6 +48,12 @@ class WorkbookExportPort(Protocol):
     def export(self, evaluation_id: str, path: Path) -> Path: ...
 
 
+class StandardSourcePort(Protocol):
+    """Locate a standard source file without exposing storage details to the UI."""
+
+    def find(self, source_file: str, source_sha256: str) -> Path | None: ...
+
+
 class PackageManifestPort(Protocol):
     package_id: str
     data_version: str

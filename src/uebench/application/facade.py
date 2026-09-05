@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from datetime import date
 from pathlib import Path
@@ -24,6 +23,7 @@ from .ports import (
     PackageInstallResultPort,
     PackageValidationReportPort,
     StandardPackagePort,
+    StandardSourcePort,
     TemplatePort,
     WorkbookExportPort,
     WorkbookImportPort,
@@ -47,7 +47,7 @@ class ApplicationFacade:
         package_service: StandardPackagePort | None = None,
         backup_service: BackupPort | None = None,
         audit: AuditPort | None = None,
-        source_root: Path | None = None,
+        source_service: StandardSourcePort | None = None,
     ) -> None:
         self._standards = standards
         self._evaluations = evaluations
@@ -59,7 +59,7 @@ class ApplicationFacade:
         self._package_updates = PackageDirectoryService(package_service) if package_service is not None else None
         self._backup = backup_service
         self._audit = audit
-        self._source_root = source_root
+        self._source_service = source_service
         self._catalog = StandardCatalogService(standards)
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
@@ -212,23 +212,6 @@ class ApplicationFacade:
             if evaluation_date is None
             else self.get_standard_for_evaluation(standard_id, evaluation_date, selection_mode)
         )
-        if standard is None or self._source_root is None:
+        if standard is None or self._source_service is None:
             return None
-        expected_hash = standard.source_sha256.lower()
-        candidates = sorted(
-            self._source_root.rglob(standard.source_file),
-            key=lambda item: str(item).casefold(),
-        )
-        for candidate in candidates:
-            if not candidate.is_file():
-                continue
-            digest = hashlib.sha256()
-            try:
-                with candidate.open("rb") as stream:
-                    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-                        digest.update(chunk)
-            except OSError:
-                continue
-            if digest.hexdigest() == expected_hash:
-                return candidate
-        return None
+        return self._source_service.find(standard.source_file, standard.source_sha256)

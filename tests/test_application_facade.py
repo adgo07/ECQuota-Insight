@@ -109,24 +109,22 @@ def test_facade_lists_package_history_through_application_port():
     package.list_history.assert_called_once_with(12)
 
 def test_facade_finds_selected_source_by_hash_and_selection_mode(tmp_path: Path):
-    source_root = tmp_path / "standards"
-    stale = source_root / "old-package" / "same.pdf"
-    current = source_root / "new-package" / "same.pdf"
-    stale.parent.mkdir(parents=True)
-    current.parent.mkdir(parents=True)
-    stale.write_bytes(b"old source")
-    current.write_bytes(b"selected source")
+    selected = tmp_path / "same.pdf"
+    selected.write_bytes(b"selected source")
+    expected_hash = hashlib.sha256(b"selected source").hexdigest()
 
     standard = Mock()
     standard.source_file = "same.pdf"
-    standard.source_sha256 = hashlib.sha256(b"selected source").hexdigest()
+    standard.source_sha256 = expected_hash
     standards = Mock()
     standards.get_for_evaluation.return_value = standard
+    source_service = Mock()
+    source_service.find.return_value = selected
     facade = ApplicationFacade(
         standards=standards,
         evaluations=Mock(),
         evaluation_service=Mock(),
-        source_root=source_root,
+        source_service=source_service,
     )
 
     evaluation_date = date(2026, 9, 5)
@@ -134,7 +132,8 @@ def test_facade_finds_selected_source_by_hash_and_selection_mode(tmp_path: Path)
         "std-1",
         evaluation_date=evaluation_date,
         selection_mode=StandardSelectionMode.FUTURE,
-    ) == current
+    ) == selected
     standards.get_for_evaluation.assert_called_once_with(
         "std-1", evaluation_date, StandardSelectionMode.FUTURE
     )
+    source_service.find.assert_called_once_with("same.pdf", expected_hash)
