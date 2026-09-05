@@ -1,7 +1,7 @@
 {
   "canonical": {
-    "root": "G:\\Python Project\\能耗限额\\standards\\development\\scope-63",
-    "scope_file": "G:\\Python Project\\能耗限额\\standards\\development\\scope-63\\scope-63.json",
+    "root": "standards/development/scope-63",
+    "scope_file": "standards/development/scope-63/scope-63.json",
     "scope_name": "当前目录及新增标准的63项工作范围（已同步用户替代关系）",
     "numbers": [
       "GB 16780-2021",
@@ -76,8 +76,8 @@
     }
   },
   "legacy": {
-    "root": "G:\\Python Project\\能耗限额\\standards\\development\\scope-65",
-    "scope_file": "G:\\Python Project\\能耗限额\\standards\\development\\scope-65\\scope-65.json",
+    "root": "standards/development/scope-65",
+    "scope_file": "standards/development/scope-65/scope-65.json",
     "scope_name": "当前目录及新增标准的65项工作范围",
     "numbers": [
       "GB 16780-2021",

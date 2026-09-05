@@ -16,6 +16,17 @@ from pathlib import Path
 from typing import Any
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _display_path(path: Path) -> str:
+    """Use repository-relative paths in tracked reports when possible."""
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def _load_snapshot(root: Path) -> dict[str, Any]:
     root = root.resolve()
     scope_path = root / f"{root.name}.json"
@@ -49,8 +60,8 @@ def _load_snapshot(root: Path) -> dict[str, Any]:
     expected = set(numbers)
     actual = set(definitions)
     return {
-        "root": str(root),
-        "scope_file": str(scope_path),
+        "root": _display_path(root),
+        "scope_file": _display_path(scope_path),
         "scope_name": payload.get("scope_name", root.name),
         "numbers": numbers,
         "definitions": definitions,

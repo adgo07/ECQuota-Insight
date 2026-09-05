@@ -25,3 +25,13 @@ def test_canonical_snapshot_does_not_embed_legacy_scope_manifest() -> None:
     assert not (canonical / "scope-65.json").exists()
     assert (legacy / "scope-65.json").exists()
     assert any((canonical / "retired-definitions").glob("*.json"))
+def test_snapshot_report_uses_portable_paths() -> None:
+    root = Path(__file__).resolve().parents[1]
+    report = compare_snapshots(
+        root / "standards" / "development" / "scope-63",
+        root / "standards" / "development" / "scope-65",
+        root / "data" / "standard-replacements.json",
+    )
+    assert report["canonical"]["root"] == "standards/development/scope-63"
+    assert report["canonical"]["scope_file"] == "standards/development/scope-63/scope-63.json"
+    assert report["legacy"]["root"] == "standards/development/scope-65"

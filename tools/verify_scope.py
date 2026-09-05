@@ -11,6 +11,17 @@ from pathlib import Path
 from uebench.domain.models import StandardDefinition
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _display_path(path: Path) -> str:
+    """Keep tracked verification reports portable across workstations."""
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -148,7 +159,7 @@ def main() -> None:
                 if definition.publication_status.value == "draft" and "not_for_formal_evaluation" not in indicator.notes:
                     draft_warnings.append(f"{definition.number}/{indicator.id}: draft规则缺少禁止正式评价标记")
     report = {
-        "scope_file": str(scope_path),
+        "scope_file": _display_path(scope_path),
         "scope_count": len(expected),
         "catalog_count": len(catalog),
         "definition_count": len(definitions),
