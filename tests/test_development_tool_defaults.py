@@ -40,3 +40,19 @@ def test_review_tool_never_defaults_to_historical_scope() -> None:
     text = (ROOT / "tools" / "review_confirmed_rules.py").read_text(encoding="utf-8")
     assert 'data_dir / "scope-65.json"' not in text
     assert "不会默认使用历史scope-65.json" in text
+
+
+def test_draft_generator_replays_all_remaining_specialized_refinements() -> None:
+    text = (ROOT / "tools" / "prepare_next_scope_drafts.py").read_text(encoding="utf-8")
+    expected = {
+        "GB 32032-2024": 'refine_complex(data_dir, "GB 32032-2024")',
+        "GB 32044-2015": 'refine_gb32044(data_dir)',
+        "GB 32051-2024": 'refine_simple(data_dir, "GB 32051-2024")',
+        "GB 36887-2018": 'refine_gb36887(data_dir)',
+        "GB 36890-2018": 'refine_gb36890(data_dir)',
+        "GB 40877-2021": 'refine_gb40877(data_dir)',
+        "GB 40878-2021": 'refine_gb40878(data_dir)',
+        "GB 45246-2025": 'refine_simple(data_dir, "GB 45246-2025")',
+    }
+    for number, marker in expected.items():
+        assert marker in text, f"{number} 的专项精化脚本未接入草案生成器"

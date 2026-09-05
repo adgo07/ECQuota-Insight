@@ -417,6 +417,30 @@ def main() -> None:
     if any(item["number"] == "GB 31830-2024" for item in rows):
         from refine_gb31830_rule import build as build_gb31830
         build_gb31830(data_dir)
+    if any(item["number"] == "GB 32032-2024" for item in rows):
+        from refine_complex_draft_rows import refine_one as refine_complex
+        refine_complex(data_dir, "GB 32032-2024")
+    if any(item["number"] == "GB 32044-2015" for item in rows):
+        from refine_gb32044_rule import refine as refine_gb32044
+        refine_gb32044(data_dir)
+    if any(item["number"] == "GB 32051-2024" for item in rows):
+        from refine_simple_remaining_rules import refine_one as refine_simple
+        refine_simple(data_dir, "GB 32051-2024")
+    if any(item["number"] == "GB 36887-2018" for item in rows):
+        from refine_gb36887_rule import refine as refine_gb36887
+        refine_gb36887(data_dir)
+    if any(item["number"] == "GB 36890-2018" for item in rows):
+        from refine_gb36890_rule import refine as refine_gb36890
+        refine_gb36890(data_dir)
+    if any(item["number"] == "GB 40877-2021" for item in rows):
+        from refine_gb40877_rule import refine as refine_gb40877
+        refine_gb40877(data_dir)
+    if any(item["number"] == "GB 40878-2021" for item in rows):
+        from refine_gb40878_rule import refine as refine_gb40878
+        refine_gb40878(data_dir)
+    if any(item["number"] == "GB 45246-2025" for item in rows):
+        from refine_simple_remaining_rules import refine_one as refine_simple
+        refine_simple(data_dir, "GB 45246-2025")
     errors = []
     for path in sorted(definitions_dir.glob("*.json")):
         try:
