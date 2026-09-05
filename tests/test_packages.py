@@ -329,6 +329,39 @@ def test_package_file_kind_and_manifest_lineage_are_rejected() -> None:
             files=[],
         )
 
+def test_full_package_new_revision_selects_new_rule_and_keeps_history(tmp_path: Path) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    _, _, standards, service = make_service(tmp_path, private_key)
+    first = build_package(
+        tmp_path,
+        private_key,
+        package_id="full-parent",
+        rule_revision=1,
+        issued_at=datetime(2026, 8, 23, tzinfo=timezone.utc),
+    )
+    second = build_package(
+        tmp_path,
+        private_key,
+        package_id="full-revision-2",
+        rule_revision=2,
+        level_1="11",
+        issued_at=datetime(2026, 8, 24, tzinfo=timezone.utc),
+    )
+
+    service.install(first)
+    service.install(second)
+
+    selected = standards.get_for_evaluation(
+        "gb-00000-2026", date(2026, 8, 31), StandardSelectionMode.CURRENT
+    )
+    assert selected is not None
+    assert selected.rule_revision == 2
+    assert len(standards.list_all()) == 2
+    assert [entry.package_id for entry in service.list_history(2)] == [
+        "full-revision-2",
+        "full-parent",
+    ]
+
 def test_incremental_install_preserves_parent_and_selects_new_revision(tmp_path: Path) -> None:
     private_key = Ed25519PrivateKey.generate()
     _, _, standards, service = make_service(tmp_path, private_key)
