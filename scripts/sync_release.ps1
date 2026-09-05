@@ -73,6 +73,7 @@ foreach ($Document in @(
     "安装发布说明.md",
     "交付清单.md",
     "验收记录.md",
+    "宏观结构审计-20260905.md",
     "README.md"
 )) {
     $Source = if ($Document -eq "README.md") {

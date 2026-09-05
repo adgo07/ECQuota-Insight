@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import date
 from pathlib import Path
@@ -193,8 +194,41 @@ class ApplicationFacade:
         if loader is None:
             return []
         return list(loader(limit))
-    def find_standard_source(self, standard_id: str) -> Path | None:
-        standard = self.get_published_standard(standard_id)
+    def find_standard_source(
+        self,
+        standard_id: str,
+        *,
+        evaluation_date: date | None = None,
+        selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
+    ) -> Path | None:
+        """Find the selected standard's source PDF and verify its SHA-256.
+
+        A package upgrade can leave several copies with the same filename in
+        different package directories. Matching the hash prevents opening an
+        older PDF merely because it happens to be found first.
+        """
+        standard = (
+            self.get_published_standard(standard_id)
+            if evaluation_date is None
+            else self.get_standard_for_evaluation(standard_id, evaluation_date, selection_mode)
+        )
         if standard is None or self._source_root is None:
             return None
-        return next(self._source_root.rglob(standard.source_file), None)
+        expected_hash = standard.source_sha256.lower()
+        candidates = sorted(
+            self._source_root.rglob(standard.source_file),
+            key=lambda item: str(item).casefold(),
+        )
+        for candidate in candidates:
+            if not candidate.is_file():
+                continue
+            digest = hashlib.sha256()
+            try:
+                with candidate.open("rb") as stream:
+                    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                        digest.update(chunk)
+            except OSError:
+                continue
+            if digest.hexdigest() == expected_hash:
+                return candidate
+        return None

@@ -955,9 +955,13 @@ class MainWindow(QMainWindow):
         standard = self.context.application.get_published_standard(standard_id)
         if standard is None:
             return
-        source = self.context.application.find_standard_source(standard_id)
+        source = self.context.application.find_standard_source(
+            standard_id,
+            evaluation_date=date.today(),
+            selection_mode=StandardSelectionMode.CURRENT,
+        )
         if source is None:
-            QMessageBox.warning(self, "原文缺失", "本机标准库中未找到该PDF。")
+            QMessageBox.warning(self, "原文缺失或不匹配", "本机标准库中未找到与该标准版本 SHA-256 一致的 PDF。")
             return
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(source)))
 
