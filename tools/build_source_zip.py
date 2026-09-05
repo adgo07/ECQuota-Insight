@@ -5,7 +5,7 @@ from pathlib import Path
 import zipfile
 
 
-INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs"]
+INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development"]
 ROOT_FILES = [
     "README.md",
     "pyproject.toml",
