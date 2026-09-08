@@ -4,7 +4,7 @@ import sys
 import logging
 from pathlib import Path
 
-from PySide6.QtGui import QFont, QFontDatabase
+from PySide6.QtGui import QFont, QFontDatabase, QIcon
 from PySide6.QtWidgets import QApplication
 
 from .bootstrap import create_context
@@ -44,6 +44,9 @@ def main() -> int:
     application = QApplication.instance() or QApplication(sys.argv)
     application.setApplicationName("单位产品能耗对标软件")
     application.setOrganizationName("UEBench")
+    bundled_icon = Path(__file__).resolve().parent / "resources" / "uebench.ico"
+    if bundled_icon.exists():
+        application.setWindowIcon(QIcon(str(bundled_icon)))
     configure_application_font(application)
     resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
     context = create_context(public_key_path=resource_key)

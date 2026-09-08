@@ -98,6 +98,16 @@ class ApplicationFacade:
     def get_published_standard(self, standard_id: str) -> StandardDefinition | None:
         return self._standards.get_published(standard_id)
 
+    def get_standard(self, standard_id: str) -> StandardDefinition | None:
+        """Return a catalogue entry for read-only library/source browsing.
+
+        Formal evaluation still resolves through ``get_standard_for_evaluation``
+        and therefore accepts published rules only.  This separate lookup lets
+        the standard library show a future or pending-confirmation entry and
+        explain its status without accidentally making it executable.
+        """
+        return next((item for item in self._standards.list_all() if item.id == standard_id), None)
+
     def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)
 
@@ -208,7 +218,7 @@ class ApplicationFacade:
         older PDF merely because it happens to be found first.
         """
         standard = (
-            self.get_published_standard(standard_id)
+            self.get_standard(standard_id)
             if evaluation_date is None
             else self.get_standard_for_evaluation(standard_id, evaluation_date, selection_mode)
         )

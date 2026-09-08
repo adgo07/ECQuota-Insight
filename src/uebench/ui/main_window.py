@@ -48,6 +48,7 @@ from uebench.domain.models import (
     LifecycleStatus,
     InputMode,
     InputValue,
+    PublicationStatus,
     StandardSelectionMode,
     ProductionLine,
     StandardDefinition,
@@ -62,6 +63,7 @@ QListWidget#navigation::item:selected { background: #2f75b5; }
 QFrame.card { background: white; border: 1px solid #d9e2f3; border-radius: 8px; padding: 12px; }
 QPushButton { background: #2f75b5; color: white; border: none; border-radius: 5px; padding: 7px 14px; }
 QPushButton:hover { background: #245f94; }
+QPushButton:checked { background: #17365d; border: 2px solid #f5a623; }
 QPushButton:disabled { background: #aebdca; }
 QLineEdit, QComboBox, QDateEdit, QTextEdit, QTableWidget { background: white; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px; }
 QHeaderView::section { background: #d9eaf7; color: #17365d; padding: 7px; border: none; border-bottom: 1px solid #9fbad0; font-weight: bold; }
@@ -77,6 +79,100 @@ def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
     return item
 
 
+# Rule JSON keeps stable machine-readable note codes.  The desktop UI must
+# never expose those implementation codes to Chinese users, so translate the
+# common codes at the presentation boundary and keep a Chinese fallback for
+# newly added rules.
+_NOTE_TRANSLATIONS = {
+    "requires_independent_review": "需独立复核后使用",
+    "original_pdf_transcribed": "已从标准原文转录",
+    "candidate_from_original_pdf": "由标准原文提取的候选规则",
+    "not_for_formal_evaluation": "尚未发布，不能用于正式评价",
+    "product_specification_factor_from_table_footnotes": "产品规格修正系数取自表格脚注",
+    "statistics_scope_and_80_percent_rule_in_clause_6": "统计范围及80%规则见第6章",
+    "winter_heating_scope_note_in_table": "采暖范围按表中说明执行",
+    "statistics_and_yield_conversion_in_clause_6": "统计范围和产量折算见第6章",
+    "thickness_column_from_table_3": "厚度修正取表3",
+    "paper_process_modifier_from_table_2_notes": "纸种和工艺修正取表2注",
+    "detail_formula_blocked_until_factor_model_review": "修正因子模型复核完成前，明细模式返回不完整",
+    "non_monotonic_source_values_preserved": "保留标准原文中的非单调限额值",
+    "table_rows_transcribed_from_current_mandatory_text": "已从现行强制性标准原文表格转录",
+    "special_process_boundary_or_product_conversion_requires_clause_review": "特殊工艺边界或产品折算需按条款复核",
+    "product_indicator_split_confirmed": "产品和指标已按规则拆分",
+    "missing_grade_preserved": "标准原文缺少该等级，按缺级保留",
+    "detail_energy_lines_are_scoped_to_the_selected_product": "能源明细仅计入所选产品或工序范围",
+    "standard_scope_excludes_special_glass_fibers": "标准范围不包括特殊玻璃纤维",
+    "qualified_product_must_meet_GB_T_32469_for_TDI_or_GB_T_13941_for_MDI": "合格产品应满足标准引用的产品质量要求",
+}
+
+
+def _translate_note(note: str) -> str:
+    text = str(note).strip()
+    if not text:
+        return ""
+    if text in _NOTE_TRANSLATIONS:
+        return _NOTE_TRANSLATIONS[text]
+    if text.startswith("visual_reviewed_"):
+        return "已对照标准原文复核"
+    if text.startswith("detail_input_category:"):
+        return "明细录入分类按标准规则设置"
+    if text.startswith("detail_energy_category_keys:"):
+        return "明细能源分类按标准规则设置"
+    if text.startswith("detail_") and text.endswith("_review"):
+        return "明细计算口径需按标准条款复核"
+    if text.startswith("formula_") or text.endswith("_formula") or "_formula_" in text:
+        return "修正公式已结构化，计算时按标准条款执行"
+    if text.startswith("capacity_") or text.startswith("fuel_") or text.startswith("heating_"):
+        return "修正参数按标准表格和条款执行"
+    # Do not leak a new English rule code before its translation is added.
+    if any("a" <= char.lower() <= "z" for char in text):
+        return "规则说明已登记，具体以标准原文依据为准"
+    return text
+
+
+def _condition_description(condition) -> str:
+    """Render a concise Chinese applicability description for the library."""
+    op = getattr(condition, "op", "always")
+    if op == "always":
+        return ""
+    operators = {
+        "eq": "等于",
+        "ne": "不等于",
+        "lt": "小于",
+        "lte": "小于或等于",
+        "gt": "大于",
+        "gte": "大于或等于",
+        "in": "属于规定选项",
+    }
+    if op in {"all", "any"}:
+        parts = [_condition_description(item) for item in getattr(condition, "args", [])]
+        parts = [item for item in parts if item]
+        connector = "且" if op == "all" else "或"
+        return connector.join(parts) if parts else "按标准规定确认"
+    if op == "not":
+        parts = [_condition_description(item) for item in getattr(condition, "args", [])]
+        return "不满足（" + "且".join(item for item in parts if item) + "）"
+    if op == "range":
+        minimum = getattr(condition, "minimum", None)
+        maximum = getattr(condition, "maximum", None)
+        left = "不小于" if getattr(condition, "include_minimum", True) else "大于"
+        right = "不大于" if getattr(condition, "include_maximum", True) else "小于"
+        return f"相关参数{left}{minimum}且{right}{maximum}"
+    if op == "in":
+        values = "、".join(str(item) for item in getattr(condition, "values", []))
+        return f"相关参数属于{values or '标准规定选项'}"
+    value = getattr(condition, "value", None)
+    return f"相关参数{operators.get(op, '满足')} {value if value is not None else '标准规定值'}"
+
+
+def _friendly_error(exc: Exception, operation: str) -> str:
+    """Keep error dialogs understandable and Chinese even for library errors."""
+    detail = str(exc).strip()
+    if detail and any("\u4e00" <= char <= "\u9fff" for char in detail):
+        return f"{operation}：{detail}"
+    return f"{operation}失败，请检查输入数据、单位和适用条件后重试。"
+
+
 class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
@@ -85,8 +181,10 @@ class MainWindow(QMainWindow):
         self.last_result_id: str | None = None
         self.pending_import_id: str | None = None
         self.setWindowTitle("单位产品能耗对标软件")
-        self.resize(1280, 820)
-        self.setMinimumSize(1080, 700)
+        # Leave room for the ten-column energy table on ordinary 1366x768 and
+        # 1920x1080 screens.  Users can still resize the window smaller.
+        self.resize(1440, 900)
+        self.setMinimumSize(1180, 760)
         self.setStyleSheet(APP_STYLE)
 
         central = QWidget()
@@ -174,6 +272,8 @@ class MainWindow(QMainWindow):
         self.standard_table.setHorizontalHeaderLabels(["标准编号", "标准名称", "状态", "版本", "实施日期", "产品/工序数", "原文SHA-256"])
         self._configure_table(self.standard_table)
         self.standard_table.itemSelectionChanged.connect(self.refresh_standard_detail)
+        self.standard_table.itemDoubleClicked.connect(lambda *_: self.open_selected_standard())
+        self.standard_table.setToolTip("双击标准行直接打开已安装且校验通过的标准原文")
         layout.addWidget(self.standard_table, 1)
         self.standard_detail_label = QLabel("选择标准后查看指标、限额和原文依据")
         layout.addWidget(self.standard_detail_label)
@@ -203,21 +303,23 @@ class MainWindow(QMainWindow):
         self.eval_mode.addItem("直接录入实际值", InputMode.DIRECT.value)
         self.eval_mode.addItem("能源与产量明细计算", InputMode.DETAIL.value)
         self.eval_mode.currentIndexChanged.connect(self._refresh_input_table)
+        # Kept as a hidden compatibility model field; the visible choice is
+        # presented as two large checkable buttons beside the action buttons.
+        self.eval_mode.setVisible(False)
         self.eval_date = QDateEdit(QDate.currentDate())
         self.eval_date.setCalendarPopup(False)
         self.eval_date.setReadOnly(True)
         self.eval_date.setEnabled(False)
+        self.eval_date.setVisible(False)
         self.eval_organization = QLineEdit()
         self.eval_project = QLineEdit()
+        self.eval_project.setVisible(False)
         self.eval_notes = QLineEdit()
         form.addRow("标准选择方式", self.eval_selection_mode)
         form.addRow("标准", self.eval_standard)
         form.addRow("标准状态提示", self.eval_standard_status)
         form.addRow("产品/工序", self.eval_product)
-        form.addRow("评价日期", self.eval_date)
-        form.addRow("录入模式", self.eval_mode)
         form.addRow("单位名称", self.eval_organization)
-        form.addRow("项目名称", self.eval_project)
         form.addRow("评价备注", self.eval_notes)
         form_layout.addLayout(form)
         layout.addWidget(form_card)
@@ -235,9 +337,30 @@ class MainWindow(QMainWindow):
         self.input_tabs.addTab(self.eval_inputs, "标准输入")
         self.input_tabs.addTab(self.energy_table, "能源明细")
         self.input_tabs.addTab(self.production_table, "产量与分摊")
+        self.input_tabs.setMinimumHeight(360)
+        for table in (self.eval_inputs, self.energy_table, self.production_table):
+            table.setMinimumHeight(300)
+            table.verticalHeader().setDefaultSectionSize(28)
+        input_hint = QLabel(
+            "下方参数由所选标准和产品/工序自动生成。可直接点击“值”列输入；选择明细方式时，"
+            "再填写能源明细和产量与分摊。"
+        )
+        input_hint.setWordWrap(True)
+        layout.addWidget(input_hint)
         layout.addWidget(self.input_tabs, 1)
 
         buttons = QHBoxLayout()
+        mode_label = QLabel("输入方式")
+        self.direct_mode_button = QPushButton("直接录入实际值")
+        self.detail_mode_button = QPushButton("按能源/产量明细计算")
+        for button in (self.direct_mode_button, self.detail_mode_button):
+            button.setCheckable(True)
+            button.setAutoExclusive(True)
+        self.direct_mode_button.clicked.connect(lambda: self._set_input_mode(InputMode.DIRECT))
+        self.detail_mode_button.clicked.connect(lambda: self._set_input_mode(InputMode.DETAIL))
+        buttons.addWidget(mode_label)
+        buttons.addWidget(self.direct_mode_button)
+        buttons.addWidget(self.detail_mode_button)
         add_energy = QPushButton("新增能源行")
         add_energy.clicked.connect(lambda: self._append_blank_row(self.energy_table, [str(uuid4())[:8], "", "", "input", "", "", "", "", "1", ""]))
         add_product = QPushButton("新增产量行")
@@ -255,9 +378,11 @@ class MainWindow(QMainWindow):
             ["指标", "实际值", "单位", "1级基础", "2级基础", "3级基础", "1级修正", "2级修正", "3级修正", "判定", "警告", "依据页码", "条款/表号", "来源"]
         )
         self._configure_table(self.eval_results)
+        self.eval_results.setMinimumHeight(220)
         self.eval_summary = QLabel("等级汇总：尚未计算")
         layout.addWidget(self.eval_summary)
         layout.addWidget(self.eval_results, 1)
+        self._sync_mode_buttons()
         return page
 
     def _build_records(self) -> QWidget:
@@ -288,6 +413,12 @@ class MainWindow(QMainWindow):
 
     def _build_import(self) -> QWidget:
         page, layout = self._page("Excel导入")
+        explanation = QLabel(
+            "Excel导入用于批量填写评价信息、适用条件、实际值、能源明细和产量分摊。"
+            "软件会先按固定模板逐单元格校验，校验通过后再提交计算；Excel本身不单独判级。"
+        )
+        explanation.setWordWrap(True)
+        layout.addWidget(explanation)
         controls = QHBoxLayout()
         template = QPushButton("保存导入模板")
         template.clicked.connect(self.save_import_template)
@@ -408,7 +539,14 @@ class MainWindow(QMainWindow):
 
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
-        standards = self.context.application.list_current_standards(date.today())
+        # The library is a catalogue of the 63 in-scope standards, not only
+        # today's executable subset.  Draft/future entries remain visible so
+        # users can find them and see why formal evaluation is unavailable.
+        standards = [
+            item
+            for item in self.context.application.list_all_standards()
+            if item.lifecycle_status is not LifecycleStatus.OBSOLETE
+        ]
         self.standard_table.setRowCount(0)
         for standard in standards:
             haystack = f"{standard.number} {standard.title} {' '.join(p.name for p in standard.products)}".lower()
@@ -416,10 +554,18 @@ class MainWindow(QMainWindow):
                 continue
             row = self.standard_table.rowCount()
             self.standard_table.insertRow(row)
+            if standard.publication_status is not PublicationStatus.PUBLISHED:
+                status = "待确认（不可正式评价）"
+            elif standard.effective_date > date.today():
+                status = "尚未实施（仅预览）"
+            elif standard.is_effective_on(date.today()):
+                status = "当前有效"
+            else:
+                status = "历史/已替代"
             values = [
                 standard.number,
                 standard.title,
-                ("当前有效" if standard.is_effective_on(date.today()) else ("尚未实施" if standard.effective_date > date.today() else "历史/已替代")),
+                status,
                 standard.version,
                 standard.effective_date,
                 len(standard.products),
@@ -440,14 +586,15 @@ class MainWindow(QMainWindow):
         selected_item = self.standard_table.item(row, 0) if row >= 0 else None
         standard_id = selected_item.data(Qt.ItemDataRole.UserRole) if selected_item else None
         standard = next(
-            (item for item in self.context.application.list_current_standards(date.today()) if item.id == standard_id),
+            (item for item in self.context.application.list_all_standards() if item.id == standard_id),
             None,
         )
         if standard is None:
             self.standard_detail_label.setText("选择标准后查看指标、限额和原文依据")
             return
         indicator_count = sum(len(product.indicators) for product in standard.products)
-        self.standard_detail_label.setText(f"{standard.number}：{indicator_count} 个指标")
+        status = "已发布" if standard.publication_status is PublicationStatus.PUBLISHED else "待确认，不能正式评价"
+        self.standard_detail_label.setText(f"{standard.number}：{indicator_count} 个指标；{status}")
 
         def limit_value(expression):
             if expression is None:
@@ -462,9 +609,16 @@ class MainWindow(QMainWindow):
                 clauses = "; ".join(
                     filter(None, {reference.clause for reference in references} | {reference.table for reference in references})
                 )
-                notes = "；".join(indicator.notes)
+                notes = "；".join(
+                    translated
+                    for translated in (_translate_note(note) for note in indicator.notes)
+                    if translated
+                )
                 if indicator.applicability.op != "always":
-                    notes = (notes + "；" if notes else "") + "存在适用条件"
+                    condition_text = _condition_description(indicator.applicability)
+                    notes = (notes + "；" if notes else "") + (
+                        f"适用条件：{condition_text}" if condition_text else "适用条件：按标准规定确认"
+                    )
                 values = [
                     product.name,
                     indicator.name,
@@ -531,6 +685,24 @@ class MainWindow(QMainWindow):
 
     def _product_changed(self) -> None:
         self._refresh_input_table()
+
+    def _set_input_mode(self, mode: InputMode) -> None:
+        """Update the hidden request field from the visible mode buttons."""
+        index = self.eval_mode.findData(mode.value)
+        if index < 0:
+            return
+        self.eval_mode.blockSignals(True)
+        self.eval_mode.setCurrentIndex(index)
+        self.eval_mode.blockSignals(False)
+        self._sync_mode_buttons()
+        self._refresh_input_table()
+
+    def _sync_mode_buttons(self) -> None:
+        if not hasattr(self, "direct_mode_button"):
+            return
+        mode = self.eval_mode.currentData()
+        self.direct_mode_button.setChecked(mode == InputMode.DIRECT.value)
+        self.detail_mode_button.setChecked(mode == InputMode.DETAIL.value)
 
     def _selected_product(self):
         if self.current_standard is None:
@@ -646,7 +818,7 @@ class MainWindow(QMainWindow):
             is_preview = request.selection_mode is StandardSelectionMode.FUTURE
             result = self.context.application.preview_evaluation(request) if is_preview else self.context.application.evaluate(request)
         except Exception as exc:
-            QMessageBox.critical(self, "无法计算", str(exc))
+            QMessageBox.critical(self, "无法计算", _friendly_error(exc, "计算和判级"))
             return
         self.last_result_id = None if is_preview else result.evaluation_id
         self.eval_results.setRowCount(0)
@@ -742,6 +914,7 @@ class MainWindow(QMainWindow):
         mode_index = self.eval_mode.findData(request.input_mode.value)
         if mode_index >= 0:
             self.eval_mode.setCurrentIndex(mode_index)
+        self._sync_mode_buttons()
         self.eval_date.setDate(QDate(request.evaluation_date.year, request.evaluation_date.month, request.evaluation_date.day))
         self.eval_organization.setText(request.organization_name or "")
         self.eval_project.setText(request.project_name or "")
@@ -811,7 +984,7 @@ class MainWindow(QMainWindow):
             self.context.application.export_evaluation(evaluation_id, Path(path))
             QMessageBox.information(self, "导出成功", path)
         except Exception as exc:
-            QMessageBox.critical(self, "导出失败", str(exc))
+            QMessageBox.critical(self, "导出失败", _friendly_error(exc, "导出Excel"))
 
     def delete_selected_record(self) -> None:
         evaluation_id = self._selected_record_id()
@@ -852,7 +1025,7 @@ class MainWindow(QMainWindow):
             self.pending_import_id = None
             self.import_commit_button.setEnabled(False)
         except Exception as exc:
-            QMessageBox.critical(self, "导入失败", str(exc))
+            QMessageBox.critical(self, "导入失败", _friendly_error(exc, "导入Excel"))
 
     def refresh_package_history(self) -> None:
         self.package_history_table.setRowCount(0)
@@ -893,7 +1066,7 @@ class MainWindow(QMainWindow):
         try:
             items = self.context.application.scan_package_directory(Path(directory), recursive=True)
         except Exception as exc:
-            QMessageBox.critical(self, "扫描失败", str(exc))
+            QMessageBox.critical(self, "扫描失败", _friendly_error(exc, "扫描标准包目录"))
             return
         if not items:
             QMessageBox.information(self, "扫描结果", "目录中没有找到 .uebench 标准包。")
@@ -926,7 +1099,7 @@ class MainWindow(QMainWindow):
             self.refresh_all()
             QMessageBox.information(self, "安装完成", f"已安装 {result.standards_installed} 项标准。")
         except Exception as exc:
-            QMessageBox.critical(self, "安装失败", str(exc))
+            QMessageBox.critical(self, "安装失败", _friendly_error(exc, "安装标准包"))
 
     def create_backup(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "创建备份", f"uebench-{date.today():%Y%m%d}.uebackup", "UEBench备份 (*.uebackup)")
@@ -945,23 +1118,26 @@ class MainWindow(QMainWindow):
             self.refresh_all()
             QMessageBox.information(self, "恢复完成", "数据已恢复。")
         except Exception as exc:
-            QMessageBox.critical(self, "恢复失败", str(exc))
+            QMessageBox.critical(self, "恢复失败", _friendly_error(exc, "恢复备份"))
 
     def open_selected_standard(self) -> None:
         row = self.standard_table.currentRow()
         if row < 0:
             return
         standard_id = self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
-        standard = self.context.application.get_published_standard(standard_id)
+        standard = next(
+            (item for item in self.context.application.list_all_standards() if item.id == standard_id),
+            None,
+        )
         if standard is None:
             return
-        source = self.context.application.find_standard_source(
-            standard_id,
-            evaluation_date=date.today(),
-            selection_mode=StandardSelectionMode.CURRENT,
-        )
+        source = self.context.application.find_standard_source(standard_id)
         if source is None:
-            QMessageBox.warning(self, "原文缺失或不匹配", "本机标准库中未找到与该标准版本 SHA-256 一致的 PDF。")
+            QMessageBox.warning(
+                self,
+                "原文缺失或不匹配",
+                "本机标准库中未找到与该标准版本 SHA-256 一致的PDF；请先安装包含该原文的标准包。",
+            )
             return
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(source)))
 

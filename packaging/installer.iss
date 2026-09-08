@@ -21,14 +21,15 @@ SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayName={#MyAppName}
 SetupLogging=yes
+SetupIconFile=uebench.ico
 
 [Languages]
-; The portable Inno Setup compiler intentionally ships with the English
-; message file only.  The application itself remains fully Chinese.
-Name: "english"; MessagesFile: "compiler:Default.isl"
+; 软件仅面向中文用户，安装向导、取消确认和安装完成页面统一使用简体中文。
+Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
 
 [Files]
 Source: "..\dist\UEBench\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "uebench.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\dist\release\单位产品能耗对标导入模板.xlsx"; DestDir: "{app}\模板"; Flags: ignoreversion
 Source: "..\dist\release\统一标准规则确认表.xlsx"; DestDir: "{app}\规则确认"; Flags: ignoreversion
 Source: "..\docs\用户手册.md"; DestDir: "{app}\文档"; Flags: ignoreversion
@@ -39,8 +40,8 @@ Source: "..\docs\交付清单.md"; DestDir: "{app}\文档"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}\文档"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\uebench.ico"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\uebench.ico"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加图标："

@@ -14,7 +14,11 @@ binaries = [
 binaries.extend(
     (str(path), ".")
     for path in (site_packages / "PySide6").glob("*.dll")
+    # The application opens PDF files with the Windows default viewer and
+    # does not import QtWebEngine/QtWebView.  Do not ship these multi-hundred
+    # megabyte browser runtimes in the offline desktop package.
     if path.name not in {"shiboken6.abi3.dll"}
+    and not path.name.lower().startswith(("qt6webengine", "qt6webview"))
 )
 datas = [
     (str(project_root / "migrations"), "migrations"),
@@ -63,6 +67,7 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
+    icon=str(project_root / "packaging" / "uebench.ico"),
     target_arch="x86_64",
     codesign_identity=None,
     entitlements_file=None,

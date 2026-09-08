@@ -10,7 +10,14 @@ from PySide6.QtWidgets import QApplication
 
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
-from uebench.domain.models import EvaluationRequest, InputMode, InputValue, PackageHistoryEntry, StandardSelectionMode
+from uebench.domain.models import (
+    EvaluationRequest,
+    InputMode,
+    InputValue,
+    PackageHistoryEntry,
+    PublicationStatus,
+    StandardSelectionMode,
+)
 
 from .test_engine import make_standard
 
@@ -156,5 +163,43 @@ def test_maintenance_page_shows_package_history_from_application_layer(tmp_path:
     assert window.package_history_table.item(0, 2).text() == "增量包"
     assert window.package_history_table.item(0, 3).text() == "pkg-parent"
     assert window.package_history_table.item(0, 7).text() == "a" * 64
+    window.close()
+    context.database.dispose()
+
+
+def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    pending = make_standard().model_copy(update={
+        "id": "gb-pending-2027",
+        "number": "GB 00005-2027",
+        "version": "2027",
+        "title": "待确认测试标准",
+        "publication_status": PublicationStatus.DRAFT,
+        "effective_date": date(2027, 1, 1),
+    })
+    pending.products[0].indicators[0].notes = ["requires_independent_review"]
+    context.standards.install(pending)
+    window = MainWindow(context)
+    assert window.standard_table.rowCount() == 1
+    assert window.standard_table.item(0, 2).text() == "待确认（不可正式评价）"
+    window.standard_table.selectRow(0)
+    assert "需独立复核后使用" in window.standard_indicator_table.item(0, 6).text()
+    assert "requires_independent_review" not in window.standard_indicator_table.item(0, 6).text()
+    window.close()
+    context.database.dispose()
+
+
+def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    context.standards.install(make_standard())
+    window = MainWindow(context)
+    assert not window.eval_date.isVisible()
+    assert not window.eval_project.isVisible()
+    window.detail_mode_button.click()
+    assert window.eval_mode.currentData() == InputMode.DETAIL.value
+    window.direct_mode_button.click()
+    assert window.eval_mode.currentData() == InputMode.DIRECT.value
     window.close()
     context.database.dispose()
