@@ -544,7 +544,7 @@ class MainWindow(QMainWindow):
         # users can find them and see why formal evaluation is unavailable.
         standards = [
             item
-            for item in self.context.application.list_all_standards()
+            for item in self.context.application.list_library_standards()
             if item.lifecycle_status is not LifecycleStatus.OBSOLETE
         ]
         self.standard_table.setRowCount(0)
@@ -586,7 +586,7 @@ class MainWindow(QMainWindow):
         selected_item = self.standard_table.item(row, 0) if row >= 0 else None
         standard_id = selected_item.data(Qt.ItemDataRole.UserRole) if selected_item else None
         standard = next(
-            (item for item in self.context.application.list_all_standards() if item.id == standard_id),
+            (item for item in self.context.application.list_library_standards() if item.id == standard_id),
             None,
         )
         if standard is None:
@@ -1126,7 +1126,7 @@ class MainWindow(QMainWindow):
             return
         standard_id = self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
         standard = next(
-            (item for item in self.context.application.list_all_standards() if item.id == standard_id),
+            (item for item in self.context.application.list_library_standards() if item.id == standard_id),
             None,
         )
         if standard is None:

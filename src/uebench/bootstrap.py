@@ -68,6 +68,15 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
         backup_service=backup_service,
         audit=audit,
         source_service=source_service,
+        # The normal executable (root=None) exposes bundled, read-only
+        # catalogue entries such as pending GB 29435-2025.  Tests and callers
+        # that supply an explicit isolated root remain deterministic and only
+        # see the standards they install into that root.
+        catalogue_dir=(
+            Path(__file__).resolve().parent / "resources" / "catalogue"
+            if root is None
+            else None
+        ),
     )
     return AppContext(
         paths=paths,

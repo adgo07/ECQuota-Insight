@@ -48,6 +48,7 @@ class ApplicationFacade:
         backup_service: BackupPort | None = None,
         audit: AuditPort | None = None,
         source_service: StandardSourcePort | None = None,
+        catalogue_dir: Path | None = None,
     ) -> None:
         self._standards = standards
         self._evaluations = evaluations
@@ -60,6 +61,8 @@ class ApplicationFacade:
         self._backup = backup_service
         self._audit = audit
         self._source_service = source_service
+        self._catalogue_dir = catalogue_dir.resolve() if catalogue_dir is not None else None
+        self._catalogue_cache: list[StandardDefinition] | None = None
         self._catalog = StandardCatalogService(standards)
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
@@ -73,6 +76,35 @@ class ApplicationFacade:
 
     def list_all_standards(self) -> list[StandardDefinition]:
         return self._standards.list_all()
+
+    def list_library_standards(self) -> list[StandardDefinition]:
+        """List installed standards plus read-only catalogue entries.
+
+        Catalogue entries are intentionally not installed into SQLite and are
+        never returned by the evaluation-selection methods.  This allows a
+        newly added, pending-confirmation standard to be discoverable in the
+        library without weakening the ``published`` calculation gate.
+        """
+        installed = self._standards.list_all()
+        by_id = {item.id: item for item in installed}
+        for item in self._load_catalogue_standards():
+            by_id.setdefault(item.id, item)
+        return sorted(by_id.values(), key=lambda item: (item.number, item.effective_date, item.rule_revision))
+
+    def _load_catalogue_standards(self) -> list[StandardDefinition]:
+        if self._catalogue_cache is not None:
+            return list(self._catalogue_cache)
+        loaded: list[StandardDefinition] = []
+        if self._catalogue_dir is not None and self._catalogue_dir.is_dir():
+            for path in sorted(self._catalogue_dir.glob("*.json")):
+                try:
+                    loaded.append(StandardDefinition.model_validate_json(path.read_text(encoding="utf-8")))
+                except (OSError, ValueError):
+                    # A bad catalogue file must not prevent the executable
+                    # published database from starting.
+                    continue
+        self._catalogue_cache = loaded
+        return list(loaded)
 
     def list_historical_standards(self) -> list[StandardDefinition]:
         return self._standards.list_historical()
@@ -106,7 +138,7 @@ class ApplicationFacade:
         the standard library show a future or pending-confirmation entry and
         explain its status without accidentally making it executable.
         """
-        return next((item for item in self._standards.list_all() if item.id == standard_id), None)
+        return next((item for item in self.list_library_standards() if item.id == standard_id), None)
 
     def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)
