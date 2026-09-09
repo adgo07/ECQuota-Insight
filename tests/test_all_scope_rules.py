@@ -18,7 +18,7 @@ def _definitions() -> list[StandardDefinition]:
 
 def test_every_scope_standard_has_at_least_one_source_backed_rule() -> None:
     definitions = _definitions()
-    assert len(definitions) == 46
+    assert len(definitions) == 47
     assert all(definition.products for definition in definitions)
     assert all(product.indicators for definition in definitions for product in definition.products)
     for definition in definitions:
@@ -70,16 +70,32 @@ def test_constant_candidate_thresholds_are_monotone_for_lte_rules() -> None:
 def test_scope_manifest_and_catalog_remain_exact() -> None:
     scope = json.loads(Path("data/scope-44.json").read_text(encoding="utf-8"))
     catalog = json.loads(Path("data/catalog.json").read_text(encoding="utf-8"))
-    assert len(scope["standards"]) == 46
-    assert len(catalog["standards"]) == 46
+    assert len(scope["standards"]) == 47
+    assert len(catalog["standards"]) == 47
     assert {row["number"] for row in catalog["standards"]} == set(scope["standards"])
 
 
 def test_every_published_indicator_runs_in_direct_entry_smoke() -> None:
     report = check_published_rules(Path("data/definitions"))
-    assert report["total_indicators"] == 702
+    assert report["total_indicators"] == 753
     assert report["incomplete"] == []
     assert report["boundary_errors"] == []
+
+
+def test_gb29435_2025_is_formally_published_with_51_source_backed_rules() -> None:
+    definition = next(item for item in _definitions() if item.number == "GB 29435-2025")
+    assert definition.publication_status is PublicationStatus.PUBLISHED
+    assert definition.effective_date.isoformat() == "2027-01-01"
+    assert len(definition.products) == 51
+    assert sum(len(product.indicators) for product in definition.products) == 51
+    assert [level.key for level in definition.selection_schema] == ["product_category", "product_spec"]
+    assert all(product.selection_values for product in definition.products)
+    assert all(
+        reference.source_sha256 == "7fe37d8710c4639c63fdc47e51afda0de20fa683a0dfd62877f7aa5cfde95f54"
+        for product in definition.products
+        for indicator in product.indicators
+        for reference in indicator.source_references
+    )
 
 
 def test_original_table_batch1_values_and_citations() -> None:

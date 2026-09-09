@@ -72,6 +72,10 @@ if (-not $SkipPortableZip) {
 
 Copy-Item -LiteralPath $Installer -Destination (Join-Path $Release "UEBench-Setup-0.1.0-x64.exe") -Force
 Copy-Item -LiteralPath $Package -Destination (Join-Path $Release "initial-standard-package-published.uebench") -Force
+$ScopeReport = Join-Path $ProjectRoot "work\verification\formal-scope-47-20260909.json"
+if (Test-Path -LiteralPath $ScopeReport -PathType Leaf) {
+    Copy-Item -LiteralPath $ScopeReport -Destination (Join-Path $Release "scope-47-report.json") -Force
+}
 
 foreach ($Document in @(
     "用户手册.md",

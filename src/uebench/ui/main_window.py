@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QComboBox,
+    QCompleter,
     QDateEdit,
     QFileDialog,
     QFormLayout,
@@ -49,6 +50,7 @@ from uebench.domain.models import (
     InputMode,
     InputValue,
     PublicationStatus,
+    SelectionLevel,
     StandardSelectionMode,
     ProductionLine,
     StandardDefinition,
@@ -295,10 +297,27 @@ class MainWindow(QMainWindow):
         self.eval_selection_mode.addItem("尚未实施标准（仅预览）", StandardSelectionMode.FUTURE.value)
         self.eval_selection_mode.currentIndexChanged.connect(self.refresh_standard_combo)
         self.eval_standard = QComboBox()
+        self.eval_standard.setEditable(True)
+        self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.eval_standard.setPlaceholderText("输入标准编号或名称后选择")
+        completer = self.eval_standard.completer()
+        if completer is not None:
+            completer.setFilterMode(Qt.MatchFlag.MatchContains)
+            completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         self.eval_standard.currentIndexChanged.connect(self._standard_changed)
         self.eval_standard_status = QLabel("评价日期自动读取今天")
+        self.eval_standard_status.setWordWrap(True)
+        self.eval_standard_status.setMinimumWidth(250)
+        self.eval_standard_open = QPushButton("查看原文")
+        self.eval_standard_open.clicked.connect(self.open_selected_standard_for_evaluation)
         self.eval_product = QComboBox()
         self.eval_product.currentIndexChanged.connect(self._product_changed)
+        self.eval_product.setVisible(False)
+        self.selection_container = QWidget()
+        self.selection_form = QFormLayout(self.selection_container)
+        self.selection_form.setContentsMargins(0, 0, 0, 0)
+        self.selection_form.setSpacing(6)
+        self.selection_widgets: list[tuple[SelectionLevel, QComboBox]] = []
         self.eval_mode = QComboBox()
         self.eval_mode.addItem("直接录入实际值", InputMode.DIRECT.value)
         self.eval_mode.addItem("能源与产量明细计算", InputMode.DETAIL.value)
@@ -315,10 +334,15 @@ class MainWindow(QMainWindow):
         self.eval_project = QLineEdit()
         self.eval_project.setVisible(False)
         self.eval_notes = QLineEdit()
-        form.addRow("标准选择方式", self.eval_selection_mode)
-        form.addRow("标准", self.eval_standard)
-        form.addRow("标准状态提示", self.eval_standard_status)
-        form.addRow("产品/工序", self.eval_product)
+        standard_row = QHBoxLayout()
+        standard_row.addWidget(QLabel("标准"))
+        standard_row.addWidget(self.eval_standard, 3)
+        standard_row.addWidget(QLabel("版本"))
+        standard_row.addWidget(self.eval_selection_mode, 2)
+        standard_row.addWidget(self.eval_standard_status, 3)
+        standard_row.addWidget(self.eval_standard_open)
+        form.addRow(standard_row)
+        form.addRow("产品/工序", self.selection_container)
         form.addRow("单位名称", self.eval_organization)
         form.addRow("评价备注", self.eval_notes)
         form_layout.addLayout(form)
@@ -334,7 +358,7 @@ class MainWindow(QMainWindow):
         self.production_table = QTableWidget(0, 8)
         self.production_table.setHorizontalHeaderLabels(["行ID", "产品名称", "分类键", "产量", "单位", "折算系数", "合格", "备注"])
         self._configure_table(self.production_table, editable=True)
-        self.input_tabs.addTab(self.eval_inputs, "标准输入")
+        self.input_tabs.addTab(self.eval_inputs, "适用条件/修正参数")
         self.input_tabs.addTab(self.energy_table, "能源明细")
         self.input_tabs.addTab(self.production_table, "产量与分摊")
         self.input_tabs.setMinimumHeight(360)
@@ -648,12 +672,157 @@ class MainWindow(QMainWindow):
         self.eval_standard.clear()
         for standard in self._standards_for_selection():
             self.eval_standard.addItem(f"{standard.number} {standard.title}", standard.id)
+        restored = False
         if selected:
             index = self.eval_standard.findData(selected)
             if index >= 0:
                 self.eval_standard.setCurrentIndex(index)
+                restored = True
+        if not restored and self.eval_standard.count():
+            # Editable combo boxes keep an empty edit line after clear(); set
+            # the first valid standard explicitly so the default really is
+            # the first standard in the newly selected version scope.
+            self.eval_standard.setCurrentIndex(0)
         self.eval_standard.blockSignals(False)
         self._standard_changed()
+
+    @staticmethod
+    def _display_product_name(product, product_name_counts: Counter[str]) -> str:
+        display_name = product.name
+        if product_name_counts[product.name] > 1:
+            indicator_names = "、".join(indicator.name for indicator in product.indicators)
+            display_name = f"{product.name}（指标：{indicator_names}）"
+        return display_name
+
+    def _selection_levels_for_standard(self) -> list[SelectionLevel]:
+        if self.current_standard and self.current_standard.selection_schema:
+            return list(self.current_standard.selection_schema)
+        # Legacy definitions have one flat product/process list.  Treat it as
+        # a one-level schema so all old packages use the same selector code.
+        return [SelectionLevel(key="product", label="产品/工序", required=True)]
+
+    def _clear_selection_form(self) -> None:
+        while self.selection_form.count():
+            item = self.selection_form.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+        self.selection_widgets = []
+
+    def _product_selection_value(self, product, level: SelectionLevel) -> str:
+        value = product.selection_values.get(level.key)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+        # Fallback for legacy rules without selection metadata.
+        return product.name
+
+    def _selection_raw_value(self, level_index: int) -> str | None:
+        if level_index < 0 or level_index >= len(self.selection_widgets):
+            return None
+        _level, combo = self.selection_widgets[level_index]
+        data = combo.currentData()
+        if not data:
+            return None
+        text = str(data)
+        if text.startswith("__product__:"):
+            product_id = text.split(":", 1)[1]
+            product = next(
+                (item for item in (self.current_standard.products if self.current_standard else []) if item.id == product_id),
+                None,
+            )
+            return self._product_selection_value(product, self.selection_widgets[level_index][0]) if product else None
+        if text.startswith("__value__:"):
+            return text.split(":", 1)[1]
+        return text
+
+    def _products_matching_selection(self, before_level: int | None = None) -> list:
+        if self.current_standard is None:
+            return []
+        products = list(self.current_standard.products)
+        limit = len(self.selection_widgets) if before_level is None else before_level
+        for index in range(limit):
+            selected = self._selection_raw_value(index)
+            if selected is None:
+                continue
+            level = self.selection_widgets[index][0]
+            products = [
+                product for product in products
+                if self._product_selection_value(product, level) == selected
+            ]
+        return products
+
+    def _populate_selection_levels(self, start_index: int = 0) -> None:
+        if self.current_standard is None:
+            return
+        levels = self._selection_levels_for_standard()
+        product_name_counts = Counter(product.name for product in self.current_standard.products)
+        for index in range(start_index, len(self.selection_widgets)):
+            level, combo = self.selection_widgets[index]
+            old_data = combo.currentData()
+            candidates = self._products_matching_selection(index)
+            grouped: dict[str, list] = {}
+            for product in candidates:
+                grouped.setdefault(self._product_selection_value(product, level), []).append(product)
+            combo.blockSignals(True)
+            combo.clear()
+            if not grouped:
+                combo.addItem("暂无可选项", None)
+            else:
+                for value, group in grouped.items():
+                    # At the final level retain the old duplicate-product
+                    # behaviour by showing indicator names and binding the
+                    # item directly to one product ID.
+                    if index == len(levels) - 1 and len(group) > 1:
+                        for product in group:
+                            combo.addItem(self._display_product_name(product, product_name_counts), f"__product__:{product.id}")
+                    else:
+                        combo.addItem(value, f"__value__:{value}")
+            if old_data is not None:
+                restored = combo.findData(old_data)
+                if restored >= 0:
+                    combo.setCurrentIndex(restored)
+            if combo.currentIndex() < 0 and combo.count() and combo.itemData(0) is not None:
+                combo.setCurrentIndex(0)
+            combo.blockSignals(False)
+
+    def _sync_hidden_product(self) -> None:
+        if self.current_standard is None:
+            self.eval_product.setCurrentIndex(-1)
+            return
+        product_id: str | None = None
+        if self.selection_widgets:
+            last_data = self.selection_widgets[-1][1].currentData()
+            if isinstance(last_data, str) and last_data.startswith("__product__:"):
+                product_id = last_data.split(":", 1)[1]
+            else:
+                products = self._products_matching_selection()
+                if len(products) == 1:
+                    product_id = products[0].id
+        index = self.eval_product.findData(product_id) if product_id else -1
+        self.eval_product.blockSignals(True)
+        self.eval_product.setCurrentIndex(index)
+        self.eval_product.blockSignals(False)
+
+    def _rebuild_selection_widgets(self) -> None:
+        self._clear_selection_form()
+        if self.current_standard is None:
+            return
+        for index, level in enumerate(self._selection_levels_for_standard()):
+            combo = QComboBox()
+            combo.setMinimumWidth(280)
+            combo.setPlaceholderText(f"请选择{level.label}")
+            combo.currentIndexChanged.connect(
+                lambda _value=0, level_index=index: self._selection_level_changed(level_index)
+            )
+            self.selection_form.addRow(level.label, combo)
+            self.selection_widgets.append((level, combo))
+        self._populate_selection_levels(0)
+        self._sync_hidden_product()
+
+    def _selection_level_changed(self, level_index: int) -> None:
+        self._populate_selection_levels(level_index + 1)
+        self._sync_hidden_product()
+        self._refresh_input_table()
 
     def _standard_changed(self) -> None:
         standard_id = self.eval_standard.currentData()
@@ -667,10 +836,7 @@ class MainWindow(QMainWindow):
         if self.current_standard:
             product_name_counts = Counter(product.name for product in self.current_standard.products)
             for product in self.current_standard.products:
-                display_name = product.name
-                if product_name_counts[product.name] > 1:
-                    indicator_names = "、".join(indicator.name for indicator in product.indicators)
-                    display_name = f"{product.name}（指标：{indicator_names}）"
+                display_name = self._display_product_name(product, product_name_counts)
                 self.eval_product.addItem(display_name, product.id)
             self.eval_date.setDate(QDate.currentDate())
             warning = self.current_standard.selection_warning(date.today())
@@ -681,7 +847,8 @@ class MainWindow(QMainWindow):
         else:
             self.eval_standard_status.setText("当前选择方式下没有可用标准")
         self.eval_product.blockSignals(False)
-        self._product_changed()
+        self._rebuild_selection_widgets()
+        self._refresh_input_table()
 
     def _product_changed(self) -> None:
         self._refresh_input_table()
@@ -703,6 +870,41 @@ class MainWindow(QMainWindow):
         mode = self.eval_mode.currentData()
         self.direct_mode_button.setChecked(mode == InputMode.DIRECT.value)
         self.detail_mode_button.setChecked(mode == InputMode.DETAIL.value)
+
+    def _select_product_by_id(self, product_id: str) -> bool:
+        product = next(
+            (item for item in (self.current_standard.products if self.current_standard else []) if item.id == product_id),
+            None,
+        )
+        if product is None:
+            return False
+        hidden_index = self.eval_product.findData(product_id)
+        if hidden_index < 0:
+            return False
+        self.eval_product.blockSignals(True)
+        self.eval_product.setCurrentIndex(hidden_index)
+        self.eval_product.blockSignals(False)
+        if not self.selection_widgets:
+            self._refresh_input_table()
+            return True
+        levels = self._selection_levels_for_standard()
+        for index, (level, combo) in enumerate(self.selection_widgets):
+            value = self._product_selection_value(product, level)
+            item_index = combo.findData(f"__value__:{value}")
+            if index == len(levels) - 1:
+                duplicate_index = combo.findData(f"__product__:{product.id}")
+                if duplicate_index >= 0:
+                    item_index = duplicate_index
+            if item_index < 0:
+                return False
+            combo.blockSignals(True)
+            combo.setCurrentIndex(item_index)
+            combo.blockSignals(False)
+            if index < len(levels) - 1:
+                self._populate_selection_levels(index + 1)
+        self._sync_hidden_product()
+        self._refresh_input_table()
+        return self.eval_product.currentData() == product_id
 
     def _selected_product(self):
         if self.current_standard is None:
@@ -906,11 +1108,9 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法复制或重新计算。")
             return False
         self.eval_standard.setCurrentIndex(standard_index)
-        product_index = self.eval_product.findData(request.product_id)
-        if product_index < 0:
+        if not self._select_product_by_id(request.product_id):
             QMessageBox.warning(self, "产品不可用", "该评价使用的产品/工序当前不在标准规则中。")
             return False
-        self.eval_product.setCurrentIndex(product_index)
         mode_index = self.eval_mode.findData(request.input_mode.value)
         if mode_index >= 0:
             self.eval_mode.setCurrentIndex(mode_index)
@@ -1132,6 +1332,25 @@ class MainWindow(QMainWindow):
         if standard is None:
             return
         source = self.context.application.find_standard_source(standard_id)
+        if source is None:
+            QMessageBox.warning(
+                self,
+                "原文缺失或不匹配",
+                "本机标准库中未找到与该标准版本 SHA-256 一致的PDF；请先安装包含该原文的标准包。",
+            )
+            return
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(source)))
+
+    def open_selected_standard_for_evaluation(self) -> None:
+        standard_id = self.eval_standard.currentData()
+        if not standard_id:
+            QMessageBox.warning(self, "未选择标准", "请先选择标准后再打开原文。")
+            return
+        source = self.context.application.find_standard_source(
+            standard_id,
+            evaluation_date=date.today(),
+            selection_mode=self._selection_mode(),
+        )
         if source is None:
             QMessageBox.warning(
                 self,

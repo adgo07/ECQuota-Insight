@@ -16,6 +16,7 @@ from uebench.domain.models import (
     InputValue,
     PackageHistoryEntry,
     PublicationStatus,
+    SelectionLevel,
     StandardSelectionMode,
 )
 
@@ -197,9 +198,68 @@ def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path)
     window = MainWindow(context)
     assert not window.eval_date.isVisible()
     assert not window.eval_project.isVisible()
+    assert window.eval_standard.isEditable()
+    assert window.eval_standard_open.text() == "查看原文"
+    assert window.eval_standard_status.text().startswith("GB 00000-2026")
     window.detail_mode_button.click()
     assert window.eval_mode.currentData() == InputMode.DETAIL.value
     window.direct_mode_button.click()
     assert window.eval_mode.currentData() == InputMode.DIRECT.value
+    window.close()
+    context.database.dispose()
+
+
+def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    standard = make_standard()
+    standard.selection_schema = [
+        SelectionLevel(key="product_category", label="产品类别"),
+        SelectionLevel(key="product_spec", label="产品规格/工序"),
+    ]
+    standard.products[0].selection_values = {
+        "product_category": "类别A",
+        "product_spec": "规格A",
+    }
+    second = standard.products[0].model_copy(deep=True)
+    second.id = "product-2"
+    second.name = "产品B"
+    second.indicators[0].id = "energy-2"
+    second.selection_values = {
+        "product_category": "类别B",
+        "product_spec": "规格B",
+    }
+    standard.products.append(second)
+    context.standards.install(standard)
+    window = MainWindow(context)
+
+    assert [level.label for level, _combo in window.selection_widgets] == ["产品类别", "产品规格/工序"]
+    category, specification = [combo for _level, combo in window.selection_widgets]
+    assert [category.itemText(i) for i in range(category.count())] == ["类别A", "类别B"]
+    assert [specification.itemText(i) for i in range(specification.count())] == ["规格A"]
+    category.setCurrentIndex(category.findData("__value__:类别B"))
+    assert [specification.itemText(i) for i in range(specification.count())] == ["规格B"]
+    assert window.eval_product.currentData() == "product-2"
+    window.close()
+    context.database.dispose()
+
+
+def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    current = make_standard()
+    future = make_standard().model_copy(update={
+        "id": "gb-future-selector",
+        "number": "GB 00006-2027",
+        "version": "2027",
+        "effective_date": date(2027, 1, 1),
+    })
+    context.standards.install(current)
+    context.standards.install(future)
+    window = MainWindow(context)
+    assert window.eval_standard.currentData() == current.id
+    window.eval_selection_mode.setCurrentIndex(2)
+    assert window.eval_standard.currentData() == future.id
+    assert "尚未实施" in window.eval_standard_status.text()
     window.close()
     context.database.dispose()

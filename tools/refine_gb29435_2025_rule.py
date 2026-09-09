@@ -137,6 +137,7 @@ def product_row(category_id: str, category_name: str, row_no: int, product_name:
     return {
         "id": product_id, "name": f"{category_name}—{product_name}",
         "description": f"{category_name}生产的{product_name}；按原文{table}执行，统计合格产品实物产量。",
+        "selection_values": {"product_category": category_name, "product_spec": product_name},
         "input_definitions": [process_input(process_key)] if process_condition else [],
         "indicators": [indicator],
     }
@@ -160,7 +161,12 @@ def build(source_file: str, source_sha: str) -> dict[str, Any]:
         "schema_version": "1.0", "id": "gb-29435-2025", "number": NUMBER, "title": TITLE,
         "version": "2025", "publication_status": "draft",
         "publication_date": "2025-12-31", "effective_date": "2027-01-01",
-        "source_file": source_file, "source_sha256": source_sha, "products": products,
+        "source_file": source_file, "source_sha256": source_sha,
+        "selection_schema": [
+            {"key": "product_category", "label": "产品类别", "required": True},
+            {"key": "product_spec", "label": "产品规格/工序", "required": True},
+        ],
+        "products": products,
         "corrections": ["用户确认GB 29435-2012已由GB 29435-2025替代；旧版仅保留为历史记录。",
                         "新标准封面发布日期为2025-12-31、实施日期为2027-01-01。"],
         "lifecycle_status": "future", "obsolete_date": None, "replaced_by": [],

@@ -26,7 +26,7 @@ def test_all_development_drafts_are_structurally_reviewable() -> None:
     drafts = [item for item in definitions if item.publication_status is PublicationStatus.DRAFT]
 
     assert len(definitions) == 63
-    assert len(drafts) == 17
+    assert len(drafts) == 16
     for definition in drafts:
         assert definition.source_file
         assert definition.source_sha256 and len(definition.source_sha256) == 64

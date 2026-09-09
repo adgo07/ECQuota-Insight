@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "catalog_name": "用户确认的46项强制性能耗限额标准",
+  "catalog_name": "用户确认的47项强制性能耗限额标准（含GB 29435-2025，2027-01-01实施）",
   "catalog_sha256": "fe3bb754754eebd91cabede8729de1326018843fd0581db057471a447f3b01d6",
   "generated_at": "2026-08-30T03:33:56.307365+00:00",
-  "standard_count": 46,
+  "standard_count": 47,
   "standards": [
     {
       "sequence": 1,
@@ -312,6 +312,20 @@
         "GB 29441-2012"
       ],
       "standard_family_id": "GB 29141",
+      "rule_revision": 1
+    },
+    {
+      "sequence": 22,
+      "id": "gb-29435-2025",
+      "number": "GB 29435-2025",
+      "title": "稀土冶炼企业单位产品能源消耗限额",
+      "publication_date": "2025-12-31",
+      "effective_date": "2027-01-01",
+      "remark": "代替GB 29435-2012",
+      "source_file": "【2027-01-01实施】22. GB+29435-2025 稀土冶炼企业单位产品能源消耗限额.pdf",
+      "source_sha256": "7fe37d8710c4639c63fdc47e51afda0de20fa683a0dfd62877f7aa5cfde95f54",
+      "status": "published",
+      "standard_family_id": "GB 29435",
       "rule_revision": 1
     },
     {
@@ -747,7 +761,7 @@
       "rule_revision": 1
     }
   ],
-  "scope_version": "46",
+  "scope_version": "47",
   "metadata_note": "统一规则库不再按7项/46项拆分；标准生命周期和替代关系由本目录及standard-replacements.json共同维护。",
   "historical_standards": [
     {

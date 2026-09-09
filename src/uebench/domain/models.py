@@ -185,6 +185,20 @@ class InputDefinition(StrictModel):
         return self
 
 
+class SelectionLevel(StrictModel):
+    """A rule-declared level in the product/process selection cascade.
+
+    The options are intentionally derived from ``ProductDefinition``
+    selection values instead of being duplicated here.  This keeps one
+    authoritative product list while allowing a standard to declare two or
+    more levels (for example, product category then specification/process).
+    """
+
+    key: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_.-]*$")
+    label: str
+    required: bool = True
+
+
 class Condition(StrictModel):
     op: Literal[
         "always",
@@ -299,6 +313,7 @@ class ProductDefinition(StrictModel):
     id: str
     name: str
     description: str | None = None
+    selection_values: dict[str, str] = Field(default_factory=dict)
     input_definitions: list[InputDefinition] = Field(default_factory=list)
     indicators: list[IndicatorDefinition]
 
@@ -316,6 +331,7 @@ class StandardDefinition(StrictModel):
     effective_date: date
     source_file: str
     source_sha256: str = Field(pattern=r"^[A-Fa-f0-9]{64}$")
+    selection_schema: list[SelectionLevel] = Field(default_factory=list)
     products: list[ProductDefinition]
     corrections: list[str] = Field(default_factory=list)
     lifecycle_status: LifecycleStatus = LifecycleStatus.ACTIVE
@@ -357,6 +373,9 @@ class StandardDefinition(StrictModel):
 
     @model_validator(mode="after")
     def validate_unique_ids(self) -> StandardDefinition:
+        selection_keys = [level.key for level in self.selection_schema]
+        if len(selection_keys) != len(set(selection_keys)):
+            raise ValueError("产品选择层级 key 重复")
         product_ids = [product.id for product in self.products]
         if len(product_ids) != len(set(product_ids)):
             raise ValueError("产品/工序 ID 重复")

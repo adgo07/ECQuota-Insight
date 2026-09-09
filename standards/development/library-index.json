@@ -292,11 +292,11 @@
       "version": "2025",
       "standard_family_id": "GB 29435",
       "rule_revision": 1,
-      "publication_status": "draft",
+      "publication_status": "published",
       "lifecycle_status": "future",
       "scope": "current",
       "definition_path": "scope-63/definitions/gb-29435-2025.json",
-      "definition_sha256": "3576b8ac092694c443aff39b4fd88d12870817bc41c34a8881ec315e7cd43525"
+      "definition_sha256": "946c220a46fbb6b105ffbee12d1264a0d51ca2bcf6f436105729ec8a36bba5fb"
     },
     {
       "number": "GB 29436-2023",
