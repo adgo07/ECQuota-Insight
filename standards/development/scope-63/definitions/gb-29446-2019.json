@@ -4,7 +4,7 @@
   "number": "GB 29446-2019",
   "title": "选煤电力消耗限额",
   "version": "2019",
-  "rule_revision": 1,
+  "rule_revision": 2,
   "standard_family_id": "GB 29446",
   "publication_status": "published",
   "publication_date": "2019-12-17",
@@ -15,155 +15,248 @@
     {
       "id": "gb_29446-2019-coking-coal",
       "name": "炼焦煤选煤企业选煤电力单耗",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
+      "description": "炼焦煤；选煤工艺从联动下拉框选择，k按附录A自动匹配。",
+      "input_definitions": [
+        {
+          "key": "washing_process",
+          "label": "选煤工艺类型",
+          "data_type": "text",
+          "required": true,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "跳汰",
+            "跳汰、浮选联合",
+            "重介",
+            "重介、浮选联合",
+            "重介、跳汰、浮选联合",
+            "附录A外工艺（需人工确认）"
+          ],
+          "description": "工艺选项随煤种变化；k按附录A自动匹配，不提供手工输入。"
+        },
+        {
+          "key": "enterprise_status",
+          "label": "企业建设属性",
+          "data_type": "text",
+          "required": false,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "现有",
+            "新建",
+            "改扩建"
+          ],
+          "description": "仅用于判定企业合规要求；未填写或填写无效时仍输出能耗等级，但不生成合规结论。"
+        },
+        {
+          "key": "single_coal_single_process",
+          "label": "本次统计范围是否为单一煤种、单一工艺",
+          "data_type": "boolean",
+          "required": true,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "是",
+            "否"
+          ],
+          "description": "本软件仅接受单一煤种、单一工艺；多种煤种或多工艺不能作为一次输入。"
+        }
+      ],
       "indicators": [
         {
           "id": "GB_29446-2019.coking-coal",
-          "name": "电耗",
+          "name": "选煤电力单耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
             {
               "key": "actual.coking-coal",
-              "label": "炼焦煤选煤企业选煤电力单耗实际值",
+              "label": "直接录入选煤电力单耗 e_d（已按 E_d×k÷m 折算）",
               "data_type": "decimal",
               "unit": "kW·h/t",
               "required": true,
-              "required_if": null,
               "modes": [
-                "DIRECT",
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "description": "直接口径为标准公式计算后的 e_d，不是未折算电耗。"
+            },
+            {
+              "key": "electricity_consumption",
+              "label": "统计期选煤电力消耗量 E_d",
+              "data_type": "decimal",
+              "unit": "kW·h",
+              "required": true,
+              "modes": [
                 "DETAIL"
               ],
               "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
+              "description": "统计边界按标准第5.1条；单位为 kW·h。"
+            },
+            {
+              "key": "raw_coal_input",
+              "label": "统计期入选原煤量 m",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "description": "单位为 t，必须大于 0。"
             }
           ],
           "applicability": {
             "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
             "include_minimum": true,
-            "include_maximum": true,
-            "args": []
+            "include_maximum": true
           },
           "direct_input_key": "actual.coking-coal",
           "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
+            "op": "divide",
             "args": [
               {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
+                "op": "multiply",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "electricity_consumption",
+                    "label": "统计期选煤电力消耗量 E_d",
+                    "unit": "kW·h"
+                  },
+                  {
+                    "op": "lookup",
+                    "rows": [
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.26",
+                          "label": "附录A 表A.1：跳汰，k=1.26"
+                        },
+                        "label": "跳汰"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.00",
+                          "label": "附录A 表A.1：跳汰、浮选联合，k=1.00"
+                        },
+                        "label": "跳汰、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.12",
+                          "label": "附录A 表A.1：重介，k=1.12"
+                        },
+                        "label": "重介"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.83",
+                          "label": "附录A 表A.1：重介、浮选联合，k=0.83"
+                        },
+                        "label": "重介、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.78",
+                          "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.78"
+                        },
+                        "label": "重介、跳汰、浮选联合"
+                      }
+                    ],
+                    "label": "工艺类型折算系数 k"
+                  }
+                ],
+                "label": "E_d × k",
+                "unit": "kW·h"
               },
               {
                 "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
+                "input_key": "raw_coal_input",
+                "label": "统计期入选原煤量 m",
+                "unit": "t"
               }
             ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kW·h/t",
-            "round_places": null
+            "label": "e_d = E_d × k ÷ m",
+            "unit": "kW·h/t"
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
               "value": "5.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_2": {
               "op": "constant",
               "value": "7.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_3": {
               "op": "constant",
               "value": "8.5",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             }
           },
           "thresholds": {
             "level_1": {
               "op": "constant",
               "value": "5.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_2": {
               "op": "constant",
               "value": "7.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_3": {
               "op": "constant",
               "value": "8.5",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             }
           },
           "display_places": 2,
@@ -173,170 +266,620 @@
               "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
               "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
               "page": 3,
-              "clause": "第4章 能耗限额等级",
+              "clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
               "table": "表1",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "note": "PDF第3页，正文印刷页码1。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "4.1.1 现有炼焦煤选煤企业限定值",
+              "table": "表1",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+              "table": "表1",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "5.2 选煤电力单耗计算方法",
+              "table": "式（1）",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 5,
+              "clause": "附录A 选煤工艺类型折算系数",
+              "table": "表A.1",
+              "note": "PDF第5页（附录页无印刷页码）。"
             }
           ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
+          "display_calculations": [
+            {
+              "key": "process_factor",
+              "label": "工艺类型折算系数 k",
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "lookup",
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "跳汰",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.26",
+                      "label": "附录A 表A.1：跳汰，k=1.26"
+                    },
+                    "label": "跳汰"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "跳汰、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.00",
+                      "label": "附录A 表A.1：跳汰、浮选联合，k=1.00"
+                    },
+                    "label": "跳汰、浮选联合"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.12",
+                      "label": "附录A 表A.1：重介，k=1.12"
+                    },
+                    "label": "重介"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.83",
+                      "label": "附录A 表A.1：重介、浮选联合，k=0.83"
+                    },
+                    "label": "重介、浮选联合"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介、跳汰、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.78",
+                      "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.78"
+                    },
+                    "label": "重介、跳汰、浮选联合"
+                  }
+                ],
+                "label": "工艺类型折算系数 k"
+              }
+            },
+            {
+              "key": "unadjusted_power_consumption",
+              "label": "未折算电耗 E_d ÷ m",
+              "unit": "kW·h/t",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "divide",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "electricity_consumption",
+                    "label": "统计期选煤电力消耗量 E_d",
+                    "unit": "kW·h"
+                  },
+                  {
+                    "op": "input",
+                    "input_key": "raw_coal_input",
+                    "label": "统计期入选原煤量 m",
+                    "unit": "t"
+                  }
+                ],
+                "label": "未折算电耗 E_d ÷ m",
+                "unit": "kW·h/t"
+              }
+            },
+            {
+              "key": "electricity_consumption",
+              "label": "统计期选煤电力消耗量 E_d",
+              "unit": "kW·h",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "input",
+                "input_key": "electricity_consumption",
+                "label": "统计期选煤电力消耗量 E_d",
+                "unit": "kW·h"
+              }
+            },
+            {
+              "key": "raw_coal_input",
+              "label": "统计期入选原煤量 m",
+              "unit": "t",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "input",
+                "input_key": "raw_coal_input",
+                "label": "统计期入选原煤量 m",
+                "unit": "t"
+              }
+            },
+            {
+              "key": "unadjusted_power_consumption",
+              "label": "直接口径反算未折算电耗",
+              "unit": "kW·h/t",
+              "modes": [
+                "DIRECT"
+              ],
+              "formula": {
+                "op": "divide",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "actual.coking-coal",
+                    "label": "直接录入的选煤电力单耗 e_d",
+                    "unit": "kW·h/t"
+                  },
+                  {
+                    "op": "lookup",
+                    "rows": [
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.26",
+                          "label": "附录A 表A.1：跳汰，k=1.26"
+                        },
+                        "label": "跳汰"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.00",
+                          "label": "附录A 表A.1：跳汰、浮选联合，k=1.00"
+                        },
+                        "label": "跳汰、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.12",
+                          "label": "附录A 表A.1：重介，k=1.12"
+                        },
+                        "label": "重介"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.83",
+                          "label": "附录A 表A.1：重介、浮选联合，k=0.83"
+                        },
+                        "label": "重介、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.78",
+                          "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.78"
+                        },
+                        "label": "重介、跳汰、浮选联合"
+                      }
+                    ],
+                    "label": "工艺类型折算系数 k"
+                  }
+                ],
+                "label": "直接口径反算未折算电耗",
+                "unit": "kW·h/t"
+              }
+            }
+          ],
+          "manual_review_conditions": [
+            {
+              "condition": {
+                "op": "eq",
+                "field": "single_coal_single_process",
+                "value": false,
+                "include_minimum": true,
+                "include_maximum": true
+              },
+              "message": "本软件不接受多种煤种或多工艺作为一次输入；请按单一煤种、单一工艺分开计算。"
+            },
+            {
+              "condition": {
+                "op": "eq",
+                "field": "washing_process",
+                "value": "附录A外工艺（需人工确认）",
+                "include_minimum": true,
+                "include_maximum": true
+              },
+              "message": "附录A未列出所选工艺的折算系数 k，需人工确认；本次不生成等级或合规结论。"
+            }
+          ],
+          "compliance_rule": {
+            "input_key": "enterprise_status",
+            "cases": [
+              {
+                "value": "现有",
+                "requirement": "3级限定值",
+                "threshold_key": "LEVEL_3"
+              },
+              {
+                "value": "新建",
+                "requirement": "2级准入值",
+                "threshold_key": "LEVEL_2"
+              },
+              {
+                "value": "改扩建",
+                "requirement": "2级准入值",
+                "threshold_key": "LEVEL_2"
+              }
+            ]
+          }
         }
-      ]
+      ],
+      "selection_values": {
+        "coal_type": "炼焦煤"
+      }
     },
     {
       "id": "gb_29446-2019-power-coal",
       "name": "动力煤选煤企业选煤电力单耗",
-      "description": "依据强制性标准原文表格录入，待独立复核。",
-      "input_definitions": [],
+      "description": "动力煤；选煤工艺从联动下拉框选择，k按附录A自动匹配。",
+      "input_definitions": [
+        {
+          "key": "washing_process",
+          "label": "选煤工艺类型",
+          "data_type": "text",
+          "required": true,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "干法选煤",
+            "跳汰",
+            "跳汰、浮选联合",
+            "跳汰、重介联合",
+            "重介",
+            "重介、浮选联合",
+            "重介、跳汰、浮选联合",
+            "附录A外工艺（需人工确认）"
+          ],
+          "description": "工艺选项随煤种变化；k按附录A自动匹配，不提供手工输入。"
+        },
+        {
+          "key": "enterprise_status",
+          "label": "企业建设属性",
+          "data_type": "text",
+          "required": false,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "现有",
+            "新建",
+            "改扩建"
+          ],
+          "description": "仅用于判定企业合规要求；未填写或填写无效时仍输出能耗等级，但不生成合规结论。"
+        },
+        {
+          "key": "single_coal_single_process",
+          "label": "本次统计范围是否为单一煤种、单一工艺",
+          "data_type": "boolean",
+          "required": true,
+          "modes": [
+            "DIRECT",
+            "DETAIL"
+          ],
+          "choices": [
+            "是",
+            "否"
+          ],
+          "description": "本软件仅接受单一煤种、单一工艺；多种煤种或多工艺不能作为一次输入。"
+        }
+      ],
       "indicators": [
         {
           "id": "GB_29446-2019.power-coal",
-          "name": "电耗",
+          "name": "选煤电力单耗",
           "unit": "kW·h/t",
           "comparison": "lte",
           "input_definitions": [
             {
               "key": "actual.power-coal",
-              "label": "动力煤选煤企业选煤电力单耗实际值",
+              "label": "直接录入选煤电力单耗 e_d（已按 E_d×k÷m 折算）",
               "data_type": "decimal",
               "unit": "kW·h/t",
               "required": true,
-              "required_if": null,
               "modes": [
-                "DIRECT",
+                "DIRECT"
+              ],
+              "minimum": "0",
+              "description": "直接口径为标准公式计算后的 e_d，不是未折算电耗。"
+            },
+            {
+              "key": "electricity_consumption",
+              "label": "统计期选煤电力消耗量 E_d",
+              "data_type": "decimal",
+              "unit": "kW·h",
+              "required": true,
+              "modes": [
                 "DETAIL"
               ],
               "minimum": "0",
-              "maximum": null,
-              "choices": [],
-              "description": null
+              "description": "统计边界按标准第5.1条；单位为 kW·h。"
+            },
+            {
+              "key": "raw_coal_input",
+              "label": "统计期入选原煤量 m",
+              "data_type": "decimal",
+              "unit": "t",
+              "required": true,
+              "modes": [
+                "DETAIL"
+              ],
+              "minimum": "0",
+              "description": "单位为 t，必须大于 0。"
             }
           ],
           "applicability": {
             "op": "always",
-            "field": null,
-            "value": null,
-            "values": [],
-            "minimum": null,
-            "maximum": null,
             "include_minimum": true,
-            "include_maximum": true,
-            "args": []
+            "include_maximum": true
           },
           "direct_input_key": "actual.power-coal",
           "detail_formula": {
-            "op": "per_unit",
-            "value": null,
-            "input_key": null,
+            "op": "divide",
             "args": [
               {
-                "op": "input",
-                "value": null,
-                "input_key": "energy.total_standard_coal",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
+                "op": "multiply",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "electricity_consumption",
+                    "label": "统计期选煤电力消耗量 E_d",
+                    "unit": "kW·h"
+                  },
+                  {
+                    "op": "lookup",
+                    "rows": [
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "干法选煤",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.04",
+                          "label": "附录A 表A.1：干法选煤，k=1.04"
+                        },
+                        "label": "干法选煤"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.94",
+                          "label": "附录A 表A.1：跳汰，k=0.94"
+                        },
+                        "label": "跳汰"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.80",
+                          "label": "附录A 表A.1：跳汰、浮选联合，k=0.80"
+                        },
+                        "label": "跳汰、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、重介联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.85",
+                          "label": "附录A 表A.1：跳汰、重介联合，k=0.85"
+                        },
+                        "label": "跳汰、重介联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.89",
+                          "label": "附录A 表A.1：重介，k=0.89"
+                        },
+                        "label": "重介"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.76",
+                          "label": "附录A 表A.1：重介、浮选联合，k=0.76"
+                        },
+                        "label": "重介、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.72",
+                          "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.72"
+                        },
+                        "label": "重介、跳汰、浮选联合"
+                      }
+                    ],
+                    "label": "工艺类型折算系数 k"
+                  }
+                ],
+                "label": "E_d × k",
+                "unit": "kW·h"
               },
               {
                 "op": "input",
-                "value": null,
-                "input_key": "production.total_equivalent",
-                "args": [],
-                "cases": [],
-                "rows": [],
-                "default": null,
-                "label": null,
-                "unit": null,
-                "round_places": null
+                "input_key": "raw_coal_input",
+                "label": "统计期入选原煤量 m",
+                "unit": "t"
               }
             ],
-            "cases": [],
-            "rows": [],
-            "default": null,
-            "label": "单位产品综合能耗",
-            "unit": "kW·h/t",
-            "round_places": null
+            "label": "e_d = E_d × k ÷ m",
+            "unit": "kW·h/t"
           },
           "base_thresholds": {
             "level_1": {
               "op": "constant",
               "value": "2.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_2": {
               "op": "constant",
               "value": "3.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_3": {
               "op": "constant",
               "value": "4.5",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             }
           },
           "thresholds": {
             "level_1": {
               "op": "constant",
               "value": "2.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_2": {
               "op": "constant",
               "value": "3.0",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             },
             "level_3": {
               "op": "constant",
               "value": "4.5",
-              "input_key": null,
-              "args": [],
-              "cases": [],
-              "rows": [],
-              "default": null,
-              "label": null,
-              "unit": "kW·h/t",
-              "round_places": null
+              "unit": "kW·h/t"
             }
           },
           "display_places": 2,
@@ -346,22 +889,410 @@
               "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
               "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
               "page": 3,
-              "clause": "第4章 能耗限额等级",
+              "clause": "3.2 动力煤选煤企业选煤电力单耗限额等级",
               "table": "表2",
-              "note": "已按强制性标准原文表格录入；待独立复核和确认表签署。"
+              "note": "PDF第3页，正文印刷页码1。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "4.2.1 现有动力煤选煤企业限定值",
+              "table": "表2",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "4.2.2 新建或改扩建动力煤选煤企业准入值",
+              "table": "表2",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 4,
+              "clause": "5.2 选煤电力单耗计算方法",
+              "table": "式（1）",
+              "note": "PDF第4页，正文印刷页码2。"
+            },
+            {
+              "standard_number": "GB 29446-2019",
+              "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
+              "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+              "page": 5,
+              "clause": "附录A 选煤工艺类型折算系数",
+              "table": "表A.1",
+              "note": "PDF第5页（附录页无印刷页码）。"
             }
           ],
-          "notes": [
-            "original_pdf_transcribed",
-            "requires_independent_review"
-          ]
+          "display_calculations": [
+            {
+              "key": "process_factor",
+              "label": "工艺类型折算系数 k",
+              "modes": [
+                "DIRECT",
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "lookup",
+                "rows": [
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "干法选煤",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "1.04",
+                      "label": "附录A 表A.1：干法选煤，k=1.04"
+                    },
+                    "label": "干法选煤"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "跳汰",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.94",
+                      "label": "附录A 表A.1：跳汰，k=0.94"
+                    },
+                    "label": "跳汰"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "跳汰、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.80",
+                      "label": "附录A 表A.1：跳汰、浮选联合，k=0.80"
+                    },
+                    "label": "跳汰、浮选联合"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "跳汰、重介联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.85",
+                      "label": "附录A 表A.1：跳汰、重介联合，k=0.85"
+                    },
+                    "label": "跳汰、重介联合"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.89",
+                      "label": "附录A 表A.1：重介，k=0.89"
+                    },
+                    "label": "重介"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.76",
+                      "label": "附录A 表A.1：重介、浮选联合，k=0.76"
+                    },
+                    "label": "重介、浮选联合"
+                  },
+                  {
+                    "condition": {
+                      "op": "eq",
+                      "field": "washing_process",
+                      "value": "重介、跳汰、浮选联合",
+                      "include_minimum": true,
+                      "include_maximum": true
+                    },
+                    "expression": {
+                      "op": "constant",
+                      "value": "0.72",
+                      "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.72"
+                    },
+                    "label": "重介、跳汰、浮选联合"
+                  }
+                ],
+                "label": "工艺类型折算系数 k"
+              }
+            },
+            {
+              "key": "unadjusted_power_consumption",
+              "label": "未折算电耗 E_d ÷ m",
+              "unit": "kW·h/t",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "divide",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "electricity_consumption",
+                    "label": "统计期选煤电力消耗量 E_d",
+                    "unit": "kW·h"
+                  },
+                  {
+                    "op": "input",
+                    "input_key": "raw_coal_input",
+                    "label": "统计期入选原煤量 m",
+                    "unit": "t"
+                  }
+                ],
+                "label": "未折算电耗 E_d ÷ m",
+                "unit": "kW·h/t"
+              }
+            },
+            {
+              "key": "electricity_consumption",
+              "label": "统计期选煤电力消耗量 E_d",
+              "unit": "kW·h",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "input",
+                "input_key": "electricity_consumption",
+                "label": "统计期选煤电力消耗量 E_d",
+                "unit": "kW·h"
+              }
+            },
+            {
+              "key": "raw_coal_input",
+              "label": "统计期入选原煤量 m",
+              "unit": "t",
+              "modes": [
+                "DETAIL"
+              ],
+              "formula": {
+                "op": "input",
+                "input_key": "raw_coal_input",
+                "label": "统计期入选原煤量 m",
+                "unit": "t"
+              }
+            },
+            {
+              "key": "unadjusted_power_consumption",
+              "label": "直接口径反算未折算电耗",
+              "unit": "kW·h/t",
+              "modes": [
+                "DIRECT"
+              ],
+              "formula": {
+                "op": "divide",
+                "args": [
+                  {
+                    "op": "input",
+                    "input_key": "actual.power-coal",
+                    "label": "直接录入的选煤电力单耗 e_d",
+                    "unit": "kW·h/t"
+                  },
+                  {
+                    "op": "lookup",
+                    "rows": [
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "干法选煤",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "1.04",
+                          "label": "附录A 表A.1：干法选煤，k=1.04"
+                        },
+                        "label": "干法选煤"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.94",
+                          "label": "附录A 表A.1：跳汰，k=0.94"
+                        },
+                        "label": "跳汰"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.80",
+                          "label": "附录A 表A.1：跳汰、浮选联合，k=0.80"
+                        },
+                        "label": "跳汰、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "跳汰、重介联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.85",
+                          "label": "附录A 表A.1：跳汰、重介联合，k=0.85"
+                        },
+                        "label": "跳汰、重介联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.89",
+                          "label": "附录A 表A.1：重介，k=0.89"
+                        },
+                        "label": "重介"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.76",
+                          "label": "附录A 表A.1：重介、浮选联合，k=0.76"
+                        },
+                        "label": "重介、浮选联合"
+                      },
+                      {
+                        "condition": {
+                          "op": "eq",
+                          "field": "washing_process",
+                          "value": "重介、跳汰、浮选联合",
+                          "include_minimum": true,
+                          "include_maximum": true
+                        },
+                        "expression": {
+                          "op": "constant",
+                          "value": "0.72",
+                          "label": "附录A 表A.1：重介、跳汰、浮选联合，k=0.72"
+                        },
+                        "label": "重介、跳汰、浮选联合"
+                      }
+                    ],
+                    "label": "工艺类型折算系数 k"
+                  }
+                ],
+                "label": "直接口径反算未折算电耗",
+                "unit": "kW·h/t"
+              }
+            }
+          ],
+          "manual_review_conditions": [
+            {
+              "condition": {
+                "op": "eq",
+                "field": "single_coal_single_process",
+                "value": false,
+                "include_minimum": true,
+                "include_maximum": true
+              },
+              "message": "本软件不接受多种煤种或多工艺作为一次输入；请按单一煤种、单一工艺分开计算。"
+            },
+            {
+              "condition": {
+                "op": "eq",
+                "field": "washing_process",
+                "value": "附录A外工艺（需人工确认）",
+                "include_minimum": true,
+                "include_maximum": true
+              },
+              "message": "附录A未列出所选工艺的折算系数 k，需人工确认；本次不生成等级或合规结论。"
+            }
+          ],
+          "compliance_rule": {
+            "input_key": "enterprise_status",
+            "cases": [
+              {
+                "value": "现有",
+                "requirement": "3级限定值",
+                "threshold_key": "LEVEL_3"
+              },
+              {
+                "value": "新建",
+                "requirement": "2级准入值",
+                "threshold_key": "LEVEL_2"
+              },
+              {
+                "value": "改扩建",
+                "requirement": "2级准入值",
+                "threshold_key": "LEVEL_2"
+              }
+            ]
+          }
         }
-      ]
+      ],
+      "selection_values": {
+        "coal_type": "动力煤"
+      }
     }
   ],
-  "corrections": [],
   "lifecycle_status": "active",
-  "obsolete_date": null,
-  "replaced_by": [],
-  "supersedes": []
+  "selection_schema": [
+    {
+      "key": "coal_type",
+      "label": "煤种",
+      "required": true
+    }
+  ]
 }

@@ -29,6 +29,10 @@ from uebench.domain.models import (
 
 
 def _value(definition):
+    if definition.key == "single_coal_single_process":
+        # The GB 29446 sample uses this confirmation to distinguish a
+        # standard-defined single-process case from unsupported mixed scopes.
+        return True
     if definition.data_type is DataType.BOOLEAN:
         return False
     if definition.data_type is DataType.TEXT:

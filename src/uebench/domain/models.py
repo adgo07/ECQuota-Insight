@@ -238,6 +238,11 @@ class Condition(StrictModel):
         return Decimal(str(value))
 
 
+class ManualReviewCondition(StrictModel):
+    condition: Condition
+    message: str
+
+
 class PiecewiseCase(StrictModel):
     condition: Condition
     expression: Expression
@@ -284,6 +289,27 @@ class Expression(StrictModel):
         return _reject_float(value)
 
 
+class CalculatedDisplayValue(StrictModel):
+    """An auditable auxiliary calculation shown with an indicator result."""
+
+    key: str = Field(pattern=r"^[a-zA-Z][a-zA-Z0-9_.-]*$")
+    label: str
+    unit: str | None = None
+    modes: list[InputMode] = Field(default_factory=lambda: [InputMode.DIRECT, InputMode.DETAIL])
+    formula: Expression
+
+
+class ComplianceCase(StrictModel):
+    value: str
+    requirement: str
+    threshold_key: Literal["LEVEL_2", "LEVEL_3"]
+
+
+class ComplianceRule(StrictModel):
+    input_key: str
+    cases: list[ComplianceCase]
+
+
 class ThresholdSet(StrictModel):
     # Some mandatory standards use an em dash for a grade (for example,
     # certain product rows have only a level-3 limit).  Preserve that source
@@ -304,6 +330,9 @@ class IndicatorDefinition(StrictModel):
     detail_formula: Expression | None = None
     base_thresholds: ThresholdSet | None = None
     thresholds: ThresholdSet
+    display_calculations: list[CalculatedDisplayValue] = Field(default_factory=list)
+    manual_review_conditions: list[ManualReviewCondition] = Field(default_factory=list)
+    compliance_rule: ComplianceRule | None = None
     display_places: int = Field(default=2, ge=0, le=8)
     source_references: list[SourceReference]
     notes: list[str] = Field(default_factory=list)
@@ -416,6 +445,10 @@ class IndicatorResult(StrictModel):
     unit: str
     base_thresholds: dict[str, Decimal] = Field(default_factory=dict)
     corrected_thresholds: dict[str, Decimal] = Field(default_factory=dict)
+    display_values: dict[str, Decimal] = Field(default_factory=dict)
+    compliance_requirement: str | None = None
+    compliance_limit: Decimal | None = None
+    compliance_result: Literal["符合", "不符合"] | None = None
     grade: Grade
     calculation_trace: list[CalculationStep] = Field(default_factory=list)
     source_references: list[SourceReference] = Field(default_factory=list)

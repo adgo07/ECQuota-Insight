@@ -26,6 +26,19 @@ from .models import (
     parse_decimal,
 )
 
+_THRESHOLD_COMPARISON_QUANTUM = Decimal("0.000001")
+
+
+def _round_threshold_value(value: Decimal) -> Decimal:
+    """Match Excel ROUND(value, 6) for numeric threshold comparisons."""
+    return value.quantize(_THRESHOLD_COMPARISON_QUANTUM, rounding=ROUND_HALF_UP)
+
+
+def _format_comparison_operand(value: Decimal) -> str:
+    """Format a Decimal without changing its value or showing insignificant zeros."""
+    formatted = format(value, "f")
+    return formatted.rstrip("0").rstrip(".") if "." in formatted else formatted
+
 
 class EvaluationValidationError(ValueError):
     """The request cannot be formally evaluated."""
@@ -45,14 +58,16 @@ class EvaluationContext:
         values: dict[str, Scalar],
         units: dict[str, str | None],
         pre_steps: list[CalculationStep] | None = None,
+        input_labels: dict[str, str] | None = None,
     ) -> None:
         self.values = values
         self.units = units
         self.pre_steps = pre_steps or []
+        self.input_labels = input_labels or {}
 
     def require(self, key: str) -> Scalar:
         if key not in self.values or self.values[key] is None or self.values[key] == "":
-            raise MissingInputError(f"缺少输入：{key}")
+            raise MissingInputError(f"缺少输入：{self.input_labels.get(key, key)}")
         return self.values[key]
 
 
@@ -256,19 +271,49 @@ class EvaluationEngine:
         product = next((item for item in standard.products if item.id == request.product_id), None)
         if product is None:
             raise EvaluationValidationError(f"标准中不存在产品/工序：{request.product_id}")
+        if standard.id == "gb-29446-2019":
+            selected_coal = product.selection_values.get("coal_type")
+            for key in ("coal_type", "coal_types"):
+                supplied_coal = request.inputs.get(key)
+                if supplied_coal is not None and (
+                    not isinstance(supplied_coal.value, str)
+                    or supplied_coal.value.strip() != selected_coal
+                ):
+                    return self._incomplete_result(
+                        standard,
+                        request,
+                        product,
+                        "本软件不接受多种煤种或与所选煤种不一致的输入；请按单一煤种分别计算。",
+                    )
 
         definitions = {item.key: item for item in product.input_definitions}
         for indicator in product.indicators:
             definitions.update({item.key: item for item in indicator.input_definitions})
+        validation_request = request
+        if standard.id == "gb-29446-2019" and "single_coal_single_process" in request.inputs:
+            validation_request = request.model_copy(
+                update={
+                    "inputs": {
+                        key: value
+                        for key, value in request.inputs.items()
+                        if key != "single_coal_single_process"
+                    }
+                }
+            )
         try:
-            values, units, pre_steps = self._validate_inputs(definitions, request)
+            values, units, pre_steps = self._validate_inputs(definitions, validation_request)
         except EvaluationValidationError as exc:
             # Input-level failures (for example a wrong unit or an out-of-range
             # value) are part of the evaluated data quality result.  Preserve a
             # row for every indicator so the caller receives the fixed
             # INCOMPLETE enum instead of a partially computed or guessed grade.
             return self._incomplete_result(standard, request, product, str(exc))
-        context = EvaluationContext(values, units, pre_steps)
+        input_labels = (
+            {key: definition.label for key, definition in definitions.items()}
+            if standard.id == "gb-29446-2019"
+            else None
+        )
+        context = EvaluationContext(values, units, pre_steps, input_labels)
 
         results = [
             self._evaluate_indicator(
@@ -276,6 +321,7 @@ class EvaluationEngine:
                 request.input_mode,
                 context,
                 product_input_definitions=product.input_definitions,
+                standard_id=standard.id,
             )
             for indicator in product.indicators
         ]
@@ -354,6 +400,13 @@ class EvaluationEngine:
             value: Scalar
             if definition.data_type is DataType.DECIMAL:
                 value = parse_decimal(supplied.value, field_name=definition.label)
+                if request.standard_id == "gb-29446-2019" and definition.key in {
+                    "electricity_consumption",
+                    "raw_coal_input",
+                    "actual.coking-coal",
+                    "actual.power-coal",
+                } and value <= 0:
+                    raise EvaluationValidationError(f"{definition.label} 必须大于 0")
                 if definition.minimum is not None and value < definition.minimum:
                     raise EvaluationValidationError(f"{definition.label} 小于允许最小值")
                 if definition.maximum is not None and value > definition.maximum:
@@ -365,7 +418,9 @@ class EvaluationEngine:
             else:
                 value = str(supplied.value) if supplied.value is not None else None
                 if definition.choices and value not in definition.choices:
-                    raise EvaluationValidationError(f"{definition.label} 不在允许选项中")
+                    if definition.required:
+                        raise EvaluationValidationError(f"{definition.label} 不在允许选项中")
+                    value = None
             values[key] = value
             units[key] = supplied.unit
         if request.energy_lines:
@@ -495,8 +550,10 @@ class EvaluationEngine:
         context: EvaluationContext,
         *,
         product_input_definitions: list[InputDefinition] | None = None,
+        standard_id: str | None = None,
     ) -> IndicatorResult:
         trace: list[CalculationStep] = [step.model_copy() for step in context.pre_steps]
+        is_gb29446 = standard_id == "gb-29446-2019"
         for sequence, step in enumerate(trace, start=1):
             step.sequence = sequence
         try:
@@ -510,6 +567,18 @@ class EvaluationEngine:
                     source_references=indicator.source_references,
                 )
 
+            # Conditions whose meaning is intentionally outside the standard's
+            # numeric rules stop evaluation before any grade or compliance
+            # conclusion can be inferred.
+            for review_condition in indicator.manual_review_conditions:
+                if (
+                    is_gb29446
+                    and review_condition.condition.field == "single_coal_single_process"
+                ):
+                    continue
+                if self.conditions.evaluate(review_condition.condition, context):
+                    raise RuleEvaluationError(review_condition.message)
+
             # Product-level inputs apply to every indicator in that product.
             # Enforce them here (rather than only when a formula happens to
             # reference them) so a required condition cannot be silently
@@ -519,6 +588,8 @@ class EvaluationEngine:
             }
             required_definitions.update({definition.key: definition for definition in indicator.input_definitions})
             for definition in required_definitions.values():
+                if is_gb29446 and definition.key == "single_coal_single_process":
+                    continue
                 # Skip definitions that belong only to the other input mode
                 # before evaluating required_if. Otherwise direct entry can
                 # incorrectly require a detail-only selector.
@@ -548,11 +619,72 @@ class EvaluationEngine:
                     raise MissingInputError("该指标尚未配置明细计算公式")
                 actual = self.expressions.evaluate(indicator.detail_formula, context, trace, label="计算实际值")
 
+            display_values = {
+                display.key: self.expressions.evaluate(
+                    display.formula,
+                    context,
+                    trace,
+                    label=display.label,
+                )
+                for display in indicator.display_calculations
+                if input_mode in display.modes
+            }
+
             base_thresholds = self._evaluate_threshold_set(
                 indicator.base_thresholds or indicator.thresholds, context, trace, "修正前"
             )
             corrected_thresholds = self._evaluate_threshold_set(indicator.thresholds, context, trace, "修正后")
-            grade = self._grade(actual, corrected_thresholds, indicator.comparison)
+            grade = self._grade(
+                actual,
+                corrected_thresholds,
+                indicator.comparison,
+                trace=trace if is_gb29446 else None,
+                unit=indicator.unit,
+            )
+            compliance_requirement = None
+            compliance_limit = None
+            compliance_result = None
+            warnings: list[str] = []
+            if indicator.compliance_rule is not None and not is_gb29446:
+                status_value = context.values.get(indicator.compliance_rule.input_key)
+                compliance_case = next(
+                    (
+                        case
+                        for case in indicator.compliance_rule.cases
+                        if status_value is not None and case.value == str(status_value)
+                    ),
+                    None,
+                )
+                if compliance_case is None:
+                    warnings.append("企业建设属性为空或无效；等级判定正常输出，未生成合规结论。")
+                else:
+                    compliance_limit = corrected_thresholds.get(compliance_case.threshold_key)
+                    if compliance_limit is None:
+                        raise RuleEvaluationError(
+                            f"执行要求 {compliance_case.requirement} 缺少对应限值，需人工确认"
+                        )
+                    rounded_actual = _round_threshold_value(actual)
+                    rounded_limit = _round_threshold_value(compliance_limit)
+                    predicate = (
+                        rounded_actual <= rounded_limit
+                        if indicator.comparison is ComparisonDirection.LTE
+                        else rounded_actual >= rounded_limit
+                    )
+                    compliance_requirement = compliance_case.requirement
+                    compliance_result = "符合" if predicate else "不符合"
+                    trace.append(
+                        CalculationStep(
+                            sequence=len(trace) + 1,
+                            label="企业执行要求合规判定",
+                            operation="compliance",
+                            expression=(
+                                f"ROUND({actual}, 6) {indicator.comparison.value} "
+                                f"ROUND({compliance_limit}, 6)"
+                            ),
+                            value=compliance_result,
+                            unit=indicator.unit,
+                        )
+                    )
             return IndicatorResult(
                 indicator_id=indicator.id,
                 indicator_name=indicator.name,
@@ -560,9 +692,14 @@ class EvaluationEngine:
                 unit=indicator.unit,
                 base_thresholds=base_thresholds,
                 corrected_thresholds=corrected_thresholds,
+                display_values=display_values,
+                compliance_requirement=compliance_requirement,
+                compliance_limit=compliance_limit,
+                compliance_result=compliance_result,
                 grade=grade,
                 calculation_trace=trace,
                 source_references=indicator.source_references,
+                warnings=warnings,
             )
         except (MissingInputError, RuleEvaluationError, ValueError) as exc:
             return IndicatorResult(
@@ -578,19 +715,63 @@ class EvaluationEngine:
 
     @staticmethod
     def _grade(
-        actual: Decimal, thresholds: dict[str, Decimal], comparison: ComparisonDirection
+        actual: Decimal,
+        thresholds: dict[str, Decimal],
+        comparison: ComparisonDirection,
+        *,
+        trace: list[CalculationStep] | None = None,
+        unit: str | None = None,
     ) -> Grade:
         predicate = (lambda left, right: left <= right) if comparison is ComparisonDirection.LTE else (
             lambda left, right: left >= right
         )
+        relation = "<=" if comparison is ComparisonDirection.LTE else ">="
+        compared_actual = _round_threshold_value(actual)
         for key, grade in (
             ("LEVEL_1", Grade.LEVEL_1),
             ("LEVEL_2", Grade.LEVEL_2),
             ("LEVEL_3", Grade.LEVEL_3),
         ):
             threshold = thresholds.get(key)
-            if threshold is not None and predicate(actual, threshold):
+            if threshold is None:
+                continue
+            compared_threshold = _round_threshold_value(threshold)
+            if predicate(compared_actual, compared_threshold):
+                if trace is not None:
+                    trace.append(
+                        CalculationStep(
+                            sequence=len(trace) + 1,
+                            label="等级判定比较",
+                            operation="grade_comparison",
+                            expression=(
+                                f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
+                                f"ROUND({_format_comparison_operand(threshold)}, 6) = {compared_threshold}；"
+                                f"{compared_actual} {relation} {compared_threshold}"
+                            ),
+                            value=grade.value,
+                            unit=unit,
+                        )
+                    )
                 return grade
+        if trace is not None:
+            level_3 = thresholds.get("LEVEL_3")
+            if level_3 is not None:
+                compared_level_3 = _round_threshold_value(level_3)
+                out_of_range_relation = ">" if comparison is ComparisonDirection.LTE else "<"
+                trace.append(
+                    CalculationStep(
+                        sequence=len(trace) + 1,
+                        label="超出3级限值比较",
+                        operation="grade_comparison",
+                        expression=(
+                            f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
+                            f"ROUND({_format_comparison_operand(level_3)}, 6) = {compared_level_3}；"
+                            f"{compared_actual} {out_of_range_relation} {compared_level_3}"
+                        ),
+                        value=Grade.NOT_QUALIFIED.value,
+                        unit=unit,
+                    )
+                )
         return Grade.NOT_QUALIFIED
 
     def _evaluate_threshold_set(

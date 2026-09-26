@@ -343,12 +343,12 @@
       "title": "选煤电力消耗限额",
       "version": "2019",
       "standard_family_id": "GB 29446",
-      "rule_revision": 1,
+      "rule_revision": 2,
       "publication_status": "published",
       "lifecycle_status": "active",
       "scope": "current",
       "definition_path": "scope-63/definitions/gb-29446-2019.json",
-      "definition_sha256": "26bea9e3e5b0b357b6075e23298e020359a25f1f592ea4947055f3e8c7d598a5"
+      "definition_sha256": "ad56e2ff21a9b5b530a298f5f0530fb4d47db7695875e85d64d2a6466a094a4e"
     },
     {
       "number": "GB 29447-2026",

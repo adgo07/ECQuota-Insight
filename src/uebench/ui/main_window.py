@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QSpinBox,
     QStackedWidget,
     QTableWidget,
@@ -72,6 +73,12 @@ QHeaderView::section { background: #d9eaf7; color: #17365d; padding: 7px; border
 QLabel[class="pageTitle"] { font-size: 18pt; font-weight: bold; color: #17365d; }
 QLabel[class="metric"] { font-size: 24pt; font-weight: bold; color: #2f75b5; }
 """
+
+GB29446_PERIOD_OPTIONS = (
+    "全年",
+    *(f"{month}月" for month in range(1, 13)),
+    "自定义",
+)
 
 
 def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
@@ -288,8 +295,19 @@ class MainWindow(QMainWindow):
         return page
 
     def _build_evaluation(self) -> QWidget:
-        page, layout = self._page("新建评价")
+        page, page_layout = self._page("新建评价")
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        layout = QVBoxLayout(content)
+        layout.setContentsMargins(0, 0, 8, 0)
+        layout.setSpacing(14)
+        scroll.setWidget(content)
+        page_layout.addWidget(scroll, 1)
+
         form_card, form_layout = self._card()
+        form_layout.addWidget(QLabel("一、评价信息与数据填写"))
         form = QFormLayout()
         self.eval_selection_mode = QComboBox()
         self.eval_selection_mode.addItem("当前有效标准（自动）", StandardSelectionMode.CURRENT.value)
@@ -334,6 +352,61 @@ class MainWindow(QMainWindow):
         self.eval_project = QLineEdit()
         self.eval_project.setVisible(False)
         self.eval_notes = QLineEdit()
+        self.generic_form_container = QWidget()
+        generic_form = QFormLayout(self.generic_form_container)
+        generic_form.setContentsMargins(0, 0, 0, 0)
+        generic_form.addRow("产品/工序", self.selection_container)
+        generic_form.addRow("单位名称", self.eval_organization)
+        generic_form.addRow("评价备注", self.eval_notes)
+
+        self.gb29446_form_container = QWidget()
+        gb_form = QFormLayout(self.gb29446_form_container)
+        gb_form.setContentsMargins(0, 0, 0, 0)
+        self.gb29446_organization = QLineEdit()
+        self.gb29446_organization.setPlaceholderText("可选填写")
+        self.gb29446_organization.textChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_period = QComboBox()
+        for period in GB29446_PERIOD_OPTIONS:
+            self.gb29446_period.addItem(period, period)
+        self.gb29446_period.currentIndexChanged.connect(self._gb29446_period_changed)
+        self.gb29446_period.currentIndexChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_custom_period = QLineEdit()
+        self.gb29446_custom_period.setPlaceholderText("填写核算周期，例如：2026年第一季度")
+        self.gb29446_custom_period.setVisible(False)
+        self.gb29446_custom_period.textChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_coal_type = QComboBox()
+        self.gb29446_coal_type.currentIndexChanged.connect(self._gb29446_coal_changed)
+        self.gb29446_coal_type.currentIndexChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_process = QComboBox()
+        self.gb29446_process.currentIndexChanged.connect(self._gb29446_process_changed)
+        self.gb29446_process.currentIndexChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_electricity = QLineEdit()
+        self.gb29446_electricity.setPlaceholderText("输入统计期选煤电力消耗量")
+        self.gb29446_electricity.textChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_raw_coal = QLineEdit()
+        self.gb29446_raw_coal.setPlaceholderText("输入统计期入选原煤量")
+        self.gb29446_raw_coal.textChanged.connect(self._gb29446_inputs_changed)
+        self.gb29446_factor = QLineEdit()
+        self.gb29446_factor.setReadOnly(True)
+        self.gb29446_factor.setPlaceholderText("根据煤种和工艺自动匹配")
+        self.gb29446_notes = QLineEdit()
+        self.gb29446_notes.setPlaceholderText("可选")
+        self.gb29446_notes.textChanged.connect(self._gb29446_inputs_changed)
+        period_row = QWidget()
+        period_layout = QVBoxLayout(period_row)
+        period_layout.setContentsMargins(0, 0, 0, 0)
+        period_layout.setSpacing(4)
+        period_layout.addWidget(self.gb29446_period)
+        period_layout.addWidget(self.gb29446_custom_period)
+        gb_form.addRow("企业名称（可选）", self.gb29446_organization)
+        gb_form.addRow("核算周期", period_row)
+        gb_form.addRow("煤种", self.gb29446_coal_type)
+        gb_form.addRow("选煤工艺", self.gb29446_process)
+        gb_form.addRow("统计期选煤电力消耗量 E_d（kW·h）", self.gb29446_electricity)
+        gb_form.addRow("统计期入选原煤量 m（t）", self.gb29446_raw_coal)
+        gb_form.addRow("折算系数 k（自动匹配，只读）", self.gb29446_factor)
+        gb_form.addRow("备注", self.gb29446_notes)
+
         standard_row = QHBoxLayout()
         standard_row.addWidget(QLabel("标准"))
         standard_row.addWidget(self.eval_standard, 3)
@@ -342,12 +415,14 @@ class MainWindow(QMainWindow):
         standard_row.addWidget(self.eval_standard_status, 3)
         standard_row.addWidget(self.eval_standard_open)
         form.addRow(standard_row)
-        form.addRow("产品/工序", self.selection_container)
-        form.addRow("单位名称", self.eval_organization)
-        form.addRow("评价备注", self.eval_notes)
         form_layout.addLayout(form)
+        form_layout.addWidget(self.generic_form_container)
+        form_layout.addWidget(self.gb29446_form_container)
         layout.addWidget(form_card)
 
+        self.input_controls_container = QWidget()
+        input_controls_layout = QVBoxLayout(self.input_controls_container)
+        input_controls_layout.setContentsMargins(0, 0, 0, 0)
         self.input_tabs = QTabWidget()
         self.eval_inputs = QTableWidget(0, 5)
         self.eval_inputs.setHorizontalHeaderLabels(["键", "名称", "值", "单位", "说明"])
@@ -369,9 +444,10 @@ class MainWindow(QMainWindow):
             "下方参数由所选标准和产品/工序自动生成。可直接点击“值”列输入；选择明细方式时，"
             "再填写能源明细和产量与分摊。"
         )
+        self.input_hint = input_hint
         input_hint.setWordWrap(True)
-        layout.addWidget(input_hint)
-        layout.addWidget(self.input_tabs, 1)
+        input_controls_layout.addWidget(input_hint)
+        input_controls_layout.addWidget(self.input_tabs, 1)
 
         buttons = QHBoxLayout()
         mode_label = QLabel("输入方式")
@@ -390,13 +466,19 @@ class MainWindow(QMainWindow):
         add_product = QPushButton("新增产量行")
         add_product.clicked.connect(lambda: self._append_blank_row(self.production_table, [str(uuid4())[:8], "", "", "", "t", "1", "是", ""]))
         calculate = QPushButton("计算并判级")
+        self.calculate_button = calculate
         calculate.clicked.connect(self.calculate_evaluation)
         buttons.addWidget(add_energy)
         buttons.addWidget(add_product)
-        buttons.addStretch()
-        buttons.addWidget(calculate)
-        layout.addLayout(buttons)
+        input_controls_layout.addLayout(buttons)
+        layout.addWidget(self.input_controls_container)
+        action_row = QHBoxLayout()
+        action_row.addStretch()
+        action_row.addWidget(calculate)
+        layout.addLayout(action_row)
 
+        self.generic_result_section, generic_result_layout = self._card()
+        generic_result_layout.addWidget(QLabel("评价结果"))
         self.eval_results = QTableWidget(0, 14)
         self.eval_results.setHorizontalHeaderLabels(
             ["指标", "实际值", "单位", "1级基础", "2级基础", "3级基础", "1级修正", "2级修正", "3级修正", "判定", "警告", "依据页码", "条款/表号", "来源"]
@@ -404,8 +486,76 @@ class MainWindow(QMainWindow):
         self._configure_table(self.eval_results)
         self.eval_results.setMinimumHeight(220)
         self.eval_summary = QLabel("等级汇总：尚未计算")
-        layout.addWidget(self.eval_summary)
-        layout.addWidget(self.eval_results, 1)
+        generic_result_layout.addWidget(self.eval_summary)
+        generic_result_layout.addWidget(self.eval_results, 1)
+        layout.addWidget(self.generic_result_section, 1)
+
+        self.gb29446_result_section, gb_result_section_layout = self._card()
+        gb_result_section_layout.addWidget(QLabel("二、评价结果"))
+        self.gb29446_result_card = QFrame()
+        self.gb29446_result_card.setObjectName("card")
+        gb29446_layout = QVBoxLayout(self.gb29446_result_card)
+        gb_result_heading = QLabel("计算完成后显示本次评价结果")
+        gb_result_heading.setWordWrap(True)
+        gb29446_layout.addWidget(gb_result_heading)
+        metrics = QHBoxLayout()
+        ed_card, ed_layout = self._card()
+        ed_layout.addWidget(QLabel("选煤电力单耗 e_d"))
+        self.gb29446_result_ed = QLabel("— kW·h/t")
+        self.gb29446_result_ed.setProperty("class", "metric")
+        ed_layout.addWidget(self.gb29446_result_ed)
+        grade_card, grade_layout = self._card()
+        grade_layout.addWidget(QLabel("电耗等级"))
+        self.gb29446_result_grade = QLabel("—")
+        self.gb29446_result_grade.setProperty("class", "metric")
+        grade_layout.addWidget(self.gb29446_result_grade)
+        metrics.addWidget(ed_card)
+        metrics.addWidget(grade_card)
+        gb29446_layout.addLayout(metrics)
+        self.gb29446_result_message = QLabel("尚未计算")
+        self.gb29446_result_message.setWordWrap(True)
+        gb29446_layout.addWidget(self.gb29446_result_message)
+        gb_result_section_layout.addWidget(self.gb29446_result_card)
+        layout.addWidget(self.gb29446_result_section)
+
+        self.gb29446_explanation_section, explanation_layout = self._card()
+        explanation_layout.addWidget(QLabel("三、计算与判定说明"))
+        self.gb29446_explanation = QLabel("完成计算后显示本次代入计算和判定阈值。")
+        self.gb29446_explanation.setWordWrap(True)
+        self.gb29446_explanation.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        explanation_layout.addWidget(self.gb29446_explanation)
+        layout.addWidget(self.gb29446_explanation_section)
+
+        self.gb29446_basis_section, basis_layout = self._card()
+        basis_layout.addWidget(QLabel("四、标准依据"))
+        self.gb29446_basis = QLabel(
+            "等级依据：第3.1条、第3.2条，表1、表2\n"
+            "计算依据：第5.2条，公式（1）\n"
+            "折算系数依据：附录A表A.1"
+        )
+        self.gb29446_basis.setWordWrap(True)
+        basis_layout.addWidget(self.gb29446_basis)
+        self.gb29446_basis_open = QPushButton("查看标准原文")
+        self.gb29446_basis_open.clicked.connect(self.open_selected_standard_for_evaluation)
+        basis_layout.addWidget(self.gb29446_basis_open, 0, Qt.AlignmentFlag.AlignLeft)
+        self.gb29446_scope_toggle = QPushButton("统计范围说明 ▸")
+        self.gb29446_scope_toggle.setCheckable(True)
+        self.gb29446_scope_details = QLabel(
+            "原煤输送至选煤厂 → 选煤产品运输出选煤厂\n"
+            "统计内容包括：选煤机械、照明、化验室、相关线路电损失、相关变压器电损失。"
+        )
+        self.gb29446_scope_details.setWordWrap(True)
+        self.gb29446_scope_details.setVisible(False)
+        self.gb29446_scope_toggle.toggled.connect(
+            lambda expanded: (
+                self.gb29446_scope_details.setVisible(expanded),
+                self.gb29446_scope_toggle.setText("统计范围说明 ▾" if expanded else "统计范围说明 ▸"),
+            )
+        )
+        basis_layout.addWidget(self.gb29446_scope_toggle, 0, Qt.AlignmentFlag.AlignLeft)
+        basis_layout.addWidget(self.gb29446_scope_details)
+
+        layout.addWidget(self.gb29446_basis_section)
         self._sync_mode_buttons()
         return page
 
@@ -824,6 +974,117 @@ class MainWindow(QMainWindow):
         self._sync_hidden_product()
         self._refresh_input_table()
 
+    def _is_gb29446(self) -> bool:
+        return self.current_standard is not None and self.current_standard.id == "gb-29446-2019"
+
+    def _set_evaluation_view(self) -> None:
+        is_gb29446 = self._is_gb29446()
+        self.generic_form_container.setVisible(not is_gb29446)
+        self.gb29446_form_container.setVisible(is_gb29446)
+        self.input_controls_container.setVisible(not is_gb29446)
+        self.generic_result_section.setVisible(not is_gb29446)
+        self.gb29446_result_section.setVisible(is_gb29446)
+        self.gb29446_explanation_section.setVisible(is_gb29446)
+        self.gb29446_basis_section.setVisible(is_gb29446)
+        self.eval_standard_open.setVisible(not is_gb29446)
+
+    @staticmethod
+    def _gb29446_factor_map(product) -> dict[str, Decimal]:
+        """Read the Appendix A lookup from the rule definition for the selector."""
+        factors: dict[str, Decimal] = {}
+        for indicator in product.indicators:
+            for display in indicator.display_calculations:
+                if display.key != "process_factor" or display.formula.op != "lookup":
+                    continue
+                for row in display.formula.rows:
+                    condition = row.condition
+                    expression = row.expression
+                    if (
+                        condition.op == "eq"
+                        and condition.field == "washing_process"
+                        and expression.op == "constant"
+                        and condition.value is not None
+                        and expression.value is not None
+                    ):
+                        factors[str(condition.value)] = Decimal(str(expression.value))
+        return factors
+
+    def _populate_gb29446_coal_types(self) -> None:
+        combo = self.gb29446_coal_type
+        previous = combo.currentText()
+        combo.blockSignals(True)
+        combo.clear()
+        if self.current_standard is not None:
+            seen: set[str] = set()
+            for product in self.current_standard.products:
+                coal_type = product.selection_values.get("coal_type", product.name)
+                coal_type = str(coal_type).strip()
+                if coal_type and coal_type not in seen:
+                    combo.addItem(coal_type, product.id)
+                    seen.add(coal_type)
+        restored = combo.findText(previous) if previous else -1
+        if restored >= 0:
+            combo.setCurrentIndex(restored)
+        elif combo.count():
+            combo.setCurrentIndex(0)
+        combo.blockSignals(False)
+
+    def _refresh_gb29446_processes(self, product=None) -> None:
+        combo = self.gb29446_process
+        previous = combo.currentData()
+        combo.blockSignals(True)
+        combo.clear()
+        factors = self._gb29446_factor_map(product) if product is not None else {}
+        process_definition = next(
+            (item for item in product.input_definitions if item.key == "washing_process"),
+            None,
+        ) if product is not None else None
+        choices = (
+            [choice for choice in process_definition.choices if choice in factors]
+            if process_definition is not None and process_definition.choices
+            else list(factors)
+        )
+        combo.addItem("请选择选煤工艺", None)
+        for choice in choices:
+            combo.addItem(choice, choice)
+        restored = combo.findData(previous) if previous else -1
+        if restored >= 0:
+            combo.setCurrentIndex(restored)
+        combo.blockSignals(False)
+        self._update_gb29446_factor(factors)
+
+    def _update_gb29446_factor(self, factors: dict[str, Decimal] | None = None) -> None:
+        product = self._selected_product()
+        factors = factors if factors is not None else self._gb29446_factor_map(product) if product else {}
+        process = self.gb29446_process.currentData()
+        factor = factors.get(str(process)) if process else None
+        self.gb29446_factor.setText(format(factor, "f") if factor is not None else "")
+
+    def _gb29446_coal_changed(self, _index: int = 0) -> None:
+        product_id = self.gb29446_coal_type.currentData()
+        if product_id and self.eval_product.currentData() != product_id:
+            self._select_product_by_id(str(product_id))
+        else:
+            self._refresh_gb29446_processes(self._selected_product())
+
+    def _gb29446_process_changed(self, _index: int = 0) -> None:
+        self._update_gb29446_factor()
+
+    def _gb29446_period_changed(self, _index: int = 0) -> None:
+        is_custom = self.gb29446_period.currentData() == "自定义"
+        self.gb29446_custom_period.setVisible(is_custom)
+
+    def _clear_gb29446_result(self) -> None:
+        self.last_result_id = None
+        self.gb29446_result_ed.setText("— kW·h/t")
+        self.gb29446_result_grade.setText("—")
+        self.gb29446_result_message.setText("尚未计算")
+        self.gb29446_explanation.setText("完成计算后显示本次代入计算和判定阈值。")
+
+    def _gb29446_inputs_changed(self, *_args) -> None:
+        if self._is_gb29446():
+            self._clear_gb29446_result()
+
     def _standard_changed(self) -> None:
         standard_id = self.eval_standard.currentData()
         mode = self._selection_mode()
@@ -848,7 +1109,17 @@ class MainWindow(QMainWindow):
             self.eval_standard_status.setText("当前选择方式下没有可用标准")
         self.eval_product.blockSignals(False)
         self._rebuild_selection_widgets()
-        self._refresh_input_table()
+        self._set_evaluation_view()
+        if self._is_gb29446():
+            self._populate_gb29446_coal_types()
+            product_id = self.gb29446_coal_type.currentData()
+            if product_id:
+                self._select_product_by_id(str(product_id))
+            else:
+                self._refresh_input_table()
+            self._clear_gb29446_result()
+        else:
+            self._refresh_input_table()
 
     def _product_changed(self) -> None:
         self._refresh_input_table()
@@ -919,6 +1190,11 @@ class MainWindow(QMainWindow):
         mode = InputMode(self.eval_mode.currentData())
         self.eval_inputs.setRowCount(0)
         if product is None:
+            if self._is_gb29446():
+                self._refresh_gb29446_processes(None)
+            return
+        if self._is_gb29446():
+            self._refresh_gb29446_processes(product)
             return
         definitions = {definition.key: definition for definition in product.input_definitions if mode in definition.modes}
         for indicator in product.indicators:
@@ -934,12 +1210,20 @@ class MainWindow(QMainWindow):
                 if column != 2:
                     item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 self.eval_inputs.setItem(row, column, item)
+            if definition.choices:
+                selector = QComboBox()
+                selector.addItem("请选择", "")
+                for choice in definition.choices:
+                    selector.addItem(choice, choice)
+                self.eval_inputs.setCellWidget(row, 2, selector)
         self.energy_table.setEnabled(mode is InputMode.DETAIL)
         self.production_table.setEnabled(mode is InputMode.DETAIL)
 
     def _collect_request(self) -> EvaluationRequest:
         if self.current_standard is None:
             raise ValueError("没有可用标准")
+        if self._is_gb29446():
+            return self._collect_gb29446_request()
         product = self._selected_product()
         definitions = {}
         if product is not None:
@@ -949,7 +1233,12 @@ class MainWindow(QMainWindow):
         inputs = {}
         for row in range(self.eval_inputs.rowCount()):
             key = self.eval_inputs.item(row, 0).text()
-            value = self.eval_inputs.item(row, 2).text().strip()
+            selector = self.eval_inputs.cellWidget(row, 2)
+            if isinstance(selector, QComboBox):
+                selected = selector.currentData()
+                value = str(selected).strip() if selected not in (None, "") else ""
+            else:
+                value = self.eval_inputs.item(row, 2).text().strip()
             unit = self.eval_inputs.item(row, 3).text().strip() or None
             if value:
                 definition = definitions.get(key)
@@ -1014,8 +1303,79 @@ class MainWindow(QMainWindow):
             notes=self.eval_notes.text().strip() or None,
         )
 
+    @staticmethod
+    def _encode_gb29446_notes(period: str, custom_period: str, note: str) -> str:
+        lines = [f"核算周期：{period}"]
+        if period == "自定义":
+            lines.append(f"自定义周期：{custom_period.strip()}")
+        if note.strip():
+            lines.append(f"备注：{note.strip()}")
+        return "\n".join(lines)
+
+    @staticmethod
+    def _decode_gb29446_notes(notes: str | None) -> tuple[str, str, str]:
+        lines = (notes or "").splitlines()
+        if not lines or not lines[0].startswith("核算周期："):
+            return "全年", "", notes or ""
+        period = lines[0].split("：", 1)[1].strip()
+        if period == "1月～12月":
+            period = "全年"
+        if period not in GB29446_PERIOD_OPTIONS:
+            return "全年", "", notes or ""
+        custom_period = ""
+        remaining = lines[1:]
+        if period == "自定义" and remaining and remaining[0].startswith("自定义周期："):
+            custom_period = remaining.pop(0).split("：", 1)[1].strip()
+        note = "\n".join(remaining)
+        if note.startswith("备注："):
+            note = note.split("：", 1)[1]
+        return period, custom_period, note
+
+    def _collect_gb29446_request(self) -> EvaluationRequest:
+        assert self.current_standard is not None
+        period = str(self.gb29446_period.currentData() or "全年")
+        custom_period = self.gb29446_custom_period.text().strip()
+        if period == "自定义" and not custom_period:
+            raise ValueError("请填写自定义核算周期。")
+        product_id = self.gb29446_coal_type.currentData()
+        if not product_id:
+            raise ValueError("请选择煤种。")
+        product = next(
+            (item for item in self.current_standard.products if item.id == product_id),
+            None,
+        )
+        if product is None:
+            raise ValueError("所选煤种没有对应的标准评价规则。")
+        process = self.gb29446_process.currentData()
+        if not process:
+            raise ValueError("请选择选煤工艺。")
+        inputs = {"washing_process": InputValue(value=str(process))}
+        electricity = self.gb29446_electricity.text().strip()
+        raw_coal = self.gb29446_raw_coal.text().strip()
+        if electricity:
+            inputs["electricity_consumption"] = InputValue(value=electricity, unit="kW·h")
+        if raw_coal:
+            inputs["raw_coal_input"] = InputValue(value=raw_coal, unit="t")
+        notes = self._encode_gb29446_notes(period, custom_period, self.gb29446_notes.text())
+        return EvaluationRequest(
+            evaluation_date=date.today(),
+            standard_id=self.current_standard.id,
+            product_id=product.id,
+            selection_mode=self._selection_mode(),
+            input_mode=InputMode.DETAIL,
+            inputs=inputs,
+            organization_name=self.gb29446_organization.text().strip() or None,
+            notes=notes,
+        )
+
     def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
         try:
+            if request is None and self._is_gb29446():
+                try:
+                    request = self._collect_request()
+                except ValueError as exc:
+                    QMessageBox.warning(self, "信息未填写", str(exc))
+                    return
             request = request or self._collect_request()
             is_preview = request.selection_mode is StandardSelectionMode.FUTURE
             result = self.context.application.preview_evaluation(request) if is_preview else self.context.application.evaluate(request)
@@ -1023,6 +1383,23 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "无法计算", _friendly_error(exc, "计算和判级"))
             return
         self.last_result_id = None if is_preview else result.evaluation_id
+        self._show_gb29446_result(request, result)
+        if result.standard_id == "gb-29446-2019":
+            self.eval_results.setRowCount(0)
+            self.eval_summary.setText("")
+            self.refresh_home()
+            if not is_preview:
+                self.refresh_records()
+            if any(item.grade is Grade.INCOMPLETE for item in result.results):
+                QMessageBox.warning(
+                    self,
+                    "无法计算",
+                    "输入数据未通过校验，未生成电耗等级。请查看评价结果中的提示并修正。",
+                )
+                return
+            message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
+            QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
+            return
         self.eval_results.setRowCount(0)
         counts = Counter(item.grade for item in result.results)
         summary = "；".join(
@@ -1074,6 +1451,147 @@ class MainWindow(QMainWindow):
         message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
 
+    @staticmethod
+    def _format_result_number(value: Decimal | None, places: int = 2) -> str:
+        return "—" if value is None else f"{value:.{places}f}"
+
+    @staticmethod
+    def _format_explanation_number(value: Decimal | None) -> str:
+        if value is None:
+            return "—"
+        return f"{value:.8f}".rstrip("0").rstrip(".")
+
+    @staticmethod
+    def _gb29446_grade_label(grade: Grade) -> str:
+        if grade is Grade.NOT_QUALIFIED:
+            return "超出3级"
+        return GRADE_LABELS[grade]
+
+    def _gb29446_warning_for_display(self, request: EvaluationRequest, warning: str) -> str:
+        product = next(
+            (
+                item
+                for item in (self.current_standard.products if self.current_standard else [])
+                if item.id == request.product_id
+            ),
+            None,
+        )
+        labels = {
+            "washing_process": "选煤工艺",
+            "electricity_consumption": "统计期选煤电力消耗量 E_d",
+            "raw_coal_input": "统计期入选原煤量 m",
+            "actual.coking-coal": "选煤电力单耗 e_d",
+            "actual.power-coal": "选煤电力单耗 e_d",
+            "single_coal_single_process": "本次统计范围",
+            "enterprise_status": "企业属性",
+        }
+        if product is not None:
+            definitions = list(product.input_definitions)
+            for indicator in product.indicators:
+                definitions.extend(indicator.input_definitions)
+            labels.update({definition.key: definition.label for definition in definitions})
+        for key, label in sorted(labels.items(), key=lambda item: len(item[0]), reverse=True):
+            warning = warning.replace(key, label)
+        return warning
+
+    def _show_gb29446_result(self, request: EvaluationRequest, result) -> None:
+        if result.standard_id != "gb-29446-2019":
+            return
+        item = next(
+            (
+                row
+                for row in result.results
+                if row.indicator_id in {"GB_29446-2019.coking-coal", "GB_29446-2019.power-coal"}
+            ),
+            result.results[0] if result.results else None,
+        )
+        if item is None:
+            self._clear_gb29446_result()
+            return
+
+        if item.actual_value is None:
+            self.gb29446_result_ed.setText("— kW·h/t")
+            self.gb29446_result_grade.setText("—")
+            self.gb29446_result_message.setText(
+                "无法计算："
+                + "；".join(self._gb29446_warning_for_display(request, warning) for warning in item.warnings)
+            )
+            self.gb29446_explanation.setText("请根据提示补全或修正评价数据后重新计算。")
+            return
+
+        actual = item.actual_value
+        grade_label = self._gb29446_grade_label(item.grade)
+        self.gb29446_result_ed.setText(f"{self._format_result_number(actual)} kW·h/t")
+        self.gb29446_result_grade.setText(grade_label)
+        self.gb29446_result_message.setText("")
+
+        supplied_electricity = request.inputs.get("electricity_consumption")
+        supplied_raw_coal = request.inputs.get("raw_coal_input")
+        electricity = (
+            Decimal(str(supplied_electricity.value))
+            if supplied_electricity is not None
+            else None
+        )
+        raw_coal = (
+            Decimal(str(supplied_raw_coal.value))
+            if supplied_raw_coal is not None
+            else None
+        )
+        e0 = item.display_values.get("unadjusted_power_consumption")
+        factor = item.display_values.get("process_factor")
+        e0_line = (
+            f"未折算单位电耗 E_d/m：{self._format_result_number(e0)} kW·h/t"
+            if request.input_mode is InputMode.DETAIL
+            else "未折算单位电耗 E_d/m：— kW·h/t"
+        )
+        factor_line = f"折算系数 k：{self._format_result_number(factor)}"
+        if electricity is not None and raw_coal is not None and factor is not None:
+            formula_line = (
+                f"本次代入：e_d = {self._format_explanation_number(electricity)} × "
+                f"{self._format_explanation_number(factor)} / "
+                f"{self._format_explanation_number(raw_coal)} = "
+                f"{self._format_explanation_number(actual)} kW·h/t"
+            )
+        else:
+            formula_line = "计算公式：e_d = E_d × k / m"
+
+        thresholds = item.corrected_thresholds
+        threshold_names = (("LEVEL_1", "1级"), ("LEVEL_2", "2级"), ("LEVEL_3", "3级"))
+        threshold_text = "；".join(
+            f"{name} ≤ {self._format_result_number(thresholds.get(key))} kW·h/t"
+            for key, name in threshold_names
+            if thresholds.get(key) is not None
+        )
+        level3 = thresholds.get("LEVEL_3")
+        if level3 is not None:
+            threshold_text += f"；超出3级：> {self._format_result_number(level3)} kW·h/t"
+        comparison_step = next(
+            (step for step in reversed(item.calculation_trace) if step.operation == "grade_comparison"),
+            None,
+        )
+        raw_value_line = f"原始计算值（未修约）：{self._format_explanation_number(actual)} kW·h/t"
+        comparison_line = (
+            f"判级比较：{comparison_step.expression}；结果：{grade_label}"
+            if comparison_step is not None
+            else f"判级比较：计算值和阈值分别 ROUND(..., 6) 后比较；正式结果：{grade_label}"
+        )
+        current_grade_line = (
+            f"{raw_value_line}\n{comparison_line}\n"
+            "判级时将计算值和阈值分别 ROUND(..., 6) 后比较；显示位数不参与判级。"
+        )
+        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
+        self.gb29446_explanation.setText(
+            "\n".join(
+                (
+                    e0_line,
+                    factor_line,
+                    formula_line,
+                    f"{coal_type}分级阈值：{threshold_text}",
+                    current_grade_line,
+                )
+            )
+        )
+
     def refresh_records(self) -> None:
         self.record_table.setRowCount(0)
         for record in self.context.application.list_recent_evaluations(200):
@@ -1119,12 +1637,47 @@ class MainWindow(QMainWindow):
         self.eval_organization.setText(request.organization_name or "")
         self.eval_project.setText(request.project_name or "")
         self.eval_notes.setText(request.notes or "")
+        if request.standard_id == "gb-29446-2019":
+            coal_index = self.gb29446_coal_type.findData(request.product_id)
+            if coal_index >= 0:
+                self.gb29446_coal_type.setCurrentIndex(coal_index)
+            self.gb29446_organization.setText(request.organization_name or "")
+            period, custom_period, note = self._decode_gb29446_notes(request.notes)
+            period_index = self.gb29446_period.findData(period)
+            if period_index >= 0:
+                self.gb29446_period.setCurrentIndex(period_index)
+            self.gb29446_custom_period.setText(custom_period)
+            self.gb29446_custom_period.setVisible(period == "自定义")
+            self.gb29446_notes.setText(note)
+            supplied_process = request.inputs.get("washing_process")
+            if supplied_process is not None:
+                process_index = self.gb29446_process.findData(str(supplied_process.value))
+                if process_index >= 0:
+                    self.gb29446_process.setCurrentIndex(process_index)
+            supplied_electricity = request.inputs.get("electricity_consumption")
+            self.gb29446_electricity.setText(
+                str(supplied_electricity.value) if supplied_electricity is not None else ""
+            )
+            supplied_raw_coal = request.inputs.get("raw_coal_input")
+            self.gb29446_raw_coal.setText(
+                str(supplied_raw_coal.value) if supplied_raw_coal is not None else ""
+            )
         self._refresh_input_table()
         input_rows = {self.eval_inputs.item(row, 0).text(): row for row in range(self.eval_inputs.rowCount())}
         for key, value in request.inputs.items():
             row = input_rows.get(key)
             if row is not None:
-                self.eval_inputs.item(row, 2).setText(str(value.value))
+                selector = self.eval_inputs.cellWidget(row, 2)
+                if isinstance(selector, QComboBox):
+                    text_value = (
+                        "是" if value.value is True else "否" if value.value is False
+                        else str(value.value)
+                    )
+                    index = selector.findData(text_value)
+                    if index >= 0:
+                        selector.setCurrentIndex(index)
+                else:
+                    self.eval_inputs.item(row, 2).setText(str(value.value))
                 self.eval_inputs.item(row, 3).setText(value.unit or "")
         self.energy_table.setRowCount(0)
         for line in request.energy_lines:
