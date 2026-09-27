@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "standard": {
+    "id": "gb-29446-2019",
+    "number": "GB 29446-2019",
+    "canonical_source": "data/definitions/gb-29446-2019.json",
+    "development_mirror": "standards/development/scope-63/definitions/gb-29446-2019.json",
+    "normative_source": "28.GB 29446-2019选煤电力消耗限额.pdf",
+    "normative_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+    "formula": "e_d = E_d × k / m",
+    "source_references": [
+      {
+        "page": 3,
+        "clause": "3.1",
+        "table": "表1"
+      },
+      {
+        "page": 3,
+        "clause": "3.2",
+        "table": "表2"
+      },
+      {
+        "page": 4,
+        "clause": "5.2",
+        "table": "式（1）"
+      },
+      {
+        "page": 5,
+        "clause": "附录A",
+        "table": "表A.1"
+      }
+    ],
+    "forbidden_rule_keys": [
+      "enterprise_status",
+      "single_coal_single_process",
+      "compliance_rule",
+      "direct_input_key",
+      "actual.coking-coal",
+      "actual.power-coal"
+    ]
+  },
+  "classification_cases": [
+    {
+      "coal_type": "炼焦煤",
+      "process": "跳汰",
+      "k": "1.26"
+    },
+    {
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "k": "1.00"
+    },
+    {
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "k": "1.12"
+    },
+    {
+      "coal_type": "炼焦煤",
+      "process": "重介、浮选联合",
+      "k": "0.83"
+    },
+    {
+      "coal_type": "炼焦煤",
+      "process": "重介、跳汰、浮选联合",
+      "k": "0.78"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "干法选煤",
+      "k": "1.04"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "跳汰",
+      "k": "0.94"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "k": "0.80"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "跳汰、重介联合",
+      "k": "0.85"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "重介",
+      "k": "0.89"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "重介、浮选联合",
+      "k": "0.76"
+    },
+    {
+      "coal_type": "动力煤",
+      "process": "重介、跳汰、浮选联合",
+      "k": "0.72"
+    }
+  ],
+  "limits": [
+    {
+      "coal_type": "炼焦煤",
+      "level_1": "5.0",
+      "level_2": "7.0",
+      "level_3": "8.5"
+    },
+    {
+      "coal_type": "动力煤",
+      "level_1": "2.0",
+      "level_2": "3.0",
+      "level_3": "4.5"
+    }
+  ],
+  "normal_cases": [
+    {
+      "id": "coking-level-1",
+      "input": {
+        "coal_type": "炼焦煤",
+        "process": "跳汰、浮选联合",
+        "electricity": "4.2",
+        "raw_coal": "1"
+      },
+      "expected": {
+        "k": "1.00",
+        "unadjusted": "4.2",
+        "actual": "4.2",
+        "grade": "LEVEL_1"
+      }
+    },
+    {
+      "id": "coking-level-2",
+      "input": {
+        "coal_type": "炼焦煤",
+        "process": "重介",
+        "electricity": "560",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "1.12",
+        "unadjusted": "5.6",
+        "actual": "6.272",
+        "grade": "LEVEL_2"
+      }
+    },
+    {
+      "id": "coking-level-3",
+      "input": {
+        "coal_type": "炼焦煤",
+        "process": "重介、浮选联合",
+        "electricity": "975",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "0.83",
+        "unadjusted": "9.75",
+        "actual": "8.0925",
+        "grade": "LEVEL_3"
+      }
+    },
+    {
+      "id": "coking-not-qualified",
+      "input": {
+        "coal_type": "炼焦煤",
+        "process": "重介",
+        "electricity": "1000",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "1.12",
+        "unadjusted": "10",
+        "actual": "11.2",
+        "grade": "NOT_QUALIFIED"
+      }
+    },
+    {
+      "id": "thermal-level-1",
+      "input": {
+        "coal_type": "动力煤",
+        "process": "跳汰、浮选联合",
+        "electricity": "1.5",
+        "raw_coal": "1"
+      },
+      "expected": {
+        "k": "0.80",
+        "unadjusted": "1.5",
+        "actual": "1.2",
+        "grade": "LEVEL_1"
+      }
+    },
+    {
+      "id": "thermal-level-2",
+      "input": {
+        "coal_type": "动力煤",
+        "process": "重介",
+        "electricity": "280",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "0.89",
+        "unadjusted": "2.8",
+        "actual": "2.492",
+        "grade": "LEVEL_2"
+      }
+    },
+    {
+      "id": "thermal-level-3",
+      "input": {
+        "coal_type": "动力煤",
+        "process": "干法选煤",
+        "electricity": "400",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "1.04",
+        "unadjusted": "4",
+        "actual": "4.16",
+        "grade": "LEVEL_3"
+      }
+    },
+    {
+      "id": "thermal-not-qualified",
+      "input": {
+        "coal_type": "动力煤",
+        "process": "干法选煤",
+        "electricity": "500",
+        "raw_coal": "100"
+      },
+      "expected": {
+        "k": "1.04",
+        "unadjusted": "5",
+        "actual": "5.2",
+        "grade": "NOT_QUALIFIED"
+      }
+    }
+  ],
+  "formula_cases": [
+    {
+      "id": "long-decimal-formula",
+      "input": {
+        "coal_type": "炼焦煤",
+        "process": "重介",
+        "electricity": "1",
+        "raw_coal": "3"
+      },
+      "expected": {
+        "k": "1.12",
+        "unadjusted": "0.3333333333333333333333333333",
+        "actual": "0.3733333333333333333333333333",
+        "grade": "LEVEL_1"
+      }
+    }
+  ],
+  "boundary_cases": [
+    {
+      "id": "coking-equals-level-1",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "5.0",
+      "raw_coal": "1",
+      "expected_actual": "5.0",
+      "expected_grade": "LEVEL_1"
+    },
+    {
+      "id": "coking-just-over-level-1",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "5.0001",
+      "raw_coal": "1",
+      "expected_actual": "5.0001",
+      "expected_grade": "LEVEL_2"
+    },
+    {
+      "id": "coking-equals-level-2",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "7.0",
+      "raw_coal": "1",
+      "expected_actual": "7.0",
+      "expected_grade": "LEVEL_2"
+    },
+    {
+      "id": "coking-just-over-level-2",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "7.0001",
+      "raw_coal": "1",
+      "expected_actual": "7.0001",
+      "expected_grade": "LEVEL_3"
+    },
+    {
+      "id": "coking-equals-level-3",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "8.5",
+      "raw_coal": "1",
+      "expected_actual": "8.5",
+      "expected_grade": "LEVEL_3"
+    },
+    {
+      "id": "coking-just-over-level-3",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "8.5001",
+      "raw_coal": "1",
+      "expected_actual": "8.5001",
+      "expected_grade": "NOT_QUALIFIED"
+    },
+    {
+      "id": "thermal-equals-level-1",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "2.5",
+      "raw_coal": "1",
+      "expected_actual": "2.0",
+      "expected_grade": "LEVEL_1"
+    },
+    {
+      "id": "thermal-just-over-level-1",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "2.500125",
+      "raw_coal": "1",
+      "expected_actual": "2.000100",
+      "expected_grade": "LEVEL_2"
+    },
+    {
+      "id": "thermal-equals-level-2",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "3.75",
+      "raw_coal": "1",
+      "expected_actual": "3.00",
+      "expected_grade": "LEVEL_2"
+    },
+    {
+      "id": "thermal-just-over-level-2",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "3.750125",
+      "raw_coal": "1",
+      "expected_actual": "3.000100",
+      "expected_grade": "LEVEL_3"
+    },
+    {
+      "id": "thermal-equals-level-3",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "5.625",
+      "raw_coal": "1",
+      "expected_actual": "4.500",
+      "expected_grade": "LEVEL_3"
+    },
+    {
+      "id": "thermal-just-over-level-3",
+      "coal_type": "动力煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "5.625125",
+      "raw_coal": "1",
+      "expected_actual": "4.500100",
+      "expected_grade": "NOT_QUALIFIED"
+    }
+  ],
+  "round6_cases": [
+    {
+      "id": "level-1-plus-sixth-place-4",
+      "electricity": "5.0000004",
+      "expected_grade": "LEVEL_1"
+    },
+    {
+      "id": "level-1-plus-sixth-place-5",
+      "electricity": "5.0000005",
+      "expected_grade": "LEVEL_2"
+    },
+    {
+      "id": "level-3-plus-sixth-place-4",
+      "electricity": "8.5000004",
+      "expected_grade": "LEVEL_3"
+    },
+    {
+      "id": "level-3-plus-sixth-place-5",
+      "electricity": "8.5000005",
+      "expected_grade": "NOT_QUALIFIED"
+    }
+  ],
+  "anomaly_cases": [
+    {
+      "id": "missing-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": null,
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "缺少输入"
+    },
+    {
+      "id": "missing-raw-coal",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "100",
+      "raw_coal": null,
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "缺少输入"
+    },
+    {
+      "id": "zero-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "0",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "必须大于 0"
+    },
+    {
+      "id": "zero-raw-coal",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "100",
+      "raw_coal": "0",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "必须大于 0"
+    },
+    {
+      "id": "negative-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "-1",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "必须大于 0"
+    },
+    {
+      "id": "negative-raw-coal",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "100",
+      "raw_coal": "-1",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "必须大于 0"
+    },
+    {
+      "id": "nonnumeric-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "不是数字",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE"
+    },
+    {
+      "id": "nonnumeric-raw-coal",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "100",
+      "raw_coal": "不是数字",
+      "expected_grade": "INCOMPLETE"
+    },
+    {
+      "id": "missing-process",
+      "coal_type": "炼焦煤",
+      "process": null,
+      "electricity": "100",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE"
+    },
+    {
+      "id": "coal-process-mismatch",
+      "coal_type": "炼焦煤",
+      "process": "干法选煤",
+      "electricity": "100",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE"
+    },
+    {
+      "id": "appendix-a-external-process",
+      "coal_type": "炼焦煤",
+      "process": "附录A外工艺（需人工确认）",
+      "electricity": "100",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE"
+    },
+    {
+      "id": "extremely-large-electricity",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "1E+100",
+      "raw_coal": "1",
+      "expected_grade": "NOT_QUALIFIED"
+    },
+    {
+      "id": "extremely-small-positive-denominator",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "1",
+      "raw_coal": "1E-100",
+      "expected_grade": "NOT_QUALIFIED"
+    },
+    {
+      "id": "not-a-number-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "不是数字",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "不是有效数值"
+    },
+    {
+      "id": "not-a-number-raw-coal",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "100",
+      "raw_coal": "不是数字",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "不是有效数值"
+    },
+    {
+      "id": "nan-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "NaN",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "有限数值"
+    },
+    {
+      "id": "infinite-electricity",
+      "coal_type": "炼焦煤",
+      "process": "重介",
+      "electricity": "Infinity",
+      "raw_coal": "100",
+      "expected_grade": "INCOMPLETE",
+      "warning_contains": "有限数值"
+    },
+    {
+      "id": "tiny-positive-electricity",
+      "coal_type": "炼焦煤",
+      "process": "跳汰、浮选联合",
+      "electricity": "1E-100",
+      "raw_coal": "100",
+      "expected_grade": "LEVEL_1"
+    }
+  ],
+  "ui_contract": {
+    "required_labels": [
+      "企业名称（可选）",
+      "核算周期",
+      "煤种",
+      "选煤工艺",
+      "统计期选煤电力消耗量 E_d（kW·h）",
+      "统计期入选原煤量 m（t）",
+      "折算系数 k（自动匹配，只读）",
+      "备注"
+    ],
+    "period_options": [
+      "全年",
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月",
+      "自定义"
+    ],
+    "forbidden_labels": [
+      "企业建设属性",
+      "是否为单一煤种",
+      "单一煤种",
+      "录入明细",
+      "企业合规",
+      "enterprise_status",
+      "single_coal_single_process",
+      "直接录入",
+      "直接口径",
+      "actual.coking-coal",
+      "actual.power-coal",
+      "direct_input_key"
+    ],
+    "selection_errors": {
+      "missing_coal": "请选择煤种。",
+      "missing_process": "请选择选煤工艺。"
+    },
+    "formal_input_keys": [
+      "washing_process",
+      "electricity_consumption",
+      "raw_coal_input"
+    ]
+  }
+}

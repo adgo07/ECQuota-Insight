@@ -310,7 +310,13 @@ class StandardPackageBuilder:
             definition_keys.add(definition_key)
             revision_suffix = "" if definition.rule_revision == 1 else f"-r{definition.rule_revision}"
             path = f"definitions/{definition.id}-{definition.version}{revision_suffix}.json"
-            data = _canonical_json(definition.model_dump(mode="json"))
+            definition_payload = definition.model_dump(mode="json")
+            for product_payload in definition_payload.get("products", []):
+                for indicator_payload in product_payload.get("indicators", []):
+                    for optional_legacy_key in ("direct_input_key", "compliance_rule"):
+                        if indicator_payload.get(optional_legacy_key) is None:
+                            indicator_payload.pop(optional_legacy_key, None)
+            data = _canonical_json(definition_payload)
             entries[path] = data
             rule_count += sum(len(product.indicators) for product in definition.products)
             source = source_files.get(definition.source_file)

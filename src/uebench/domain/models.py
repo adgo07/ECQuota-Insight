@@ -326,7 +326,7 @@ class IndicatorDefinition(StrictModel):
     comparison: ComparisonDirection = ComparisonDirection.LTE
     input_definitions: list[InputDefinition] = Field(default_factory=list)
     applicability: Condition = Field(default_factory=Condition)
-    direct_input_key: str
+    direct_input_key: str | None = None
     detail_formula: Expression | None = None
     base_thresholds: ThresholdSet | None = None
     thresholds: ThresholdSet

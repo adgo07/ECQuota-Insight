@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, localcontext
 from typing import Any
 from uuid import uuid4
 
@@ -31,7 +31,10 @@ _THRESHOLD_COMPARISON_QUANTUM = Decimal("0.000001")
 
 def _round_threshold_value(value: Decimal) -> Decimal:
     """Match Excel ROUND(value, 6) for numeric threshold comparisons."""
-    return value.quantize(_THRESHOLD_COMPARISON_QUANTUM, rounding=ROUND_HALF_UP)
+    integer_digits = max(value.adjusted() + 1, 1) if value else 1
+    with localcontext() as context:
+        context.prec = max(context.prec, integer_digits + 8)
+        return value.quantize(_THRESHOLD_COMPARISON_QUANTUM, rounding=ROUND_HALF_UP)
 
 
 def _format_comparison_operand(value: Decimal) -> str:
@@ -399,7 +402,12 @@ class EvaluationEngine:
                 )
             value: Scalar
             if definition.data_type is DataType.DECIMAL:
-                value = parse_decimal(supplied.value, field_name=definition.label)
+                try:
+                    value = parse_decimal(supplied.value, field_name=definition.label)
+                except (TypeError, ValueError) as exc:
+                    raise EvaluationValidationError(f"{definition.label} 不是有效数值") from exc
+                if not value.is_finite():
+                    raise EvaluationValidationError(f"{definition.label} 必须为有限数值")
                 if request.standard_id == "gb-29446-2019" and definition.key in {
                     "electricity_consumption",
                     "raw_coal_input",
@@ -761,7 +769,7 @@ class EvaluationEngine:
                 trace.append(
                     CalculationStep(
                         sequence=len(trace) + 1,
-                        label="超出3级限值比较",
+                        label="未达标限值比较",
                         operation="grade_comparison",
                         expression=(
                             f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"

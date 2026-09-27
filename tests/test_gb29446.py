@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import zipfile
 from datetime import date
 from decimal import Decimal
@@ -23,29 +24,23 @@ from uebench.infrastructure.packages import PackageManifest, StandardPackageBuil
 
 STANDARD_PATH = Path(__file__).parents[1] / "data" / "definitions" / "gb-29446-2019.json"
 OUTSIDE_PROCESS = "附录A外工艺（需人工确认）"
-PROCESSES = {
-    "炼焦煤": {
-        "跳汰": "1.26",
-        "跳汰、浮选联合": "1.00",
-        "重介": "1.12",
-        "重介、浮选联合": "0.83",
-        "重介、跳汰、浮选联合": "0.78",
-    },
-    "动力煤": {
-        "干法选煤": "1.04",
-        "跳汰": "0.94",
-        "跳汰、浮选联合": "0.80",
-        "跳汰、重介联合": "0.85",
-        "重介": "0.89",
-        "重介、浮选联合": "0.76",
-        "重介、跳汰、浮选联合": "0.72",
-    },
-}
+GOLDEN_PATH = Path(__file__).parent / "fixtures" / "gb29446_golden_cases.json"
+GOLDEN = json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))
+PROCESSES = {}
+for _case in GOLDEN["classification_cases"]:
+    PROCESSES.setdefault(_case["coal_type"], {})[_case["process"]] = _case["k"]
 THRESHOLDS = {
-    "炼焦煤": [("5.0", Grade.LEVEL_1), ("5.0001", Grade.LEVEL_2), ("7.0", Grade.LEVEL_2), ("7.0001", Grade.LEVEL_3), ("8.5", Grade.LEVEL_3), ("8.5001", Grade.NOT_QUALIFIED)],
-    "动力煤": [("2.0", Grade.LEVEL_1), ("2.0001", Grade.LEVEL_2), ("3.0", Grade.LEVEL_2), ("3.0001", Grade.LEVEL_3), ("4.5", Grade.LEVEL_3), ("4.5001", Grade.NOT_QUALIFIED)],
+    item["coal_type"]: [
+        (item["level_1"], Grade.LEVEL_1),
+        (str(Decimal(item["level_1"]) + Decimal("0.0001")), Grade.LEVEL_2),
+        (item["level_2"], Grade.LEVEL_2),
+        (str(Decimal(item["level_2"]) + Decimal("0.0001")), Grade.LEVEL_3),
+        (item["level_3"], Grade.LEVEL_3),
+        (str(Decimal(item["level_3"]) + Decimal("0.0001")), Grade.NOT_QUALIFIED),
+    ]
+    for item in GOLDEN["limits"]
 }
-
+_DEFAULT_PROCESS = object()
 
 @pytest.fixture(scope="module")
 def standard() -> StandardDefinition:
@@ -60,31 +55,27 @@ def _request(
     standard: StandardDefinition,
     coal_type: str,
     *,
-    process: str | None = None,
-    mode: InputMode = InputMode.DETAIL,
-    actual: str | None = None,
+    process: str | None | object = _DEFAULT_PROCESS,
     electricity: str | None = "100",
     raw_coal: str | None = "100",
     electricity_unit: str = "kW·h",
     raw_coal_unit: str = "t",
-    actual_unit: str = "kW·h/t",
 ) -> EvaluationRequest:
     product = _product(standard, coal_type)
-    process = process or next(iter(PROCESSES[coal_type]))
-    inputs = {"washing_process": InputValue(value=process)}
-    if mode is InputMode.DIRECT:
-        if actual is not None:
-            inputs[product.indicators[0].direct_input_key] = InputValue(value=actual, unit=actual_unit)
-    else:
-        if electricity is not None:
-            inputs["electricity_consumption"] = InputValue(value=electricity, unit=electricity_unit)
-        if raw_coal is not None:
-            inputs["raw_coal_input"] = InputValue(value=raw_coal, unit=raw_coal_unit)
+    if process is _DEFAULT_PROCESS:
+        process = next(iter(PROCESSES[coal_type]))
+    inputs = {}
+    if process is not None:
+        inputs["washing_process"] = InputValue(value=process)
+    if electricity is not None:
+        inputs["electricity_consumption"] = InputValue(value=electricity, unit=electricity_unit)
+    if raw_coal is not None:
+        inputs["raw_coal_input"] = InputValue(value=raw_coal, unit=raw_coal_unit)
     return EvaluationRequest(
         evaluation_date=max(standard.effective_date, date(2026, 9, 26)),
         standard_id=standard.id,
         product_id=product.id,
-        input_mode=mode,
+        input_mode=InputMode.DETAIL,
         inputs=inputs,
     )
 
@@ -92,9 +83,8 @@ def _request(
 @pytest.mark.parametrize(
     ("coal_type", "process", "expected_factor"),
     [
-        (coal, process, factor)
-        for coal, processes in PROCESSES.items()
-        for process, factor in processes.items()
+        (case["coal_type"], case["process"], case["k"])
+        for case in GOLDEN["classification_cases"]
     ],
 )
 def test_appendix_a_has_all_twelve_exact_factors(standard, coal_type, process, expected_factor):
@@ -119,37 +109,41 @@ def test_unadjusted_e0_is_explanatory_and_grade_uses_adjusted_ed(standard):
     assert result.grade is Grade.LEVEL_2
 
 
-@pytest.mark.parametrize("enterprise", [None, "现有", "新建", "改扩建", "其他"])
-def test_enterprise_status_never_affects_gb29446_level_or_result(standard, enterprise):
-    request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual="8.0")
-    if enterprise is not None:
-        request.inputs["enterprise_status"] = InputValue(value=enterprise)
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is Grade.LEVEL_3
-    assert result.compliance_requirement is None
-    assert result.compliance_limit is None
-    assert result.compliance_result is None
-    assert not any("企业建设属性" in warning for warning in result.warnings)
-
-
 @pytest.mark.parametrize(("coal_type", "actual", "expected"), [(coal, actual, grade) for coal, values in THRESHOLDS.items() for actual, grade in values])
 def test_each_coal_grade_boundaries_include_threshold_and_values_on_both_sides(standard, coal_type, actual, expected):
-    request = _request(standard, coal_type, mode=InputMode.DIRECT, actual=actual)
-    assert EvaluationEngine().evaluate(standard, request).results[0].grade is expected
+    process, factor = next(iter(PROCESSES[coal_type].items()))
+    actual_value = Decimal(actual)
+    factor_value = Decimal(factor)
+    request = _request(
+        standard,
+        coal_type,
+        process=process,
+        electricity=str(actual_value * Decimal("100")),
+        raw_coal=str(factor_value * Decimal("100")),
+    )
+    result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == actual_value
+    assert result.grade is expected
 
 
 @pytest.mark.parametrize(
     ("actual", "expected"),
     [
-        ("5.0000004", Grade.LEVEL_1),
-        ("5.0000005", Grade.LEVEL_2),
-        ("8.5000004", Grade.LEVEL_3),
-        ("8.5000005", Grade.NOT_QUALIFIED),
+        (case["electricity"], Grade[case["expected_grade"]])
+        for case in GOLDEN["round6_cases"]
     ],
 )
 def test_gb29446_grade_threshold_comparisons_round_both_values_to_six_places(standard, actual, expected):
-    request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual=actual)
+    actual_value = Decimal(actual)
+    request = _request(
+        standard,
+        "炼焦煤",
+        process="跳汰、浮选联合",
+        electricity=str(actual_value * Decimal("100")),
+        raw_coal="100",
+    )
     result = EvaluationEngine().evaluate(standard, request).results[0]
+    assert result.actual_value == actual_value
     assert result.grade is expected
 
 
@@ -175,46 +169,6 @@ def test_detail_formula_grade_trace_shows_six_place_comparison(standard, electri
     assert rounded_comparison in comparison_step.expression
 
 
-def test_missing_or_false_single_coal_flag_does_not_block_grade(standard):
-    request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual="9")
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is Grade.NOT_QUALIFIED
-    assert result.actual_value == Decimal("9")
-    assert result.compliance_requirement is None
-    assert result.compliance_limit is None
-    assert result.compliance_result is None
-    assert result.warnings == []
-
-    request.inputs["single_coal_single_process"] = InputValue(value=False)
-    result_with_legacy_flag = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result_with_legacy_flag.grade is result.grade
-    assert result_with_legacy_flag.warnings == []
-
-    request.inputs["single_coal_single_process"] = InputValue(value="无效旧值")
-    result_with_invalid_legacy_flag = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result_with_invalid_legacy_flag.grade is result.grade
-    assert result_with_invalid_legacy_flag.warnings == []
-
-
-@pytest.mark.parametrize("coal_type,process,factor", [(coal, "重介", PROCESSES[coal]["重介"]) for coal in PROCESSES])
-def test_direct_and_detail_inputs_agree_on_grade_and_compliance(standard, coal_type, process, factor):
-    detail = _request(
-        standard,
-        coal_type,
-        process=process,
-        electricity=str(Decimal("7.0") * Decimal("100") / Decimal(factor)),
-        raw_coal="100",
-    )
-    direct = _request(standard, coal_type, process=process, mode=InputMode.DIRECT, actual="7.0")
-    detail_result = EvaluationEngine().evaluate(standard, detail).results[0]
-    direct_result = EvaluationEngine().evaluate(standard, direct).results[0]
-    assert detail_result.actual_value == direct_result.actual_value == Decimal("7.0")
-    assert detail_result.grade is direct_result.grade
-    assert detail_result.compliance_result is direct_result.compliance_result is None
-    assert detail_result.display_values["unadjusted_power_consumption"] == Decimal("7.0") / Decimal(factor)
-    assert direct_result.display_values["unadjusted_power_consumption"] == Decimal("7.0") / Decimal(factor)
-
-
 @pytest.mark.parametrize(
     ("changes", "warning"),
     [
@@ -235,15 +189,6 @@ def test_invalid_detail_inputs_are_incomplete(standard, changes, warning):
     assert any(warning in item for item in result.warnings)
 
 
-@pytest.mark.parametrize("coal_type", ["炼焦煤", "动力煤"])
-def test_direct_zero_power_consumption_is_incomplete(standard, coal_type):
-    request = _request(standard, coal_type, mode=InputMode.DIRECT, actual="0")
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is Grade.INCOMPLETE
-    assert result.actual_value is None
-    assert "必须大于 0" in result.warnings[0]
-
-
 @pytest.mark.parametrize(
     ("changes", "label", "internal_key"),
     [
@@ -257,18 +202,6 @@ def test_missing_detail_warnings_use_chinese_rule_labels(standard, changes, labe
     assert result.grade is Grade.INCOMPLETE
     assert label in result.warnings[0]
     assert internal_key not in result.warnings[0]
-
-
-def test_direct_wrong_unit_and_missing_value_are_incomplete(standard):
-    request = _request(standard, "动力煤", mode=InputMode.DIRECT, actual="1", actual_unit="kWh/t")
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is Grade.INCOMPLETE
-    assert "单位应为 kW·h/t" in result.warnings[0]
-
-    request = _request(standard, "动力煤", mode=InputMode.DIRECT, actual=None)
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is Grade.INCOMPLETE
-    assert "缺少输入" in result.warnings[0]
 
 
 def test_process_mismatch_and_appendix_external_process_require_manual_review(standard):
@@ -285,7 +218,7 @@ def test_process_mismatch_and_appendix_external_process_require_manual_review(st
 
 
 def test_explicit_multiple_coal_input_is_rejected(standard):
-    request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual="5")
+    request = _request(standard, "炼焦煤", electricity="500", raw_coal="100")
     request.inputs["coal_type"] = InputValue(value="炼焦煤、动力煤")
     result = EvaluationEngine().evaluate(standard, request).results[0]
     assert result.grade is Grade.INCOMPLETE
@@ -350,11 +283,191 @@ def test_gb29446_definition_round_trips_through_signed_package_builder(tmp_path:
     )
     with zipfile.ZipFile(output) as package:
         manifest = PackageManifest.model_validate_json(package.read("manifest.json"))
-        packaged_definition = StandardDefinition.model_validate_json(
-            package.read("definitions/gb-29446-2019-2019-r2.json")
-        )
+        packaged_definition_data = json.loads(package.read("definitions/gb-29446-2019-2019-r2.json"))
+        packaged_definition = StandardDefinition.model_validate(packaged_definition_data)
+    packaged_indicator_data = packaged_definition_data["products"][0]["indicators"][0]
+    assert "direct_input_key" not in packaged_indicator_data
+    assert "compliance_rule" not in packaged_indicator_data
     assert manifest.standard_count == 1
     assert manifest.rule_count == 2
     assert packaged_definition.rule_revision == 2
-    assert packaged_definition.products[0].indicators[0].compliance_rule is not None
+    assert packaged_definition.products[0].indicators[0].compliance_rule is None
     assert packaged_definition.products[0].indicators[0].display_calculations
+
+
+def test_golden_standard_data_is_complete_canonical_and_source_bound():
+    for group_name in ("normal_cases", "formula_cases", "boundary_cases", "round6_cases", "anomaly_cases"):
+        case_ids = [case["id"] for case in GOLDEN[group_name]]
+        assert len(case_ids) == len(set(case_ids)), f"duplicate case id in {group_name}"
+    factor_keys = [(case["coal_type"], case["process"]) for case in GOLDEN["classification_cases"]]
+    assert len(factor_keys) == len(set(factor_keys))
+    canonical_bytes = STANDARD_PATH.read_bytes()
+    mirror_path = Path(__file__).parents[1] / GOLDEN["standard"]["development_mirror"]
+    assert canonical_bytes == mirror_path.read_bytes()
+
+    payload = json.loads(canonical_bytes)
+    standard = StandardDefinition.model_validate(payload)
+    assert standard.id == GOLDEN["standard"]["id"]
+    assert standard.number == GOLDEN["standard"]["number"]
+    assert standard.source_sha256 == GOLDEN["standard"]["normative_sha256"]
+    coal_types = {product.selection_values["coal_type"] for product in standard.products}
+    assert coal_types == {item["coal_type"] for item in GOLDEN["limits"]}
+    assert set(PROCESSES) == coal_types
+    for product in standard.products:
+        indicator = product.indicators[0]
+        assert indicator.thresholds.level_1.value == next(x["level_1"] for x in GOLDEN["limits"] if x["coal_type"] == product.selection_values["coal_type"])
+        assert indicator.thresholds.level_2.value == next(x["level_2"] for x in GOLDEN["limits"] if x["coal_type"] == product.selection_values["coal_type"])
+        assert indicator.thresholds.level_3.value == next(x["level_3"] for x in GOLDEN["limits"] if x["coal_type"] == product.selection_values["coal_type"])
+        actual_factors = _ui_factor_map(product)
+        assert actual_factors == {
+            case["process"]: Decimal(case["k"])
+            for case in GOLDEN["classification_cases"]
+            if case["coal_type"] == product.selection_values["coal_type"]
+        }
+        references = {(ref.page, ref.clause, ref.table) for ref in indicator.source_references}
+        assert any(page == 4 and table == "式（1）" for page, _clause, table in references)
+        assert any(page == 5 and table == "表A.1" for page, _clause, table in references)
+        assert indicator.compliance_rule is None
+    all_references = {
+        (reference.page, reference.clause, reference.table)
+        for product in standard.products
+        for indicator in product.indicators
+        for reference in indicator.source_references
+    }
+    for reference in GOLDEN["standard"]["source_references"]:
+        assert any(
+            page == reference["page"] and table == reference["table"]
+            for page, _clause, table in all_references
+        )
+    encoded = canonical_bytes.decode("utf-8")
+    for key in GOLDEN["standard"]["forbidden_rule_keys"]:
+        assert key not in encoded
+
+
+
+def test_golden_contract_uses_only_the_standard_formula_and_engine_grade():
+    payload = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
+    expected_inputs = set(GOLDEN["ui_contract"]["formal_input_keys"])
+    for product in payload["products"]:
+        product_inputs = product["input_definitions"]
+        indicator = product["indicators"][0]
+        assert {item["key"] for item in product_inputs + indicator["input_definitions"]} == expected_inputs
+        assert all(item["modes"] == ["DETAIL"] for item in product_inputs + indicator["input_definitions"])
+        assert "direct_input_key" not in indicator
+        assert all(item["modes"] == ["DETAIL"] for item in indicator["display_calculations"])
+        assert {item["key"] for item in indicator["display_calculations"]} == {
+            "process_factor",
+            "unadjusted_power_consumption",
+            "electricity_consumption",
+            "raw_coal_input",
+        }
+
+    from inspect import getsource
+    from uebench.ui.main_window import MainWindow
+
+    collect_source = getsource(MainWindow._collect_gb29446_request)
+    calculate_source = getsource(MainWindow.calculate_evaluation)
+    display_source = getsource(MainWindow._show_gb29446_result)
+    assert "InputMode.DETAIL" in collect_source
+    assert "InputMode.DIRECT" not in collect_source
+    assert "self.context.application.evaluate(request)" in calculate_source
+    assert "self._show_gb29446_result(request, result)" in calculate_source
+    assert "Grade." not in display_source
+    assert "EvaluationEngine" not in display_source
+    assert "comparison_step.expression" in display_source
+
+
+def _ui_factor_map(product):
+    # Keep the UI selector contract tied to the display lookup in canonical rule data.
+    from uebench.ui.main_window import MainWindow
+    return MainWindow._gb29446_factor_map(product)
+
+
+@pytest.mark.parametrize(
+    "case",
+    GOLDEN["normal_cases"],
+    ids=[case["id"] for case in GOLDEN["normal_cases"]],
+)
+def test_golden_normal_cases_match_engine(case, standard):
+    inputs = case["input"]
+    result = EvaluationEngine().evaluate(
+        standard,
+        _request(
+            standard,
+            inputs["coal_type"],
+            process=inputs["process"],
+            electricity=inputs["electricity"],
+            raw_coal=inputs["raw_coal"],
+        ),
+    ).results[0]
+    expected = case["expected"]
+    assert result.display_values["process_factor"] == Decimal(expected["k"])
+    assert result.display_values["unadjusted_power_consumption"] == Decimal(expected["unadjusted"])
+    assert result.actual_value == Decimal(expected["actual"])
+    assert result.grade is Grade[expected["grade"]]
+
+
+@pytest.mark.parametrize(
+    "case",
+    GOLDEN["formula_cases"],
+    ids=[case["id"] for case in GOLDEN["formula_cases"]],
+)
+def test_golden_formula_cases_preserve_decimal_calculation(case, standard):
+    inputs = case["input"]
+    result = EvaluationEngine().evaluate(
+        standard,
+        _request(
+            standard,
+            inputs["coal_type"],
+            process=inputs["process"],
+            electricity=inputs["electricity"],
+            raw_coal=inputs["raw_coal"],
+        ),
+    ).results[0]
+    assert result.display_values["process_factor"] == Decimal(case["expected"]["k"])
+    assert result.display_values["unadjusted_power_consumption"] == Decimal(case["expected"]["unadjusted"])
+    assert result.actual_value == Decimal(case["expected"]["actual"])
+    assert result.grade is Grade[case["expected"]["grade"]]
+
+
+@pytest.mark.parametrize(
+    "case",
+    GOLDEN["boundary_cases"],
+    ids=[case["id"] for case in GOLDEN["boundary_cases"]],
+)
+def test_golden_all_limit_equality_and_just_over_cases(case, standard):
+    result = EvaluationEngine().evaluate(
+        standard,
+        _request(
+            standard,
+            case["coal_type"],
+            process=case["process"],
+            electricity=case["electricity"],
+            raw_coal=case["raw_coal"],
+        ),
+    ).results[0]
+    assert result.actual_value == Decimal(case["expected_actual"])
+    assert result.grade is Grade[case["expected_grade"]]
+
+
+@pytest.mark.parametrize(
+    "case",
+    GOLDEN["anomaly_cases"],
+    ids=[case["id"] for case in GOLDEN["anomaly_cases"]],
+)
+def test_golden_invalid_and_extreme_inputs(case, standard):
+    process = case.get("process", _DEFAULT_PROCESS)
+    result = EvaluationEngine().evaluate(
+        standard,
+        _request(
+            standard,
+            case["coal_type"],
+            process=process,
+            electricity=case.get("electricity"),
+            raw_coal=case.get("raw_coal"),
+        ),
+    ).results[0]
+    assert result.grade is Grade[case["expected_grade"]]
+    warning = case.get("warning_contains")
+    if warning:
+        assert any(warning in item for item in result.warnings)

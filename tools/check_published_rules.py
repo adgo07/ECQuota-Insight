@@ -1,9 +1,8 @@
-"""Run a deterministic direct-entry smoke check for every published rule.
+"""Run deterministic input and threshold-boundary checks for published rules.
 
 This is an acceptance aid rather than a replacement for source-based boundary
-tests.  It fills declared inputs with conservative values, probes each rule at
-its first constant threshold when possible, and reports indicators that remain
-incomplete because their source-specific conditions need a real case.
+tests. It follows each rule's declared input mode and reports indicators that
+remain incomplete because their source-specific conditions need a real case.
 """
 
 from __future__ import annotations
@@ -29,10 +28,6 @@ from uebench.domain.models import (
 
 
 def _value(definition):
-    if definition.key == "single_coal_single_process":
-        # The GB 29446 sample uses this confirmation to distinguish a
-        # standard-defined single-process case from unsupported mixed scopes.
-        return True
     if definition.data_type is DataType.BOOLEAN:
         return False
     if definition.data_type is DataType.TEXT:
@@ -42,13 +37,13 @@ def _value(definition):
     return Decimal("0")
 
 
-def _inputs(product, indicator):
+def _inputs(product, indicator, mode: InputMode):
     definitions = {item.key: item for item in product.input_definitions}
     definitions.update({item.key: item for item in indicator.input_definitions})
     return {
         key: InputValue(value=_value(item), unit=item.unit)
         for key, item in definitions.items()
-        if InputMode.DIRECT in item.modes
+        if mode in item.modes
     }
 
 
@@ -93,19 +88,39 @@ def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) 
         for product in standard.products:
             for indicator in product.indicators:
                 total += 1
-                inputs = _inputs(product, indicator)
+                is_detail_only = indicator.direct_input_key is None
+                mode = InputMode.DETAIL if is_detail_only else InputMode.DIRECT
+                inputs = _inputs(product, indicator, mode)
                 probe = _constant_value(indicator.thresholds.level_1)
                 if probe is None:
                     probe = Decimal("0")
-                direct_definition = _definition_for(product, indicator, indicator.direct_input_key)
-                if direct_definition is not None and direct_definition.minimum is not None:
-                    probe = max(probe, direct_definition.minimum)
-                inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
+                value_definition = None
+                input_key = indicator.direct_input_key
+                input_unit = indicator.unit
+                if is_detail_only:
+                    input_key = "electricity_consumption"
+                    value_definition = _definition_for(product, indicator, input_key)
+                    if value_definition is None:
+                        raise ValueError(f"缺少明细电力输入定义：{standard.number}/{indicator.id}")
+                    input_unit = value_definition.unit
+                    for required_key in ("electricity_consumption", "raw_coal_input"):
+                        definition = _definition_for(product, indicator, required_key)
+                        if definition is None:
+                            raise ValueError(f"缺少明细输入定义：{standard.number}/{indicator.id}/{required_key}")
+                        value = _value(definition)
+                        if isinstance(value, (int, Decimal)) and Decimal(str(value)) <= 0:
+                            value = Decimal("1")
+                        inputs[required_key] = InputValue(value=value, unit=definition.unit)
+                else:
+                    value_definition = _definition_for(product, indicator, input_key)
+                    if value_definition is not None and value_definition.minimum is not None:
+                        probe = max(probe, value_definition.minimum)
+                    inputs[input_key] = InputValue(value=probe, unit=input_unit)
                 request = EvaluationRequest(
                     evaluation_date=max(standard.effective_date, date.today()),
                     standard_id=standard.id,
                     product_id=product.id,
-                    input_mode=InputMode.DIRECT,
+                    input_mode=mode,
                     inputs=inputs,
                 )
                 evaluated = engine.evaluate(standard, request)
@@ -133,12 +148,30 @@ def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) 
                     delta = Decimal("0.01")
                     probes.append(ordered[-1] + delta if indicator.comparison is ComparisonDirection.LTE else ordered[-1] - delta)
                     for probe in probes:
-                        if direct_definition is not None and direct_definition.minimum is not None and probe < direct_definition.minimum:
-                            continue
-                        if direct_definition is not None and direct_definition.maximum is not None and probe > direct_definition.maximum:
-                            continue
                         candidate = request.model_copy(deep=True)
-                        candidate.inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
+                        if is_detail_only:
+                            factor = result.display_values.get("process_factor")
+                            raw_coal = Decimal(str(candidate.inputs["raw_coal_input"].value))
+                            if factor is None:
+                                incomplete.append({
+                                    "standard": standard.number,
+                                    "product": product.id,
+                                    "indicator": indicator.id,
+                                    "warning": "缺少规则匹配的折算系数",
+                                })
+                                break
+                            input_value = probe * raw_coal / factor
+                            if value_definition.minimum is not None and input_value < value_definition.minimum:
+                                continue
+                            if value_definition.maximum is not None and input_value > value_definition.maximum:
+                                continue
+                            candidate.inputs[input_key] = InputValue(value=input_value, unit=input_unit)
+                        else:
+                            if value_definition is not None and value_definition.minimum is not None and probe < value_definition.minimum:
+                                continue
+                            if value_definition is not None and value_definition.maximum is not None and probe > value_definition.maximum:
+                                continue
+                            candidate.inputs[input_key] = InputValue(value=probe, unit=input_unit)
                         checked = next(
                             item for item in engine.evaluate(standard, candidate).results if item.indicator_id == indicator.id
                         )

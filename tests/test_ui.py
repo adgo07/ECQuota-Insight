@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -8,12 +9,13 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QLabel, QMessageBox
+from PySide6.QtWidgets import QApplication, QComboBox, QLabel, QLineEdit, QMessageBox
 
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
 from uebench.domain.models import (
     EvaluationRequest,
+    Grade,
     InputMode,
     InputValue,
     PackageHistoryEntry,
@@ -27,6 +29,8 @@ from .test_engine import make_standard
 
 
 GB29446_STANDARD_PATH = Path(__file__).parents[1] / "data" / "definitions" / "gb-29446-2019.json"
+GB29446_GOLDEN_PATH = Path(__file__).parent / "fixtures" / "gb29446_golden_cases.json"
+GB29446_GOLDEN = json.loads(GB29446_GOLDEN_PATH.read_text(encoding="utf-8"))
 
 
 def _gb29446_standard() -> StandardDefinition:
@@ -287,9 +291,9 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     monkeypatch.setattr(QMessageBox, "information", lambda *args, **kwargs: None)
 
     assert window.eval_standard.currentData() == standard.id
-    assert [window.gb29446_period.itemText(i) for i in range(window.gb29446_period.count())] == [
-        "全年", *(f"{month}月" for month in range(1, 13)), "自定义"
-    ]
+    assert [window.gb29446_period.itemText(i) for i in range(window.gb29446_period.count())] == (
+        GB29446_GOLDEN["ui_contract"]["period_options"]
+    )
     assert window.gb29446_period.currentData() == "全年"
     assert not window.gb29446_custom_period.isVisible()
     assert window.gb29446_factor.isReadOnly()
@@ -306,18 +310,28 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
         for widget in window.findChildren(QLabel)
         if widget.isVisible()
     )
-    for internal_label in (
-        "enterprise_status",
-        "single_coal_single_process",
-        "electricity_consumption",
-        "raw_coal_input",
-        "lookup",
-        "constant",
-        "运算轨迹",
-        "是否符合",
-        "执行要求",
-    ):
-        assert internal_label not in visible_text
+    form_label_text = " ".join(
+        widget.text()
+        for widget in window.gb29446_form_container.findChildren(QLabel)
+        if widget.isVisible()
+    )
+    for required_label in GB29446_GOLDEN["ui_contract"]["required_labels"]:
+        assert required_label in form_label_text
+    all_control_text = " ".join(
+        [
+            *(widget.text() for widget in window.findChildren(QLabel)),
+            *(widget.placeholderText() for widget in window.findChildren(QLineEdit)),
+            *(
+                window_combo.itemText(index)
+                for window_combo in window.findChildren(QComboBox)
+                for index in range(window_combo.count())
+            ),
+        ]
+    )
+    for forbidden_label in GB29446_GOLDEN["ui_contract"]["forbidden_labels"]:
+        assert forbidden_label not in all_control_text
+    for forbidden_label in ("electricity_consumption", "raw_coal_input", "lookup", "constant", "运算轨迹", "是否符合", "执行要求"):
+        assert forbidden_label not in visible_text
 
     window.gb29446_process.setCurrentIndex(window.gb29446_process.findData("重介"))
     assert window.gb29446_factor.text() == "1.12"
@@ -366,8 +380,8 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert window.gb29446_result_message.text() == "尚未计算"
     window.calculate_evaluation()
     assert window.gb29446_result_ed.text() == "11.20 kW·h/t"
-    assert window.gb29446_result_grade.text() == "超出3级"
-    assert "未达标" not in window.gb29446_result_grade.text()
+    assert window.gb29446_result_grade.text() == "未达标"
+    assert "超出3级" not in window.gb29446_result_grade.text()
 
     assert not window.gb29446_scope_details.isVisible()
     window.gb29446_scope_toggle.click()
@@ -375,6 +389,25 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert window.gb29446_scope_details.isVisible()
     assert "原煤输送至选煤厂 → 选煤产品运输出选煤厂" in window.gb29446_scope_details.text()
     assert "化验室" in window.gb29446_scope_details.text()
+    assert MainWindow._gb29446_grade_label(Grade.NOT_QUALIFIED) == "未达标"
+    window.close()
+    context.database.dispose()
+
+
+def test_gb29446_requires_explicit_coal_and_process_selection(tmp_path: Path) -> None:
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    standard = _gb29446_standard()
+    context.standards.install(standard)
+    window = MainWindow(context)
+    window.navigation.setCurrentRow(2)
+    window.gb29446_coal_type.setCurrentIndex(-1)
+    with pytest.raises(ValueError, match=GB29446_GOLDEN["ui_contract"]["selection_errors"]["missing_coal"]):
+        window._collect_request()
+    window.gb29446_coal_type.setCurrentIndex(0)
+    window.gb29446_process.setCurrentIndex(0)
+    with pytest.raises(ValueError, match=GB29446_GOLDEN["ui_contract"]["selection_errors"]["missing_process"]):
+        window._collect_request()
     window.close()
     context.database.dispose()
 

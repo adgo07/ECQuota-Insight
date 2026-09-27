@@ -75,7 +75,7 @@ def test_scope_manifest_and_catalog_remain_exact() -> None:
     assert {row["number"] for row in catalog["standards"]} == set(scope["standards"])
 
 
-def test_every_published_indicator_runs_in_direct_entry_smoke() -> None:
+def test_every_published_indicator_runs_with_its_formal_inputs() -> None:
     report = check_published_rules(Path("data/definitions"))
     assert report["total_indicators"] == 753
     assert report["incomplete"] == []

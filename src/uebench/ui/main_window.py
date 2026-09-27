@@ -1463,8 +1463,6 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _gb29446_grade_label(grade: Grade) -> str:
-        if grade is Grade.NOT_QUALIFIED:
-            return "超出3级"
         return GRADE_LABELS[grade]
 
     def _gb29446_warning_for_display(self, request: EvaluationRequest, warning: str) -> str:
@@ -1480,10 +1478,6 @@ class MainWindow(QMainWindow):
             "washing_process": "选煤工艺",
             "electricity_consumption": "统计期选煤电力消耗量 E_d",
             "raw_coal_input": "统计期入选原煤量 m",
-            "actual.coking-coal": "选煤电力单耗 e_d",
-            "actual.power-coal": "选煤电力单耗 e_d",
-            "single_coal_single_process": "本次统计范围",
-            "enterprise_status": "企业属性",
         }
         if product is not None:
             definitions = list(product.input_definitions)
@@ -1539,11 +1533,7 @@ class MainWindow(QMainWindow):
         )
         e0 = item.display_values.get("unadjusted_power_consumption")
         factor = item.display_values.get("process_factor")
-        e0_line = (
-            f"未折算单位电耗 E_d/m：{self._format_result_number(e0)} kW·h/t"
-            if request.input_mode is InputMode.DETAIL
-            else "未折算单位电耗 E_d/m：— kW·h/t"
-        )
+        e0_line = f"未折算单位电耗 E_d/m：{self._format_result_number(e0)} kW·h/t"
         factor_line = f"折算系数 k：{self._format_result_number(factor)}"
         if electricity is not None and raw_coal is not None and factor is not None:
             formula_line = (
@@ -1564,7 +1554,7 @@ class MainWindow(QMainWindow):
         )
         level3 = thresholds.get("LEVEL_3")
         if level3 is not None:
-            threshold_text += f"；超出3级：> {self._format_result_number(level3)} kW·h/t"
+            threshold_text += f"；未达标：> {self._format_result_number(level3)} kW·h/t"
         comparison_step = next(
             (step for step in reversed(item.calculation_trace) if step.operation == "grade_comparison"),
             None,
