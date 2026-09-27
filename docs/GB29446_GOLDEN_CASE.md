@@ -30,7 +30,7 @@ GB 29446 的正式记录输入是煤种、选煤工艺、统计期电力消耗�
 
 隔离候选工作簿：`work/phase0-spreadsheet/GB29446-Phase0-Candidate-edited.xlsx`，SHA-256 `3a094434aedbcc3f00bd4eaea274101aa3c4875b2668c07e903adf44286b639d`。包含“计算器”和“规则与来源”两张表、6个公式及仅与当前正式输入相符的数据验证；公式/文字对照报告为 `work/phase0-spreadsheet/excel-parity-report.json`。Artifact Tool 工作簿计算器对 55 个 Golden Case 得出 55/55 通过，0个公式错误；计算器和来源表预览已检查。
 
-历史原始工作簿保持只读，SHA-256 `63a2a3ac1346e4d219b47772b54b601508e34463cd909239d6605ef97839e434`。Candidate parity 使用 Artifact Tool 公式计算结果；Microsoft Excel 桌面打开/重算烟测为 `BLOCKED`：桌面自动化 app approval 超时，Excel 尚未打开，未操作任何窗口。因此不能把 Artifact Tool 结果描述为 Microsoft Excel 实机验收。
+历史原始工作簿保持只读，SHA-256 `63a2a3ac1346e4d219b47772b54b601508e34463cd909239d6605ef97839e434`。Candidate parity 使用 Artifact Tool 公式计算结果。续测中 Microsoft Excel 桌面已启动，但窗口状态捕获连续两次超时，Candidate 工作簿没有在 Excel 中打开，也未完成 Excel 实机重算；因此不能把 Artifact Tool 结果描述为 Microsoft Excel 实机验收。
 
 ## 发布目录与便携 Candidate
 
@@ -40,6 +40,6 @@ GB 29446 的正式记录输入是煤种、选煤工艺、统计期电力消耗�
 
 - 标准包：`work/phase0-exe-candidate-final3-20260927/GB29446-Phase0-Candidate.uebench`，数据版本 `2026.09-phase0-candidate.1`，48项定义/765条规则，SHA-256 `b190b0fa3d2cfecfc893bbe2772a8302257bbd532b220b52748afd76bb2c9d82`。清单、签名、文件哈希和 GB 29446 定义与 canonical 的模型语义均已核对；被嵌入的包哈希相同。
 - 便携程序：`work/phase0-exe-candidate-final3-20260927/pyinstaller-dist/UEBench/UEBench.exe`，SHA-256 `c3236d946d15d32a0c600a0009c64465b2bf9dc56151dd0a0f14834afc2abef4`。461个文件，总计约393 MB；未发现 `icuuc.dll`、`icudt78.dll`、Qt WebEngine 或 Qt WebView 二进制。
-- Candidate 是隔离验证产物，未放入正式发布目录，也未启动。UI 人工烟测为 `BLOCKED`：桌面自动化 app approval 在窗口打开前超时，故尚未完成新建评价、1级到2级改算、结果失效、记录与依据检查。
+- Candidate 是隔离验证产物，未放入正式发布目录。续测将便携程序启动在独立 `UEBENCH_DATA_DIR=work/phase0-exe-candidate-final3-20260927/smoke-data-ui-r1` 下；SQLite、迁移日志均已初始化，应用进程响应正常，窗口标题为“单位产品能耗对标软件”。桌面自动化的 `list_apps` / `list_windows` 未返回该窗口，因此 UI 人工烟测仍为 `BLOCKED`：尚未完成新建评价、1级到2级改算、结果失效、记录与依据检查。Candidate 仅写入上述隔离目录。
 
 所有实际命令、测试结果、哈希和阻断均记录在 `docs/验收记录.md` 最新的 2026-09-27 Phase 0 章节。历史验收条目记录当时事实；如与本节冲突，以最新 Phase 0 记录和当前分支文件为准。
