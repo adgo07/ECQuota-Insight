@@ -212,7 +212,7 @@
 
 ## 7. 已经踩过的坑（不要重复）
 
-1. 安装器 /DIR 路径必须带引号：路径含空格时，PowerShell Start-Process 需要类似 /DIR=\"G:/Python Project/能耗限额/work/installed-test\"。未加引号会变成 /DIR= G:/...，Inno Setup 会忽略目标路径并安装到默认目录。
+1. 安装器 /DIR 路径必须带引号：路径含空格时，PowerShell Start-Process 需要类似 /DIR="G:/Python Project/能耗限额/work/installed-test"。未加引号会变成 /DIR= G:/...，Inno Setup 会忽略目标路径并安装到默认目录。
 2. 安装启动后要等待数据库初始化：8～15 秒内直接查询可能得到空库或缺表；不要把启动竞态误判为安装失败。
 3. 数据库字段不要猜：标准表使用 status、lifecycle_status、effective_date，不是 publication_status 列。规则 JSON 中才使用 publication_status。
 4. 验证脚本参数不能混用：
