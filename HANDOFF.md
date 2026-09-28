@@ -1,3 +1,14 @@
+# QZC-A01 Qingzhou Contracts 治理接入（2026-09-28）
+
+- 公共规范权威仓：`https://github.com/adgo07/Qingzhou-contracts.git`。
+- 当前无正式 Contract release/tag；本仓以 **pre-release / bootstrap baseline** 锁定中央已合并 `main` commit `0cd74d783fa23add6dc881b408a8c8ba8503f8e8`。
+- Architecture：`V2.1 FROZEN`；Numeric / Unit / Module-Capability / Workspace-Record-Result / qzpack 均仍为 `draft-v1 / DRAFT / NOT YET RELEASED`。
+- 本仓不得自动跟随中央 `main`；当前批准基线见 `PLATFORM_BASELINE.md` 与 `platform-lock.json`。
+- 接入分支：`chore/qingzhou-contracts-adoption`；本次只修改治理文件，不修改业务算法、Canonical 标准数据、UI、数据库或标准包实现。
+- 已知硬冲突：本仓《统一判定规范》的全局 ROUND6 与 Architecture V2.1 FROZEN 的默认 full-value comparison / 禁止 implicit rounding 原则冲突。本次只登记为 BLOCKED，不在 QZC-A01 中修改业务结果。详见 `docs/governance/PLATFORM_ADOPTION_REPORT.md`。
+
+---
+
 # UEBench 能耗对标软件交接说明
 
 > 2026-09-26：已合入独立验收PASS的GB29446新建页面源码，完整测试303项通过；新版EXE/安装包及公式Excel尚未同步验收。最新使用与测试前提见 docs/仓库使用说明.md。下文发布状态与旧数字为历史基线。
@@ -201,7 +212,7 @@
 
 ## 7. 已经踩过的坑（不要重复）
 
-1. 安装器 /DIR 路径必须带引号：路径含空格时，PowerShell Start-Process 需要类似 /DIR="G:/Python Project/能耗限额/work/installed-test"。未加引号会变成 /DIR= G:/...，Inno Setup 会忽略目标路径并安装到默认目录。
+1. 安装器 /DIR 路径必须带引号：路径含空格时，PowerShell Start-Process 需要类似 /DIR=\"G:/Python Project/能耗限额/work/installed-test\"。未加引号会变成 /DIR= G:/...，Inno Setup 会忽略目标路径并安装到默认目录。
 2. 安装启动后要等待数据库初始化：8～15 秒内直接查询可能得到空库或缺表；不要把启动竞态误判为安装失败。
 3. 数据库字段不要猜：标准表使用 status、lifecycle_status、effective_date，不是 publication_status 列。规则 JSON 中才使用 publication_status。
 4. 验证脚本参数不能混用：
