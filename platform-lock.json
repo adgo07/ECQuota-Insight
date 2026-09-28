@@ -1,0 +1,44 @@
+{
+  "repository": "https://github.com/adgo07/Qingzhou-contracts.git",
+  "baseline_kind": "pre-release/bootstrap",
+  "contracts_release": null,
+  "release_tag": null,
+  "commit_sha": "0cd74d783fa23add6dc881b408a8c8ba8503f8e8",
+  "locked_at": "2026-09-28",
+  "module_id": "qz.energy_quota",
+  "architecture_version": "2.1",
+  "architecture_status": "FROZEN",
+  "numeric_contract": {
+    "version": "draft-v1",
+    "status": "DRAFT",
+    "path": "contracts/numeric/NUMERIC_CONTRACT_V1_DRAFT.md"
+  },
+  "unit_contract": {
+    "version": "draft-v1",
+    "status": "DRAFT",
+    "path": "contracts/units/UNIT_CONTRACT_V1_DRAFT.md"
+  },
+  "module_capability_contract": {
+    "version": "draft-v1",
+    "status": "DRAFT",
+    "path": "contracts/module/MODULE_CAPABILITY_CONTRACT_V1_DRAFT.md"
+  },
+  "record_contract": {
+    "version": "draft-v1",
+    "status": "DRAFT",
+    "path": "contracts/records/WORKSPACE_ATTEMPT_RECORD_RESULT_CONTRACT_V1_DRAFT.md"
+  },
+  "package_contract": {
+    "version": "draft-v1",
+    "status": "DRAFT",
+    "path": "contracts/package/QZPACK_CONTRACT_V1_DRAFT.md"
+  },
+  "auto_follow_main": false,
+  "known_deviations": [
+    "D-ECQ-001-global-round6-vs-frozen-full-value",
+    "D-ECQ-002-module-capability-manifest-not-implemented",
+    "D-ECQ-003-workspace-attempt-record-result-envelope-partial",
+    "D-ECQ-004-qzpack-not-implemented",
+    "D-ECQ-005-unit-and-conformance-not-formalized"
+  ]
+}
