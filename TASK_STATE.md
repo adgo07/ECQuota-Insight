@@ -39,7 +39,7 @@ contracts: draft-v1 / DRAFT / NOT YET RELEASED
 
 ## 当前接入状态
 
-已建立/计划在本分支建立：
+已建立：
 
 - `PLATFORM_BASELINE.md`
 - `platform-lock.json`
@@ -47,11 +47,21 @@ contracts: draft-v1 / DRAFT / NOT YET RELEASED
 - `docs/governance/PLATFORM_ADOPTION_REPORT.md`
 - HANDOFF 最小同步
 
-本任务不修改业务算法、Canonical 标准数据、UI、数据库 schema/migration、标准包实现或公共 Contract。
+本任务未修改业务算法、Canonical 标准数据、UI、数据库 schema/migration、标准包实现或公共 Contract。
 
-## 已知 BLOCKED 点
+## 验收结论
 
-### QZC-A01-B01 — Numeric Governance Conflict
+> **Governance Adoption PASS / Numeric Conformance BLOCKED**
+
+含义：
+
+- 治理接入本身通过，可以合并治理文件；
+- 当前 Numeric Conformance 尚未通过；
+- ROUND6 本任务不处理，也不得因本次合并被解释为已经解决。
+
+## Numeric Conformance BLOCKED
+
+### QZC-A01-NC-B01 — Numeric Governance Conflict
 
 本仓当前 `docs/统一判定规范.md` 要求全部数值边界比较先 `ROUND(value, 6)`；Qingzhou Architecture V2.1 FROZEN 要求默认 full-value comparison，并禁止无标准依据的 implicit rounding。
 
@@ -59,12 +69,10 @@ contracts: draft-v1 / DRAFT / NOT YET RELEASED
 
 因此：
 
-> 治理接入文件可以建立，但在该冲突解决前，不得把 ECQuota 描述为已完全符合 Qingzhou Numeric / Architecture V2.1。
+> 在该冲突解决前，不得把 ECQuota 描述为已完全符合 Qingzhou Numeric Contract / Architecture V2.1 的 Numeric 语义。
 
 ## 后续
 
-- 完成 Adoption Report；
-- 最小同步 HANDOFF；
-- 核对最终 diff 仅包含治理文件；
-- 不自动合并 main；
-- 数值冲突由独立后续任务处理。
+- QZC-A01 治理文件允许合并 `main`；
+- 数值冲突由独立后续任务处理；
+- 后续处理 ROUND6 时必须重新依据标准原文、Canonical 规则和 Conformance case 审核，不能由本次治理接入自动改变业务结果。
