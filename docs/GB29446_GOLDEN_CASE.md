@@ -2,7 +2,7 @@
 
 ## 范围与数据源
 
-Phase 0 分支 `phase0-gb29446-golden-case` 从 main 基线 `d857f70acbc476f30decc2e0bd367d692a1447d1` 建立。该分支不合并、不推送、不正式发布，后续交独立验收。
+Phase 0 分支 `phase0-gb29446-golden-case` 从 main 基线 `d857f70acbc476f30decc2e0bd367d692a1447d1` 建立。分支用于提交 PR 审查；合并与正式发布仍需另行验收。
 
 GB 29446—2019《选煤电力消耗限额》在国家标准信息公共服务平台列为现行，发布日期为 2019-12-17，实施日期为 2020-07-01：[标准状态记录](https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=1A88315378C426335E443EC52CD4BA57)。本机标准原文 SHA-256 为 `72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d`，本次核对了 PDF 第3页表1/表2、第4页式（1）、第5页附录A表A.1。
 
@@ -29,6 +29,8 @@ GB 29446 的正式记录输入是煤种、选煤工艺、统计期电力消耗�
 ## Excel 候选
 
 隔离候选工作簿：`work/phase0-spreadsheet/GB29446-Phase0-Candidate-edited.xlsx`，SHA-256 `3a094434aedbcc3f00bd4eaea274101aa3c4875b2668c07e903adf44286b639d`。包含“计算器”和“规则与来源”两张表、6个公式及仅与当前正式输入相符的数据验证；公式/文字对照报告为 `work/phase0-spreadsheet/excel-parity-report.json`。Artifact Tool 工作簿计算器对 55 个 Golden Case 得出 55/55 通过，0个公式错误；计算器和来源表预览已检查。
+
+与候选工作簿逐字节相同的交付副本已纳入仓库：[`deliverables/GB29446-2019-选煤电力消耗限额-计算器.xlsx`](../deliverables/GB29446-2019-选煤电力消耗限额-计算器.xlsx)，SHA-256 不变。只纳入工作簿，不纳入隔离目录中的程序、数据库及测试缓存。
 
 历史原始工作簿保持只读，SHA-256 `63a2a3ac1346e4d219b47772b54b601508e34463cd909239d6605ef97839e434`。Candidate parity 使用 Artifact Tool 公式计算结果。续测中 Microsoft Excel 桌面已启动，但窗口状态捕获连续两次超时，Candidate 工作簿没有在 Excel 中打开，也未完成 Excel 实机重算；因此不能把 Artifact Tool 结果描述为 Microsoft Excel 实机验收。
 
