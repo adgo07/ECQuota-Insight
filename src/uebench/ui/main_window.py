@@ -1570,14 +1570,16 @@ class MainWindow(QMainWindow):
             None,
         )
         raw_value_line = f"原始计算值（未修约）：{self._format_explanation_number(actual)} kW·h/t"
-        comparison_line = (
-            f"判级比较：{comparison_step.expression}；结果：{grade_label}"
-            if comparison_step is not None
-            else f"判级比较：计算值和阈值分别 ROUND(..., 6) 后比较；正式结果：{grade_label}"
-        )
+        if comparison_step is not None:
+            comparison_expression = comparison_step.expression
+            if comparison_expression.startswith("numeric_behavior=") and "; " in comparison_expression:
+                comparison_expression = comparison_expression.split("; ", 1)[1]
+            comparison_line = f"判级比较：{comparison_expression}；结果：{grade_label}"
+        else:
+            comparison_line = f"判级比较：按未修约 Decimal 全值与阈值直接比较；正式结果：{grade_label}"
         current_grade_line = (
             f"{raw_value_line}\n{comparison_line}\n"
-            "判级时将计算值和阈值分别 ROUND(..., 6) 后比较；显示位数不参与判级。"
+            "正式判级使用未修约 Decimal 全值与阈值直接比较；显示位数仅用于展示，不参与判级。"
         )
         coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
         self.gb29446_explanation.setText(
