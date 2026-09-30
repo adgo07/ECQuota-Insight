@@ -4,7 +4,6 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_HALF_UP
-from typing import Any
 from uuid import uuid4
 
 from .models import (
@@ -26,11 +25,16 @@ from .models import (
     parse_decimal,
 )
 
+# Legacy compatibility for standards that have not yet completed an
+# independent standard-source numeric migration.  GB 29446 does NOT use this
+# policy after QZC-N01-A.
 _THRESHOLD_COMPARISON_QUANTUM = Decimal("0.000001")
+LEGACY_ROUND6_NUMERIC_BEHAVIOR = "ecquota-legacy-round6-v1"
+GB29446_NUMERIC_BEHAVIOR_VERSION = "ecquota-gb29446-full-value-v2"
 
 
 def _round_threshold_value(value: Decimal) -> Decimal:
-    """Match Excel ROUND(value, 6) for numeric threshold comparisons."""
+    """Legacy ECQuota comparison rule retained only for unmigrated standards."""
     return value.quantize(_THRESHOLD_COMPARISON_QUANTUM, rounding=ROUND_HALF_UP)
 
 
@@ -303,10 +307,6 @@ class EvaluationEngine:
         try:
             values, units, pre_steps = self._validate_inputs(definitions, validation_request)
         except EvaluationValidationError as exc:
-            # Input-level failures (for example a wrong unit or an out-of-range
-            # value) are part of the evaluated data quality result.  Preserve a
-            # row for every indicator so the caller receives the fixed
-            # INCOMPLETE enum instead of a partially computed or guessed grade.
             return self._incomplete_result(standard, request, product, str(exc))
         input_labels = (
             {key: definition.label for key, definition in definitions.items()}
@@ -423,6 +423,7 @@ class EvaluationEngine:
                     value = None
             values[key] = value
             units[key] = supplied.unit
+
         if request.energy_lines:
             total_energy = Decimal("0")
             amount_totals: dict[str, Decimal] = {}
@@ -486,6 +487,7 @@ class EvaluationEngine:
                     unit="kgce",
                 )
             )
+
         if request.production_lines:
             total_production = Decimal("0")
             category_production_totals: dict[str, Decimal] = {}
@@ -567,22 +569,12 @@ class EvaluationEngine:
                     source_references=indicator.source_references,
                 )
 
-            # Conditions whose meaning is intentionally outside the standard's
-            # numeric rules stop evaluation before any grade or compliance
-            # conclusion can be inferred.
             for review_condition in indicator.manual_review_conditions:
-                if (
-                    is_gb29446
-                    and review_condition.condition.field == "single_coal_single_process"
-                ):
+                if is_gb29446 and review_condition.condition.field == "single_coal_single_process":
                     continue
                 if self.conditions.evaluate(review_condition.condition, context):
                     raise RuleEvaluationError(review_condition.message)
 
-            # Product-level inputs apply to every indicator in that product.
-            # Enforce them here (rather than only when a formula happens to
-            # reference them) so a required condition cannot be silently
-            # skipped in direct-entry mode.
             required_definitions: dict[str, InputDefinition] = {
                 definition.key: definition for definition in (product_input_definitions or [])
             }
@@ -590,9 +582,6 @@ class EvaluationEngine:
             for definition in required_definitions.values():
                 if is_gb29446 and definition.key == "single_coal_single_process":
                     continue
-                # Skip definitions that belong only to the other input mode
-                # before evaluating required_if. Otherwise direct entry can
-                # incorrectly require a detail-only selector.
                 if not definition.required or input_mode not in definition.modes:
                     continue
                 condition_met = (
@@ -606,7 +595,7 @@ class EvaluationEngine:
                 actual = parse_decimal(context.require(indicator.direct_input_key), field_name=indicator.name)
                 trace.append(
                     CalculationStep(
-                        sequence=1,
+                        sequence=len(trace) + 1,
                         label="直接录入实际值",
                         operation="input",
                         expression=indicator.direct_input_key,
@@ -640,6 +629,7 @@ class EvaluationEngine:
                 indicator.comparison,
                 trace=trace if is_gb29446 else None,
                 unit=indicator.unit,
+                full_value=is_gb29446,
             )
             compliance_requirement = None
             compliance_limit = None
@@ -721,12 +711,14 @@ class EvaluationEngine:
         *,
         trace: list[CalculationStep] | None = None,
         unit: str | None = None,
+        full_value: bool = False,
     ) -> Grade:
         predicate = (lambda left, right: left <= right) if comparison is ComparisonDirection.LTE else (
             lambda left, right: left >= right
         )
         relation = "<=" if comparison is ComparisonDirection.LTE else ">="
-        compared_actual = _round_threshold_value(actual)
+        compared_actual = actual if full_value else _round_threshold_value(actual)
+
         for key, grade in (
             ("LEVEL_1", Grade.LEVEL_1),
             ("LEVEL_2", Grade.LEVEL_2),
@@ -735,43 +727,34 @@ class EvaluationEngine:
             threshold = thresholds.get(key)
             if threshold is None:
                 continue
-            compared_threshold = _round_threshold_value(threshold)
-            if predicate(compared_actual, compared_threshold):
-                if trace is not None:
-                    trace.append(
-                        CalculationStep(
-                            sequence=len(trace) + 1,
-                            label="等级判定比较",
-                            operation="grade_comparison",
-                            expression=(
-                                f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
-                                f"ROUND({_format_comparison_operand(threshold)}, 6) = {compared_threshold}；"
-                                f"{compared_actual} {relation} {compared_threshold}"
-                            ),
-                            value=grade.value,
-                            unit=unit,
-                        )
+            compared_threshold = threshold if full_value else _round_threshold_value(threshold)
+            matched = predicate(compared_actual, compared_threshold)
+            if trace is not None:
+                if full_value:
+                    expression = (
+                        f"numeric_behavior={GB29446_NUMERIC_BEHAVIOR_VERSION}; "
+                        f"{_format_comparison_operand(actual)} {relation} "
+                        f"{_format_comparison_operand(threshold)}"
                     )
-                return grade
-        if trace is not None:
-            level_3 = thresholds.get("LEVEL_3")
-            if level_3 is not None:
-                compared_level_3 = _round_threshold_value(level_3)
-                out_of_range_relation = ">" if comparison is ComparisonDirection.LTE else "<"
+                else:
+                    expression = (
+                        f"numeric_behavior={LEGACY_ROUND6_NUMERIC_BEHAVIOR}; "
+                        f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
+                        f"ROUND({_format_comparison_operand(threshold)}, 6) = {compared_threshold}；"
+                        f"{compared_actual} {relation} {compared_threshold}"
+                    )
                 trace.append(
                     CalculationStep(
                         sequence=len(trace) + 1,
-                        label="超出3级限值比较",
+                        label=f"{grade.value}等级判定比较",
                         operation="grade_comparison",
-                        expression=(
-                            f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
-                            f"ROUND({_format_comparison_operand(level_3)}, 6) = {compared_level_3}；"
-                            f"{compared_actual} {out_of_range_relation} {compared_level_3}"
-                        ),
-                        value=Grade.NOT_QUALIFIED.value,
+                        expression=expression,
+                        value=matched,
                         unit=unit,
                     )
                 )
+            if matched:
+                return grade
         return Grade.NOT_QUALIFIED
 
     def _evaluate_threshold_set(
