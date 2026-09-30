@@ -6,15 +6,32 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   numeric-pilot:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - name: Checkout
+      - name: Checkout execution branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Apply strict one-shot UI migration
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          python tools/qzc_n01_a_apply_ui_patch.py
+          $changes = git status --porcelain -- src/uebench/ui/main_window.py tests/test_ui.py
+          if ($changes) {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/uebench/ui/main_window.py tests/test_ui.py
+            git commit -m "fix: align GB 29446 UI with full-value semantics"
+            git push origin HEAD:${{ github.head_ref }}
+          }
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
