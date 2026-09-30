@@ -339,9 +339,9 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert "e_d = 560 × 1.12 / 100 = 6.272 kW·h/t" in window.gb29446_explanation.text()
     assert "1级 ≤ 5.00 kW·h/t" in window.gb29446_explanation.text()
     assert "原始计算值（未修约）：6.272 kW·h/t" in window.gb29446_explanation.text()
-    assert "6.272000 <= 7.000000" in window.gb29446_explanation.text()
+    assert "判级比较：6.272 <= 7；结果：2级" in window.gb29446_explanation.text()
     assert "结果：2级" in window.gb29446_explanation.text()
-    assert "显示位数不参与判级" in window.gb29446_explanation.text()
+    assert "显示位数仅用于展示，不参与判级" in window.gb29446_explanation.text()
     assert "PDF第" not in window.gb29446_basis.text()
     assert "第3.1条" in window.gb29446_basis.text()
     assert "第5.2条" in window.gb29446_basis.text()
@@ -548,7 +548,7 @@ def test_gb29446_error_card_uses_chinese_labels_and_no_grade(
     context.database.dispose()
 
 
-def test_gb29446_six_place_boundary_explanation_matches_formal_grade(tmp_path: Path, monkeypatch) -> None:
+def test_gb29446_full_value_boundary_explanation_matches_formal_grade(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     context.standards.install(_gb29446_standard())
@@ -560,16 +560,14 @@ def test_gb29446_six_place_boundary_explanation_matches_formal_grade(tmp_path: P
     window.gb29446_raw_coal.setText("1")
     window.calculate_evaluation()
 
-    assert window.gb29446_result_grade.text() == "1级"
-    assert "原始计算值（未修约）：5.0000004 kW·h/t" in window.gb29446_explanation.text()
-    assert (
-        "ROUND(5.0000004, 6) = 5.000000；ROUND(5, 6) = 5.000000；"
-        "5.000000 <= 5.000000"
-    ) in window.gb29446_explanation.text()
-    assert "结果：1级" in window.gb29446_explanation.text()
-    assert "判级时将计算值和阈值分别 ROUND(..., 6) 后比较" in window.gb29446_explanation.text()
-    assert "显示位数不参与判级" in window.gb29446_explanation.text()
-    assert "未舍入的计算值" not in window.gb29446_explanation.text()
+    assert window.gb29446_result_grade.text() == "2级"
+    explanation = window.gb29446_explanation.text()
+    assert "原始计算值（未修约）：5.0000004 kW·h/t" in explanation
+    assert "判级比较：5.0000004 <= 7；结果：2级" in explanation
+    assert "正式判级使用未修约 Decimal 全值与阈值直接比较" in explanation
+    assert "显示位数仅用于展示，不参与判级" in explanation
+    assert "ROUND(" not in explanation
+    assert "numeric_behavior=" not in explanation
 
     window.close()
     context.database.dispose()

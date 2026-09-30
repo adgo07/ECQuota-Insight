@@ -1,0 +1,39 @@
+{
+  "schema": "qzc-n01-a-candidate-v0",
+  "pilot_id": "N01-A",
+  "module_id": "qz.energy_quota",
+  "standard_id": "gb-29446-2019",
+  "numeric_profile_candidate": {
+    "representation": "Decimal",
+    "binary_float": "forbidden in authoritative chain",
+    "implicit_rounding": "forbidden",
+    "business_comparison": "full-value",
+    "display_rounding": "presentation-only",
+    "explicit_rounding": "only when Rule/standard declares",
+    "behavior_version": "ecquota-gb29446-full-value-v2"
+  },
+  "delta": "0.0000004",
+  "boundary_vectors": [
+    {"id":"coking-l1-minus","coal_type":"炼焦煤","actual":"4.9999996","threshold":"5.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_1","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l1-equal","coal_type":"炼焦煤","actual":"5.0","threshold":"5.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_1","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l1-plus","coal_type":"炼焦煤","actual":"5.0000004","threshold":"5.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_2","breaking":true,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l2-minus","coal_type":"炼焦煤","actual":"6.9999996","threshold":"7.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_2","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l2-equal","coal_type":"炼焦煤","actual":"7.0","threshold":"7.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_2","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l2-plus","coal_type":"炼焦煤","actual":"7.0000004","threshold":"7.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_3","breaking":true,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l3-minus","coal_type":"炼焦煤","actual":"8.4999996","threshold":"8.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"LEVEL_3","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l3-equal","coal_type":"炼焦煤","actual":"8.5","threshold":"8.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"LEVEL_3","breaking":false,"source":"GB 29446-2019 Table 1"},
+    {"id":"coking-l3-plus","coal_type":"炼焦煤","actual":"8.5000004","threshold":"8.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"NOT_QUALIFIED","breaking":true,"source":"GB 29446-2019 Table 1"},
+    {"id":"power-l1-minus","coal_type":"动力煤","actual":"1.9999996","threshold":"2.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_1","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l1-equal","coal_type":"动力煤","actual":"2.0","threshold":"2.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_1","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l1-plus","coal_type":"动力煤","actual":"2.0000004","threshold":"2.0","expected_legacy_grade":"LEVEL_1","expected_new_grade":"LEVEL_2","breaking":true,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l2-minus","coal_type":"动力煤","actual":"2.9999996","threshold":"3.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_2","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l2-equal","coal_type":"动力煤","actual":"3.0","threshold":"3.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_2","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l2-plus","coal_type":"动力煤","actual":"3.0000004","threshold":"3.0","expected_legacy_grade":"LEVEL_2","expected_new_grade":"LEVEL_3","breaking":true,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l3-minus","coal_type":"动力煤","actual":"4.4999996","threshold":"4.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"LEVEL_3","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l3-equal","coal_type":"动力煤","actual":"4.5","threshold":"4.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"LEVEL_3","breaking":false,"source":"GB 29446-2019 Table 2"},
+    {"id":"power-l3-plus","coal_type":"动力煤","actual":"4.5000004","threshold":"4.5","expected_legacy_grade":"LEVEL_3","expected_new_grade":"NOT_QUALIFIED","breaking":true,"source":"GB 29446-2019 Table 2"}
+  ],
+  "e2e_vectors": [
+    {"id":"coking-detail-just-above-l1","coal_type":"炼焦煤","process":"跳汰、浮选联合","electricity":"50.000004","raw_coal":"10","expected_calculation_value":"5.0000004","expected_display_2dp":"5.00","expected_grade":"LEVEL_2","source":"GB 29446-2019 5.2 formula (1), Annex A Table A.1, Table 1"}
+  ]
+}
