@@ -34,16 +34,18 @@ jobs:
 
       - name: Execute N01-A conformance vectors
         shell: pwsh
-        run: python -m pytest tests/pilots/numeric/test_qzc_n01_a.py -q -p no:cacheprovider
+        run: python -m pytest tests/pilots/numeric/test_qzc_n01_a.py -vv -p no:cacheprovider
 
       - name: Execute GB 29446 regression and legacy migration evidence
         shell: pwsh
-        run: python -m pytest tests/test_gb29446.py -q -p no:cacheprovider
+        run: python -m pytest tests/test_gb29446.py -q -ra -p no:cacheprovider
 
       - name: Execute numeric domain and import regressions
         shell: pwsh
-        run: python -m pytest tests/test_engine.py tests/test_excel.py -q -p no:cacheprovider
+        run: python -m pytest tests/test_engine.py tests/test_excel.py -q -ra -p no:cacheprovider
 
       - name: Execute full suite
         shell: pwsh
-        run: python -m pytest -q -p no:cacheprovider --basetemp work/pytest-n01-a
+        run: |
+          New-Item -ItemType Directory -Force work | Out-Null
+          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a
