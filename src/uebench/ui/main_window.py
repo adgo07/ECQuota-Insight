@@ -88,6 +88,10 @@ def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
     return item
 
 
+# Rule JSON keeps stable machine-readable note codes.  The desktop UI must
+# never expose those implementation codes to Chinese users, so translate the
+# common codes at the presentation boundary and keep a Chinese fallback for
+# newly added rules.
 _NOTE_TRANSLATIONS = {
     "requires_independent_review": "需独立复核后使用",
     "original_pdf_transcribed": "已从标准原文转录",
@@ -129,12 +133,14 @@ def _translate_note(note: str) -> str:
         return "修正公式已结构化，计算时按标准条款执行"
     if text.startswith("capacity_") or text.startswith("fuel_") or text.startswith("heating_"):
         return "修正参数按标准表格和条款执行"
+    # Do not leak a new English rule code before its translation is added.
     if any("a" <= char.lower() <= "z" for char in text):
         return "规则说明已登记，具体以标准原文依据为准"
     return text
 
 
 def _condition_description(condition) -> str:
+    """Render a concise Chinese applicability description for the library."""
     op = getattr(condition, "op", "always")
     if op == "always":
         return ""
@@ -169,6 +175,7 @@ def _condition_description(condition) -> str:
 
 
 def _friendly_error(exc: Exception, operation: str) -> str:
+    """Keep error dialogs understandable and Chinese even for library errors."""
     detail = str(exc).strip()
     if detail and any("\u4e00" <= char <= "\u9fff" for char in detail):
         return f"{operation}：{detail}"
@@ -183,6 +190,8 @@ class MainWindow(QMainWindow):
         self.last_result_id: str | None = None
         self.pending_import_id: str | None = None
         self.setWindowTitle("单位产品能耗对标软件")
+        # Leave room for the ten-column energy table on ordinary 1366x768 and
+        # 1920x1080 screens.  Users can still resize the window smaller.
         self.resize(1440, 900)
         self.setMinimumSize(1180, 760)
         self.setStyleSheet(APP_STYLE)
@@ -331,6 +340,8 @@ class MainWindow(QMainWindow):
         self.eval_mode.addItem("直接录入实际值", InputMode.DIRECT.value)
         self.eval_mode.addItem("能源与产量明细计算", InputMode.DETAIL.value)
         self.eval_mode.currentIndexChanged.connect(self._refresh_input_table)
+        # Kept as a hidden compatibility model field; the visible choice is
+        # presented as two large checkable buttons beside the action buttons.
         self.eval_mode.setVisible(False)
         self.eval_date = QDateEdit(QDate.currentDate())
         self.eval_date.setCalendarPopup(False)
@@ -543,6 +554,7 @@ class MainWindow(QMainWindow):
         )
         basis_layout.addWidget(self.gb29446_scope_toggle, 0, Qt.AlignmentFlag.AlignLeft)
         basis_layout.addWidget(self.gb29446_scope_details)
+
         layout.addWidget(self.gb29446_basis_section)
         self._sync_mode_buttons()
         return page
@@ -562,6 +574,7 @@ class MainWindow(QMainWindow):
         delete.clicked.connect(self.delete_selected_record)
         controls.addWidget(refresh)
         controls.addWidget(copy_record)
+        controls.addWidget(recalculate)
         controls.addStretch()
         controls.addWidget(export)
         controls.addWidget(delete)
@@ -700,6 +713,9 @@ class MainWindow(QMainWindow):
 
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
+        # The library is a catalogue of the 63 in-scope standards, not only
+        # today's executable subset.  Draft/future entries remain visible so
+        # users can find them and see why formal evaluation is unavailable.
         standards = [
             item
             for item in self.context.application.list_library_standards()
@@ -736,6 +752,7 @@ class MainWindow(QMainWindow):
         self.refresh_standard_detail()
 
     def refresh_standard_detail(self) -> None:
+        """Show the selected standard's products, limits and source citations."""
         if not hasattr(self, "standard_indicator_table"):
             return
         self.standard_indicator_table.setRowCount(0)
@@ -812,6 +829,9 @@ class MainWindow(QMainWindow):
                 self.eval_standard.setCurrentIndex(index)
                 restored = True
         if not restored and self.eval_standard.count():
+            # Editable combo boxes keep an empty edit line after clear(); set
+            # the first valid standard explicitly so the default really is
+            # the first standard in the newly selected version scope.
             self.eval_standard.setCurrentIndex(0)
         self.eval_standard.blockSignals(False)
         self._standard_changed()
@@ -827,6 +847,8 @@ class MainWindow(QMainWindow):
     def _selection_levels_for_standard(self) -> list[SelectionLevel]:
         if self.current_standard and self.current_standard.selection_schema:
             return list(self.current_standard.selection_schema)
+        # Legacy definitions have one flat product/process list.  Treat it as
+        # a one-level schema so all old packages use the same selector code.
         return [SelectionLevel(key="product", label="产品/工序", required=True)]
 
     def _clear_selection_form(self) -> None:
@@ -841,6 +863,7 @@ class MainWindow(QMainWindow):
         value = product.selection_values.get(level.key)
         if value is not None and str(value).strip():
             return str(value).strip()
+        # Fallback for legacy rules without selection metadata.
         return product.name
 
     def _selection_raw_value(self, level_index: int) -> str | None:
@@ -896,6 +919,9 @@ class MainWindow(QMainWindow):
                 combo.addItem("暂无可选项", None)
             else:
                 for value, group in grouped.items():
+                    # At the final level retain the old duplicate-product
+                    # behaviour by showing indicator names and binding the
+                    # item directly to one product ID.
                     if index == len(levels) - 1 and len(group) > 1:
                         for product in group:
                             combo.addItem(self._display_product_name(product, product_name_counts), f"__product__:{product.id}")
@@ -964,6 +990,7 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _gb29446_factor_map(product) -> dict[str, Decimal]:
+        """Read the Appendix A lookup from the rule definition for the selector."""
         factors: dict[str, Decimal] = {}
         for indicator in product.indicators:
             for display in indicator.display_calculations:
@@ -1098,6 +1125,7 @@ class MainWindow(QMainWindow):
         self._refresh_input_table()
 
     def _set_input_mode(self, mode: InputMode) -> None:
+        """Update the hidden request field from the visible mode buttons."""
         index = self.eval_mode.findData(mode.value)
         if index < 0:
             return
@@ -1542,16 +1570,14 @@ class MainWindow(QMainWindow):
             None,
         )
         raw_value_line = f"原始计算值（未修约）：{self._format_explanation_number(actual)} kW·h/t"
-        if comparison_step is not None:
-            comparison_expression = comparison_step.expression
-            if comparison_expression.startswith("numeric_behavior=") and "; " in comparison_expression:
-                comparison_expression = comparison_expression.split("; ", 1)[1]
-            comparison_line = f"判级比较：{comparison_expression}；结果：{grade_label}"
-        else:
-            comparison_line = f"判级比较：按未修约 Decimal 全值与阈值直接比较；正式结果：{grade_label}"
+        comparison_line = (
+            f"判级比较：{comparison_step.expression}；结果：{grade_label}"
+            if comparison_step is not None
+            else f"判级比较：计算值和阈值分别 ROUND(..., 6) 后比较；正式结果：{grade_label}"
+        )
         current_grade_line = (
             f"{raw_value_line}\n{comparison_line}\n"
-            "正式判级使用未修约 Decimal 全值与阈值直接比较；显示位数仅用于展示，不参与判级。"
+            "判级时将计算值和阈值分别 ROUND(..., 6) 后比较；显示位数不参与判级。"
         )
         coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
         self.gb29446_explanation.setText(
@@ -1588,6 +1614,7 @@ class MainWindow(QMainWindow):
         return self.record_table.item(row, 6).text() if row >= 0 and self.record_table.item(row, 6) else None
 
     def _load_request_into_form(self, request: EvaluationRequest) -> bool:
+        """Populate the wizard from a saved request without changing its data."""
         requested_mode = request.selection_mode
         mode_index = self.eval_selection_mode.findData(requested_mode.value)
         if mode_index < 0:
@@ -1774,7 +1801,6 @@ class MainWindow(QMainWindow):
                 if column == 7:
                     item.setToolTip(entry.package_sha256)
                 self.package_history_table.setItem(row, column, item)
-
     def refresh_audit(self) -> None:
         self.audit_table.setRowCount(0)
         for entry in self.context.application.list_audit(500):
@@ -1784,6 +1810,7 @@ class MainWindow(QMainWindow):
                 self.audit_table.setItem(row, column, _item(value))
 
     def discover_standard_packages(self) -> None:
+        """Scan a selected local/NAS directory through the application use case."""
         if not self.context.application.has_package_service():
             return
         directory = QFileDialog.getExistingDirectory(self, "选择标准包目录")
@@ -1808,7 +1835,6 @@ class MainWindow(QMainWindow):
             else:
                 lines.append(f"{filename}：拒绝；" + "；".join(item.errors))
         QMessageBox.information(self, "标准包扫描结果", "\n".join(lines))
-
     def install_standard_package(self) -> None:
         if not self.context.application.has_package_service():
             return
