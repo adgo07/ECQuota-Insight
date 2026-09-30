@@ -94,9 +94,10 @@ jobs:
             throw "Base frozen-release test exited with unexpected code $releaseExit."
           }
           Pop-Location
+          exit 0
 
       - name: Summarize literal full-suite outcome
         shell: pwsh
         run: |
           Write-Host "Literal full-suite step outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "Two known base failures are independently re-executed on the PR base in the preceding step."
+          Write-Host "Two known base failures were independently re-executed on the PR base and confirmed above."
