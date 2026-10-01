@@ -169,3 +169,94 @@ Excel 特别规则：authoritative XLSX 数值如被 openpyxl 物化为 Python `
 5. 与任务相关的本仓业务规范
 
 如任务涉及公共 Contract，再读取锁定 SHA 对应的 Qingzhou-contracts 文件，不得按中央仓最新 `main` 猜测规则。
+
+## 11. 青舟平台开发前置检查（Qingzhou Platform Contract Preflight）
+
+本节适用于后续设计、开发、重构、修复、标准接入、Calculator、Numeric、Excel、Record、数据库、Schema、Module、Package、跨平台和导入导出任务。
+
+### 11.1 开工前必须执行
+
+```text
+读取本仓 platform-lock.json
+→ 确认锁定的 Qingzhou-contracts commit SHA
+→ 按该 locked SHA 读取相关 Frozen Contract
+→ 提取适用于当前任务的 MUST / MUST NOT
+→ 检查任务与 Contract 是否冲突
+→ 完成分类后再设计或编码
+```
+
+不得因为中央 `main` 有新 commit 就自动升级本项目。只有任务明确要求“升级中央 Contract 基线”时，才能通过独立治理任务修改 `PLATFORM_BASELINE.md` / `platform-lock.json`。
+
+中央产品交付治理规则路径：
+
+`docs/governance/PRODUCT_DELIVERY_POLICY_V1.md`
+
+该文件是 Architecture V2.1 下的 **ACTIVE GOVERNANCE POLICY**，负责产品优先级和交付顺序；它不是 Frozen Contract，不改变本仓当前 Contract lock。
+
+### 11.2 当前产品交付优先级
+
+- **Windows-first**：Windows Desktop 是当前第一正式交付、测试、打包、文件/Excel 和用户验收平台；
+- **Reference Standard first**：当前参考标准为 `GB 29446—2019 选煤电力消耗限额`；
+- **Product-core-first**：先关闭参考标准软件核心纵向闭环，再完成 Excel 闭环；
+- **Excel-as-adapter**：Excel 是导入/导出适配器，不得形成第二套业务算法；GUI 与 Excel 必须进入同一 Application/Domain/Calculator；
+- **Cross-platform-ready**：当前不全面开发 Android/iOS/HarmonyOS，但 Application/Domain 不得被 Windows UI/API 绑死；
+- **逐标准扩展**：参考标准完整闭环正式验收前，不以大量新增标准为主要开发目标；已有其他标准可维护和修复严重问题。
+
+本仓当前 Reference Standard 状态和缺口统一见：
+
+`REFERENCE_STANDARD_ROADMAP.md`
+
+### 11.3 Contract 冲突分类
+
+发现不一致时必须标记为以下之一：
+
+- `LOCAL DEFECT`：本地实现违反已采用 Frozen Contract；修本仓；
+- `ALLOWED PROJECT DIFFERENCE`：中央允许项目自定义，例如 Numeric Profile precision；不得为了表面一致强行统一；
+- `REGISTERED DEVIATION`：已有正式登记且尚未关闭；按治理状态执行；
+- `CENTRAL CONTRACT GAP`：真实业务需求无法被中央 Contract 正确表达；不得本地永久发明中央规则，应整理业务证据/案例/Contract 缺口/Candidate 返回中央仓。
+
+### 11.4 正式报告必须写平台预检查
+
+后续正式 Design、Execution Report、Acceptance Report 不得省略“平台 / Contract 预检查”。至少记录：
+
+- 当前业务仓 SHA；
+- `platform-lock.json` / 中央锁定 SHA；
+- 本任务相关 Frozen Contract；
+- 适用 MUST / MUST NOT；
+- 是否发现冲突及其分类；
+- 是否需要中央 Contract 修改。
+
+若任务确实与中央公共语义无关，也必须明确写：`本任务不涉及中央公共 Contract。`
+
+### 11.5 中文优先
+
+在不破坏机器识别、稳定接口、Schema、API、代码标识符、自动化测试和跨平台兼容的前提下：
+
+> 用户可见内容、治理文档、路线、执行报告、验收报告、PR/Issue 描述、错误/校验提示和面向人的说明优先使用中文。
+
+稳定机器字段、JSON/YAML key、enum、API/schema field、Module ID、Contract ID、Python 类/函数/模块名等继续保持既有英文标识；面向人解释时优先使用“中文名称（英文标识）”。
+
+## 12. 标准问题与解释治理
+
+开工前还必须读取根目录 `STANDARD_ISSUES_REGISTER.md`，检查当前任务是否涉及已有 Standard Issue。
+
+以后正式 Design、Execution Report、Acceptance Report 的“平台 / Contract 预检查”必须增加：
+
+```text
+是否存在与当前任务相关的 Standard Issue：是 / 否
+涉及的问题编号：……
+本任务是否改变既有软件解释：是 / 否
+```
+
+如果在标准映射、软件设计、Calculator、Golden Case、测试、Excel、用户实际使用或标准更新中发现新的疑似笔误、歧义、冲突、未规定、术语、引用或软件解释问题，必须先登记到 `STANDARD_ISSUES_REGISTER.md`，再完成正式实现说明。
+
+每个问题必须明确分开记录“标准原文事实”“技术判断”“软件实现决定”。不得把内部技术判断或软件选择写成标准明文，不得在 Mapping、Rule、Calculator 或测试中静默纠正疑似标准错误。若问题会影响正式业务结果，必须能追踪：
+
+```text
+Standard Issue
+→ Software Decision
+→ Rule / Calculator
+→ Test / Golden Case
+```
+
+修改既有解释时必须同步检查相关测试和历史结果兼容性。本规则只建立治理机制，不授权当前任务修复已登记问题。
