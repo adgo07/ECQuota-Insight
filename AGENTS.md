@@ -260,3 +260,18 @@ Standard Issue
 ```
 
 修改既有解释时必须同步检查相关测试和历史结果兼容性。本规则只建立治理机制，不授权当前任务修复已登记问题。
+
+### 12.1 UI 设计前置原则
+
+后续涉及桌面 UI 的 Design / Execution / Acceptance 还必须检查中央 `docs/ui/UI_DESIGN_GUIDELINES_V0.1.md` 的当前适用版本，并遵守以下原则：
+
+1. 当前 Windows Desktop 默认 UI 技术栈为 PySide6；
+2. 用户可见内容中文优先；
+3. 普通 UI 不得默认泄露内部 `key / field / field_id / rule_id / internal_id`、Python 变量或调试标识；
+4. 简单业务采用 `One-page first`，但不是所有标准强制单页；
+5. 技术 trace、Numeric Profile、Calculator version、内部 Rule 等采用渐进展示，不删除审计能力；
+6. UI 设计优先满足真实用户任务，不按数据库、JSON 或代码结构组织普通页面；
+7. `Qingzhou Desktop UI Guidelines v0.1` 是 **ACTIVE / EVOLVING** 的 Product Design Guideline，不是 Frozen Contract；
+8. AI 不得因为 v0.1 的推荐 AppShell、页面示意或当前实现而拒绝合理的页面改进，也不得把推荐模式误当强制布局。
+
+该 UI Guideline 不改变本仓 `platform-lock.json` 的 Frozen Contract 锁定语义；具体 UI 版本升级仍按独立治理任务执行。
