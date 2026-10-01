@@ -77,6 +77,19 @@ def _decimal_from_cell(value, *, sheet: str, cell: str, issues: list[ImportIssue
     if value is None or value == "":
         issues.append(ImportIssue(severity="error", sheet=sheet, cell=cell, message="数值不能为空"))
         return None
+    if isinstance(value, float):
+        issues.append(
+            ImportIssue(
+                severity="error",
+                sheet=sheet,
+                cell=cell,
+                message=(
+                    "正式数值不能使用 XLSX 数值单元格导入：openpyxl 已将其物化为二进制浮点。"
+                    "请将单元格设为文本并录入十进制字符串。"
+                ),
+            )
+        )
+        return None
     try:
         return Decimal(str(value))
     except (InvalidOperation, ValueError):
@@ -121,7 +134,7 @@ class WorkbookTemplateService:
             "模板版本和工作表名称不可修改。",
             "直接录入模式填写“实际值”；明细计算模式填写“能源明细”和“产量与分摊”。",
             "适用条件和实际值中的“键”应由软件生成的标准专用模板提供。",
-            "所有数值使用十进制，不要录入带单位的文本。",
+            "正式数值请使用文本格式录入十进制字符串（模板数值输入列已设为文本）；不要使用 XLSX 浮点数值单元格，也不要录入带单位的文本。",
             "direction 只能填写 input 或 output；分摊比例范围为 0~1。",
         ]
         for row, note in enumerate(notes, start=3):
@@ -154,6 +167,8 @@ class WorkbookTemplateService:
         self._header(sheet, ["键", "名称", "值", "单位", "数据来源/备注"])
         for _ in range(20):
             sheet.append(["", "", "", "", ""])
+        for row in range(2, 22):
+            sheet.cell(row=row, column=3).number_format = "@"
         widths = [28, 34, 20, 18, 48]
         for index, width in enumerate(widths, start=1):
             sheet.column_dimensions[chr(64 + index)].width = width
@@ -165,6 +180,9 @@ class WorkbookTemplateService:
         )
         for _ in range(50):
             sheet.append(["", "", "", "input", "", "", "", "", 1, ""])
+        for row in range(2, 52):
+            for column in (5, 7, 9):
+                sheet.cell(row=row, column=column).number_format = "@"
         validation = DataValidation(type="list", formula1='"input,output"', allow_blank=False)
         sheet.add_data_validation(validation)
         validation.add("D2:D51")
@@ -176,6 +194,9 @@ class WorkbookTemplateService:
         self._header(sheet, ["行ID", "产品名称", "分类键", "产量", "单位", "折算系数", "是否合格", "数据来源/备注"])
         for _ in range(30):
             sheet.append(["", "", "", "", "", 1, "是", ""])
+        for row in range(2, 32):
+            for column in (4, 6):
+                sheet.cell(row=row, column=column).number_format = "@"
         validation = DataValidation(type="list", formula1='"是,否"', allow_blank=False)
         sheet.add_data_validation(validation)
         validation.add("G2:G31")
@@ -349,7 +370,21 @@ class WorkbookImportService:
                 key = row[0].value
                 if not key:
                     continue
-                value = _excel_value(row[2].value)
+                raw_value = row[2].value
+                if isinstance(raw_value, float):
+                    issues.append(
+                        ImportIssue(
+                            severity="error",
+                            sheet=sheet_name,
+                            cell=f"C{row_number}",
+                            message=(
+                                "正式输入不能使用 XLSX 数值单元格：openpyxl 已将其物化为二进制浮点。"
+                                "请将单元格设为文本并录入十进制字符串。"
+                            ),
+                        )
+                    )
+                    continue
+                value = _excel_value(raw_value)
                 if value is None or value == "":
                     issues.append(
                         ImportIssue(severity="error", sheet=sheet_name, cell=f"C{row_number}", message="值不能为空")

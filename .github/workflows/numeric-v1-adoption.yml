@@ -1,0 +1,133 @@
+name: Numeric v1 Full Adoption
+
+on:
+  push:
+    branches:
+      - adopt/numeric-contract-v1-full
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  numeric-v1-adoption:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout adoption head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install project and test dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Compile and static import check
+        shell: pwsh
+        run: python -m compileall -q src tests tools
+
+      - name: Assert legacy global ROUND6 is absent from production comparison
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          engine = Path("src/uebench/domain/engine.py").read_text(encoding="utf-8")
+          forbidden = ["_round_threshold_value", "_THRESHOLD_COMPARISON_QUANTUM", "ecquota-legacy-round6-v1", "ROUND({actual}, 6)"]
+          hits = [item for item in forbidden if item in engine]
+          if hits:
+              raise SystemExit(f"legacy authoritative ROUND6 tokens remain: {hits}")
+          print("PASS: public Engine has no legacy global ROUND6 comparison helper/path")
+          '@ | python -
+
+      - name: Assert published rules do not silently declare rounding
+        shell: pwsh
+        run: |
+          @'
+          import json
+          from pathlib import Path
+          hits = []
+          for path in sorted(Path("data/definitions").glob("*.json")):
+              data = json.loads(path.read_text(encoding="utf-8"))
+              def walk(obj, trail):
+                  if isinstance(obj, dict):
+                      if obj.get("round_places") is not None:
+                          hits.append((path.name, "/".join(trail), obj.get("round_places"), obj.get("rounding")))
+                      for k, v in obj.items():
+                          walk(v, trail + [str(k)])
+                  elif isinstance(obj, list):
+                      for i, v in enumerate(obj):
+                          walk(v, trail + [str(i)])
+              walk(data, [])
+          for item in hits:
+              if item[3] is None:
+                  raise SystemExit(f"implicit Rule rounding found: {item}")
+          print(f"published explicit rounding declarations: {len(hits)}")
+          '@ | python -
+
+      - name: Execute Frozen Numeric v1 Conformance
+        shell: pwsh
+        run: python -m pytest tests/conformance/numeric/test_ecquota_numeric_v1.py -vv -p no:cacheprovider
+
+      - name: Execute N01-A migration evidence
+        shell: pwsh
+        run: python -m pytest tests/pilots/numeric/test_qzc_n01_a.py tests/test_gb29446.py -q -ra -p no:cacheprovider
+
+      - name: Execute numeric domain and import regressions
+        shell: pwsh
+        run: python -m pytest tests/test_engine.py tests/test_excel.py -q -ra -p no:cacheprovider
+
+      - name: Execute GB 29446 UI regression
+        shell: pwsh
+        run: python -m pytest tests/test_ui.py -q -ra -p no:cacheprovider
+
+      - name: Execute literal full suite
+        id: literal_full_suite
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force work | Out-Null
+          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-full
+
+      - name: Verify all tests except two proven baseline asset failures
+        shell: pwsh
+        run: |
+          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-clean `
+            --deselect tests/test_development_library.py::test_unified_development_library_index_is_complete `
+            --deselect tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu
+
+      - name: Prove excluded asset failures exist on execution base
+        shell: pwsh
+        run: |
+          git worktree add ../numeric-v1-base 031d0bb3406918d841984b3a535e172a8190b876
+          Push-Location ../numeric-v1-base
+          python -m pytest tests/test_development_library.py::test_unified_development_library_index_is_complete -q -p no:cacheprovider
+          $developmentExit = $LASTEXITCODE
+          if ($developmentExit -ne 1) { throw "Unexpected base exit for development-library test: $developmentExit" }
+          python -m pytest tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu -q -p no:cacheprovider
+          $releaseExit = $LASTEXITCODE
+          if ($releaseExit -ne 1) { throw "Unexpected base exit for frozen-release test: $releaseExit" }
+          Pop-Location
+          exit 0
+
+      - name: Record resolved Numeric dependency versions
+        shell: pwsh
+        run: |
+          python -m pip freeze | Select-String -Pattern '^(jsonschema|jsonschema-specifications|attrs|referencing|rpds-py)='
+
+      - name: Summarize literal suite
+        shell: pwsh
+        run: |
+          Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
+          Write-Host "Known base asset failures are independently proven above; all other tests must pass."

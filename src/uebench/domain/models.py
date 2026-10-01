@@ -255,6 +255,13 @@ class LookupRow(StrictModel):
     label: str | None = None
 
 
+class ExplicitRounding(StrictModel):
+    stage: Literal["intermediate", "comparison", "other"]
+    mode: Literal["ROUND_HALF_UP"]
+    purpose: Literal["business-explicit"]
+    source: str = Field(min_length=1)
+
+
 class Expression(StrictModel):
     op: Literal[
         "constant",
@@ -282,11 +289,20 @@ class Expression(StrictModel):
     label: str | None = None
     unit: str | None = None
     round_places: int | None = Field(default=None, ge=0, le=12)
+    rounding: ExplicitRounding | None = None
 
     @field_validator("value", mode="before")
     @classmethod
     def reject_float(cls, value: Any) -> Any:
         return _reject_float(value)
+
+    @model_validator(mode="after")
+    def validate_explicit_rounding(self) -> Expression:
+        if self.round_places is None and self.rounding is not None:
+            raise ValueError("rounding 元数据只能与 round_places 一起声明")
+        if self.round_places is not None and self.rounding is None:
+            raise ValueError("round_places 必须声明 stage/mode/purpose/source")
+        return self
 
 
 class CalculatedDisplayValue(StrictModel):
@@ -505,6 +521,10 @@ class EvaluationResult(StrictModel):
     product_id: str
     standard_family_id: str | None = None
     rule_revision: int = Field(default=1, ge=1)
+    numeric_contract_version: str | None = None
+    numeric_profile_id: str | None = None
+    calculator_version: str | None = None
+    numeric_behavior_version: str | None = None
     product_name: str
     results: list[IndicatorResult]
     rule_snapshot_sha256: str

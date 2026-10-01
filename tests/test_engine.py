@@ -323,6 +323,12 @@ def test_piecewise_and_decimal_rounding() -> None:
                     op="add",
                     args=[constant("1"), Expression(op="input", input_key="delta")],
                     round_places=3,
+                    rounding={
+                        "stage": "intermediate",
+                        "mode": "ROUND_HALF_UP",
+                        "purpose": "business-explicit",
+                        "source": "synthetic test rule: explicit 3-place rounding",
+                    },
                 ),
                 "label": "高温",
             },

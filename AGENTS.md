@@ -16,18 +16,34 @@ qz.energy_quota
 
 ## 2. Qingzhou Contracts 上位治理
 
-本项目受 `Qingzhou-contracts` 公共架构与 Contract 治理约束。
-
 公共规范权威仓库：
 
 `https://github.com/adgo07/Qingzhou-contracts.git`
 
-当前批准基线必须以本仓库以下文件为准：
+当前批准基线必须以本仓以下文件为准：
 
 - `PLATFORM_BASELINE.md`
 - `platform-lock.json`
 
-当前是 **pre-release / bootstrap baseline**。中央仓尚无正式 Contract release/tag，因此本项目锁定的是已经合并批准的精确 commit SHA；不得虚构 release/tag。
+当前锁定中央精确 commit：
+
+`ee5feb0cc34dbd99790500fadd0c4c932e202a20`
+
+不得自动跟随中央 `main`，不得虚构 release/tag。
+
+当前正式采用：
+
+- Architecture 2.1 — **FROZEN**；
+- Numeric Contract v1 — **FROZEN / ADOPTED**；
+- Numeric Profiles v1 — **FROZEN / ADOPTED**；
+- Numeric Conformance Vector v1 — **FROZEN / ADOPTED**。
+
+仍未正式采用/冻结：
+
+- Unit Contract — **DRAFT**；
+- Module/Capability Contract — **DRAFT**；
+- Workspace/Attempt/Record/Result Contract — **DRAFT**；
+- qzpack Contract — **DRAFT**。
 
 ## 3. 版本锁定规则
 
@@ -35,79 +51,114 @@ qz.energy_quota
 2. 中央仓后续 commit 默认不会自动对本项目生效；
 3. 只有显式升级 `PLATFORM_BASELINE.md` 与 `platform-lock.json` 后，新公共 Contract 才进入本项目基线；
 4. 有正式 release/tag 后，应锁定 release/tag + 对应精确 commit SHA；
-5. 升级公共 Contract 后必须运行适用的公共 Conformance 和本项目完整回归；
-6. DRAFT Contract 必须明确标识为 DRAFT，不得描述成 FROZEN 或正式稳定 Contract。
+5. 升级公共 Contract 后必须运行适用公共 Conformance 和本项目完整回归；
+6. DRAFT Contract 必须明确标识为 DRAFT。
 
-## 4. 权威边界
+## 4. Numeric v1 正式执行规则
 
-- 标准原文、正式修改单和更具体的法定/标准专属要求不得被通用公共 Contract 覆盖；
-- Qingzhou Architecture FROZEN 约束长期公共边界；
-- 已发布 Contract/Schema 在本项目显式升级后约束对应公共语义；
-- 当前 DRAFT Contract 只作为锁定 bootstrap baseline 的试点参考；
+项目级 Numeric Profile：
+
+`ECQUOTA_DECIMAL_FULL_VALUE_V1`
+
+正式默认语义：
+
+```text
+representation      = Decimal
+working_precision   = 28
+working_rounding    = ROUND_HALF_EVEN
+formal comparison   = full-value exact
+implicit rounding   = forbidden
+business tolerance  = none by default
+display rounding    = presentation-only
+```
+
+公共 Engine **不得**恢复：
+
+- 默认 ROUND6；
+- 无来源的 pre-comparison quantize；
+- global epsilon；
+- display value 回流 formal comparison；
+- caller ambient Decimal context 静默改变 authoritative result。
+
+如果标准原文或正式 Rule 明确要求业务修约，必须显式声明：
+
+- stage；
+- places / precision / significant digits；
+- rounding mode；
+- purpose；
+- source/provenance。
+
+不得以“旧软件一直这样算”作为保留隐式修约的依据。
+
+## 5. Numeric traceability 与 Conformance
+
+新的正式计算结果至少必须能够识别：
+
+- `numeric_contract_version`；
+- `numeric_profile_id`；
+- `calculator_version`；
+- `rule_revision`；
+- 必要时 `numeric_behavior_version`。
+
+Numeric 相关修改至少运行：
+
+- `tests/conformance/numeric/test_ecquota_numeric_v1.py`；
+- 原 N01-A migration evidence；
+- Numeric/domain/import tests；
+- full suite；
+- `.github/workflows/numeric-v1-adoption.yml`。
+
+`tests/conformance/numeric/ecquota_numeric_v1_vectors.json` 必须继续符合中央 Frozen Conformance Vector v1 schema，并被真实执行，不能只生成 JSON。
+
+## 6. 权威边界
+
+- 标准原文、正式修改单和更具体法定/标准专属要求不得被通用公共 Contract 覆盖；
+- Frozen Numeric Contract 规定默认 Numeric 语义；标准明确例外通过显式 Rule 表达；
 - 普通业务问题、产品 Bug、单标准专属公式、专属 UI、产品内部实现继续在本仓解决；
-- 公共 Contract 不得覆盖当前业务模块合法自治范围。
+- 公共 Contract 不得覆盖业务模块合法自治范围。
 
-如本仓现有治理与上位 FROZEN 规范存在冲突：
+## 7. 当前已知上位偏差
 
-> 不得偷偷改掉现有治理或业务行为。先在 `PLATFORM_BASELINE.md` / `docs/governance/PLATFORM_ADOPTION_REPORT.md` 记录偏差，再通过独立任务处理。
+已关闭：
 
-## 5. 公共 Contract 缺口与 RFC Candidate
+- `D-ECQ-001-global-round6-vs-frozen-full-value` — Numeric v1 Full Adoption 已移除公共 Engine 无依据默认 ROUND6。
 
-如果问题同时影响三个产品、多平台公共语义或以下公共能力：
+仍 OPEN：
 
-- Numeric / Unit；
-- Module / Capability；
-- Canonical / qzpack；
-- Workspace / Attempt / Record / Result；
-- Conformance；
-- 公共版本兼容与迁移；
-
-不得在本项目永久私自定义一套同名不同义的公共规则。
-
-应：
-
-1. 记录 RFC candidate；
-2. 写明当前产品真实案例、影响 Contract 和兼容性；
-3. 由总负责人决定是否提交 `Qingzhou-contracts` RFC/ADR；
-4. 本仓仅允许明确、可逆、不会冒充公共规范的局部试验。
-
-本项目不得直接修改 Qingzhou-contracts 正式 Contract，除非任务明确切换到公共仓治理流程。
-
-## 6. 当前已知上位偏差
-
-当前至少存在以下已记录偏差：
-
-- 本仓 `docs/统一判定规范.md` 的全局 ROUND6 比较规则，与 Qingzhou Architecture V2.1 FROZEN 的默认 full-value comparison / 禁止 implicit rounding 原则存在硬冲突；
 - Module/Capability Manifest 尚未正式实施；
 - Workspace/Attempt/Record/Result 公共外围仅部分具备；
 - 现有 `.uebench` 包不是正式 qzpack v1；
-- Unit Contract 与平台无关 Conformance Vectors 尚未正式实施。
+- Unit Contract 仍未正式采用；
+- 中央 lossless XLSX numeric-cell 公共方案仍 OPEN。
+
+Excel 特别规则：authoritative XLSX 数值如被 openpyxl 物化为 Python `float`，必须拒绝；当前模板正式数值列要求以文本形式录入十进制 lexical value。不得再通过 `float -> str -> Decimal` 静默恢复为业务真值。
 
 详见：
 
 - `PLATFORM_BASELINE.md`
-- `docs/governance/PLATFORM_ADOPTION_REPORT.md`
+- `platform-lock.json`
+- `docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`
 
-未经独立任务批准，不得在普通业务修改中顺手解决这些偏差。
+## 8. 公共 Contract 缺口与 RFC Candidate
 
-## 7. 当前接入不要求业务重构
+如果问题同时影响三个产品、多平台公共语义或 Numeric / Unit / Module / qzpack / Record / Conformance 等公共能力，不得在本项目永久私自定义一套同名不同义的公共规则。
 
-QZC-A01 以及后续普通 Contract baseline 升级任务不得默认要求：
+应记录 RFC candidate，由中央治理流程决定；本项目不得直接修改 Qingzhou-contracts 正式 Contract，除非任务明确切换到公共仓治理流程。
 
-- 修改业务公式；
-- 修改 Canonical 标准数据；
-- 修改 evaluator/calculator；
+## 9. 禁止无关扩大范围
+
+普通 Contract adoption / Numeric 任务不得借机默认要求：
+
 - 重写业务 UI；
 - 迁移数据库；
-- 抽公共 Python package；
 - 合并三个仓库；
-- 启动 Suite；
-- 开始 Android/HarmonyOS/iOS；
-- 将所有算法 DSL 化；
+- 启动 Suite / Mobile；
 - 全量 qzpack 化；
-- 为统一架构重写成熟 UI。
+- 为统一架构重写成熟业务能力。
 
-## 8. 当前仓执行原则
+只有与已冻结 Contract 直接冲突的生产行为，才允许做最小必要修复。
+
+## 10. 当前仓执行原则
 
 开始任务前至少检查：
 
@@ -117,4 +168,4 @@ QZC-A01 以及后续普通 Contract baseline 升级任务不得默认要求：
 4. `HANDOFF.md`
 5. 与任务相关的本仓业务规范
 
-如任务涉及公共 Contract，再读取锁定 SHA 对应的 Qingzhou-contracts 文件，不得直接按中央仓当前最新 `main` 猜测规则。
+如任务涉及公共 Contract，再读取锁定 SHA 对应的 Qingzhou-contracts 文件，不得按中央仓最新 `main` 猜测规则。

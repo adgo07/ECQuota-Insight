@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qingzhou.example/contracts/numeric/conformance-vector-v1.schema.json",
+  "title": "Qingzhou Numeric Conformance Vector v1",
+  "description": "Frozen Numeric Conformance Vector v1: Common Core plus category-specific fields.",
+  "type": "object",
+  "required": ["case_id", "category", "numeric_contract_version", "numeric_profile_id", "authority_scope", "inputs", "provenance"],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "category": {"enum": ["parse_normalization", "input_rejection", "exact_comparison", "business_boundary", "display_separation", "explicit_rounding", "unit_conversion", "quantity_transformation", "coefficient_trace", "characterization_factor", "transcendental_reference", "precision_sensitivity", "operation_order_sensitivity", "numerical_tolerance", "profile_propagation", "ambient_independence", "profile_mismatch_rejection", "legacy_migration", "golden_replay"]},
+    "numeric_contract_version": {"type": "string", "minLength": 1},
+    "numeric_profile_id": {"type": "string", "minLength": 1},
+    "authority_scope": {"type": "string", "minLength": 1},
+    "inputs": {},
+    "provenance": {"type": ["object", "string", "array"]},
+    "expected_business_result": {},
+    "expected_reference_value": {},
+    "expected_error": {"type": ["string", "object", "array", "null"]},
+    "normalized_value": {}, "calculation_value": {}, "comparison_value": {}, "display_value": {},
+    "operator": {"enum": ["lt", "lte", "eq", "gte", "gt", null]}, "threshold": {},
+    "rounding": {"type": ["object", "null"], "properties": {"stage": {"type": "string"}, "mode": {"type": "string"}, "places": {"type": ["integer", "null"]}, "precision": {"type": ["integer", "null"]}, "significant_digits": {"type": ["integer", "null"]}, "purpose": {"type": "string"}, "source": {}}, "additionalProperties": true},
+    "transcendental_reference": {"type": ["object", "null"], "properties": {"function": {"type": "string"}, "operation_order": {}, "reference_procedure": {}, "normalization": {}}, "additionalProperties": true},
+    "tolerance": {"type": ["object", "null"], "required": ["purpose", "mode", "value"], "properties": {"purpose": {"enum": ["business-boundary", "standard-explicit", "algorithmic-numerical", "lookup-interpolation", "test-conformance"]}, "mode": {"type": "string", "minLength": 1}, "value": {"type": "string", "minLength": 1}, "unit": {"type": ["string", "null"]}, "source": {}}, "additionalProperties": true},
+    "requested_profile": {}, "effective_profile": {}, "ambient_profile": {}, "conflicting_profile": {},
+    "legacy_expected_result": {}, "legacy_numeric_behavior_version": {"type": ["string", "null"]}, "current_numeric_behavior_version": {"type": ["string", "null"]},
+    "unit_conversion": {"type": ["object", "null"]}, "input_quantity": {"type": ["object", "null"]}, "output_quantity": {"type": ["object", "null"]}, "coefficient": {"type": ["object", "null"]}, "characterization_factor": {"type": ["object", "null"]}
+  },
+  "anyOf": [{"required": ["expected_business_result"]}, {"required": ["expected_reference_value"]}, {"required": ["expected_error"]}],
+  "additionalProperties": true
+}
