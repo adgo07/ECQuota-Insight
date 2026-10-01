@@ -329,4 +329,4 @@ Required Full Adoption gates:
 
 This conclusion means ECQuota's adopted authoritative Numeric scope conforms to the frozen Numeric Contract v1 semantics described above. It does **not** mean Unit, Module, Record, qzpack or other DRAFT Contracts have been frozen/adopted.
 
-PR: to be assigned after governance cleanup; PR must not be self-merged.
+PR: `#4` — `https://github.com/adgo07/ECQuota-Insight/pull/4`; execution task must not self-merge it.

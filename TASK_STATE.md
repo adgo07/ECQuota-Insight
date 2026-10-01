@@ -95,4 +95,6 @@ GitHub Actions `Numeric v1 Full Adoption` 已实际验证：
 FULL NUMERIC V1 ADOPTION
 ```
 
+PR：`#4` — `https://github.com/adgo07/ECQuota-Insight/pull/4`。
+
 不要自行合并 PR。
