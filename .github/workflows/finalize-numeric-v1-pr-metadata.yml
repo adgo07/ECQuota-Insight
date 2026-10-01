@@ -1,0 +1,37 @@
+name: Finalize Numeric v1 PR Metadata
+
+on:
+  push:
+    branches:
+      - adopt/numeric-contract-v1-full
+    paths:
+      - tools/finalize_numeric_v1_pr_metadata.py
+      - .github/workflows/finalize-numeric-v1-pr-metadata.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: adopt/numeric-contract-v1-full
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Finalize PR metadata and self-clean
+        shell: pwsh
+        run: |
+          python tools/finalize_numeric_v1_pr_metadata.py
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/governance/NUMERIC_V1_ADOPTION_REPORT.md TASK_STATE.md
+          git rm tools/finalize_numeric_v1_pr_metadata.py .github/workflows/finalize-numeric-v1-pr-metadata.yml
+          git commit -m "docs: finalize Numeric v1 adoption PR metadata"
+          git push origin HEAD:adopt/numeric-contract-v1-full
