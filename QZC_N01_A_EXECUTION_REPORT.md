@@ -1,5 +1,15 @@
 # QZC-N01-A — ECQuota Exact Decimal / Rounding Pilot Execution Report
 
+> **状态：`HISTORICAL-SUPERSEDED`**
+>
+> **用途：QZC-N01-A Pilot 历史审计证据。**
+>
+> **注意：不得作为当前 Numeric 正式规则依据。** 本文件记录的是 Pilot 当时的执行与验收证据；后续 **Numeric Contract v1 Full Adoption** 已完成正式迁移与验证。
+>
+> **当前权威：** `platform-lock.json`（locked SHA）、`docs/统一判定规范.md`、`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`。
+>
+> 本文件正文保持原样，不重写当时真实结论；文中的 `READY FOR INDEPENDENT ACCEPTANCE` 是 Pilot 当时的记录状态。
+
 Status: **EXECUTION COMPLETE — READY FOR INDEPENDENT ACCEPTANCE**  
 Independent Acceptance: **NOT PERFORMED**
 
