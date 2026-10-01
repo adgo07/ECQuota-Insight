@@ -1,0 +1,74 @@
+name: Numeric v1 Adoption Probe
+
+on:
+  push:
+    branches:
+      - adopt/numeric-contract-v1-full
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install project
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Numeric source audit
+        shell: pwsh
+        run: |
+          Write-Host "=== authoritative source numeric tokens ==="
+          Get-ChildItem src -Recurse -File -Include *.py | Select-String -Pattern '_round_threshold_value|ROUND_HALF_UP|ROUND_HALF_EVEN|quantize\(|\bround\(|isclose|epsilon|tolerance' | ForEach-Object { "{0}:{1}: {2}" -f $_.Path,$_.LineNumber,$_.Line.Trim() }
+      - name: Rule-declared rounding audit
+        shell: pwsh
+        run: |
+          @'
+          import json
+          from pathlib import Path
+
+          hits = []
+          for path in sorted(Path("data/definitions").glob("*.json")):
+              data = json.loads(path.read_text(encoding="utf-8"))
+              def walk(obj, trail):
+                  if isinstance(obj, dict):
+                      if obj.get("round_places") is not None:
+                          hits.append((path.name, "/".join(trail), obj.get("round_places")))
+                      for k, v in obj.items():
+                          walk(v, trail + [str(k)])
+                  elif isinstance(obj, list):
+                      for i, v in enumerate(obj):
+                          walk(v, trail + [str(i)])
+              walk(data, [])
+          print(f"published definition round_places count: {len(hits)}")
+          for item in hits:
+              print("ROUND_PLACES", *item)
+          '@ | python -
+      - name: Compile baseline
+        shell: pwsh
+        run: python -m compileall -q src tests tools
+      - name: N01-A baseline
+        shell: pwsh
+        run: python -m pytest tests/pilots/numeric/test_qzc_n01_a.py tests/test_gb29446.py -q -ra -p no:cacheprovider
+      - name: Literal full-suite baseline
+        id: full
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force work | Out-Null
+          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-adoption-probe
+      - name: Summary
+        shell: pwsh
+        run: |
+          Write-Host "Literal full-suite outcome: ${{ steps.full.outcome }}"
