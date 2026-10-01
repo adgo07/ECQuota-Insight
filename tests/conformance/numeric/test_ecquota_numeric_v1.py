@@ -194,7 +194,8 @@ def _execute_vector(vector: dict) -> None:
     if case_id == "ecq-display-separation":
         result = EvaluationEngine().evaluate(GB29446, _gb_detail(vector["inputs"]["E_d"]))
         item = result.results[0]
-        assert str(item.actual_value) == vector["calculation_value"]
+        assert item.actual_value == Decimal(vector["calculation_value"])
+        assert item.actual_value == Decimal(vector["comparison_value"])
         assert item.grade.value == vector["expected_business_result"]
         assert format(item.actual_value.quantize(Decimal("0.01")), "f") == vector["display_value"]
         return
