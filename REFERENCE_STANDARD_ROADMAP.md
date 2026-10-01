@@ -1,8 +1,8 @@
 # ECQuota 参考标准开发路线
 
-状态：**CURRENT INVENTORY / GOVERNANCE ROADMAP**  
-盘点日期：2026-10-01  
-盘点基线：`main@c2dea39bd609c89a6c29cc526e29680b556e6be6`  
+状态：**CURRENT INVENTORY / GOVERNANCE ROADMAP**
+盘点日期：2026-10-01
+盘点基线：`main@c2dea39bd609c89a6c29cc526e29680b556e6be6`
 参考标准：`GB 29446—2019 选煤电力消耗限额`
 
 > 本文件只记录当前真实能力与后续交付顺序，不修改 Calculator、标准规则、Numeric Profile、数据库、Excel 实现或 Windows 打包产物。
