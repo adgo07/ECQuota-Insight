@@ -235,3 +235,28 @@ Excel 特别规则：authoritative XLSX 数值如被 openpyxl 物化为 Python `
 > 用户可见内容、治理文档、路线、执行报告、验收报告、PR/Issue 描述、错误/校验提示和面向人的说明优先使用中文。
 
 稳定机器字段、JSON/YAML key、enum、API/schema field、Module ID、Contract ID、Python 类/函数/模块名等继续保持既有英文标识；面向人解释时优先使用“中文名称（英文标识）”。
+
+## 12. 标准问题与解释治理
+
+开工前还必须读取根目录 `STANDARD_ISSUES_REGISTER.md`，检查当前任务是否涉及已有 Standard Issue。
+
+以后正式 Design、Execution Report、Acceptance Report 的“平台 / Contract 预检查”必须增加：
+
+```text
+是否存在与当前任务相关的 Standard Issue：是 / 否
+涉及的问题编号：……
+本任务是否改变既有软件解释：是 / 否
+```
+
+如果在标准映射、软件设计、Calculator、Golden Case、测试、Excel、用户实际使用或标准更新中发现新的疑似笔误、歧义、冲突、未规定、术语、引用或软件解释问题，必须先登记到 `STANDARD_ISSUES_REGISTER.md`，再完成正式实现说明。
+
+每个问题必须明确分开记录“标准原文事实”“技术判断”“软件实现决定”。不得把内部技术判断或软件选择写成标准明文，不得在 Mapping、Rule、Calculator 或测试中静默纠正疑似标准错误。若问题会影响正式业务结果，必须能追踪：
+
+```text
+Standard Issue
+→ Software Decision
+→ Rule / Calculator
+→ Test / Golden Case
+```
+
+修改既有解释时必须同步检查相关测试和历史结果兼容性。本规则只建立治理机制，不授权当前任务修复已登记问题。
