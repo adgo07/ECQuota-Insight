@@ -1,17 +1,29 @@
 {
   "repository": "https://github.com/adgo07/Qingzhou-contracts.git",
-  "baseline_kind": "pre-release/bootstrap",
+  "baseline_kind": "frozen-contract-adoption",
   "contracts_release": null,
   "release_tag": null,
-  "commit_sha": "0cd74d783fa23add6dc881b408a8c8ba8503f8e8",
-  "locked_at": "2026-09-28",
+  "commit_sha": "ee5feb0cc34dbd99790500fadd0c4c932e202a20",
+  "locked_at": "2026-10-01",
   "module_id": "qz.energy_quota",
   "architecture_version": "2.1",
   "architecture_status": "FROZEN",
   "numeric_contract": {
-    "version": "draft-v1",
-    "status": "DRAFT",
-    "path": "contracts/numeric/NUMERIC_CONTRACT_V1_DRAFT.md"
+    "version": "v1",
+    "status": "FROZEN",
+    "path": "contracts/numeric/NUMERIC_CONTRACT_V1_FROZEN.md"
+  },
+  "numeric_profiles": {
+    "version": "v1",
+    "status": "FROZEN",
+    "path": "contracts/numeric/NUMERIC_PROFILES_V1_FROZEN.md",
+    "project_profile_id": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+  },
+  "numeric_conformance": {
+    "version": "v1",
+    "status": "FROZEN",
+    "path": "conformance/common/numeric/CONFORMANCE_VECTOR_V1_FROZEN.md",
+    "schema_path": "conformance/common/numeric/conformance_vector_v1.schema.json"
   },
   "unit_contract": {
     "version": "draft-v1",
@@ -35,10 +47,10 @@
   },
   "auto_follow_main": false,
   "known_deviations": [
-    "D-ECQ-001-global-round6-vs-frozen-full-value",
     "D-ECQ-002-module-capability-manifest-not-implemented",
     "D-ECQ-003-workspace-attempt-record-result-envelope-partial",
     "D-ECQ-004-qzpack-not-implemented",
-    "D-ECQ-005-unit-and-conformance-not-formalized"
+    "D-ECQ-005-unit-contract-not-formally-adopted",
+    "D-ECQ-006-lossless-xlsx-numeric-cell-scheme-open-authoritative-floats-rejected"
   ]
 }
