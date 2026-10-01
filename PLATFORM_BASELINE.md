@@ -5,91 +5,127 @@
 ## 1. 基线来源
 
 - repository: `https://github.com/adgo07/Qingzhou-contracts.git`
-- baseline type: **pre-release / bootstrap baseline**
-- contracts release/tag: **无（当前中央仓尚未发布正式 release/tag）**
-- locked commit SHA: `0cd74d783fa23add6dc881b408a8c8ba8503f8e8`
-- locked date: `2026-09-28`
+- baseline type: **frozen-contract adoption baseline**
+- contracts release/tag: **无（本次锁定精确 commit，不虚构 release/tag）**
+- locked commit SHA: `ee5feb0cc34dbd99790500fadd0c4c932e202a20`
+- locked date: `2026-10-01`
 - module id: `qz.energy_quota`
 
-本仓库只受上述锁定 commit 中已经存在的公共治理内容约束，不自动采用 Qingzhou-contracts 后续 `main` 变化。
+本仓库只受上述锁定 commit 中已经存在且被本项目显式采用的公共治理内容约束，不自动采用 Qingzhou-contracts 后续 `main` 变化。
 
 ## 2. 版本与状态
 
 | 项目 | 锁定版本/状态 | 权威文件 |
 |---|---|---|
 | Architecture | `2.1` — **FROZEN** | `docs/architecture/ARCHITECTURE_V2.1_FROZEN.md` |
-| Numeric Contract | `draft-v1` — **DRAFT / NOT YET RELEASED** | `contracts/numeric/NUMERIC_CONTRACT_V1_DRAFT.md` |
-| Unit Contract | `draft-v1` — **DRAFT / NOT YET RELEASED** | `contracts/units/UNIT_CONTRACT_V1_DRAFT.md` |
-| Module / Capability Contract | `draft-v1` — **DRAFT / NOT YET RELEASED** | `contracts/module/MODULE_CAPABILITY_CONTRACT_V1_DRAFT.md` |
-| Workspace / Attempt / Record / Result Contract | `draft-v1` — **DRAFT / NOT YET RELEASED** | `contracts/records/WORKSPACE_ATTEMPT_RECORD_RESULT_CONTRACT_V1_DRAFT.md` |
-| qzpack / Canonical Package Contract | `draft-v1` — **DRAFT / NOT YET RELEASED** | `contracts/package/QZPACK_CONTRACT_V1_DRAFT.md` |
+| Numeric Contract | `v1` — **FROZEN / ADOPTED** | `contracts/numeric/NUMERIC_CONTRACT_V1_FROZEN.md` |
+| Numeric Profiles | `v1` — **FROZEN / ADOPTED** | `contracts/numeric/NUMERIC_PROFILES_V1_FROZEN.md` |
+| Numeric Conformance Vector | `v1` — **FROZEN / ADOPTED** | `conformance/common/numeric/CONFORMANCE_VECTOR_V1_FROZEN.md` |
+| Unit Contract | `draft-v1` — **DRAFT** | `contracts/units/UNIT_CONTRACT_V1_DRAFT.md` |
+| Module / Capability Contract | `draft-v1` — **DRAFT** | `contracts/module/MODULE_CAPABILITY_CONTRACT_V1_DRAFT.md` |
+| Workspace / Attempt / Record / Result Contract | `draft-v1` — **DRAFT** | `contracts/records/WORKSPACE_ATTEMPT_RECORD_RESULT_CONTRACT_V1_DRAFT.md` |
+| qzpack / Canonical Package Contract | `draft-v1` — **DRAFT** | `contracts/package/QZPACK_CONTRACT_V1_DRAFT.md` |
 
-DRAFT 仅表示当前锁定 bootstrap baseline 中的试点参考，不得描述成 FROZEN，也不得在未显式升级 baseline 的情况下把中央仓后续修改自动视为本项目规则。
+本次 Numeric v1 Adoption 不改变 Unit、Module、Record、qzpack 的 DRAFT 状态。
 
-## 3. 权威关系
+## 3. Numeric v1 项目实现基线
 
-本项目采用以下原则：
+项目级 Numeric Profile：
 
-1. 标准原文、正式修改单和更具体的法定/标准专属要求优先于通用公共 Contract；
-2. Qingzhou Contracts 的 FROZEN 公共架构约束本项目的长期公共边界；
-3. 已发布 Contract/Schema 在未来显式升级后成为对应公共语义的正式约束；
-4. 当前 DRAFT Contract 仅按本文件锁定版本作为试点参考，不得自行宣称稳定；
-5. 单产品合法自治范围继续由本仓库治理，普通产品 Bug、单标准公式、专属 UI 等仍在本仓解决。
+`ECQUOTA_DECIMAL_FULL_VALUE_V1`
+
+核心语义：
+
+- authoritative representation：`Decimal`；
+- working precision：`28`；
+- working rounding mode：`ROUND_HALF_EVEN`；
+- default formal comparison：`full-value exact`；
+- implicit business rounding：禁止；
+- business tolerance：默认无；
+- display rounding：仅展示；
+- explicit business rounding：仅允许标准/Rule 明确声明，并带 stage / mode / purpose / source；
+- authoritative evaluation 使用 profile-owned Decimal context，隔离 caller ambient context。
+
+GB 29446 原 N01-A behavior marker `ecquota-gb29446-full-value-v2` 继续保留为 migration/audit marker；正式 Numeric Profile ID 为 `ECQUOTA_DECIMAL_FULL_VALUE_V1`。
+
+正式新结果至少可追踪：
+
+- `numeric_contract_version`；
+- `numeric_profile_id`；
+- `calculator_version`；
+- `rule_revision`；
+- `numeric_behavior_version`。
+
+历史记录不自动重算，旧 JSON 仍可按可选 Numeric 元数据字段读取。
 
 ## 4. 已知公共 Contract 偏差
 
-### D-ECQ-001 — Numeric / 全局 ROUND6 硬冲突
+### D-ECQ-001 — CLOSED：全局 ROUND6 与 full-value 冲突
 
-当前本仓 `docs/统一判定规范.md` 要求所有数值边界在比较前统一 `ROUND(value, 6)`，并使用 `ROUND_HALF_UP`。
+Numeric v1 Full Adoption 已取消公共 Engine 中无依据默认 ROUND6：
 
-Qingzhou Architecture V2.1 FROZEN 则规定：
+- grade 默认直接使用 Decimal full-value comparison；
+- compliance 默认直接使用 Decimal full-value comparison；
+- `_round_threshold_value()` / 全局 `ROUND(value, 6)` 正式比较机制已移除；
+- 现有 published definitions 中 `round_places` 使用数为 `0`；
+- 如未来标准确有显式修约要求，必须通过带 authority metadata 的 explicit Rule rounding 表达。
 
-- 默认 full-value comparison；
-- 禁止 implicit rounding；
-- 只有标准或正式业务规则明确要求修约时，才允许显式修约；
-- 显示位数不得改变正式判定。
-
-因此这是当前已知的**真实上位治理冲突**。QZC-A01 只登记，不修改算法、规则或现有治理文件。本偏差必须在后续独立任务中依据标准证据和公共 Numeric 决策处理。
+因此 `D-ECQ-001-global-round6-vs-frozen-full-value` 已关闭。
 
 ### D-ECQ-002 — Module / Capability Manifest 尚未实施
 
-中央架构冻结了永久 Module ID `qz.energy_quota`，但当前产品尚未实现正式 Module/Capability Manifest。当前只在治理层登记 Module ID，不修改运行代码。
+中央架构冻结了永久 Module ID `qz.energy_quota`，但当前产品尚未实现正式 Module/Capability Manifest。当前只在治理层登记 Module ID。
 
 ### D-ECQ-003 — Workspace / Attempt / Record / Result 公共外围尚未完整实施
 
-当前已有 `EvaluationRequest`、`EvaluationResult`、保存记录、规则快照和审计能力，但尚未形成中央 DRAFT 所描述的完整 Workspace / Attempt / Record / Result Envelope，也没有跨平台 Workspace Contract。
+当前已有 `EvaluationRequest`、`EvaluationResult`、保存记录、规则快照和审计能力，并已增加 Numeric v1 最小 traceability；但尚未形成中央 DRAFT 所描述的完整 Workspace / Attempt / Record / Result Envelope。
 
 ### D-ECQ-004 — qzpack 尚未实施
 
-当前 `.uebench` 签名标准包已经具备 manifest、SHA-256、Ed25519 签名、版本/父包和安装校验等能力，但并非 Qingzhou `qzpack` Contract 的正式实现。不得把现有 `.uebench` 包直接描述为已符合 qzpack v1。
+当前 `.uebench` 签名标准包并非 Qingzhou `qzpack` Contract 的正式实现。
 
-### D-ECQ-005 — Unit / Conformance 公共契约尚未正式接入
+### D-ECQ-005 — Unit Contract 尚未正式采用
 
-当前代码已有单位字段、Decimal 计算、输入单位校验和产品测试，但尚无正式 Unit Contract 实现、公共 Unit ID/Conversion Contract，也尚无平台无关的 Qingzhou Conformance Vectors。
+Numeric Conformance v1 已正式接入；Unit Contract 仍为 DRAFT，现有单位字段与校验不得描述成 Unit Contract v1 已采用。
 
-## 5. Upgrade Rule
+### D-ECQ-006 — lossless XLSX numeric-cell 公共方案仍 OPEN
+
+实测证明：高精度 XLSX numeric cell 可被 openpyxl 物化为 Python binary float，并跨越 full-value 业务边界。
+
+本项目已做最小安全修复：
+
+- authoritative XLSX 数值单元格若被 openpyxl 读成 `float`，导入直接报错；
+- 模板正式数值列设为文本格式，要求十进制 lexical text；
+- 不再允许 `float -> str -> Decimal` 静默成为正式业务值。
+
+中央统一 lossless XLSX numeric-cell interchange scheme 仍 OPEN，因此保留本 deviation；但该 OPEN 项不再构成 Numeric v1 Full Adoption 的 authoritative-path 违规。
+
+## 5. 权威关系
+
+1. 标准原文、正式修改单和更具体的法定/标准专属要求优先于通用公共 Contract；
+2. Numeric Contract v1 的默认正式比较语义为 full-value exact；
+3. 标准或正式 Rule 如要求显式修约，必须保留其来源和应用阶段；
+4. 显示精度不得反馈正式 comparison；
+5. Unit、Module、Record、qzpack 当前仍按 DRAFT 边界治理；
+6. 中央后续 commit 不会自动改变本项目行为。
+
+## 6. Conformance 与回归要求
+
+本项目 Numeric v1 Adoption 的正式证据包括：
+
+- `tests/conformance/numeric/ecquota_numeric_v1_vectors.json`；
+- `tests/conformance/numeric/conformance_vector_v1.schema.json`；
+- `tests/conformance/numeric/test_ecquota_numeric_v1.py`；
+- 原 N01-A migration evidence；
+- `.github/workflows/numeric-v1-adoption.yml`。
+
+任何后续修改 Numeric Profile、formal comparison、explicit rounding、tolerance、authoritative ingress 或 traceability 时，必须运行对应 Frozen Numeric v1 Conformance 和完整回归。
+
+## 7. Upgrade Rule
 
 - 本项目不得自动跟随 `Qingzhou-contracts/main`；
 - 中央仓出现新 commit 不会自动改变本项目行为；
 - 升级必须显式修改本文件与 `platform-lock.json`；
 - 有正式 release/tag 后优先锁定 release/tag + 精确 SHA；
-- 升级前检查 breaking changes、RFC/ADR/CHANGELOG；
-- 升级后运行适用的公共 Conformance 与本项目完整回归；
+- 升级后运行适用公共 Conformance 与本项目完整回归；
 - 如发现公共 Contract 缺口，记录 RFC candidate，不能在本项目永久私自发明同名不同义的公共规则。
-
-## 6. 当前接入范围
-
-本次 QZC-A01 仅建立治理锁定关系和差异记录：
-
-- 不修改业务公式；
-- 不修改 Canonical 标准数据；
-- 不修改 evaluator/calculator；
-- 不修改 UI；
-- 不修改数据库 schema/migration；
-- 不引入 Git Submodule；
-- 不 vendor Qingzhou-contracts；
-- 不创建公共 Python package；
-- 不启动 Suite / Mobile / Native Core；
-- 不修改中央 Contract。
-
-详细差异见 `docs/governance/PLATFORM_ADOPTION_REPORT.md`。
