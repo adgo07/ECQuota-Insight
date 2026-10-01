@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, localcontext
 from uuid import uuid4
 
 from .models import (
@@ -25,17 +25,13 @@ from .models import (
     parse_decimal,
 )
 
-# Legacy compatibility for standards that have not yet completed an
-# independent standard-source numeric migration.  GB 29446 does NOT use this
-# policy after QZC-N01-A.
-_THRESHOLD_COMPARISON_QUANTUM = Decimal("0.000001")
-LEGACY_ROUND6_NUMERIC_BEHAVIOR = "ecquota-legacy-round6-v1"
-GB29446_NUMERIC_BEHAVIOR_VERSION = "ecquota-gb29446-full-value-v2"
-
-
-def _round_threshold_value(value: Decimal) -> Decimal:
-    """Legacy ECQuota comparison rule retained only for unmigrated standards."""
-    return value.quantize(_THRESHOLD_COMPARISON_QUANTUM, rounding=ROUND_HALF_UP)
+from .numeric import (
+    ECQUOTA_CALCULATOR_VERSION,
+    ECQUOTA_DECIMAL_FULL_VALUE_V1,
+    ECQUOTA_FULL_VALUE_BEHAVIOR_VERSION,
+    GB29446_NUMERIC_BEHAVIOR_VERSION,
+    NumericProfile,
+)
 
 
 def _format_comparison_operand(value: Decimal) -> str:
@@ -235,9 +231,16 @@ class ExpressionEvaluator:
             raise RuleEvaluationError(f"不支持的表达式操作：{op}")
 
         if expression.round_places is not None:
+            if expression.rounding is None:
+                raise RuleEvaluationError("显式修约缺少 rounding 元数据")
+            if expression.rounding.mode != "ROUND_HALF_UP":
+                raise RuleEvaluationError(f"暂不支持显式修约模式：{expression.rounding.mode}")
             quantum = Decimal("1").scaleb(-expression.round_places)
             result = result.quantize(quantum, rounding=ROUND_HALF_UP)
-            rendered = f"round({rendered}, {expression.round_places})"
+            rendered = (
+                f"explicit_round({rendered}, {expression.round_places}, "
+                f"{expression.rounding.mode}, source={expression.rounding.source})"
+            )
 
         trace.append(
             CalculationStep(
@@ -253,11 +256,28 @@ class ExpressionEvaluator:
 
 
 class EvaluationEngine:
-    def __init__(self) -> None:
+    def __init__(self, numeric_profile: NumericProfile = ECQUOTA_DECIMAL_FULL_VALUE_V1) -> None:
+        self.numeric_profile = numeric_profile
         self.expressions = ExpressionEvaluator()
         self.conditions = ConditionEvaluator()
 
     def evaluate(
+        self,
+        standard: StandardDefinition,
+        request: EvaluationRequest,
+        *,
+        allow_pre_effective: bool = False,
+    ) -> EvaluationResult:
+        # The project Profile owns authoritative finite-precision arithmetic.
+        # A caller's ambient Decimal context must not change a governed result.
+        with localcontext(self.numeric_profile.decimal_context()):
+            return self._evaluate_authoritative(
+                standard,
+                request,
+                allow_pre_effective=allow_pre_effective,
+            )
+
+    def _evaluate_authoritative(
         self,
         standard: StandardDefinition,
         request: EvaluationRequest,
@@ -335,6 +355,14 @@ class EvaluationEngine:
             standard_version=standard.version,
             standard_family_id=standard.family_id,
             rule_revision=standard.rule_revision,
+            numeric_contract_version=self.numeric_profile.numeric_contract_version,
+            numeric_profile_id=self.numeric_profile.numeric_profile_id,
+            calculator_version=ECQUOTA_CALCULATOR_VERSION,
+            numeric_behavior_version=(
+                GB29446_NUMERIC_BEHAVIOR_VERSION
+                if standard.id == "gb-29446-2019"
+                else ECQUOTA_FULL_VALUE_BEHAVIOR_VERSION
+            ),
             product_id=product.id,
             product_name=product.name,
             results=results,
@@ -363,6 +391,14 @@ class EvaluationEngine:
             standard_version=standard.version,
             standard_family_id=standard.family_id,
             rule_revision=standard.rule_revision,
+            numeric_contract_version=self.numeric_profile.numeric_contract_version,
+            numeric_profile_id=self.numeric_profile.numeric_profile_id,
+            calculator_version=ECQUOTA_CALCULATOR_VERSION,
+            numeric_behavior_version=(
+                GB29446_NUMERIC_BEHAVIOR_VERSION
+                if standard.id == "gb-29446-2019"
+                else ECQUOTA_FULL_VALUE_BEHAVIOR_VERSION
+            ),
             product_id=product.id,
             product_name=product.name,
             results=[
@@ -556,6 +592,11 @@ class EvaluationEngine:
     ) -> IndicatorResult:
         trace: list[CalculationStep] = [step.model_copy() for step in context.pre_steps]
         is_gb29446 = standard_id == "gb-29446-2019"
+        numeric_behavior_version = (
+            GB29446_NUMERIC_BEHAVIOR_VERSION
+            if is_gb29446
+            else ECQUOTA_FULL_VALUE_BEHAVIOR_VERSION
+        )
         for sequence, step in enumerate(trace, start=1):
             step.sequence = sequence
         try:
@@ -627,9 +668,9 @@ class EvaluationEngine:
                 actual,
                 corrected_thresholds,
                 indicator.comparison,
-                trace=trace if is_gb29446 else None,
+                trace=trace,
                 unit=indicator.unit,
-                full_value=is_gb29446,
+                numeric_behavior_version=numeric_behavior_version,
             )
             compliance_requirement = None
             compliance_limit = None
@@ -653,23 +694,23 @@ class EvaluationEngine:
                         raise RuleEvaluationError(
                             f"执行要求 {compliance_case.requirement} 缺少对应限值，需人工确认"
                         )
-                    rounded_actual = _round_threshold_value(actual)
-                    rounded_limit = _round_threshold_value(compliance_limit)
                     predicate = (
-                        rounded_actual <= rounded_limit
+                        actual <= compliance_limit
                         if indicator.comparison is ComparisonDirection.LTE
-                        else rounded_actual >= rounded_limit
+                        else actual >= compliance_limit
                     )
                     compliance_requirement = compliance_case.requirement
                     compliance_result = "符合" if predicate else "不符合"
+                    relation = "<=" if indicator.comparison is ComparisonDirection.LTE else ">="
                     trace.append(
                         CalculationStep(
                             sequence=len(trace) + 1,
                             label="企业执行要求合规判定",
                             operation="compliance",
                             expression=(
-                                f"ROUND({actual}, 6) {indicator.comparison.value} "
-                                f"ROUND({compliance_limit}, 6)"
+                                f"numeric_behavior={numeric_behavior_version}; "
+                                f"{_format_comparison_operand(actual)} {relation} "
+                                f"{_format_comparison_operand(compliance_limit)}"
                             ),
                             value=compliance_result,
                             unit=indicator.unit,
@@ -711,13 +752,12 @@ class EvaluationEngine:
         *,
         trace: list[CalculationStep] | None = None,
         unit: str | None = None,
-        full_value: bool = False,
+        numeric_behavior_version: str = ECQUOTA_FULL_VALUE_BEHAVIOR_VERSION,
     ) -> Grade:
         predicate = (lambda left, right: left <= right) if comparison is ComparisonDirection.LTE else (
             lambda left, right: left >= right
         )
         relation = "<=" if comparison is ComparisonDirection.LTE else ">="
-        compared_actual = actual if full_value else _round_threshold_value(actual)
 
         for key, grade in (
             ("LEVEL_1", Grade.LEVEL_1),
@@ -727,28 +767,18 @@ class EvaluationEngine:
             threshold = thresholds.get(key)
             if threshold is None:
                 continue
-            compared_threshold = threshold if full_value else _round_threshold_value(threshold)
-            matched = predicate(compared_actual, compared_threshold)
+            matched = predicate(actual, threshold)
             if trace is not None:
-                if full_value:
-                    expression = (
-                        f"numeric_behavior={GB29446_NUMERIC_BEHAVIOR_VERSION}; "
-                        f"{_format_comparison_operand(actual)} {relation} "
-                        f"{_format_comparison_operand(threshold)}"
-                    )
-                else:
-                    expression = (
-                        f"numeric_behavior={LEGACY_ROUND6_NUMERIC_BEHAVIOR}; "
-                        f"ROUND({_format_comparison_operand(actual)}, 6) = {compared_actual}；"
-                        f"ROUND({_format_comparison_operand(threshold)}, 6) = {compared_threshold}；"
-                        f"{compared_actual} {relation} {compared_threshold}"
-                    )
                 trace.append(
                     CalculationStep(
                         sequence=len(trace) + 1,
                         label=f"{grade.value}等级判定比较",
                         operation="grade_comparison",
-                        expression=expression,
+                        expression=(
+                            f"numeric_behavior={numeric_behavior_version}; "
+                            f"{_format_comparison_operand(actual)} {relation} "
+                            f"{_format_comparison_operand(threshold)}"
+                        ),
                         value=matched,
                         unit=unit,
                     )

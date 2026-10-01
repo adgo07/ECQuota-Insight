@@ -4,6 +4,7 @@ from datetime import date
 from typing import Protocol
 
 from uebench.domain.engine import EvaluationEngine
+from uebench.domain.numeric import ECQUOTA_DECIMAL_FULL_VALUE_V1
 from uebench.domain.models import (
     EvaluationRequest,
     EvaluationResult,
@@ -86,7 +87,7 @@ class EvaluationService:
     ) -> None:
         self.standards = standards
         self.evaluations = evaluations
-        self.engine = engine or EvaluationEngine()
+        self.engine = engine or EvaluationEngine(ECQUOTA_DECIMAL_FULL_VALUE_V1)
 
     def _resolve_standard(self, request: EvaluationRequest) -> StandardDefinition:
         standard = self.standards.get_for_evaluation(
