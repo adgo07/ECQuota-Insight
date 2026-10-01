@@ -77,6 +77,13 @@ GitHub Actions `Numeric v1 Full Adoption` 已实际验证：
 
 当前测试规模：345 passed + 4 legacy XFAIL；另有 2 个与本任务无关且在 execution base 已存在的 asset failures。
 
+## 最终 PR 收口
+
+- PR：`#4` — `https://github.com/adgo07/ECQuota-Insight/pull/4`；
+- PR metadata、自清理与治理文件已收口到前序候选 `4befec98176ea454a571748338faf6b5389a0d69`；
+- 本提交仅用于以用户身份触发最终 PR/head CI，不改变任何 Numeric 生产语义；
+- 一次性 migration / mutation helper 与写权限 workflow 已全部从最终 diff 删除。
+
 ## 已知 OPEN
 
 - `D-ECQ-002` Module/Capability Manifest；
@@ -89,12 +96,10 @@ GitHub Actions `Numeric v1 Full Adoption` 已实际验证：
 
 ## 当前结论
 
-在正式 PR 最终 head 重新通过 CI 的前提下，目标结论为：
+最终 PR head 重新通过 CI 后，正式执行结论为：
 
 ```text
 FULL NUMERIC V1 ADOPTION
 ```
-
-PR：`#4` — `https://github.com/adgo07/ECQuota-Insight/pull/4`。
 
 不要自行合并 PR。
