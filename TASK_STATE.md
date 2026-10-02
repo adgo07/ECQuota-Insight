@@ -14,17 +14,16 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-**`ECQ-GOV01` — `DONE`**（仓库治理清理 + 参考标准开发路线收口）
+**`ECQ-RS01` — `DONE`**（GB29446 业务 Vertical Slice 闭环）
 
-- 性质：治理 / 文档 / 路线收口，**不是业务开发**；
-- 目标：清除会误导后续开发的过时状态、重复治理、历史发布表述和无必要人工确认要求；确立"下一正式版完整支持 GB29446"为唯一主线；将总体路线改为中文文件名 `参考标准开发路线.md`；
-- 验收载体：**PR #8**（`chore/ecq-gov01-roadmap-cleanup`）。具体 head、审查与合并状态以该 PR 为准，不写入本文件。
+- `ECQ-GOV01` = `DONE`，PR #8 已合并；
+- `GB29446 Business Capability = COMPLETE`；
+- `Reference Standard Product Closure = PARTIAL`；
+- 已完成资产元数据、标准发现 / 原文入口、12 个工艺系数、异常数值入口、失败时清除旧结果、计算说明与动态标准依据；
+- 验收证据：`tests/test_gb29446_reference_slice.py`、既有 GB29446 / N01-A / Frozen Numeric Conformance，以及 PR #9 执行报告；
+- 下一阶段 `RS02` = `NOT STARTED`；本任务未实施 RS02–RS06。
 
-**下一任务 = `RS01` — `NOT STARTED`**（GB29446 业务 Vertical Slice 闭环）。
-
-> GOV01 已停在完成状态，**未开始 RS01**。
-
-> 本文件只记录稳定状态。PR head SHA、审查进度与合并状态一律以 PR #8 自身为准，不写入本文件。
+本文件记录稳定状态。execution head SHA、审查进度与合并状态以 PR #9 自身为准。
 
 ## 当前治理基线
 
@@ -43,7 +42,10 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 - Numeric Profile / Numeric Conformance（Frozen v1，可执行）；
 - implicit ROUND6 移除（`D-ECQ-001` 已关闭）；
 - GB29446 Calculator / Numeric 主链；
-- GB29446 专用页面基础。
+- GB29446 专用页面基础；
+- RS01 业务 Gate：两煤种、12 个 k、分级 / 边界、异常输入、原文入口与动态依据；
+- GB29446 `data` / `scope-63` Definition 语义一致，开发库索引 hash 修复、目录规则修订号同步为 2；
+- 非有限 Decimal 入口拒绝；有限 `1e999` 可正常计算，没有新增业务上限。
 
 Numeric v1 已完成，**不再重新设计 ROUND6**。
 
@@ -51,8 +53,8 @@ Numeric v1 已完成，**不再重新设计 ROUND6**。
 
 ```text
 ECQ-GOV01 治理清理与路线收口                        DONE
-→ RS01 GB29446 业务 Vertical Slice 闭环              NOT STARTED  ← 下一任务
-→ RS02 GB29446 产品生命周期闭环                      NOT STARTED
+→ RS01 GB29446 业务 Vertical Slice 闭环              DONE
+→ RS02 GB29446 产品生命周期闭环                      NOT STARTED  ← 下一阶段
 → RS03 GB29446 Excel Adapter 闭环                    NOT STARTED
 → RS04 GB29446 Product Golden Gate                   NOT STARTED
 → RS05 Windows V1 最终验收与发布                     NOT STARTED
@@ -67,7 +69,8 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 |---|---|
 | Numeric Contract v1 / Profile / Conformance | `DONE` |
 | GB29446 Calculator / Numeric 主链 | `DONE` |
-| GB29446 业务 Vertical Slice 完整闭环 | `PARTIAL`（RS01 处理） |
+| GB29446 业务 Vertical Slice 完整闭环 | `DONE`（业务能力 `COMPLETE`） |
+| Reference Standard Product Closure | `PARTIAL`（RS02–RS05 尚未完成） |
 | GB29446 产品生命周期闭环（保存 / 历史恢复） | `PARTIAL`（RS02 处理） |
 | GB29446 Excel Adapter 闭环 | `PARTIAL`（RS03 处理） |
 | GB29446 Product Golden Gate | `NOT STARTED`（RS04 处理） |
@@ -93,15 +96,15 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 - `ECQ-STD-GB29446-001` —— 状态 `PROVISIONAL`，见 `STANDARD_ISSUES_REGISTER.md`。
 
-治理层 Deferred（不在 GOV01 处理，仅登记）：
+治理层 Deferred（不在 RS01 处理，仅登记）：
 
 - 现有"规则确认表"机制作为 legacy publication gate 保留；后续可在不降低标准可追溯性的前提下单独简化（`tools/publish_confirmed_rules.py` 本任务不修改）；
-- 开发库 `standards/development/library-index.json` 记录的 `definition_sha256` 与实际定义文件不一致，根因是 `data/definitions/` 与 `standards/development/scope-63/definitions/` 存在两份同义但字节不同的 GB29446 定义副本。**GOV01 只登记，不修改任何标准数据**，应在后续独立任务中收口；
 - `data/catalog.json` 中 `gb-29435-2025` 的 `lifecycle_status` 与定义文件不一致。**GOV01 只登记，不修改任何标准数据**，应在后续独立任务中收口。
 
 ## 下一步
 
-- `ECQ-GOV01` = **`DONE`**；
-- 下一任务 = **`RS01`**（`NOT STARTED`）。
+- `ECQ-RS01` = **`DONE`**；
+- 下一阶段 = **`RS02`**（`NOT STARTED`）；RS03–RS06 仍为 `NOT STARTED`；
+- literal full suite 的旧便携 ZIP 缺失失败在当前 execution base 与本分支均复现，未冒充 PASS；开发库旧失败已修复。真实计数见 PR #9 执行报告。
 
-本任务停在 GOV01 完成状态，不开始 RS01。
+本任务停在 RS01，未开始 RS02。
