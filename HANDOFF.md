@@ -38,7 +38,7 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`。RS01 与 RS02 已完成，验收载体分别为 PR #9、PR #10。尚欠 Excel Adapter 闭环、Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
+当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`；GB29446 Excel Adapter = `COMPLETE`。RS01 / RS02 / RS03 已完成，验收载体分别为 PR #9、PR #10、PR #11。尚欠 Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
 
 ## 5. 当前 Numeric 规则
 
@@ -70,8 +70,8 @@
 ECQ-GOV01 治理清理与路线收口                        DONE
 → RS01 GB29446 业务 Vertical Slice 闭环              DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
-→ RS03 GB29446 Excel Adapter 闭环                    NOT STARTED  ← 下一阶段
-→ RS04 GB29446 Product Golden Gate                   NOT STARTED
+→ RS03 GB29446 Excel Adapter 闭环                    DONE
+→ RS04 GB29446 Product Golden Gate                   NOT STARTED  ← 下一阶段
 → RS05 Windows V1 最终验收与发布                     NOT STARTED
 → RS06 第二标准架构验证                              NOT STARTED
 ```
@@ -94,14 +94,15 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；
-- 下一阶段 = **`RS03` — GB29446 Excel Adapter Closure**（`NOT STARTED`）；RS04–RS06 均未开始；
-- RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；RS02 生命周期 Gate：`tests/test_gb29446_record_lifecycle.py`；
-- 查看原记录是纯只读用例；基于原记录重新评价仅回填输入，规则变化明确提示，正式计算成功即保存新记录；
+- `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；
+- 下一阶段 = **`RS04` — GB29446 Product Golden Gate**（`NOT STARTED`）；RS05–RS06 均未开始；
+- RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；RS02 生命周期 Gate：`tests/test_gb29446_record_lifecycle.py`；RS03 Excel Adapter Gate：`tests/test_gb29446_excel_adapter.py`；
+- Excel 仅为 Adapter：正式入口是 `ApplicationFacade.evaluate_workbook(import_id)`，计算仍由同一个 `EvaluationService` / `EvaluationEngine` 执行；权威数值入口为 text 十进制 lexical，XLSX numeric cell 与 Excel 公式一律拒绝；
+- GUI 与 Excel 共用 `src/uebench/application/gb29446.py` 的周期 codec 与字段口径，同一输入产生同一 `EvaluationRequest` 与同一业务投影；
 - Request / Result / Rule Snapshot 历史模型与 evaluate() 保存语义保持兼容；Calculator、Numeric、阈值、标准解释与数据库 Schema 不变；
-- RS02 验收载体：PR #10；旧便携 ZIP 缺失仍是已知历史发布资产问题。
+- 验收载体：RS03 = PR #11；旧便携 ZIP 缺失仍是已知历史发布资产问题。
 
-本任务停在 RS02，未开始 RS03。Reference Standard Product Closure 仍为 `PARTIAL`。
+本任务停在 RS03，未开始 RS04。Reference Standard Product Closure 仍为 `PARTIAL`。
 
 ## 10. 历史材料索引
 

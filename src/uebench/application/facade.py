@@ -163,10 +163,22 @@ class ApplicationFacade:
     def delete_evaluation(self, evaluation_id: str) -> bool:
         return self._evaluations.soft_delete(evaluation_id)
 
-    def create_template(self, path: Path) -> Path:
+    def create_template(self, path: Path, standard_id: str | None = None) -> Path:
+        """Create an import template.
+
+        ``standard_id=None`` produces the generic multi-standard template.
+        A standard id resolves the currently effective published definition and
+        produces that standard's dedicated template.  Resolution happens here so
+        the template service never queries a repository.
+        """
         if self._template is None:
             raise RuntimeError("Excel模板服务未配置")
-        return self._template.create_template(path)
+        if standard_id is None:
+            return self._template.create_template(path, None)
+        standard = self.get_published_standard(standard_id)
+        if standard is None:
+            raise LookupError(f"未找到已发布标准：{standard_id}")
+        return self._template.create_template(path, standard)
 
     def validate_workbook(self, path: Path) -> ImportReportPort:
         if self._import is None:
@@ -174,9 +186,27 @@ class ApplicationFacade:
         return self._import.validate(path)
 
     def commit_workbook(self, import_id: str) -> EvaluationDraftPort:
+        """Legacy generic submission (kept for the other standards)."""
         if self._import is None:
             raise RuntimeError("Excel导入服务未配置")
         return self._import.commit(import_id)
+
+    def evaluate_workbook(self, import_id: str) -> EvaluationResult:
+        """Formal Excel evaluation use case.
+
+        This is the reference-standard entry point: the adapter supplies a
+        canonical request, the application layer re-verifies source integrity,
+        and formal calculation still happens in ``EvaluationService`` (and
+        therefore in the shared engine).  The batch only advances to
+        ``evaluated`` after the evaluation and its record succeed, so a failed
+        attempt stays retryable.
+        """
+        if self._import is None:
+            raise RuntimeError("Excel导入服务未配置")
+        draft = self._import.prepare(import_id)
+        result = self._evaluation.evaluate(draft.request)
+        self._import.mark_evaluated(import_id, result.evaluation_id)
+        return result
 
     def export_evaluation(self, evaluation_id: str, path: Path) -> Path:
         if self._export is None:
