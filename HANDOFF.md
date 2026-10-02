@@ -38,7 +38,7 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；RS01 实现与本地业务 Gate 已完成，等待独立验收。尚欠产品生命周期闭环（保存 / 历史恢复）、Excel Adapter 闭环、Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
+当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；RS01 实现与本地业务 Gate 已完成。尚欠产品生命周期闭环（保存 / 历史恢复）、Excel Adapter 闭环、Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
 
 ## 5. 当前 Numeric 规则
 
@@ -95,11 +95,11 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 ## 9. 下一步
 
 - `ECQ-GOV01` = **`DONE`**（PR #8 已合并）；
-- `ECQ-RS01` = **`DONE`**（实现与本地业务 Gate 完成，等待独立验收；不合并 PR）；
+- `ECQ-RS01` = **`DONE`**；
 - 下一阶段 = **`RS02`**（`NOT STARTED`）；RS03–RS06 均未开始；
 - RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；其他 Numeric 证据继续保留；
 - 本次修复开发库 GB29446 hash、目录修订号、非有限数值入口及普通结果说明；未修改 Engine、Definition、数据库、Excel 或打包；
-- literal full suite 的旧便携 ZIP 缺失在当前 base 也复现，未冒充 PASS。具体执行 SHA、diff、计数与未解决问题以 RS01 PR 执行报告为准。
+- literal full suite 的旧便携 ZIP 缺失在当前 base 也复现，未冒充 PASS。具体执行 SHA、diff、计数与未解决问题以 PR #9 执行报告为准。
 
 本任务停在 RS01，未开始 RS02。Reference Standard Product Closure 仍为 `PARTIAL`。
 

@@ -14,16 +14,16 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-**`ECQ-RS01` — `DONE`**（GB29446 业务 Vertical Slice 闭环；实现与本地业务 Gate 完成，等待独立验收）
+**`ECQ-RS01` — `DONE`**（GB29446 业务 Vertical Slice 闭环）
 
 - `ECQ-GOV01` = `DONE`，PR #8 已合并；
 - `GB29446 Business Capability = COMPLETE`；
 - `Reference Standard Product Closure = PARTIAL`；
 - 已完成资产元数据、标准发现 / 原文入口、12 个工艺系数、异常数值入口、失败时清除旧结果、计算说明与动态标准依据；
-- 验收证据：`tests/test_gb29446_reference_slice.py`、既有 GB29446 / N01-A / Frozen Numeric Conformance，以及本次 RS01 PR 执行报告；
+- 验收证据：`tests/test_gb29446_reference_slice.py`、既有 GB29446 / N01-A / Frozen Numeric Conformance，以及 PR #9 执行报告；
 - 下一阶段 `RS02` = `NOT STARTED`；本任务未实施 RS02–RS06。
 
-本文件记录稳定状态。execution head SHA、审查进度与合并状态以 RS01 PR 自身为准。
+本文件记录稳定状态。execution head SHA、审查进度与合并状态以 PR #9 自身为准。
 
 ## 当前治理基线
 
@@ -69,7 +69,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 |---|---|
 | Numeric Contract v1 / Profile / Conformance | `DONE` |
 | GB29446 Calculator / Numeric 主链 | `DONE` |
-| GB29446 业务 Vertical Slice 完整闭环 | `DONE`（业务能力 `COMPLETE`，等待独立验收） |
+| GB29446 业务 Vertical Slice 完整闭环 | `DONE`（业务能力 `COMPLETE`） |
 | Reference Standard Product Closure | `PARTIAL`（RS02–RS05 尚未完成） |
 | GB29446 产品生命周期闭环（保存 / 历史恢复） | `PARTIAL`（RS02 处理） |
 | GB29446 Excel Adapter 闭环 | `PARTIAL`（RS03 处理） |
@@ -103,8 +103,8 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 下一步
 
-- `ECQ-RS01` = **`DONE`**（实现与本地业务 Gate 完成，等待独立验收）；不合并 PR；
+- `ECQ-RS01` = **`DONE`**；
 - 下一阶段 = **`RS02`**（`NOT STARTED`）；RS03–RS06 仍为 `NOT STARTED`；
-- literal full suite 的旧便携 ZIP 缺失失败在当前 execution base 与本分支均复现，未冒充 PASS；开发库旧失败已修复。真实计数见 RS01 PR 执行报告。
+- literal full suite 的旧便携 ZIP 缺失失败在当前 execution base 与本分支均复现，未冒充 PASS；开发库旧失败已修复。真实计数见 PR #9 执行报告。
 
 本任务停在 RS01，未开始 RS02。
