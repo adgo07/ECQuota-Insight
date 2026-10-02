@@ -9,7 +9,7 @@
 | Module ID | `qz.energy_quota` |
 | 产品名称 | 单位产品能耗限额评价软件（程序包名 `uebench`） |
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
-| 当前产品阶段 | 参考标准核心纵向闭环；`PHASE_1` 类业务验收已有多批记录，无统一 Phase 编号 |
+| 当前产品阶段 | 参考标准 `GB 29446—2019` 产品闭环；当前阶段状态见 `TASK_STATE.md` 与 `参考标准开发路线.md`（RS01–RS06） |
 | 当前交付范围 | 47 项强制性能耗限额标准、753 条当前指标；开发基线 `standards/development/scope-63` |
 | Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 
@@ -233,7 +233,26 @@ DRAFT Contract 必须明确标识为 DRAFT。有正式 release/tag 后，应锁�
 
 只有任务明确要求“升级中央 Contract 基线”时，才能通过独立治理任务修改 `PLATFORM_BASELINE.md` / `platform-lock.json`。
 
-### 4.1 正式报告必须写平台 / Contract 预检查
+### 4.1 当前权威读取顺序
+
+新任务默认按以下顺序建立上下文，**不要默认通读历史资料**：
+
+```text
+1. AGENTS.md
+2. TASK_STATE.md
+3. 参考标准开发路线.md
+4. STANDARD_ISSUES_REGISTER.md
+5. platform-lock.json
+6. 当前任务相关代码 / 测试
+```
+
+- **Numeric 任务**再读取 `docs/统一判定规范.md`；
+- 中央文件由中央 `docs/GUIDE_INDEX.md` 路由；
+- 历史资料（`docs/history/`、`docs/audits/`、`docs/验收记录.md`）按需读取，**不属于默认必读**。
+
+`参考标准开发路线.md` 是本仓**唯一**总体产品开发路线；不得再新建与其并列的第二份总体路线。
+
+### 4.2 正式报告必须写平台 / Contract 预检查
 
 后续正式 Design、Execution Report、Acceptance Report 不得省略“平台 / Contract 预检查”。至少记录：
 
