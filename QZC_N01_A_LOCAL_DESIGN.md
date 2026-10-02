@@ -1,5 +1,15 @@
 # QZC-N01-A — ECQuota Exact Decimal / Rounding Pilot 设计
 
+> **状态：`HISTORICAL-SUPERSEDED`**
+>
+> **用途：QZC-N01-A Pilot 历史审计证据。**
+>
+> **注意：不得作为当前 Numeric 正式规则依据。** 本文件描述的是 Pilot 当时观察到的 Engine 行为（当时仍存在无依据全局 ROUND6），该状态已被后续 **Numeric Contract v1 Full Adoption** 取代。
+>
+> **当前权威：** `platform-lock.json`（locked SHA）、`docs/统一判定规范.md`、`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`。
+>
+> 本文件正文保持原样，不重写历史结论。
+
 状态：**DESIGN ONLY / NOT EXECUTED**  
 Pilot ID：`N01-A`  
 Repository：`adgo07/ECQuota-Insight`  

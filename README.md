@@ -6,7 +6,9 @@
 
 - GB 29446—2019新建评价页面源码已通过独立验收，303项完整测试通过。
 - 核算周期、煤种、工艺、电量E_d和原煤量m为主要输入；企业名称可选，k自动匹配且只读。
-- 正式公式 `e_d = E_d × k / m`；等级比较两侧ROUND6，显示精度不参与判级；超过三级显示“超出3级”。
+- 正式公式 `e_d = E_d × k / m`；等级比较为 **Decimal full-value exact comparison**（不执行全局 ROUND6），显示精度不参与判级；超过三级显示“超出3级”。
+- **历史口径（已废止）**：早期版本对等级边界两侧执行 `ROUND(value, 6)` + `ROUND_HALF_UP`。该无依据全局 ROUND6 已由 Numeric Contract v1 Full Adoption 移除（`D-ECQ-001` 已关闭）；仅在标准原文或正式 Rule 显式要求修约时才允许 explicit rounding。
+- **当前权威来源**：`platform-lock.json`（locked SHA）、`docs/统一判定规范.md`、`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`。
 - 新版EXE/安装包和独立公式Excel尚未同步完成验收；旧发布物不代表本次源码。
 - 其余标准保留原有范围，不表示全部达到选煤专用页面的完善程度。
 
