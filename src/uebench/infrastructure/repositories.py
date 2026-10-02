@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime, timezone
 
-from sqlalchemy import desc, select
+from sqlalchemy import desc, func, select
 
 from uebench.domain.models import (
     AuditEntry,
@@ -288,19 +288,28 @@ class SqlEvaluationRepository:
                 .limit(limit)
             )
             rows = session.scalars(statement)
-            return [
-                EvaluationSummary(
+            summaries = []
+            for row in rows:
+                saved_result = EvaluationResult.model_validate_json(row.result_json)
+                summaries.append(EvaluationSummary(
                     evaluation_id=row.evaluation_id,
                     created_at=row.created_at,
                     evaluation_date=row.evaluation_date,
                     standard_id=row.standard_id,
-                    standard_number=row.standard_number,
+                    standard_number=saved_result.standard_number,
+                    standard_title=saved_result.standard_title,
                     product_id=row.product_id,
+                    product_name=saved_result.product_name,
                     organization_name=row.organization_name,
                     project_name=row.project_name,
-                )
-                for row in rows
-            ]
+                ))
+            return summaries
+
+    def count(self) -> int:
+        with self.database.session() as session:
+            return session.scalar(
+                select(func.count()).select_from(EvaluationRow).where(EvaluationRow.deleted_at.is_(None))
+            ) or 0
 
     def soft_delete(self, evaluation_id: str) -> bool:
         with self.database.session() as session:

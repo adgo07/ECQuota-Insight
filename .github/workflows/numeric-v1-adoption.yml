@@ -100,21 +100,18 @@ jobs:
           New-Item -ItemType Directory -Force work | Out-Null
           python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-full
 
-      - name: Verify all tests except two proven baseline asset failures
+      - name: Verify all tests except the proven release asset failure
         shell: pwsh
         run: |
           python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-clean `
-            --deselect tests/test_development_library.py::test_unified_development_library_index_is_complete `
             --deselect tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu
 
-      - name: Prove excluded asset failures exist on execution base
+      - name: Prove excluded release failure exists on actual PR base
+        if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
-          git worktree add ../numeric-v1-base 031d0bb3406918d841984b3a535e172a8190b876
+          git worktree add ../numeric-v1-base ${{ github.event.pull_request.base.sha }}
           Push-Location ../numeric-v1-base
-          python -m pytest tests/test_development_library.py::test_unified_development_library_index_is_complete -q -p no:cacheprovider
-          $developmentExit = $LASTEXITCODE
-          if ($developmentExit -ne 1) { throw "Unexpected base exit for development-library test: $developmentExit" }
           python -m pytest tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu -q -p no:cacheprovider
           $releaseExit = $LASTEXITCODE
           if ($releaseExit -ne 1) { throw "Unexpected base exit for frozen-release test: $releaseExit" }
@@ -130,4 +127,4 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "Known base asset failures are independently proven above; all other tests must pass."
+          Write-Host "On pull requests the release failure is independently proven on the actual PR base; all other tests must pass."

@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QCompleter,
     QDateEdit,
+    QDialog,
     QFileDialog,
     QFormLayout,
     QFrame,
@@ -261,8 +262,8 @@ class MainWindow(QMainWindow):
         layout.addLayout(metrics)
         card, card_layout = self._card()
         card_layout.addWidget(QLabel("最近评价"))
-        self.home_recent = QTableWidget(0, 4)
-        self.home_recent.setHorizontalHeaderLabels(["时间", "标准", "单位/项目", "评价ID"])
+        self.home_recent = QTableWidget(0, 3)
+        self.home_recent.setHorizontalHeaderLabels(["时间", "标准", "单位/项目"])
         self._configure_table(self.home_recent)
         card_layout.addWidget(self.home_recent)
         layout.addWidget(card, 1)
@@ -562,23 +563,23 @@ class MainWindow(QMainWindow):
         controls = QHBoxLayout()
         refresh = QPushButton("刷新")
         refresh.clicked.connect(self.refresh_records)
-        copy_record = QPushButton("复制到新评价")
-        copy_record.clicked.connect(self.copy_selected_record)
-        recalculate = QPushButton("重新计算")
+        view = QPushButton("查看原记录")
+        view.clicked.connect(self.view_selected_record)
+        recalculate = QPushButton("基于此记录重新评价")
         recalculate.clicked.connect(self.recalculate_selected_record)
         export = QPushButton("导出Excel")
         export.clicked.connect(self.export_selected_record)
         delete = QPushButton("删除记录")
         delete.clicked.connect(self.delete_selected_record)
         controls.addWidget(refresh)
-        controls.addWidget(copy_record)
+        controls.addWidget(view)
         controls.addWidget(recalculate)
         controls.addStretch()
         controls.addWidget(export)
         controls.addWidget(delete)
         layout.addLayout(controls)
-        self.record_table = QTableWidget(0, 7)
-        self.record_table.setHorizontalHeaderLabels(["计算时间", "评价日期", "标准", "单位", "项目", "产品ID", "评价ID"])
+        self.record_table = QTableWidget(0, 6)
+        self.record_table.setHorizontalHeaderLabels(["评价时间", "评价日期", "标准", "企业/单位", "项目", "产品/煤种"])
         self._configure_table(self.record_table)
         layout.addWidget(self.record_table, 1)
         return page
@@ -696,7 +697,7 @@ class MainWindow(QMainWindow):
         records = self.context.application.list_recent_evaluations(10)
         scoped_standards = [item for item in all_standards if item.lifecycle_status is not LifecycleStatus.OBSOLETE]
         self.home_standard_count.setText(f"{len(standards)}/{len(scoped_standards)}")
-        self.home_evaluation_count.setText(str(len(records)))
+        self.home_evaluation_count.setText(str(self.context.application.count_evaluations()))
         package_manifest = self.context.application.latest_package_manifest()
         self.home_package_version.setText(
             package_manifest.get("data_version", "未知") if package_manifest else "未安装"
@@ -705,9 +706,11 @@ class MainWindow(QMainWindow):
         for record in records:
             row = self.home_recent.rowCount()
             self.home_recent.insertRow(row)
-            values = [record.created_at, record.standard_number, record.organization_name or record.project_name or "", record.evaluation_id]
+            values = [record.created_at, record.standard_number, record.organization_name or record.project_name or ""]
             for column, value in enumerate(values):
-                self.home_recent.setItem(row, column, _item(value))
+                cell = _item(value)
+                cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
+                self.home_recent.setItem(row, column, cell)
 
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
@@ -1411,7 +1414,7 @@ class MainWindow(QMainWindow):
                     "输入数据未通过校验，未生成电耗等级。请查看评价结果中的提示并修正。",
                 )
                 return
-            message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
+            message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "评价完成，已生成评价记录。"
             QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
             return
         self.eval_results.setRowCount(0)
@@ -1482,11 +1485,14 @@ class MainWindow(QMainWindow):
             return "超出3级"
         return GRADE_LABELS[grade]
 
-    def _gb29446_warning_for_display(self, request: EvaluationRequest, warning: str) -> str:
+    def _gb29446_warning_for_display(
+        self, request: EvaluationRequest, warning: str, snapshot: StandardDefinition | None = None,
+    ) -> str:
+        standard = snapshot if snapshot is not None else self.current_standard
         product = next(
             (
                 item
-                for item in (self.current_standard.products if self.current_standard else [])
+                for item in (standard.products if standard else [])
                 if item.id == request.product_id
             ),
             None,
@@ -1554,6 +1560,15 @@ class MainWindow(QMainWindow):
         self.gb29446_result_grade.setText(grade_label)
         self.gb29446_result_message.setText("")
 
+        self.gb29446_explanation.setText(self._gb29446_saved_explanation(request, result, item))
+
+    @staticmethod
+    def _gb29446_saved_explanation(
+        request: EvaluationRequest, result: EvaluationResult, item: IndicatorResult,
+    ) -> str:
+        """展示保存的结果与输入，不执行公式或重新判级。"""
+        actual = item.actual_value
+        grade_label = MainWindow._gb29446_grade_label(item.grade)
         supplied_electricity = request.inputs.get("electricity_consumption")
         supplied_raw_coal = request.inputs.get("raw_coal_input")
         electricity = (
@@ -1569,22 +1584,22 @@ class MainWindow(QMainWindow):
         e0 = item.display_values.get("unadjusted_power_consumption")
         factor = item.display_values.get("process_factor")
         e0_line = (
-            f"未折算单位电耗 E_d/m：{self._format_result_number(e0)} kW·h/t"
+            f"未折算单位电耗 E_d/m：{MainWindow._format_result_number(e0)} kW·h/t"
             if request.input_mode is InputMode.DETAIL
             else "未折算单位电耗 E_d/m：— kW·h/t"
         )
         process = request.inputs.get("washing_process")
         process_name = str(process.value) if process is not None else "—"
         factor_line = (
-            f"折算系数 k：{self._format_result_number(factor)}"
+            f"折算系数 k：{MainWindow._format_result_number(factor)}"
             f"（{result.product_name}，{process_name}；按附录A表A.1自动匹配）"
         )
         if electricity is not None and raw_coal is not None and factor is not None:
             formula_line = (
-                f"本次代入：e_d = {self._format_explanation_number(electricity)} × "
-                f"{self._format_explanation_number(factor)} / "
-                f"{self._format_explanation_number(raw_coal)} = "
-                f"{self._format_explanation_number(actual)} kW·h/t"
+                f"本次代入：e_d = {MainWindow._format_explanation_number(electricity)} × "
+                f"{MainWindow._format_explanation_number(factor)} / "
+                f"{MainWindow._format_explanation_number(raw_coal)} = "
+                f"{MainWindow._format_explanation_number(actual)} kW·h/t"
             )
         else:
             formula_line = "计算公式：e_d = E_d × k / m"
@@ -1592,21 +1607,21 @@ class MainWindow(QMainWindow):
         thresholds = item.corrected_thresholds
         threshold_names = (("LEVEL_1", "1级"), ("LEVEL_2", "2级"), ("LEVEL_3", "3级"))
         threshold_text = "；".join(
-            f"{name} ≤ {self._format_result_number(thresholds.get(key))} kW·h/t"
+            f"{name} ≤ {MainWindow._format_result_number(thresholds.get(key))} kW·h/t"
             for key, name in threshold_names
             if thresholds.get(key) is not None
         )
         level3 = thresholds.get("LEVEL_3")
         if level3 is not None:
-            threshold_text += f"；超出3级：> {self._format_result_number(level3)} kW·h/t"
-        raw_value_line = f"原始计算值（未修约）：{self._format_explanation_number(actual)} kW·h/t"
+            threshold_text += f"；超出3级：> {MainWindow._format_result_number(level3)} kW·h/t"
+        raw_value_line = f"原始计算值（未修约）：{MainWindow._format_explanation_number(actual)} kW·h/t"
         threshold_key = "LEVEL_3" if item.grade is Grade.NOT_QUALIFIED else item.grade.value
         threshold = thresholds.get(threshold_key)
         if threshold is not None:
             operator = ">" if item.grade is Grade.NOT_QUALIFIED else "≤"
             comparison_line = (
-                f"判级比较：{self._format_explanation_number(actual)} {operator} "
-                f"{self._format_explanation_number(threshold)}；结果：{grade_label}"
+                f"判级比较：{MainWindow._format_explanation_number(actual)} {operator} "
+                f"{MainWindow._format_explanation_number(threshold)}；结果：{grade_label}"
             )
         else:
             comparison_line = f"正式结果：{grade_label}"
@@ -1614,18 +1629,17 @@ class MainWindow(QMainWindow):
             f"{raw_value_line}\n{comparison_line}\n"
             "判级采用原始计算值与等级限值直接比较；页面显示的小数位仅用于展示，不影响判级。"
         )
-        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
-        self.gb29446_explanation.setText(
-            "\n".join(
-                (
-                    e0_line,
-                    factor_line,
-                    formula_line,
-                    f"{coal_type}分级阈值：{threshold_text}",
-                    current_grade_line,
-                )
+        if result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1":
+            # 未声明当前 Profile 的旧记录只展示当时结论，不替它补写当前比较语义。
+            current_grade_line = (
+                f"{raw_value_line}\n当时保存的结果：{grade_label}。"
+                "正式比较语义见原记录技术详情。"
             )
-        )
+        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
+        return "\n".join((
+            e0_line, factor_line, formula_line,
+            f"{coal_type}分级阈值：{threshold_text}", current_grade_line,
+        ))
 
     def refresh_records(self) -> None:
         self.record_table.setRowCount(0)
@@ -1635,18 +1649,126 @@ class MainWindow(QMainWindow):
             values = [
                 record.created_at,
                 record.evaluation_date,
-                record.standard_number,
+                f"{record.standard_number} {record.standard_title}",
                 record.organization_name,
                 record.project_name,
-                record.product_id,
-                record.evaluation_id,
+                record.product_name,
             ]
             for column, value in enumerate(values):
-                self.record_table.setItem(row, column, _item(value))
+                cell = _item(value)
+                cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
+                self.record_table.setItem(row, column, cell)
 
     def _selected_record_id(self) -> str | None:
         row = self.record_table.currentRow()
-        return self.record_table.item(row, 6).text() if row >= 0 and self.record_table.item(row, 6) else None
+        cell = self.record_table.item(row, 0) if row >= 0 else None
+        return cell.data(Qt.ItemDataRole.UserRole) if cell is not None else None
+
+    def view_selected_record(self) -> None:
+        evaluation_id = self._selected_record_id()
+        if not evaluation_id:
+            QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
+            return
+        loaded = self.context.application.get_evaluation(evaluation_id)
+        if loaded is None:
+            QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
+            return
+        request, result, snapshot = loaded
+        dialog = QDialog(self)
+        dialog.setWindowTitle("查看原记录")
+        dialog.resize(820, 700)
+        layout = QVBoxLayout(dialog)
+        content = QTextEdit()
+        content.setObjectName("record_detail_content")
+        content.setReadOnly(True)
+        lines = [
+            f"{result.standard_number} {result.standard_title}",
+            f"评价时间：{result.evaluated_at}",
+            f"评价日期：{request.evaluation_date}",
+            f"企业名称：{request.organization_name or '—'}",
+            f"产品/煤种：{result.product_name}",
+        ]
+        if result.standard_id == "gb-29446-2019":
+            period, custom, note = self._decode_gb29446_notes(request.notes)
+            lines.extend([f"核算周期：{custom if period == '自定义' else period}", f"备注：{note or '—'}"])
+            for key, label in [("washing_process", "选煤工艺"), ("electricity_consumption", "E_d"), ("raw_coal_input", "m")]:
+                supplied = request.inputs.get(key)
+                lines.append(f"{label}：{supplied.value if supplied is not None else '—'} {supplied.unit or '' if supplied is not None else ''}")
+        else:
+            product = next((p for p in snapshot.products if p.id == request.product_id), None)
+            definitions = list(product.input_definitions) if product else []
+            if product:
+                definitions.extend(d for i in product.indicators for d in i.input_definitions)
+            labels = {d.key: d.label for d in definitions}
+            lines.append(f"备注：{request.notes or '—'}")
+            lines.extend(f"{labels.get(key, '输入项')}：{value.value} {value.unit or ''}" for key, value in request.inputs.items())
+        for item in result.results:
+            grade = self._gb29446_grade_label(item.grade) if result.standard_id == "gb-29446-2019" else GRADE_LABELS[item.grade]
+            lines.extend([f"指标：{item.indicator_name}", f"等级：{grade}"])
+            if item.grade is Grade.INCOMPLETE:
+                lines.append("数据不完整，未形成正常等级或符合性结论。")
+            if item.actual_value is not None:
+                lines.append(f"实际值：{self._format_explanation_number(item.actual_value)} {item.unit}")
+                if result.standard_id == "gb-29446-2019":
+                    lines.append(self._gb29446_saved_explanation(request, result, item))
+                else:
+                    lines.extend(f"{GRADE_LABELS[Grade(key)]}限值：{value} {item.unit}" for key, value in item.corrected_thresholds.items())
+            if result.standard_id == "gb-29446-2019":
+                lines.append(self._gb29446_basis_for_display(item))
+                lines.extend(self._gb29446_warning_for_display(request, warning, snapshot) for warning in item.warnings)
+            # 所有依据均来自保存的 Result；包括普通结果页未展开的条款。
+            lines.append("标准依据：")
+            lines.extend(
+                f"{ref.standard_number}，第{ref.page}页，{ref.clause or ''} {ref.table or ''} {ref.note or ''}"
+                for ref in item.source_references
+            )
+        content.setPlainText("\n".join(lines))
+        layout.addWidget(content, 1)
+        toggle = QPushButton("技术详情")
+        toggle.setCheckable(True)
+        technical = QTextEdit()
+        technical.setObjectName("record_detail_technical")
+        technical.setReadOnly(True)
+        technical.setPlainText("\n".join([
+            f"evaluation_id: {result.evaluation_id}",
+            f"standard version: {snapshot.version}",
+            f"rule_revision: {snapshot.rule_revision}",
+            f"numeric_contract_version: {result.numeric_contract_version}",
+            f"numeric_profile_id: {result.numeric_profile_id}",
+            f"calculator_version: {result.calculator_version}",
+            f"numeric_behavior_version: {result.numeric_behavior_version}",
+            f"rule_snapshot_sha256: {result.rule_snapshot_sha256}",
+            f"source_sha256: {snapshot.source_sha256}",
+            "原 Request：" + request.model_dump_json(),
+            "原 Result：" + result.model_dump_json(),
+            "原 Rule Snapshot：" + snapshot.model_dump_json(),
+        ]))
+        technical.setVisible(False)
+        toggle.toggled.connect(technical.setVisible)
+        layout.addWidget(toggle)
+        layout.addWidget(technical)
+        buttons = QHBoxLayout()
+        source = QPushButton("查看原评价标准原文")
+        source.clicked.connect(lambda: self.open_evaluation_standard_source(evaluation_id))
+        close = QPushButton("关闭")
+        close.clicked.connect(dialog.accept)
+        buttons.addWidget(source)
+        buttons.addStretch()
+        buttons.addWidget(close)
+        layout.addLayout(buttons)
+        previous = getattr(self, "record_detail_dialog", None)
+        if previous is not None:
+            previous.close()
+            previous.deleteLater()
+        self.record_detail_dialog = dialog
+        dialog.open()
+
+    def open_evaluation_standard_source(self, evaluation_id: str) -> None:
+        path = self.context.application.find_evaluation_standard_source(evaluation_id)
+        if path is None:
+            QMessageBox.warning(self, "原文不可用", "原评价标准原文当前不可用。")
+            return
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     def _load_request_into_form(self, request: EvaluationRequest) -> bool:
         """Populate the wizard from a saved request without changing its data."""
@@ -1658,7 +1780,7 @@ class MainWindow(QMainWindow):
             self.eval_selection_mode.setCurrentIndex(mode_index)
         standard_index = self.eval_standard.findData(request.standard_id)
         if standard_index < 0:
-            QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法复制或重新计算。")
+            QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法基于此记录重新评价。")
             return False
         self.eval_standard.setCurrentIndex(standard_index)
         if not self._select_product_by_id(request.product_id):
@@ -1736,17 +1858,8 @@ class MainWindow(QMainWindow):
         return True
 
     def copy_selected_record(self) -> None:
-        evaluation_id = self._selected_record_id()
-        if not evaluation_id:
-            QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
-            return
-        loaded = self.context.application.get_evaluation(evaluation_id)
-        if loaded is None:
-            QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
-            return
-        request, _result, _snapshot = loaded
-        if self._load_request_into_form(request):
-            self.navigation.setCurrentRow(2)
+        # 保留已有调用入口，统一为基于原记录开始新评价。
+        self.recalculate_selected_record()
 
     def recalculate_selected_record(self) -> None:
         evaluation_id = self._selected_record_id()
@@ -1757,15 +1870,33 @@ class MainWindow(QMainWindow):
         if loaded is None:
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
-        request, _result, _snapshot = loaded
-        self.calculate_evaluation(request)
+        request, _result, snapshot = loaded
+        current = self.context.application.get_standard_for_evaluation(request.standard_id, date.today())
+        if current is None:
+            QMessageBox.warning(self, "标准不可用", "当前没有可正式评价的适用标准，原记录仍可查看。")
+            return
+        if (current.version, current.rule_revision) != (snapshot.version, snapshot.rule_revision):
+            QMessageBox.information(
+                self, "规则版本变化",
+                f"原记录使用标准版本 {snapshot.version}、规则修订 {snapshot.rule_revision}；"
+                f"本次重新评价将按当前适用的标准版本 {current.version}、规则修订 {current.rule_revision} 进行。"
+                "原记录不会被修改。",
+            )
+        self.refresh_standard_combo()
+        new_request = request.model_copy(update={"selection_mode": StandardSelectionMode.CURRENT})
+        if self._load_request_into_form(new_request):
+            self.last_result_id = None
+            self.eval_results.setRowCount(0)
+            self.eval_summary.setText("")
+            self._clear_gb29446_result()
+            self.navigation.setCurrentRow(2)
 
     def export_selected_record(self) -> None:
         evaluation_id = self._selected_record_id()
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
             return
-        path, _ = QFileDialog.getSaveFileName(self, "导出Excel", f"能耗对标-{evaluation_id[:8]}.xlsx", "Excel (*.xlsx)")
+        path, _ = QFileDialog.getSaveFileName(self, "导出Excel", "能耗对标报告.xlsx", "Excel (*.xlsx)")
         if not path:
             return
         try:
