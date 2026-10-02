@@ -38,7 +38,7 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；RS01 实现与本地业务 Gate 已完成。尚欠产品生命周期闭环（保存 / 历史恢复）、Excel Adapter 闭环、Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
+当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`。RS01 与 RS02 已完成，验收载体分别为 PR #9、PR #10。尚欠 Excel Adapter 闭环、Product Golden Gate 与 Windows V1 最终验收。详见 `参考标准开发路线.md`。
 
 ## 5. 当前 Numeric 规则
 
@@ -69,8 +69,8 @@
 ```text
 ECQ-GOV01 治理清理与路线收口                        DONE
 → RS01 GB29446 业务 Vertical Slice 闭环              DONE
-→ RS02 GB29446 产品生命周期闭环                      NOT STARTED  ← 下一阶段
-→ RS03 GB29446 Excel Adapter 闭环                    NOT STARTED
+→ RS02 GB29446 产品生命周期闭环                      DONE
+→ RS03 GB29446 Excel Adapter 闭环                    NOT STARTED  ← 下一阶段
 → RS04 GB29446 Product Golden Gate                   NOT STARTED
 → RS05 Windows V1 最终验收与发布                     NOT STARTED
 → RS06 第二标准架构验证                              NOT STARTED
@@ -94,14 +94,14 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- `ECQ-GOV01` = **`DONE`**（PR #8 已合并）；
-- `ECQ-RS01` = **`DONE`**；
-- 下一阶段 = **`RS02`**（`NOT STARTED`）；RS03–RS06 均未开始；
-- RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；其他 Numeric 证据继续保留；
-- 本次修复开发库 GB29446 hash、目录修订号、非有限数值入口及普通结果说明；未修改 Engine、Definition、数据库、Excel 或打包；
-- literal full suite 的旧便携 ZIP 缺失在当前 base 也复现，未冒充 PASS。具体执行 SHA、diff、计数与未解决问题以 PR #9 执行报告为准。
+- `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；
+- 下一阶段 = **`RS03` — GB29446 Excel Adapter Closure**（`NOT STARTED`）；RS04–RS06 均未开始；
+- RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；RS02 生命周期 Gate：`tests/test_gb29446_record_lifecycle.py`；
+- 查看原记录是纯只读用例；基于原记录重新评价仅回填输入，规则变化明确提示，正式计算成功即保存新记录；
+- Request / Result / Rule Snapshot 历史模型与 evaluate() 保存语义保持兼容；Calculator、Numeric、阈值、标准解释与数据库 Schema 不变；
+- RS02 验收载体：PR #10；旧便携 ZIP 缺失仍是已知历史发布资产问题。
 
-本任务停在 RS01，未开始 RS02。Reference Standard Product Closure 仍为 `PARTIAL`。
+本任务停在 RS02，未开始 RS03。Reference Standard Product Closure 仍为 `PARTIAL`。
 
 ## 10. 历史材料索引
 
