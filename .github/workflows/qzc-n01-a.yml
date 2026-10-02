@@ -63,28 +63,18 @@ jobs:
           New-Item -ItemType Directory -Force work | Out-Null
           python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-full
 
-      - name: Verify all tests except two pre-existing baseline asset failures
+      - name: Verify all tests except the pre-existing release asset failure
         shell: pwsh
         run: |
           python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-clean `
-            --deselect tests/test_development_library.py::test_unified_development_library_index_is_complete `
             --deselect tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu
 
-      - name: Prove the two excluded failures already exist on PR base
+      - name: Prove the excluded release failure already exists on PR base
         if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
           git worktree add ../n01-a-base ${{ github.event.pull_request.base.sha }}
           Push-Location ../n01-a-base
-          python -m pytest tests/test_development_library.py::test_unified_development_library_index_is_complete -q -p no:cacheprovider
-          $developmentExit = $LASTEXITCODE
-          if ($developmentExit -eq 0) {
-            throw "Base unexpectedly passes development-library manifest test; exclusion is no longer justified."
-          }
-          if ($developmentExit -ne 1) {
-            throw "Base development-library test exited with unexpected code $developmentExit."
-          }
-
           python -m pytest tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu -q -p no:cacheprovider
           $releaseExit = $LASTEXITCODE
           if ($releaseExit -eq 0) {
@@ -100,4 +90,4 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Literal full-suite step outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "Two known base failures were independently re-executed on the PR base and confirmed above."
+          Write-Host "The known release failure was independently re-executed on the PR base and confirmed above."
