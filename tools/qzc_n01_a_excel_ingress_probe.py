@@ -18,8 +18,10 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 import zipfile
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -31,6 +33,16 @@ from uebench.infrastructure.database import DatabaseManager
 from uebench.infrastructure.excel import GB29446_DATA_SHEET, WorkbookImportService, WorkbookTemplateService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepository
+
+# CI runs this probe on a Windows console whose default encoding may be a legacy
+# code page (for example cp1252), which cannot encode CJK issue messages.  Force
+# UTF-8 with a backslashreplace fallback so the probe reports findings instead of
+# dying on its own diagnostic output.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="backslashreplace")  # type: ignore[union-attr]
+    except (AttributeError, ValueError):  # pragma: no cover - non-reconfigurable stream
+        pass
 
 ROOT = Path(__file__).resolve().parents[1]
 STANDARD_PATH = ROOT / "data" / "definitions" / "gb-29446-2019.json"
@@ -121,7 +133,8 @@ def main() -> int:
 
         def check(name: str, condition: bool, detail: str = "") -> None:
             results.append((name, bool(condition)))
-            print(f"  [{'PASS' if condition else 'FAIL'}] {name}{(' — ' + detail) if detail else ''}")
+            suffix = f" [{detail}]" if detail else ""
+            print(f"  [{'PASS' if condition else 'FAIL'}] {name}{suffix}")
 
         print("=" * 70)
         print("RS03 Excel authoritative ingress probe")
@@ -143,11 +156,16 @@ def main() -> int:
         )
         check("text '5.0000004' keeps its lexical value", preserved,
               "" if preserved else _first_error(report))
-        try:
-            float("5.0000004")
-            check("float would have lost the lexical value", True, "float('5.0000004') != Decimal('5.0000004')")
-        except ValueError:
-            pass
+        # The lexical contract matters because a binary float cannot represent
+        # every decimal literal a user may type.  Use a value whose float form
+        # really does lose information, so the assertion is not at the mercy of
+        # how a given interpreter formats floats.
+        lossy = "5.0000000000000001"
+        check(
+            "a binary float could not preserve every decimal literal",
+            Decimal(lossy) != Decimal(str(float(lossy))),
+            f"float({lossy!r}) -> {str(float(lossy))!r}",
+        )
 
         print("\n-- rejected: XLSX numeric cells --")
         for label, value in (("numeric int 560", 560), ("numeric float 560.25", 560.25)):
@@ -199,14 +217,15 @@ def main() -> int:
         failed = [name for name, ok in results if not ok]
         print("\n" + "=" * 70)
         print(f"checks: {len(results)}  failed: {len(failed)}")
-        if failed:
-            for name in failed:
-                print(f"  FAILED: {name}")
-            return 1
-        print("finding: GB29446 authoritative Excel ingress is decimal-lexical-text only;")
-        print("         XLSX numeric cells (int or float) and Excel formulas are rejected,")
-        print("         so the adapter can never manufacture a business value.")
-        return 0
+        for name in failed:
+            print(f"  FAILED: {name}")
+        if not failed:
+            print("finding: GB29446 authoritative Excel ingress is decimal-lexical-text only;")
+            print("         XLSX numeric cells (int or float) and Excel formulas are rejected,")
+            print("         so the adapter can never manufacture a business value.")
+        return_code = 1 if failed else 0
+
+    return return_code
 
 
 def _first_error(report) -> str:
