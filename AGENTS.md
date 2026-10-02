@@ -9,7 +9,7 @@
 | Module ID | `qz.energy_quota` |
 | 产品名称 | 单位产品能耗限额评价软件（程序包名 `uebench`） |
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
-| 当前产品阶段 | 参考标准核心纵向闭环；`PHASE_1` 类业务验收已有多批记录，无统一 Phase 编号 |
+| 当前产品阶段 | 参考标准 `GB 29446—2019` 产品闭环；当前阶段状态见 `TASK_STATE.md` 与 `参考标准开发路线.md`（RS01–RS06） |
 | 当前交付范围 | 47 项强制性能耗限额标准、753 条当前指标；开发基线 `standards/development/scope-63` |
 | Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 

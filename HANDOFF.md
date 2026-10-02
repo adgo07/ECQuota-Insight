@@ -64,16 +64,16 @@
 - 当前只有 Windows 桌面版；Web / Linux / 安卓 / 苹果 / 鸿蒙 与网络更新仅为架构方向；
 - 普通页面不含企业属性、单一煤种工艺确认及合规主结论；GB 29446 专用页面显示"超出3级"，覆盖早期规范中的"未达标"措辞。
 
-## 7. 当前路线
+## 7. 当前路线与阶段状态
 
 ```text
-ECQ-GOV01 治理清理与路线收口
-→ RS01 GB29446 业务 Vertical Slice 闭环
-→ RS02 GB29446 产品生命周期闭环
-→ RS03 GB29446 Excel Adapter 闭环
-→ RS04 GB29446 Product Golden Gate
-→ RS05 Windows V1 最终验收与发布
-→ RS06 第二标准架构验证
+ECQ-GOV01 治理清理与路线收口                        DONE
+→ RS01 GB29446 业务 Vertical Slice 闭环              NOT STARTED  ← 下一任务
+→ RS02 GB29446 产品生命周期闭环                      NOT STARTED
+→ RS03 GB29446 Excel Adapter 闭环                    NOT STARTED
+→ RS04 GB29446 Product Golden Gate                   NOT STARTED
+→ RS05 Windows V1 最终验收与发布                     NOT STARTED
+→ RS06 第二标准架构验证                              NOT STARTED
 ```
 
 **唯一总体路线入口**：[`参考标准开发路线.md`](参考标准开发路线.md)。
@@ -94,7 +94,8 @@ ECQ-GOV01 治理清理与路线收口
 
 ## 9. 下一步
 
-- `ECQ-GOV01` 完成后，下一任务 = **RS01**；
+- `ECQ-GOV01` = **`DONE`**（已提交并推送分支 `chore/ecq-gov01-roadmap-cleanup`，等待独立验收）；
+- 下一任务 = **`RS01`**（`NOT STARTED`）—— GB29446 业务 Vertical Slice 闭环；
 - 本任务停在 GOV01 完成状态，不开始 RS01。
 
 ## 10. 历史材料索引

@@ -14,10 +14,15 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-`ECQ-GOV01 — 仓库治理清理 + 参考标准开发路线收口`
+**`ECQ-GOV01` — `DONE`**（仓库治理清理 + 参考标准开发路线收口）
 
 - 性质：治理 / 文档 / 路线收口，**不是业务开发**；
-- 目标：清除会误导后续开发的过时状态、重复治理、历史发布表述和无必要人工确认要求；确立"下一正式版完整支持 GB29446"为唯一主线；将总体路线改为中文文件名 `参考标准开发路线.md`。
+- 目标：清除会误导后续开发的过时状态、重复治理、历史发布表述和无必要人工确认要求；确立"下一正式版完整支持 GB29446"为唯一主线；将总体路线改为中文文件名 `参考标准开发路线.md`；
+- 完成状态：**`DONE`**（已提交 `af9023e` 并推送分支 `chore/ecq-gov01-roadmap-cleanup`，等待独立验收）。
+
+**下一任务 = `RS01` — `NOT STARTED`**（GB29446 业务 Vertical Slice 闭环）。
+
+> GOV01 已停在完成状态，**未开始 RS01**。
 
 ## 当前治理基线
 
@@ -40,16 +45,16 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 Numeric v1 已完成，**不再重新设计 ROUND6**。
 
-## 当前路线
+## 当前路线与阶段状态
 
 ```text
-ECQ-GOV01
-→ RS01 GB29446 业务 Vertical Slice 闭环
-→ RS02 GB29446 产品生命周期闭环
-→ RS03 GB29446 Excel Adapter 闭环
-→ RS04 GB29446 Product Golden Gate
-→ RS05 Windows V1 最终验收与发布
-→ RS06 第二标准架构验证
+ECQ-GOV01 治理清理与路线收口                        DONE
+→ RS01 GB29446 业务 Vertical Slice 闭环              NOT STARTED  ← 下一任务
+→ RS02 GB29446 产品生命周期闭环                      NOT STARTED
+→ RS03 GB29446 Excel Adapter 闭环                    NOT STARTED
+→ RS04 GB29446 Product Golden Gate                   NOT STARTED
+→ RS05 Windows V1 最终验收与发布                     NOT STARTED
+→ RS06 第二标准架构验证                              NOT STARTED
 ```
 
 阶段定义与验收条件见 `参考标准开发路线.md`。
@@ -94,6 +99,7 @@ ECQ-GOV01
 
 ## 下一步
 
-GOV01 完成后：下一任务 = **RS01**。
+- `ECQ-GOV01` = **`DONE`**；
+- 下一任务 = **`RS01`**（`NOT STARTED`）。
 
 本任务停在 GOV01 完成状态，不开始 RS01。
