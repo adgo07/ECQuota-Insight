@@ -537,6 +537,9 @@ def parse_decimal(value: Scalar, *, field_name: str) -> Decimal:
     if isinstance(value, float):
         raise TypeError(f"{field_name} 不允许使用浮点数")
     try:
-        return value if isinstance(value, Decimal) else Decimal(str(value))
+        parsed = value if isinstance(value, Decimal) else Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
         raise ValueError(f"{field_name} 不是有效十进制数") from exc
+    if not parsed.is_finite():
+        raise ValueError(f"{field_name} 必须是有限十进制数")
+    return parsed

@@ -44,6 +44,8 @@ if TYPE_CHECKING:
 from uebench.domain.models import (
     EnergyLine,
     EvaluationRequest,
+    EvaluationResult,
+    IndicatorResult,
     DataType,
     GRADE_LABELS,
     Grade,
@@ -528,11 +530,7 @@ class MainWindow(QMainWindow):
 
         self.gb29446_basis_section, basis_layout = self._card()
         basis_layout.addWidget(QLabel("四、标准依据"))
-        self.gb29446_basis = QLabel(
-            "等级依据：第3.1条、第3.2条，表1、表2\n"
-            "计算依据：第5.2条，公式（1）\n"
-            "折算系数依据：附录A表A.1"
-        )
+        self.gb29446_basis = QLabel("完成计算后显示本次评价的标准依据。")
         self.gb29446_basis.setWordWrap(True)
         basis_layout.addWidget(self.gb29446_basis)
         self.gb29446_basis_open = QPushButton("查看标准原文")
@@ -1080,6 +1078,7 @@ class MainWindow(QMainWindow):
         self.gb29446_result_grade.setText("—")
         self.gb29446_result_message.setText("尚未计算")
         self.gb29446_explanation.setText("完成计算后显示本次代入计算和判定阈值。")
+        self.gb29446_basis.setText("完成计算后显示本次评价的标准依据。")
 
     def _gb29446_inputs_changed(self, *_args) -> None:
         if self._is_gb29446():
@@ -1369,18 +1368,33 @@ class MainWindow(QMainWindow):
         )
 
     def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
+        is_gb29446 = self._is_gb29446() if request is None else request.standard_id == "gb-29446-2019"
+        if is_gb29446:
+            self._clear_gb29446_result()
         try:
             if request is None and self._is_gb29446():
                 try:
                     request = self._collect_request()
                 except ValueError as exc:
-                    QMessageBox.warning(self, "信息未填写", str(exc))
+                    message = str(exc) if type(exc) is ValueError else "评价信息未通过校验，请检查核算周期、煤种、选煤工艺及输入数据。"
+                    self.gb29446_result_message.setText(message)
+                    QMessageBox.warning(self, "信息未填写", message)
                     return
             request = request or self._collect_request()
             is_preview = request.selection_mode is StandardSelectionMode.FUTURE
             result = self.context.application.preview_evaluation(request) if is_preview else self.context.application.evaluate(request)
         except Exception as exc:
-            QMessageBox.critical(self, "无法计算", _friendly_error(exc, "计算和判级"))
+            if is_gb29446:
+                if type(exc) is ValueError:
+                    self.gb29446_result_message.setText(f"无法计算：{exc}")
+                    self.gb29446_explanation.setText("请根据提示修正评价数据后重新计算。")
+                    QMessageBox.warning(self, "无法计算", str(exc))
+                else:
+                    message = "计算未完成，请检查输入数据、单位和选煤工艺后重试。"
+                    self.gb29446_result_message.setText(message)
+                    QMessageBox.critical(self, "无法计算", message)
+            else:
+                QMessageBox.critical(self, "无法计算", _friendly_error(exc, "计算和判级"))
             return
         self.last_result_id = None if is_preview else result.evaluation_id
         self._show_gb29446_result(request, result)
@@ -1459,7 +1473,8 @@ class MainWindow(QMainWindow):
     def _format_explanation_number(value: Decimal | None) -> str:
         if value is None:
             return "—"
-        return f"{value:.8f}".rstrip("0").rstrip(".")
+        rendered = format(value, "f")
+        return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
 
     @staticmethod
     def _gb29446_grade_label(grade: Grade) -> str:
@@ -1494,7 +1509,20 @@ class MainWindow(QMainWindow):
             warning = warning.replace(key, label)
         return warning
 
-    def _show_gb29446_result(self, request: EvaluationRequest, result) -> None:
+    @staticmethod
+    def _gb29446_basis_for_display(item: IndicatorResult) -> str:
+        lines = []
+        for reference in item.source_references:
+            clause = (reference.clause or "").split(" ", 1)[0]
+            if clause in {"3.1", "3.2"} and reference.table:
+                lines.append(f"等级依据：第{clause}条，{reference.table}")
+            elif clause == "5.2" and reference.table:
+                lines.append(f"计算依据：第{clause}条，{reference.table}")
+            elif clause == "附录A" and reference.table:
+                lines.append(f"折算系数依据：{clause}{reference.table}")
+        return "\n".join(lines)
+
+    def _show_gb29446_result(self, request: EvaluationRequest, result: EvaluationResult) -> None:
         if result.standard_id != "gb-29446-2019":
             return
         item = next(
@@ -1509,6 +1537,7 @@ class MainWindow(QMainWindow):
             self._clear_gb29446_result()
             return
 
+        self.gb29446_basis.setText(self._gb29446_basis_for_display(item))
         if item.actual_value is None:
             self.gb29446_result_ed.setText("— kW·h/t")
             self.gb29446_result_grade.setText("—")
@@ -1544,7 +1573,12 @@ class MainWindow(QMainWindow):
             if request.input_mode is InputMode.DETAIL
             else "未折算单位电耗 E_d/m：— kW·h/t"
         )
-        factor_line = f"折算系数 k：{self._format_result_number(factor)}"
+        process = request.inputs.get("washing_process")
+        process_name = str(process.value) if process is not None else "—"
+        factor_line = (
+            f"折算系数 k：{self._format_result_number(factor)}"
+            f"（{result.product_name}，{process_name}；按附录A表A.1自动匹配）"
+        )
         if electricity is not None and raw_coal is not None and factor is not None:
             formula_line = (
                 f"本次代入：e_d = {self._format_explanation_number(electricity)} × "
@@ -1565,21 +1599,20 @@ class MainWindow(QMainWindow):
         level3 = thresholds.get("LEVEL_3")
         if level3 is not None:
             threshold_text += f"；超出3级：> {self._format_result_number(level3)} kW·h/t"
-        comparison_step = next(
-            (step for step in reversed(item.calculation_trace) if step.operation == "grade_comparison"),
-            None,
-        )
         raw_value_line = f"原始计算值（未修约）：{self._format_explanation_number(actual)} kW·h/t"
-        if comparison_step is not None:
-            comparison_expression = comparison_step.expression
-            if comparison_expression.startswith("numeric_behavior=") and "; " in comparison_expression:
-                comparison_expression = comparison_expression.split("; ", 1)[1]
-            comparison_line = f"判级比较：{comparison_expression}；结果：{grade_label}"
+        threshold_key = "LEVEL_3" if item.grade is Grade.NOT_QUALIFIED else item.grade.value
+        threshold = thresholds.get(threshold_key)
+        if threshold is not None:
+            operator = ">" if item.grade is Grade.NOT_QUALIFIED else "≤"
+            comparison_line = (
+                f"判级比较：{self._format_explanation_number(actual)} {operator} "
+                f"{self._format_explanation_number(threshold)}；结果：{grade_label}"
+            )
         else:
-            comparison_line = f"判级比较：按未修约 Decimal 全值与阈值直接比较；正式结果：{grade_label}"
+            comparison_line = f"正式结果：{grade_label}"
         current_grade_line = (
             f"{raw_value_line}\n{comparison_line}\n"
-            "正式判级使用未修约 Decimal 全值与阈值直接比较；显示位数仅用于展示，不参与判级。"
+            "判级采用原始计算值与等级限值直接比较；页面显示的小数位仅用于展示，不影响判级。"
         )
         coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
         self.gb29446_explanation.setText(
