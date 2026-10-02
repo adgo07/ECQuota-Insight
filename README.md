@@ -1,20 +1,32 @@
-# 单位产品能耗对标软件
+# 单位产品能耗限额评价软件（ECQuota / `uebench`）
 
-## 最新源码状态（2026-09-26）
+仓库：<https://github.com/adgo07/ECQuota-Insight>（Module ID `qz.energy_quota`）
 
-仓库：<https://github.com/adgo07/ECQuota-Insight>。
+## 当前产品目标
 
-- GB 29446—2019新建评价页面源码已通过独立验收，303项完整测试通过。
-- 核算周期、煤种、工艺、电量E_d和原煤量m为主要输入；企业名称可选，k自动匹配且只读。
-- 正式公式 `e_d = E_d × k / m`；等级比较为 **Decimal full-value exact comparison**（不执行全局 ROUND6），显示精度不参与判级；超过三级显示“超出3级”。
-- **历史口径（已废止）**：早期版本对等级边界两侧执行 `ROUND(value, 6)` + `ROUND_HALF_UP`。该无依据全局 ROUND6 已由 Numeric Contract v1 Full Adoption 移除（`D-ECQ-001` 已关闭）；仅在标准原文或正式 Rule 显式要求修约时才允许 explicit rounding。
-- **当前权威来源**：`platform-lock.json`（locked SHA）、`docs/统一判定规范.md`、`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`。
-- 新版EXE/安装包和独立公式Excel尚未同步完成验收；旧发布物不代表本次源码。
-- 其余标准保留原有范围，不表示全部达到选煤专用页面的完善程度。
+> **下一正式版必须完整支持 GB 29446—2019《选煤电力消耗限额》。**
 
-仓库只上传源码、规则、测试和说明，不上传本机私钥、数据库、标准原文或构建缓存。启动及测试前提见 [仓库使用说明](docs/仓库使用说明.md)。下文交付状态及数量保留历史背景。
+| 项目 | 值 |
+|---|---|
+| Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
+| 总体开发路线 | [`参考标准开发路线.md`](参考标准开发路线.md)（唯一路线入口） |
+| 当前任务 | [`TASK_STATE.md`](TASK_STATE.md) |
+| 当前交接 | [`HANDOFF.md`](HANDOFF.md) |
+| 治理基线 | [`PLATFORM_BASELINE.md`](PLATFORM_BASELINE.md)、[`platform-lock.json`](platform-lock.json) |
 
-Windows 10/11 x64 单机离线应用。软件依据已发布的强制性能耗限额标准，计算或接收单位产品能耗实际值，并逐指标判定 1 级、2 级、3 级或未达标。
+## 当前开发源码 / Current Development Source
+
+- 以执行时实际 `main` SHA 为准；不要凭文档记忆 SHA。
+- 当前正在开发下一正式版，目标是完整支持 GB 29446。
+- **在 RS05（Windows V1 最终验收与发布）完成之前，不把旧 EXE / 安装包冒充为当前源码的正式 Candidate。**
+
+### 上一正式发布物 / Previous Release
+
+- `UEBench 0.1.0`
+- standard package `2026.09-published.2`
+
+> 这是历史已发布版本，**不代表当前 main 源码**。其构建时间早于当前 GB 29446 与 Numeric v1 源码变更，因此不能用于验证当前源码行为。
+> 交付物清单与历史哈希见 [`docs/交付清单.md`](docs/交付清单.md)、[`docs/安装发布说明.md`](docs/安装发布说明.md) 与 [`docs/验收记录.md`](docs/验收记录.md)（历史验收台账）。
 
 ## 开发启动
 
@@ -24,9 +36,18 @@ python -m venv .venv
 .\.venv\Scripts\python -m uebench.main
 ```
 
+启动及测试前提见 [仓库使用说明](docs/仓库使用说明.md)。
+
+## 当前 Numeric 规则
+
+- 正式语义为 **Decimal full-value exact comparison**，不执行全局 ROUND6；显示精度不参与判级。
+- 项目 Numeric Profile：`ECQUOTA_DECIMAL_FULL_VALUE_V1`。
+- **历史口径（已废止）**：早期版本对等级边界两侧执行 `ROUND(value, 6)` + `ROUND_HALF_UP`。该无依据全局 ROUND6 已由 Numeric Contract v1 Full Adoption 移除（`D-ECQ-001` 已关闭）；仅在标准原文或正式 Rule 显式要求修约时才允许 explicit rounding。
+- 当前权威来源：[`platform-lock.json`](platform-lock.json)（locked SHA）、[`docs/统一判定规范.md`](docs/统一判定规范.md)、[`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`](docs/governance/NUMERIC_V1_ADOPTION_REPORT.md)。
+
 ## 设计原则
 
-所有标准后续开发和完善须遵循 [统一判定规范](docs/统一判定规范.md)。用户已确认新口径；现有软件和GB29446 Excel相关部分列为待修改。
+所有标准后续开发和完善须遵循 [统一判定规范](docs/统一判定规范.md)。
 
 - 标准原文及修改单优先于目录和汇编。
 - 所有数值使用 `Decimal`，规则不执行任意 Python 代码。
@@ -34,12 +55,27 @@ python -m venv .venv
 - 已完成评价保存规则快照，标准更新不改写历史结果。
 - 运行时不依赖原始资料盘符。
 
-## 当前交付状态
+## 当前交付范围
 
-- 正式范围为用户确认的 47 项强制性标准，共 753 条当前指标。GB 29435-2025 的51条规则已于2026-09-09由王玮明确批准转正；其中7条原文存在缺级或非单调限额，已保留警告并禁止静默修正。GB 29447-2022 已由 GB 29447-2026 替代，并新增 GB 47834-2026、GB 47835-2026。
-- 当前正式标准包为 `initial-standard-package-published.uebench`。候选包仅用于留档，不应再用于正式判定。
-- 当前开发基线为 `standards/development/scope-63`，共63项标准定义，其中47项已发布、16项仍为草案；`standards/development/scope-65` 仅作历史对照，禁止作为发布入口。草案须完成原文复核和确认表确认后才能发布。
-- 运行 `python tools/publish_confirmed_rules.py --help` 查看确认表发布命令；未加 `--apply` 时只校验不修改。
-- 对隔离草案先运行 `python tools/review_confirmed_rules.py --help`；只有确认表完整后才能将 draft 提升为 reviewed，再生成标准包。
-- Windows 用户可双击交付目录中的 `验收助手.cmd`，先完成文件完整性检查；它不会修改规则或数据库。
-- 详细操作见 [`docs/用户手册.md`](docs/用户手册.md) 和 [`docs/验收记录.md`](docs/验收记录.md)。
+- 正式范围为用户确认的 47 项强制性标准，共 753 条当前指标；开发基线 `standards/development/scope-63` 共 63 项，其中 16 项仍为草案。
+- GB 29435-2025 的 51 条规则已成为 `published`，但生命周期为 `future`，实施日期 2027-01-01 前只能预览。
+- 其中 7 条原文存在缺级或非单调限额，已保留警告并禁止静默修正。
+- GB 29447-2022 已由 GB 29447-2026 替代，并新增 GB 47834-2026、GB 47835-2026。
+- 当前开发基线为 `standards/development/scope-63`；`standards/development/scope-65` 仅作历史对照，禁止作为发布入口。
+
+## 常用命令
+
+- 规则确认与发布：`python tools/publish_confirmed_rules.py --help`（未加 `--apply` 时只校验不修改）。
+- 隔离草案复核：`python tools/review_confirmed_rules.py --help`。
+- 运行测试：`python -m pytest -q -p no:cacheprovider --basetemp <可写临时目录>`。
+
+## 阅读顺序
+
+1. `AGENTS.md`（执行治理）
+2. `TASK_STATE.md`（当前任务）
+3. `参考标准开发路线.md`（当前路线）
+4. `STANDARD_ISSUES_REGISTER.md`（标准问题）
+5. `platform-lock.json`（治理基线）
+6. 当前任务直接相关的代码 / 测试
+
+Numeric 任务再读 `docs/统一判定规范.md`。历史资料（`docs/history/`、`docs/audits/`、`docs/验收记录.md`）按需读取，**不属于默认必读**。

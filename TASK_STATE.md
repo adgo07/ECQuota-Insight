@@ -1,105 +1,99 @@
 # TASK_STATE
 
-更新时间：2026-10-01
+更新时间：2026-10-02
+
+## 当前产品目标
+
+> **下一正式版必须完整支持 GB 29446—2019《选煤电力消耗限额》。**
+
+Reference Standard：`GB 29446—2019 选煤电力消耗限额`
+Module ID：`qz.energy_quota`
+Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
+
+总体路线唯一入口：`参考标准开发路线.md`。
 
 ## 当前任务
 
-`ECQuota — Numeric Contract v1 Full Adoption`
+`ECQ-GOV01 — 仓库治理清理 + 参考标准开发路线收口`
 
-工作分支：
+- 性质：治理 / 文档 / 路线收口，**不是业务开发**；
+- 目标：清除会误导后续开发的过时状态、重复治理、历史发布表述和无必要人工确认要求；确立"下一正式版完整支持 GB29446"为唯一主线；将总体路线改为中文文件名 `参考标准开发路线.md`。
 
-```text
-adopt/numeric-contract-v1-full
-```
+## 当前治理基线
 
-execution base：
+| 项目 | 值 |
+|---|---|
+| 中央锁定 SHA | `ee5feb0cc34dbd99790500fadd0c4c932e202a20`（见 `platform-lock.json`，`auto_follow_main: false`） |
+| Frozen Contract | Architecture V2.1；Numeric Contract v1；Numeric Profiles v1；Numeric Conformance Vector v1 |
+| DRAFT（未采用） | Unit Contract；Module/Capability Contract；Workspace/Attempt/Record/Result Contract；qzpack Contract |
+| 项目 Numeric Profile | `ECQUOTA_DECIMAL_FULL_VALUE_V1` |
 
-```text
-main@031d0bb3406918d841984b3a535e172a8190b876
-```
+## 已完成
 
-中央 Frozen baseline：
+- Qingzhou-contracts Governance Adoption（`PLATFORM_BASELINE.md` / `platform-lock.json`）；
+- Architecture V2.1 baseline；
+- Numeric Contract v1 Adoption；
+- Numeric Profile / Numeric Conformance（Frozen v1，可执行）；
+- implicit ROUND6 移除（`D-ECQ-001` 已关闭）；
+- GB29446 Calculator / Numeric 主链；
+- GB29446 专用页面基础。
 
-```text
-Qingzhou-contracts@ee5feb0cc34dbd99790500fadd0c4c932e202a20
-Numeric Contract v1: FROZEN
-Numeric Profiles v1: FROZEN
-Numeric Conformance Vector v1: FROZEN
-```
+Numeric v1 已完成，**不再重新设计 ROUND6**。
 
-QZC-N01 已结束；本任务是正式 Adoption，不是新 Pilot。
-
-## 已完成的生产迁移
-
-- 公共 Engine 默认 grade comparison 已从 legacy ROUND6 改为 Decimal full-value exact comparison；
-- compliance comparison 已取消默认 ROUND6；
-- `_round_threshold_value()` / 全局 ROUND6 正式比较路径已移除；
-- 现有 published definitions 中 `round_places` 使用数为 0；
-- Rule 层仍保留 explicit rounding 能力，但必须提供 stage / mode / purpose / source；
-- 建立项目 Profile `ECQUOTA_DECIMAL_FULL_VALUE_V1`：p28 / ROUND_HALF_EVEN working context / full-value exact / no global epsilon；
-- authoritative evaluation 使用 profile-owned `localcontext`，隔离 caller ambient Decimal context；
-- `EvaluationResult` 增加向后兼容的 Numeric traceability：contract/profile/calculator/behavior + 原 rule revision；
-- GB 29446 原 `ecquota-gb29446-full-value-v2` migration marker 保留；
-- authoritative XLSX binary-float numeric cell 现直接拒绝，模板正式数值列改用文本十进制输入。
-
-## Frozen v1 Conformance
-
-新增：
-
-- `tests/conformance/numeric/conformance_vector_v1.schema.json`
-- `tests/conformance/numeric/ecquota_numeric_v1_vectors.json`
-- `tests/conformance/numeric/test_ecquota_numeric_v1.py`
-- `.github/workflows/numeric-v1-adoption.yml`
-
-覆盖：
-
-- Decimal parse / normalization；
-- float rejection；
-- public grade/compliance ROUND6 migration；
-- GB 29446 T−δ/T/T+δ 与六个 breaking cases；
-- display separation；
-- Profile declaration/propagation；
-- ambient independence；
-- explicit Rule rounding authority metadata；
-- XLSX binary-float 跨业务边界实证与 ingress guard。
-
-## 已执行测试证据
-
-GitHub Actions `Numeric v1 Full Adoption` 已实际验证：
-
-- Frozen v1 Conformance：20 passed；
-- 原 N01-A + GB 29446：通过，保留 4 个 strict legacy XFAIL；
-- Engine + Excel：24 passed；
-- GB 29446 UI：20 passed；
-- 字面 full suite：仅 2 个既有资产失败；
-- 排除上述 2 个已证明的 base failure 后：完整回归通过；
-- 两个资产失败均已在 untouched `main@031d0bb...` 重新执行并复现。
-
-当前测试规模：345 passed + 4 legacy XFAIL；另有 2 个与本任务无关且在 execution base 已存在的 asset failures。
-
-## 最终 PR 收口
-
-- PR：`#4` — `https://github.com/adgo07/ECQuota-Insight/pull/4`；
-- PR metadata、自清理与治理文件已收口到前序候选 `4befec98176ea454a571748338faf6b5389a0d69`；
-- 本提交仅用于以用户身份触发最终 PR/head CI，不改变任何 Numeric 生产语义；
-- 一次性 migration / mutation helper 与写权限 workflow 已全部从最终 diff 删除。
-
-## 已知 OPEN
-
-- `D-ECQ-002` Module/Capability Manifest；
-- `D-ECQ-003` Workspace/Attempt/Record/Result 外围；
-- `D-ECQ-004` qzpack；
-- `D-ECQ-005` Unit Contract 仍 DRAFT；
-- `D-ECQ-006` 中央统一 lossless XLSX numeric-cell scheme 仍 OPEN；项目当前通过拒绝 authoritative float materialization 保证 Numeric v1 authoritative path 不静默失真。
-
-`D-ECQ-001-global-round6-vs-frozen-full-value` 已关闭。
-
-## 当前结论
-
-最终 PR head 重新通过 CI 后，正式执行结论为：
+## 当前路线
 
 ```text
-FULL NUMERIC V1 ADOPTION
+ECQ-GOV01
+→ RS01 GB29446 业务 Vertical Slice 闭环
+→ RS02 GB29446 产品生命周期闭环
+→ RS03 GB29446 Excel Adapter 闭环
+→ RS04 GB29446 Product Golden Gate
+→ RS05 Windows V1 最终验收与发布
+→ RS06 第二标准架构验证
 ```
 
-不要自行合并 PR。
+阶段定义与验收条件见 `参考标准开发路线.md`。
+
+## 当前真实能力状态
+
+| 能力 | 状态 |
+|---|---|
+| Numeric Contract v1 / Profile / Conformance | `DONE` |
+| GB29446 Calculator / Numeric 主链 | `DONE` |
+| GB29446 业务 Vertical Slice 完整闭环 | `PARTIAL`（RS01 处理） |
+| GB29446 产品生命周期闭环（保存 / 历史恢复） | `PARTIAL`（RS02 处理） |
+| GB29446 Excel Adapter 闭环 | `PARTIAL`（RS03 处理） |
+| GB29446 Product Golden Gate | `NOT STARTED`（RS04 处理） |
+| Windows V1 最终验收与发布 | `NOT STARTED`（RS05 处理） |
+| 第二标准架构验证 | `NOT STARTED`（RS06 处理） |
+
+## 发布物状态
+
+- **上一正式发布物 / Previous Release**：`UEBench 0.1.0`、standard package `2026.09-published.2`。历史已发布版本，**不代表当前 main 源码**。
+- **当前开发源码 / Current Development Source**：以执行时实际 `main` SHA 为准；正在开发下一正式版；RS05 完成前不把旧 EXE 当作当前源码正式 Candidate。
+
+## 当前 OPEN
+
+中央已登记偏差（权威清单见 `platform-lock.json` 的 `known_deviations`）：
+
+- `D-ECQ-002` Module/Capability Manifest 尚未正式实施；
+- `D-ECQ-003` Workspace/Attempt/Record/Result 公共外围仅部分具备；
+- `D-ECQ-004` 现有 `.uebench` 包不是正式 qzpack v1；
+- `D-ECQ-005` Unit Contract 仍未正式采用；
+- `D-ECQ-006` 中央 lossless XLSX numeric-cell 公共方案仍 OPEN。
+
+标准问题：
+
+- `ECQ-STD-GB29446-001` —— 状态 `PROVISIONAL`，见 `STANDARD_ISSUES_REGISTER.md`。
+
+治理层 Deferred（不在 GOV01 处理，仅登记）：
+
+- 现有"规则确认表"机制作为 legacy publication gate 保留；后续可在不降低标准可追溯性的前提下单独简化（`tools/publish_confirmed_rules.py` 本任务不修改）；
+- 开发库 `standards/development/library-index.json` 记录的 `definition_sha256` 与实际定义文件不一致，根因是 `data/definitions/` 与 `standards/development/scope-63/definitions/` 存在两份同义但字节不同的 GB29446 定义副本。**GOV01 只登记，不修改任何标准数据**，应在后续独立任务中收口；
+- `data/catalog.json` 中 `gb-29435-2025` 的 `lifecycle_status` 与定义文件不一致。**GOV01 只登记，不修改任何标准数据**，应在后续独立任务中收口。
+
+## 下一步
+
+GOV01 完成后：下一任务 = **RS01**。
+
+本任务停在 GOV01 完成状态，不开始 RS01。

@@ -1,5 +1,11 @@
 # 当前 UI 状态盘点
 
+> **文件位置说明：** 本文件已移至 `docs/audits/`。它是审计证据，**不是当前执行状态文件**。
+>
+> 当前权威请见：`TASK_STATE.md`、`HANDOFF.md`、`参考标准开发路线.md`。
+>
+> 本文件对 RS02（GB29446 产品生命周期闭环）仍有参考价值；但它不构成 UI 重构授权，其中的 Execution base 与问题清单均对应某一历史时点。
+
 任务：`Qingzhou Desktop UI Guidelines v0.1` 配套 UI Audit  
 Execution base：`main@e9350df70589df71ddd2146542e36755b3f4d1c0`  
 Reference Standard：`GB 29446—2019 选煤电力消耗限额`  
