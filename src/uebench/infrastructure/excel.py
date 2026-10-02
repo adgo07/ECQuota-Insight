@@ -138,6 +138,12 @@ class ImportReport(BaseModel):
     import_id: str
     valid: bool
     profile_id: str = GENERIC_PROFILE_ID
+    #: Standard version resolved at validation time.  Formal submission re-resolves
+    #: the definition and refuses to proceed when it no longer matches, so a rule
+    #: revision installed after validation cannot silently change the result.
+    standard_version: str | None = None
+    #: Rule revision resolved at validation time (see ``standard_version``).
+    rule_revision: int | None = None
     issues: list[ImportIssue] = Field(default_factory=list)
     request: EvaluationRequest | None = None
 
@@ -376,6 +382,19 @@ def _gb29446_process_is_valid(product, process: str) -> bool:
 
 def _has_error(issues: list[ImportIssue]) -> bool:
     return any(issue.severity == "error" for issue in issues)
+
+
+def _first_non_empty_row(sheet, column: int) -> int | None:
+    """Lowest row index in ``column`` that holds a non-empty value.
+
+    ``None`` means the column carries no content at all (pure formatting
+    widening).  Row 1 is included so a non-blank header is reported too.
+    """
+    for row in range(1, sheet.max_row + 1):
+        value = sheet.cell(row=row, column=column).value
+        if value is not None and value != "":
+            return row
+    return None
 
 
 class WorkbookTemplateService:
@@ -645,10 +664,13 @@ class WorkbookImportService:
         except Exception as exc:
             issues.append(ImportIssue(severity="error", sheet="工作簿", cell="-", message=str(exc)))
         valid = request is not None and not _has_error(issues)
+        resolved = self._resolved_identity(profile, workbook) if valid else (None, None)
         report = ImportReport(
             import_id=import_id,
             valid=valid,
             profile_id=profile.profile_id,
+            standard_version=resolved[0],
+            rule_revision=resolved[1],
             issues=issues,
             request=request if valid else None,
         )
@@ -671,6 +693,20 @@ class WorkbookImportService:
                 session=session,
             )
         return report
+
+    def _resolved_identity(self, profile: WorkbookProfile, workbook) -> tuple[str | None, int | None]:
+        """Identity of the definition this workbook's evaluation would use.
+
+        Recorded at validation time so formal submission can detect that the
+        currently applicable rule revision changed in the meantime.
+        """
+        if profile.kind != "gb29446" or self.standards is None:
+            return None, None
+        issues: list[ImportIssue] = []
+        standard, _meta_values, _date = self._resolve_gb29446_standard(workbook, issues)
+        if standard is None:
+            return None, None
+        return standard.version, standard.rule_revision
 
     @staticmethod
     def _detect_profile(workbook, issues: list[ImportIssue]) -> tuple[WorkbookProfile, bool]:
@@ -726,16 +762,19 @@ class WorkbookImportService:
                         message=f"表头必须严格为：{'、'.join(expected)}",
                     )
                 )
-            # A genuinely extra column only exists when the appended header cell
-            # carries a value; widening by formatting alone is not a new column.
+            # Anything beyond the declared width must be empty everywhere, not
+            # just in the header row.  A column whose header is blank but that
+            # carries data below is still a real extra column, so scanning only
+            # row 1 would silently accept it.  Merely widening columns by
+            # formatting (no content at all) stays compatible.
             for column in range(len(expected) + 1, sheet.max_column + 1):
-                extra = sheet.cell(row=1, column=column).value
-                if extra not in (None, ""):
+                offending_row = _first_non_empty_row(sheet, column)
+                if offending_row is not None:
                     issues.append(
                         ImportIssue(
                             severity="error",
                             sheet=sheet_name,
-                            cell=f"{get_column_letter(column)}1",
+                            cell=f"{get_column_letter(column)}{offending_row}",
                             message="模板不允许增加自定义列",
                         )
                     )
@@ -762,7 +801,16 @@ class WorkbookImportService:
 
     # -- lifecycle --------------------------------------------------------
     def prepare(self, import_id: str) -> EvaluationDraft:
-        """Return the canonical request, re-verifying source integrity first.
+        """Return the canonical request, re-verifying it before formal evaluation.
+
+        Two independent checks run here, and both must pass:
+
+        1. **source integrity** - the file still exists with the same SHA-256;
+        2. **applicable rule identity** - the workbook is re-parsed through the
+           formal resolver, so a standard/rule revision installed after
+           validation cannot be applied to a template that was generated for an
+           older revision.  An unchanged file hash does *not* prove that the
+           template still matches the definition that will actually run.
 
         The batch status is deliberately left at ``validated``: only a successful
         formal evaluation may advance it, so a failed evaluation stays retryable.
@@ -774,8 +822,51 @@ class WorkbookImportService:
             if row.status not in (STATUS_VALIDATED, STATUS_COMMITTED):
                 raise ValueError("只有校验通过的导入批次可以评价")
             self._verify_source(row)
+            self._verify_applicable_revision(row)
             request = EvaluationRequest.model_validate_json(row.payload_json)
             return EvaluationDraft(import_id=import_id, request=request)
+
+    def _verify_applicable_revision(self, row: ImportBatchRow) -> None:
+        """Re-run the resolution + metadata gate immediately before evaluation.
+
+        Uses the same ``_resolve_gb29446_standard`` helper as validation, so the
+        adapter still owns no second standard-selection rule.  The recorded
+        ``rule_revision`` is compared as well, which catches a definition swap
+        that left every other field equal.
+        """
+        profile = self._profile_of(row)
+        if profile is None or profile.kind != "gb29446":
+            return
+        recorded = self._validation_record(row)
+        issues: list[ImportIssue] = []
+        try:
+            workbook = load_workbook(Path(row.source_file), data_only=False)
+        except Exception as exc:  # pragma: no cover - unreadable file already rejected
+            raise ValueError("校验时使用的 Excel 文件已无法读取，请重新选择文件并重新校验。") from exc
+        standard, _meta_values, _date = self._resolve_gb29446_standard(workbook, issues)
+        if standard is None or _has_error(issues):
+            raise ValueError(
+                "该模板对应的标准/规则修订已不是当前本次评价适用版本，请重新生成模板后填写。"
+            )
+        if recorded.get("rule_revision") is not None and int(recorded["rule_revision"]) != standard.rule_revision:
+            raise ValueError(
+                "该模板对应的标准/规则修订已不是当前本次评价适用版本，请重新生成模板后填写。"
+            )
+
+    @staticmethod
+    def _validation_record(row: ImportBatchRow) -> dict:
+        try:
+            return json.loads(row.validation_json)
+        except (TypeError, ValueError):
+            return {}
+
+    def _profile_of(self, row: ImportBatchRow) -> WorkbookProfile | None:
+        profile_id = self._validation_record(row).get("profile_id")
+        if profile_id == GB29446_PROFILE.profile_id:
+            return GB29446_PROFILE
+        if profile_id == GENERIC_PROFILE.profile_id:
+            return GENERIC_PROFILE
+        return None
 
     @staticmethod
     def _verify_source(row: ImportBatchRow) -> None:
@@ -812,11 +903,7 @@ class WorkbookImportService:
 
     @staticmethod
     def _profile_id_for(row: ImportBatchRow) -> str:
-        try:
-            report = json.loads(row.validation_json)
-        except (TypeError, ValueError):
-            return GENERIC_PROFILE_ID
-        return report.get("profile_id") or GENERIC_PROFILE_ID
+        return WorkbookImportService._validation_record(row).get("profile_id") or GENERIC_PROFILE_ID
 
     def commit(self, import_id: str) -> EvaluationDraft:
         """Legacy generic submission path, retained for the other standards.
@@ -837,45 +924,59 @@ class WorkbookImportService:
             return EvaluationDraft(import_id=import_id, request=request)
 
     # -- parsing ----------------------------------------------------------
-    def _parse_gb29446(self, workbook, issues: list[ImportIssue]) -> EvaluationRequest | None:
+    def _resolve_gb29446_standard(
+        self, workbook, issues: list[ImportIssue]
+    ) -> tuple[StandardDefinition | None, dict[str, object], date | None]:
+        """Resolve the definition this evaluation would actually use.
+
+        Selection goes through the正式 resolver only; the adapter never
+        re-implements standard selection (for example ``max(rule_revision)``).
+        Returns the resolved definition together with the template metadata that
+        the workbook claims, so callers can compare the two.
+        """
         if self.standards is None:
             issues.append(
                 ImportIssue(severity="error", sheet="工作簿", cell="-", message="标准仓库未配置，无法校验 GB29446 模板")
             )
-            return None
+            return None, {}, None
         data = workbook[GB29446_DATA_SHEET]
-        meta = workbook[GB29446_META_SHEET]
         row_of = {label: index for index, (label, _hint) in enumerate(GB29446_DATA_ROWS, start=2)}
-
-        meta_values = self._read_meta(meta, issues)
+        meta_values = self._read_meta(workbook[GB29446_META_SHEET], issues)
         if _has_error(issues):
-            return None
+            return None, meta_values, None
 
         evaluation_date = self._read_gb29446_date(data.cell(row=row_of[gb.FIELD_EVALUATION_DATE], column=2), issues)
+        if evaluation_date is None:
+            return None, meta_values, None
 
-        # Resolve the standard exactly as a formal evaluation would, then compare
-        # the template metadata against it.  The adapter must not re-implement
-        # standard selection (for example max(rule_revision)).
-        standard = None
-        if evaluation_date is not None:
-            standard = self.standards.get_for_evaluation(
-                meta_values.get("standard_id") or gb.GB29446_STANDARD_ID,
-                evaluation_date,
-                StandardSelectionMode.CURRENT,
-            )
-            if standard is None:
-                issues.append(
-                    ImportIssue(
-                        severity="error",
-                        sheet=GB29446_DATA_SHEET,
-                        cell=f"B{row_of[gb.FIELD_EVALUATION_DATE]}",
-                        message="该评价日期没有适用的已发布 GB 29446—2019 规则。",
-                    )
-                )
+        standard = self.standards.get_for_evaluation(
+            str(meta_values.get("standard_id") or gb.GB29446_STANDARD_ID),
+            evaluation_date,
+            StandardSelectionMode.CURRENT,
+        )
         if standard is None:
-            return None
+            issues.append(
+                ImportIssue(
+                    severity="error",
+                    sheet=GB29446_DATA_SHEET,
+                    cell=f"B{row_of[gb.FIELD_EVALUATION_DATE]}",
+                    message="该评价日期没有适用的已发布 GB 29446—2019 规则。",
+                )
+            )
+            return None, meta_values, evaluation_date
 
         self._check_meta_against_standard(meta_values, standard, issues)
+        if _has_error(issues):
+            return None, meta_values, evaluation_date
+        return standard, meta_values, evaluation_date
+
+    def _parse_gb29446(self, workbook, issues: list[ImportIssue]) -> EvaluationRequest | None:
+        data = workbook[GB29446_DATA_SHEET]
+        row_of = {label: index for index, (label, _hint) in enumerate(GB29446_DATA_ROWS, start=2)}
+
+        standard, _meta_values, evaluation_date = self._resolve_gb29446_standard(workbook, issues)
+        if standard is None or evaluation_date is None:
+            return None
 
         period = self._read_gb29446_choice(
             data.cell(row=row_of[gb.FIELD_PERIOD], column=2),

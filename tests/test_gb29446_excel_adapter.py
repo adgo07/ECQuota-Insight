@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import subprocess
+import sys
 import zipfile
 from datetime import date
 from decimal import Decimal
@@ -559,23 +562,128 @@ def test_missing_after_validation_rejected(ctx, tmp_path):
 
 
 def test_failed_evaluation_keeps_batch_retryable(ctx, tmp_path):
-    """A batch must not be stranded by a failed formal evaluation."""
+    """A batch must not be stranded by a failed formal evaluation.
+
+    The failure is injected into the real ``EvaluationService.evaluate`` call
+    that ``evaluate_workbook`` performs, so the retry path is genuinely
+    exercised rather than asserted on paper.
+    """
     path = fill(make_template(ctx, tmp_path, "retry.xlsx"))
     report = validate(ctx, path)
     assert report.valid, report.issues
-    service = WorkbookImportService(ctx.database, ctx.audit, ctx.standards)
-    with ctx.database.session() as session:
-        from uebench.infrastructure.database import ImportBatchRow
 
-        assert session.get(ImportBatchRow, report.import_id).status == "validated"
-    # The legacy commit path marks ``committed``; the reference path must not.
+    service = ctx.application._evaluation  # noqa: SLF001 - deliberate injection point
+    original = service.evaluate
+    calls = {"n": 0}
+
+    def flaky(request):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("注入的正式评价失败")
+        return original(request)
+
+    service.evaluate = flaky
+    try:
+        with pytest.raises(RuntimeError, match="注入的正式评价失败"):
+            ctx.application.evaluate_workbook(report.import_id)
+    finally:
+        service.evaluate = original
+
+    with ctx.database.engine.connect() as connection:
+        status = connection.execute(
+            text("SELECT status FROM import_batches WHERE import_id=:i"), {"i": report.import_id}
+        ).scalar_one()
+    assert status == "validated", "正式评价失败后批次必须保持 validated 以便重试"
+
+    # A second attempt must succeed and only then advance the batch.
+    result = ctx.application.evaluate_workbook(report.import_id)
+    assert result.evaluation_id
+    with ctx.database.engine.connect() as connection:
+        status = connection.execute(
+            text("SELECT status FROM import_batches WHERE import_id=:i"), {"i": report.import_id}
+        ).scalar_one()
+    assert status == STATUS_EVALUATED
+
+
+def test_prepare_keeps_batch_retryable(ctx, tmp_path):
+    """``prepare`` alone must not advance the batch status."""
+    path = fill(make_template(ctx, tmp_path, "prepare-only.xlsx"))
+    report = validate(ctx, path)
+    service = WorkbookImportService(ctx.database, ctx.audit, ctx.standards)
     draft = service.prepare(report.import_id)
     assert draft.request.standard_id == STANDARD_ID
     with ctx.database.engine.connect() as connection:
         status = connection.execute(
             text("SELECT status FROM import_batches WHERE import_id=:i"), {"i": report.import_id}
         ).scalar_one()
-    assert status == "validated", "prepare 后仍必须保持 validated，以便评价失败时可重试"
+    assert status == "validated"
+
+
+def test_submit_rejects_template_when_rule_revision_changed(ctx, tmp_path):
+    """A rule revision installed after validation must not be applied silently.
+
+    Reproduces the reported P1: validate against r2, install a current r3,
+    then submit.  ``source_sha256`` is unchanged, so the file hash alone cannot
+    detect this; the metadata/resolver gate must.
+    """
+    from uebench.domain.models import StandardDefinition
+
+    definition = json.loads((ROOT / "data/definitions" / "gb-29446-2019.json").read_text(encoding="utf-8"))
+    path = fill(make_template(ctx, tmp_path, "stale-submit.xlsx"))
+    report = validate(ctx, path)
+    assert report.valid, report.issues
+    assert report.rule_revision == 2, "fixture expects the r2 definition"
+
+    # Install a newer revision as the currently applicable definition.  The
+    # thresholds change too, so accepting the stale template would change the grade.
+    updated = json.loads(json.dumps(definition))
+    updated["rule_revision"] = 3
+    for product in updated["products"]:
+        for indicator in product["indicators"]:
+            indicator["thresholds"] = {
+                "level_1": {"op": "constant", "value": "9.0", "unit": "kW·h/t"},
+                "level_2": {"op": "constant", "value": "9.5", "unit": "kW·h/t"},
+                "level_3": {"op": "constant", "value": "9.9", "unit": "kW·h/t"},
+            }
+            indicator["base_thresholds"] = dict(indicator["thresholds"])
+    ctx.standards.install(StandardDefinition.model_validate(updated))
+
+    with pytest.raises(ValueError, match="重新生成模板"):
+        ctx.application.evaluate_workbook(report.import_id)
+
+    with ctx.database.engine.connect() as connection:
+        status = connection.execute(
+            text("SELECT status FROM import_batches WHERE import_id=:i"), {"i": report.import_id}
+        ).scalar_one()
+        records = connection.execute(text("SELECT COUNT(*) FROM evaluations")).scalar_one()
+    assert status == "validated", "拒绝后批次必须保持可重试"
+    assert records == 0, "拒绝时不得写入任何正式记录"
+
+
+def test_legacy_commit_does_not_bypass_revision_gate(ctx, tmp_path):
+    """The legacy generic commit path must not be a way around the gate.
+
+    ``commit_workbook`` is retained only for the other standards' generic
+    template; a GB29446 batch submitted through it still has to pass the
+    revision gate at evaluation time.
+    """
+    from uebench.domain.models import StandardDefinition
+
+    definition = json.loads((ROOT / "data/definitions" / "gb-29446-2019.json").read_text(encoding="utf-8"))
+    path = fill(make_template(ctx, tmp_path, "legacy-commit.xlsx"))
+    report = validate(ctx, path)
+    assert report.valid, report.issues
+
+    updated = json.loads(json.dumps(definition))
+    updated["rule_revision"] = 3
+    ctx.standards.install(StandardDefinition.model_validate(updated))
+
+    draft = ctx.application.commit_workbook(report.import_id)
+    assert draft.request.standard_id == STANDARD_ID
+    # Even though the legacy path marked the batch committed, the formal
+    # evaluation入口 still re-runs the gate.
+    with pytest.raises(ValueError, match="重新生成模板"):
+        ctx.application.evaluate_workbook(report.import_id)
 
 
 # ---------------------------------------------------------------------------
@@ -601,6 +709,57 @@ def test_gui_request_equals_excel_request(ctx, tmp_path):
     assert excel_request.notes == gui.notes
     assert {k: v.value for k, v in excel_request.inputs.items()} == {k: v.value for k, v in gui.inputs.items()}
     assert excel_request == gui, "规范化后的 GUI 与 Excel 请求必须完全相等"
+
+
+def test_real_gui_form_request_equals_excel_request(ctx, tmp_path, monkeypatch):
+    """Equality against the request the actual desktop form produces.
+
+    The previous case compared Excel against a hand-built request.  Here the
+    real ``MainWindow`` widgets are filled through the real Qt slots, and the
+    request that ``_collect_gb29446_request`` returns must equal the Excel
+    adapter's canonical request.
+    """
+    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtWidgets import QApplication
+
+    from uebench.ui.main_window import MainWindow
+
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(ctx)
+    try:
+        window.refresh_all()
+        # Drive the real controls rather than assigning the request directly.
+        window.eval_standard.setCurrentIndex(window.eval_standard.findData(STANDARD_ID))
+        window._standard_changed()
+        window.gb29446_coal_type.setCurrentIndex(window.gb29446_coal_type.findData("gb_29446-2019-coking-coal"))
+        window._gb29446_coal_changed()
+        window.gb29446_process.setCurrentIndex(window.gb29446_process.findData("重介"))
+        window.gb29446_organization.setText("宁夏测试企业")
+        window.gb29446_period.setCurrentIndex(window.gb29446_period.findData(gb.PERIOD_CUSTOM))
+        window.gb29446_custom_period.setText("2026年6月")
+        window.gb29446_electricity.setText("560")
+        window.gb29446_raw_coal.setText("100")
+        window.gb29446_notes.setText("同一内容")
+        gui = window._collect_gb29446_request()
+    finally:
+        window.close()
+
+    report = validate(
+        ctx,
+        fill(make_template(ctx, tmp_path, "real-eq.xlsx"), period=gb.PERIOD_CUSTOM, custom_period="2026年6月"),
+    )
+    assert report.valid, report.issues
+    excel_request = report.request
+    assert {k: v.value for k, v in gui.inputs.items()} == {k: v.value for k, v in excel_request.inputs.items()}
+    assert gui.organization_name == excel_request.organization_name
+    assert gui.notes == excel_request.notes
+    assert gui.product_id == excel_request.product_id
+    assert gui.input_mode == excel_request.input_mode
+    assert gui.selection_mode == excel_request.selection_mode
+    # ``evaluation_date`` is the day the GUI is used, so pin it for comparison.
+    assert excel_request.model_copy(update={"evaluation_date": gui.evaluation_date}).model_dump() == (
+        gui.model_dump()
+    ), "真实 GUI 表单产生的请求必须与 Excel 适配器的规范请求一致"
 
 
 def test_gui_result_equals_excel_result_projection(ctx, tmp_path):
@@ -689,38 +848,79 @@ def test_import_batch_links_to_evaluation_audit(ctx, tmp_path):
 
 
 def test_excel_record_lifecycle_survives_restart(ctx, tmp_path):
-    """RS02 lifecycle inheritance: the Excel-created record restores across processes."""
+    """RS02 lifecycle inheritance across a real process boundary.
+
+    The record is created through the Excel adapter, the context is disposed, and
+    a **separate Python process** reopens the same data directory and restores
+    Request / Result / Rule Snapshot.  An in-process rebuild would not prove the
+    lifecycle, and neither would a read that silently recalculated.
+    """
     report = validate(ctx, fill(make_template(ctx, tmp_path, "life.xlsx")))
     result = ctx.application.evaluate_workbook(report.import_id)
-    database_path = ctx.paths.database
     evaluation_id = result.evaluation_id
+    data_root = tmp_path / "中文数据"
+    script = _restart_probe_script(evaluation_id, data_root)
     ctx.database.dispose()
 
-    reopened = create_context(tmp_path / "中文数据")
-    try:
-        loaded = reopened.application.get_evaluation(evaluation_id)
-        assert loaded is not None, "新进程必须能恢复 Excel 生成的正式记录"
-        request, restored, snapshot = loaded
-        assert request.standard_id == STANDARD_ID
-        assert restored.evaluation_id == evaluation_id
-        assert restored.results[0].grade == result.results[0].grade
-        assert restored.numeric_profile_id == result.numeric_profile_id
-        # Read-only viewing must not invoke the engine.
-        from uebench.domain import engine as engine_mod
+    completed = subprocess.run(
+        [sys.executable, "-B", str(script)],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        cwd=str(ROOT),
+        timeout=180,
+    )
+    assert completed.returncode == 0, f"subprocess failed:\n{completed.stdout}\n{completed.stderr}"
+    payload = json.loads(completed.stdout.strip().splitlines()[-1])
+    assert payload["restored"] is True, payload
+    assert payload["standard_id"] == STANDARD_ID
+    assert payload["evaluation_id"] == evaluation_id
+    assert payload["grade"] == str(result.results[0].grade)
+    assert payload["numeric_profile_id"] == result.numeric_profile_id
+    assert payload["rule_snapshot_revision"] == result.rule_revision
+    assert payload["engine_calls"] == 0, "只读查看历史不得重新运行 Engine"
 
-        original = engine_mod.EvaluationEngine.evaluate
 
-        def forbidden(*args, **kwargs):
-            raise AssertionError("查看历史不得重新运行 Engine")
-
-        engine_mod.EvaluationEngine.evaluate = forbidden
-        try:
-            again = reopened.application.get_evaluation(evaluation_id)
-            assert again is not None and again[1].results[0].grade == result.results[0].grade
-        finally:
-            engine_mod.EvaluationEngine.evaluate = original
-    finally:
-        reopened.database.dispose()
+def _restart_probe_script(evaluation_id: str, data_root: Path) -> Path:
+    """Write a standalone script that reopens the data directory in a new process."""
+    script = data_root / "_restart_probe.py"
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))\n"
+        "from uebench.bootstrap import create_context\n"
+        "from uebench.domain import engine as engine_mod\n"
+        "\n"
+        "calls = {'n': 0}\n"
+        "original = engine_mod.EvaluationEngine.evaluate\n"
+        "def spy(self, *a, **k):\n"
+        "    calls['n'] += 1\n"
+        "    return original(self, *a, **k)\n"
+        "engine_mod.EvaluationEngine.evaluate = spy\n"
+        "\n"
+        f"context = create_context(Path(r'{data_root}'))\n"
+        "try:\n"
+        f"    loaded = context.application.get_evaluation({evaluation_id!r})\n"
+        "    if loaded is None:\n"
+        "        print(json.dumps({'restored': False}))\n"
+        "        raise SystemExit(0)\n"
+        "    request, result, snapshot = loaded\n"
+        "    print(json.dumps({\n"
+        "        'restored': True,\n"
+        "        'standard_id': request.standard_id,\n"
+        "        'evaluation_id': result.evaluation_id,\n"
+        "        'grade': str(result.results[0].grade),\n"
+        "        'numeric_profile_id': result.numeric_profile_id,\n"
+        "        'rule_snapshot_revision': snapshot.rule_revision,\n"
+        "        'engine_calls': calls['n'],\n"
+        "    }, ensure_ascii=False))\n"
+        "finally:\n"
+        "    context.database.dispose()\n",
+        encoding="utf-8",
+    )
+    return script
 
 
 def test_import_to_export_consistency(ctx, tmp_path):

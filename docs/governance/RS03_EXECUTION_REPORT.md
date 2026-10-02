@@ -276,7 +276,7 @@ tests/test_document_hygiene.py
 tools/qzc_n01_a_excel_ingress_probe.py
 ```
 
-literal full suite：
+literal full suite（本地，带既有 dist 资产）：
 
 ```text
 505 passed, 4 xfailed, 1 warning in 377.97s (0:06:17)
@@ -284,9 +284,26 @@ literal full suite：
 
 - 4 个 xfail 为 `tests/test_gb29446.py` 中既有的 legacy strict XFAIL（N01-A 有意数值行为变更证据），**保留不动**；
 - 1 个 warning 为 `test_backup_rejects_duplicate_members` 的重复 ZIP 成员预期警告；
-- **无 failed、无 error**。
+- 上述本地结果**无 failed、无 error**，但请注意下面的 CI 事实。
 
-旧的 `test_portable_release_does_not_bundle_incompatible_poppler_icu`：在当前 base 与 head 均**通过**（RS02 阶段已移除过时基线排除），因此本次**没有** historical release asset failure 需要登记。未制造旧 ZIP。
+### CI 与旧 portable ZIP（证据更正）
+
+独立验收指出本报告原先把这一项描述为"base 与 head 均通过、因此没有历史发布资产失败需要登记"，**该描述不成立**，现更正：
+
+| 环境 | 结果 | 原因 |
+|---|---|---|
+| 本地工作区 | `test_portable_release_does_not_bundle_incompatible_poppler_icu` **通过** | 运行前本地已存在 `dist/release/UEBench-0.1.0-win-x64.zip`（该文件被 Git 忽略，不属于仓库内容） |
+| CI（干净 checkout） | 旧 portable ZIP 缺失，`tests/test_frozen_release.py` 相关检查**失败** | CI 从不包含 `dist/`，因此上面那条"通过"只反映本地恰好存在旧构建产物 |
+
+因此：
+
+- 本地 `505 passed` **不足以证明 CI 的 literal suite 全绿**；两个 workflow 的 SUCCESS 也不能替代该证明，因为 `.github/workflows/qzc-n01-a.yml` 显式 `--deselect` 了该测试，并有一步专门断言它在 base **同样失败**；
+- 该失败在 **actual PR base 与 head 上同时存在**，属于 **historical release asset failure**，按路线留至 **RS05** 处理；
+- 本次**未创建、未替换、未重建**任何发布物。
+
+### 关于 `test_portable_release_...` 的分类依据
+
+独立验收已用最新 CI 日志证明：base 与 head 都因旧 portable ZIP 缺失而失败。这属于"历史发布资产缺失"，不是本次 RS03 引入的回归，也不由 RS03 修复。
 
 新增 `tests/test_gb29446_excel_adapter.py` 覆盖任务书 §38 要求的 30 项，映射如下：
 
@@ -313,23 +330,89 @@ literal full suite：
 | 23 | formal Excel evaluate creates Record | `test_formal_excel_evaluation_creates_record` |
 | 24 | import/evaluation Audit link | `test_import_batch_links_to_evaluation_audit` |
 | 25 | selection_mode CURRENT only | `test_excel_evaluation_is_current_only` |
-| 26 | RS02 restart/view | `test_excel_record_lifecycle_survives_restart` |
+| 26 | RS02 restart/view | `test_excel_record_lifecycle_survives_restart`（**真实独立子进程**） |
 | 27 | Import → Export consistency | `test_import_to_export_consistency` |
-| 28 | real extra-column rejection | `test_real_extra_column_rejected`（另含 rename / missing / extra sheet / changed header） |
-| 29 | architecture boundary | `test_architecture_boundaries.py`（加固版） |
+| 28 | real extra-column rejection | `test_real_extra_column_rejected`（含**表头为空但有数据**的额外列；另含 rename / missing / extra sheet / changed header） |
+| 29 | architecture boundary | `test_architecture_boundaries.py`（加固版，含**相对 import 解析**正向对照） |
 | 30 | updated N01-A ingress probe | `tools/qzc_n01_a_excel_ingress_probe.py`（20 项检查全 PASS） |
+
+返工新增的持续证据（见 §6.1）：
+
+| 主题 | 测试 |
+|---|---|
+| 提交前重新核对模板修订 | `test_submit_rejects_template_when_rule_revision_changed` |
+| legacy commit 不能绕过 Gate | `test_legacy_commit_does_not_bypass_revision_gate` |
+| 注入失败后可重试 | `test_failed_evaluation_keeps_batch_retryable` |
+| prepare 不推进状态 | `test_prepare_keeps_batch_retryable` |
+| 真实 GUI 控件请求等价 | `test_real_gui_form_request_equals_excel_request` |
+| 相对 import 解析 | `test_relative_import_resolution_catches_evasion`、`test_prefix_helper_covers_intermediate_packages` |
+
+## 6.1 独立验收后的返工（本 PR 第三个提交）
+
+独立验收判定 **FAIL — REWORK REQUIRED**，并给出三项必须返工的问题与三处证据强度不足。全部已修复：
+
+### P1-a 正式提交可绕过修订 Gate —— 已修复
+
+**问题**：metadata 检查只发生在初次校验；正式提交只重查文件 SHA，随后 `EvaluationService` 重新解析 current rule。实测"r2 模板校验成功 → 安装 current r3 → `evaluate_workbook` 仍保存 r3 Record"，模拟阈值变化后等级由 2级 变成 1级。
+
+**修复**：`WorkbookImportService.prepare()` 现在执行**两项独立检查**，二者都通过才继续：
+
+1. source integrity（文件存在且 SHA-256 未变）；
+2. **适用规则身份**：用与校验时**同一个** `_resolve_gb29446_standard()` 重新解析模板，重新执行 metadata ↔ 解析结果比较；并把校验时记录的 `rule_revision` 与当前解析结果比较。
+
+任一不符即拒绝并提示"该模板对应的标准/规则修订已不是当前本次评价适用版本，请重新生成模板后填写。"，批次**保持 `validated` 可重试**，且**不写入任何正式记录**。
+
+Adapter 仍然**没有**第二套标准选择规则——它复用的就是正式 resolver。
+
+同时 `ImportReport` 新增 `standard_version` / `rule_revision`，把校验时的解析身份落库，使"定义被等价替换"也能被检出。
+
+**持续证据**：`test_submit_rejects_template_when_rule_revision_changed`（真实安装 r3 + 修改阈值，断言拒绝、批次仍 `validated`、`evaluations` 行数为 0）、`test_legacy_commit_does_not_bypass_revision_gate`（legacy `commit_workbook` 也不能绕过）。
+
+### P1-b 真实额外列可通过结构校验 —— 已修复
+
+**问题**：`评价数据!D1` 空、`D2="额外数据"`、`max_column=4` 时返回 `valid=True, issues=[]`；原实现只检查额外列的**表头**。
+
+**修复**：新增 `_first_non_empty_row(sheet, column)`，对超出声明宽度的**每一列**扫描**全部行**（含第 1 行），只要存在非空内容即报"模板不允许增加自定义列"并指向具体单元格。纯格式扩宽（整列无内容）仍然兼容。
+
+**持续证据**：`test_real_extra_column_rejected` 扩展为同时覆盖"有表头的额外列"与"表头为空但有数据的额外列"，并断言 `max_column` 确实增加。
+
+### P2 Boundary Gate 漏检相对 lazy import —— 已修复
+
+**问题**：`from ..infrastructure.excel import WorkbookImportService` 被记录为 `infrastructure.excel`，无法匹配 `uebench.infrastructure`；`from .. import infrastructure` 更被忽略。
+
+**修复**：`_ImportCollector` 现在携带被检模块的完整点分名（由文件相对 `src/` 的路径推导，`__init__.py` 归并到包名），并据此解析 `node.level`：
+
+- `from ..infrastructure.excel import X` → `uebench.infrastructure.excel` + `...WorkbookImportService`
+- `from .. import infrastructure` → `uebench.infrastructure`
+
+同时为 `import a.b` 记录所有点分前缀，使前缀规则与真实 import 语义一致。
+
+**持续证据**：`test_relative_import_resolution_catches_evasion` 把三种写法（绝对 deferred、相对 deferred、相对包 deferred）写进临时模块并用真实 collector 断言全部被解析为 `uebench.infrastructure...`；`test_prefix_helper_covers_intermediate_packages` 守护前缀展开。
+
+### 证据强度不足三处 —— 已补为持续可执行测试
+
+| 原弱点 | 现在 |
+|---|---|
+| "重启"案例实际是同进程重建 context | `test_excel_record_lifecycle_survives_restart` 改为**真实独立 Python subprocess**（`sys.executable -B`）打开同一数据目录，通过 stdout JSON 回传恢复结果，并断言 `engine_calls == 0` |
+| "失败可重试"案例没有注入 EvaluationService 失败 | `test_failed_evaluation_keeps_batch_retryable` 向**真实的** `EvaluationService.evaluate` 注入一次失败，断言批次保持 `validated`、重试成功后才变 `evaluated` |
+| GUI Request 等价案例使用手工构造的 Request | `test_real_gui_form_request_equals_excel_request` 改为驱动**真实 `MainWindow` 控件**（标准 / 煤种 / 工艺 / 企业 / 周期 / 自定义周期 / E_d / m / 备注）后调用 `_collect_gb29446_request()`，与 Excel 规范请求逐字段比较（`evaluation_date` 因取当天而固定后比较完整 dump） |
+
+保留原有的手工构造对照用例，作为独立于 Qt 的回归保护。
+
+
 
 ## 7. GUI / Excel 等价证据
 
 代表案例：企业 `宁夏测试企业`、评价日期 `2026-06-01`、周期 `自定义 / 2026年6月`、煤种 `炼焦煤`、工艺 `重介`、`E_d="560"`、`m="100"`、备注 `同一内容`。
 
 - **Request 相等**：`excel_request == gui_request`（Pydantic 全量相等），并逐项断言 `evaluation_date` / `standard_id` / `product_id` / `selection_mode` / `input_mode` / `inputs` / `organization_name` / `notes`。不是只比较最终等级。
+- **真实 GUI 控件路径**：`test_real_gui_form_request_equals_excel_request` 驱动真实 `MainWindow` 表单控件后取得请求，与 Excel 规范请求比较完整 dump（`evaluation_date` 固定后比较）。
 - **Result 投影相等**：比较 `standard_id` / `standard_version` / `rule_revision` / `product_id` / `actual_value` / `grade` / `display_values` / `corrected_thresholds` / `source_references` / numeric contract & profile / calculator version & behavior。`evaluation_id` 与 `evaluated_at` 允许不同（两条正式 Record）。
 - **full-value 边界**：lexical `"5.0000004"` 经 Excel 与 GUI 两条路径均得 `grade = LEVEL_2`，`actual_value = Decimal('5.0000004')`，**未发生 ROUND6**，Excel display value 未回流正式比较。完整 `T−δ / T / T+δ` 继续由既有 Numeric Gate 承担。
 
 ## 8. RS02 生命周期继承
 
-Excel 生成正式 Record 后：`get_evaluation` 可读、跨进程重新 `create_context` 后仍能恢复 Request / Result / Rule Snapshot，且**只读查看不重新运行 Engine**（以打桩断言）。周期 codec 搬迁后，RS02 历史记录中的全年 / 月度 / 自定义显示行为未改变，`tests/test_gb29446_record_lifecycle.py` 全绿。
+Excel 生成正式 Record 后：`get_evaluation` 可读；`test_excel_record_lifecycle_survives_restart` 通过**真实独立 Python subprocess** 打开同一数据目录恢复 Request / Result / Rule Snapshot，并断言只读查看**未运行 Engine**（`engine_calls == 0`）。周期 codec 搬迁后，RS02 历史记录中的全年 / 月度 / 自定义显示行为未改变，`tests/test_gb29446_record_lifecycle.py` 全绿。
 
 ## 9. 剩余风险与 Deferred
 
