@@ -94,9 +94,11 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- `ECQ-GOV01` = **`DONE`**（已提交并推送分支 `chore/ecq-gov01-roadmap-cleanup`，等待独立验收）；
+- `ECQ-GOV01` = **`DONE`**（验收载体：**PR #8**，分支 `chore/ecq-gov01-roadmap-cleanup`）；
 - 下一任务 = **`RS01`**（`NOT STARTED`）—— GB29446 业务 Vertical Slice 闭环；
 - 本任务停在 GOV01 完成状态，不开始 RS01。
+
+> 本文件只记录稳定状态。PR head SHA、审查进度与合并状态一律以 PR #8 自身为准，不写入本文件。
 
 ## 10. 历史材料索引
 
@@ -107,12 +109,12 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 | [`HANDOFF_LEGACY_2026-09.md`](docs/history/legacy/HANDOFF_LEGACY_2026-09.md) | QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账 | `HISTORICAL` |
 | [`QZC_N01_A_LOCAL_DESIGN.md`](docs/history/numeric/QZC_N01_A_LOCAL_DESIGN.md) | N01-A Pilot 静态设计证据 | `HISTORICAL-SUPERSEDED` |
 | [`QZC_N01_A_EXECUTION_REPORT.md`](docs/history/numeric/QZC_N01_A_EXECUTION_REPORT.md) | N01-A Pilot 执行报告 | `HISTORICAL` |
-| [`交接清单-2026-08-31.md`](docs/交接清单-2026-08-31.md) | 2026-08-31 交接清单（保留原位，已加历史标识） | `HISTORICAL` |
-| [`宏观结构审计-20260905.md`](docs/宏观结构审计-20260905.md) | 2026-09-05 宏观结构审计（保留原位，已加历史标识；`scripts/sync_release.ps1` 仍按 `docs/` 路径复制） | `HISTORICAL` |
-| [`开发基线待复核清单-20260905.md`](docs/开发基线待复核清单-20260905.md) | 2026-09-05 开发基线待复核清单（保留原位，已加历史标识） | `HISTORICAL` |
-| [`docs/验收记录.md`](docs/验收记录.md) | 历史验收台账（Historical Acceptance Ledger） | `HISTORICAL LEDGER` |
-| [`docs/audits/UI_CURRENT_STATE_AUDIT.md`](docs/audits/UI_CURRENT_STATE_AUDIT.md) | UI 现状盘点，对 RS02 仍有参考价值 | `AUDIT ONLY` |
-| [`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`](docs/governance/NUMERIC_V1_ADOPTION_REPORT.md) | Numeric v1 Adoption 证据（**现仍为 Numeric 权威证据**） | `CURRENT EVIDENCE` |
-| [`docs/governance/PLATFORM_ADOPTION_REPORT.md`](docs/governance/PLATFORM_ADOPTION_REPORT.md) | 平台接入证据 | `EVIDENCE` |
+| [`交接清单-2026-08-31.md`](docs/交接清单-2026-08-31.md) | 2026-08-31 交接清单（保留 `docs/` 原位，已加历史标识） | `HISTORICAL` |
+| [`宏观结构审计-20260905.md`](docs/宏观结构审计-20260905.md) | 2026-09-05 宏观结构审计（保留 `docs/` 原位；`scripts/sync_release.ps1:86` 按该路径复制，故不物理移动） | `HISTORICAL` |
+| [`开发基线待复核清单-20260905.md`](docs/开发基线待复核清单-20260905.md) | 2026-09-05 开发基线待复核清单（保留 `docs/` 原位，已加历史标识） | `HISTORICAL` |
+| [`验收记录.md`](docs/验收记录.md) | 历史验收台账（Historical Acceptance Ledger） | `HISTORICAL LEDGER` |
+| [`UI_CURRENT_STATE_AUDIT.md`](docs/audits/UI_CURRENT_STATE_AUDIT.md) | UI 现状盘点，对 RS02 仍有参考价值 | `AUDIT ONLY` |
+| [`NUMERIC_V1_ADOPTION_REPORT.md`](docs/governance/NUMERIC_V1_ADOPTION_REPORT.md) | Numeric v1 Adoption 证据（**现仍为 Numeric 权威证据**） | `CURRENT EVIDENCE` |
+| [`PLATFORM_ADOPTION_REPORT.md`](docs/governance/PLATFORM_ADOPTION_REPORT.md) | 平台接入证据 | `EVIDENCE` |
 
 `docs/验收记录.md` 是**历史验收台账**，**不得**作为普通新任务的 Current State Authority。
