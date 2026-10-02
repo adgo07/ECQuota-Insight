@@ -11,8 +11,47 @@
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
 | 当前产品阶段 | 参考标准核心纵向闭环；`PHASE_1` 类业务验收已有多批记录，无统一 Phase 编号 |
 | 当前交付范围 | 47 项强制性能耗限额标准、753 条当前指标；开发基线 `standards/development/scope-63` |
+| Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 
 本仓仍独立开发、独立安装、独立升级、独立离线运行。
+
+### 1.1 仓库身份与本地执行环境
+
+**仓库身份**以 GitHub owner/repository 与 `git origin` 为准，**不以本地文件夹名或绝对路径为准**：
+
+| 仓库 | Canonical repository |
+|---|---|
+| 本仓（ECQuota-Insight） | `https://github.com/adgo07/ECQuota-Insight.git` |
+| 中央治理仓（Qingzhou-contracts） | `https://github.com/adgo07/Qingzhou-contracts.git` |
+| 兄弟业务仓 | `https://github.com/adgo07/EquipEffi.git`、`https://github.com/adgo07/GHGTOOL.git` |
+
+规则：
+
+1. 本仓长期身份以 GitHub owner/repository + `git origin` 为准；**本地绝对路径只是当前运行环境，不是仓库身份**；
+2. **不得**把某台电脑的 `C:\` / `D:\` / `E:\` / `G:\` 等绝对路径当成跨机器固定路径；
+3. 历史 HANDOFF / 报告中的绝对路径只是**历史执行环境记录**，不得直接作为当前 checkout 地址；
+4. **不得仅凭文件夹名判断仓库**；本仓本地目录名与实际仓库名不一致是正常情况；
+5. **不得假设** `Qingzhou-contracts` 一定位于 `../Qingzhou-contracts` 或任何固定相对位置。
+
+**本地正式任务开始前必须实际确认**（不得凭记忆或上次会话推断）：
+
+```powershell
+git rev-parse --show-toplevel      # 实际工作树根
+git remote get-url origin          # 实际 origin
+git branch --show-current          # 当前分支
+git rev-parse HEAD                 # 当前 head
+git status --short                 # 工作区状态
+git fetch origin                   # 同步远端
+```
+
+6. 必须确认当前 `origin` 与本任务指定的 GitHub 仓库**一致**；
+7. **若 `origin` 不一致，必须 `BLOCKED` 停止，不得继续修改错误仓库**；
+8. `fetch` 后检查默认分支 / `origin` 默认分支是否同步，并核对默认分支名（本仓默认分支为 `main`）；
+9. 需要读取 `Qingzhou-contracts` 或其他青舟仓库时：
+   - **已存在本地 clone**：先验证其 `origin` 指向预期 GitHub 仓库，再读取；
+   - **没有可信本地 clone**：从 GitHub 读取；
+   - 不得仅凭文件夹名判断仓库；
+   - 不得假设中央仓位于任何固定相对路径。
 
 ## 2. 本仓专属硬规则
 
