@@ -481,6 +481,8 @@ class EvaluationSummary(StrictModel):
     standard_id: str
     standard_number: str
     product_id: str
+    standard_title: str = ""
+    product_name: str = ""
     organization_name: str | None = None
     project_name: str | None = None
 

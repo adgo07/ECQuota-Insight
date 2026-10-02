@@ -149,6 +149,17 @@ class ApplicationFacade:
     ) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None:
         return self._evaluations.get(evaluation_id)
 
+    def count_evaluations(self) -> int:
+        return self._evaluations.count()
+
+    def find_evaluation_standard_source(self, evaluation_id: str) -> Path | None:
+        """只按原评价快照定位原文；不可退回当前标准。"""
+        loaded = self._evaluations.get(evaluation_id)
+        if loaded is None or self._source_service is None:
+            return None
+        _request, _result, snapshot = loaded
+        return self._source_service.find(snapshot.source_file, snapshot.source_sha256)
+
     def delete_evaluation(self, evaluation_id: str) -> bool:
         return self._evaluations.soft_delete(evaluation_id)
 
