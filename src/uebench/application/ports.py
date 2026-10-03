@@ -16,7 +16,16 @@ from uebench.domain.models import AuditEntry, EvaluationRequest, PackageHistoryE
 
 
 class TemplatePort(Protocol):
-    def create_template(self, path: Path) -> Path: ...
+    """Create an import template.
+
+    ``standard_definition`` selects the adapter profile: ``None`` produces the
+    generic multi-standard template, while a resolved standard produces that
+    standard's dedicated template.  The application layer resolves the
+    definition and passes it in, so the template service never queries a
+    repository itself.
+    """
+
+    def create_template(self, path: Path, standard_definition: StandardDefinition | None = None) -> Path: ...
 
 
 class ImportIssuePort(Protocol):
@@ -29,6 +38,7 @@ class ImportIssuePort(Protocol):
 class ImportReportPort(Protocol):
     import_id: str
     valid: bool
+    profile_id: str
     issues: list[ImportIssuePort]
     request: EvaluationRequest | None
 
@@ -40,6 +50,16 @@ class EvaluationDraftPort(Protocol):
 
 class WorkbookImportPort(Protocol):
     def validate(self, path: Path) -> ImportReportPort: ...
+
+    def prepare(self, import_id: str) -> EvaluationDraftPort:
+        """Return the canonical request for a validated batch.
+
+        Implementations must re-verify source integrity (path still readable and
+        content hash unchanged) and must leave the batch retryable on failure.
+        """
+        ...
+
+    def mark_evaluated(self, import_id: str, evaluation_id: str) -> None: ...
 
     def commit(self, import_id: str) -> EvaluationDraftPort: ...
 

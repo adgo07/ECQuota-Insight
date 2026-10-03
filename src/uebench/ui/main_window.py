@@ -42,6 +42,13 @@ from PySide6.QtWidgets import (
 if TYPE_CHECKING:
     from uebench.bootstrap import AppContext
 
+from uebench.application.gb29446 import (
+    GB29446_PERIOD_OPTIONS,
+    GB29446_STANDARD_ID,
+    PERIOD_CUSTOM,
+    decode_period_notes,
+    encode_period_notes,
+)
 from uebench.domain.models import (
     EnergyLine,
     EvaluationRequest,
@@ -76,12 +83,6 @@ QHeaderView::section { background: #d9eaf7; color: #17365d; padding: 7px; border
 QLabel[class="pageTitle"] { font-size: 18pt; font-weight: bold; color: #17365d; }
 QLabel[class="metric"] { font-size: 24pt; font-weight: bold; color: #2f75b5; }
 """
-
-GB29446_PERIOD_OPTIONS = (
-    "全年",
-    *(f"{month}月" for month in range(1, 13)),
-    "自定义",
-)
 
 
 def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
@@ -587,26 +588,35 @@ class MainWindow(QMainWindow):
     def _build_import(self) -> QWidget:
         page, layout = self._page("Excel导入")
         explanation = QLabel(
-            "Excel导入用于批量填写评价信息、适用条件、实际值、能源明细和产量分摊。"
-            "软件会先按固定模板逐单元格校验，校验通过后再提交计算；Excel本身不单独判级。"
+            "Excel只作为录入适配器：软件按模板逐单元格校验，转换成与手工录入相同的评价请求，"
+            "再交给同一套计算引擎。Excel自身不计算折算系数、单位产品能耗或等级。"
         )
         explanation.setWordWrap(True)
         layout.addWidget(explanation)
         controls = QHBoxLayout()
         template = QPushButton("保存导入模板")
         template.clicked.connect(self.save_import_template)
+        template_gb = QPushButton("保存 GB29446 专用模板")
+        template_gb.clicked.connect(self.save_gb29446_template)
         validate = QPushButton("选择并校验Excel")
         validate.clicked.connect(self.validate_import_workbook)
-        self.import_commit_button = QPushButton("提交并计算")
+        self.import_commit_button = QPushButton("确认导入并评价")
         self.import_commit_button.setEnabled(False)
-        self.import_commit_button.clicked.connect(self.commit_import)
+        self.import_commit_button.clicked.connect(self.evaluate_import)
         controls.addWidget(template)
+        controls.addWidget(template_gb)
         controls.addWidget(validate)
         controls.addStretch()
         controls.addWidget(self.import_commit_button)
         layout.addLayout(controls)
         self.import_status = QLabel("尚未选择文件")
+        self.import_status.setWordWrap(True)
         layout.addWidget(self.import_status)
+        self.import_summary = QLabel("")
+        self.import_summary.setWordWrap(True)
+        self.import_summary.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.import_summary.setVisible(False)
+        layout.addWidget(self.import_summary)
         self.import_issues = QTableWidget(0, 4)
         self.import_issues.setHorizontalHeaderLabels(["级别", "工作表", "单元格", "问题"])
         self._configure_table(self.import_issues)
@@ -1307,31 +1317,14 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _encode_gb29446_notes(period: str, custom_period: str, note: str) -> str:
-        lines = [f"核算周期：{period}"]
-        if period == "自定义":
-            lines.append(f"自定义周期：{custom_period.strip()}")
-        if note.strip():
-            lines.append(f"备注：{note.strip()}")
-        return "\n".join(lines)
+        # Shared with the Excel adapter so both paths persist identical notes.
+        return encode_period_notes(period, custom_period, note)
 
     @staticmethod
     def _decode_gb29446_notes(notes: str | None) -> tuple[str, str, str]:
-        lines = (notes or "").splitlines()
-        if not lines or not lines[0].startswith("核算周期："):
-            return "全年", "", notes or ""
-        period = lines[0].split("：", 1)[1].strip()
-        if period == "1月～12月":
-            period = "全年"
-        if period not in GB29446_PERIOD_OPTIONS:
-            return "全年", "", notes or ""
-        custom_period = ""
-        remaining = lines[1:]
-        if period == "自定义" and remaining and remaining[0].startswith("自定义周期："):
-            custom_period = remaining.pop(0).split("：", 1)[1].strip()
-        note = "\n".join(remaining)
-        if note.startswith("备注："):
-            note = note.split("：", 1)[1]
-        return period, custom_period, note
+        # Shared with the Excel adapter; historical decoding compatibility lives
+        # in the application-layer codec.
+        return decode_period_notes(notes)
 
     def _collect_gb29446_request(self) -> EvaluationRequest:
         assert self.current_standard is not None
@@ -1920,6 +1913,19 @@ class MainWindow(QMainWindow):
             self.context.application.create_template(Path(path))
             QMessageBox.information(self, "模板已保存", path)
 
+    def save_gb29446_template(self) -> None:
+        path, _ = QFileDialog.getSaveFileName(
+            self, "保存 GB29446 专用模板", "GB29446-选煤电力消耗限额-评价数据.xlsx", "Excel (*.xlsx)"
+        )
+        if not path:
+            return
+        try:
+            self.context.application.create_template(Path(path), GB29446_STANDARD_ID)
+        except Exception as exc:
+            QMessageBox.critical(self, "模板保存失败", _friendly_error(exc, "保存GB29446模板"))
+            return
+        QMessageBox.information(self, "模板已保存", path)
+
     def validate_import_workbook(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "选择Excel", "", "Excel (*.xlsx)")
         if not path:
@@ -1927,7 +1933,8 @@ class MainWindow(QMainWindow):
         report = self.context.application.validate_workbook(Path(path))
         self.pending_import_id = report.import_id if report.valid else None
         self.import_commit_button.setEnabled(report.valid)
-        self.import_status.setText("校验通过，可提交计算。" if report.valid else "校验失败，请修正后重新导入。")
+        self.import_status.setText("校验通过，请确认下方识别摘要后点击“确认导入并评价”。" if report.valid else "校验失败，请修正后重新导入。")
+        self._show_import_summary(report)
         self.import_issues.setRowCount(0)
         for issue in report.issues:
             row = self.import_issues.rowCount()
@@ -1935,7 +1942,73 @@ class MainWindow(QMainWindow):
             for column, value in enumerate((issue.severity, issue.sheet, issue.cell, issue.message)):
                 self.import_issues.setItem(row, column, _item(value))
 
+    def _show_import_summary(self, report) -> None:
+        """Show the recognisable business summary of a validated workbook.
+
+        Only user-facing fields are shown; internal keys, the numeric profile
+        and calculator identifiers stay in the technical detail layer.
+        """
+        request = getattr(report, "request", None)
+        if not report.valid or request is None:
+            self.import_summary.setVisible(False)
+            self.import_summary.setText("")
+            return
+        lines = []
+        if request.standard_id == GB29446_STANDARD_ID:
+            period, custom_period, _note = self._decode_gb29446_notes(request.notes)
+            standard = self.context.application.get_standard(request.standard_id)
+            product = None
+            if standard is not None:
+                product = next((item for item in standard.products if item.id == request.product_id), None)
+            coal = ""
+            if product is not None:
+                coal = next(iter(product.selection_values.values()), product.name)
+            electricity = request.inputs.get("electricity_consumption")
+            raw_coal = request.inputs.get("raw_coal_input")
+            process = request.inputs.get("washing_process")
+            lines = [
+                f"标准：{standard.number if standard else 'GB 29446—2019'}",
+                f"企业：{request.organization_name or '—'}",
+                f"评价日期：{request.evaluation_date.isoformat()}",
+                f"核算周期：{custom_period if period == PERIOD_CUSTOM else period}",
+                f"煤种：{coal or '—'}",
+                f"选煤工艺：{process.value if process else '—'}",
+                f"统计期选煤电力消耗量 E_d：{electricity.value if electricity else '—'} kW·h",
+                f"统计期入选原煤量 m：{raw_coal.value if raw_coal else '—'} t",
+            ]
+        else:
+            standard = self.context.application.get_standard(request.standard_id)
+            lines = [
+                f"标准：{standard.number if standard else request.standard_id}",
+                f"企业：{request.organization_name or '—'}",
+                f"评价日期：{request.evaluation_date.isoformat()}",
+                f"产品/工序：{request.product_id}",
+            ]
+        self.import_summary.setText("\n".join(lines))
+        self.import_summary.setVisible(True)
+
+    def evaluate_import(self) -> None:
+        """Formal Excel evaluation: same application use case as the GUI path."""
+        if not self.pending_import_id:
+            return
+        try:
+            result = self.context.application.evaluate_workbook(self.pending_import_id)
+        except Exception as exc:
+            QMessageBox.critical(self, "导入评价失败", _friendly_error(exc, "导入Excel"))
+            return
+        self.pending_import_id = None
+        self.import_commit_button.setEnabled(False)
+        self.import_summary.setVisible(False)
+        self.import_summary.setText("")
+        self.import_status.setText("评价已完成并保存记录。")
+        self.refresh_all()
+        if result.standard_id == GB29446_STANDARD_ID:
+            request = self.context.application.get_evaluation(result.evaluation_id)
+            if request is not None:
+                self._show_gb29446_result(request[0], result)
+
     def commit_import(self) -> None:
+        """Legacy generic submission path kept for the other standards."""
         if not self.pending_import_id:
             return
         try:
