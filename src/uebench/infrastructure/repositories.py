@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import date, datetime, timezone
 
 from sqlalchemy import desc, func, select
 
 from uebench.domain.models import (
+    RECORD_CORRUPTED_LABEL,
     AuditEntry,
     EvaluationRequest,
     EvaluationResult,
@@ -13,6 +15,7 @@ from uebench.domain.models import (
     LifecycleStatus,
     StandardDefinition,
     StandardSelectionMode,
+    StorageCorruptionError,
 )
 
 from .database import AuditRow, DatabaseManager, EvaluationRow, StandardRow
@@ -20,6 +23,34 @@ from .database import AuditRow, DatabaseManager, EvaluationRow, StandardRow
 
 def _canonical_json(payload: dict) -> str:
     return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+#: Human labels for the three persisted payloads of one evaluation row.
+_PAYLOAD_LABELS = {
+    "request_json": "评价输入数据",
+    "result_json": "评价结论数据",
+    "rule_snapshot_json": "规则快照",
+}
+
+
+def _corruption_reason(field: str) -> str:
+    """Describe one unreadable payload without leaking an ASCII pydantic message."""
+    label = _PAYLOAD_LABELS.get(field, field)
+    return f"{RECORD_CORRUPTED_LABEL}：{label}无法解析，该记录仅按数据库原始字段降级展示。"
+
+
+def _log_corruption(evaluation_id: str, field: str, exc: Exception) -> None:
+    """Report one unreadable stored payload.
+
+    The raw pydantic message stays in the log for support; user-facing text is
+    built by :func:`_corruption_reason` so the UI never blames input data.
+    """
+    logging.getLogger(__name__).warning(
+        "评价记录 %s 的 %s 无法解析，已按降级记录处理：%s",
+        evaluation_id,
+        _PAYLOAD_LABELS.get(field, field),
+        exc,
+    )
 
 
 class AuditRepository:
@@ -269,17 +300,45 @@ class SqlEvaluationRepository:
             )
 
     def get(self, evaluation_id: str) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None:
+        """Load one stored evaluation.
+
+        ``None`` keeps its original meaning only: the record does not exist or was
+        soft-deleted.  A record that exists but whose stored payload can no longer
+        be parsed raises :class:`StorageCorruptionError`, so callers can never
+        mistake storage damage for a deletion and never silently degrade a
+        business projection that other code compares against stored expectations.
+        """
         with self.database.session() as session:
             row = session.get(EvaluationRow, evaluation_id)
             if row is None or row.deleted_at is not None:
                 return None
             return (
-                EvaluationRequest.model_validate_json(row.request_json),
-                EvaluationResult.model_validate_json(row.result_json),
-                StandardDefinition.model_validate_json(row.rule_snapshot_json),
+                self._parse_payload(evaluation_id, "request_json", row.request_json, EvaluationRequest),
+                self._parse_payload(evaluation_id, "result_json", row.result_json, EvaluationResult),
+                self._parse_payload(evaluation_id, "rule_snapshot_json", row.rule_snapshot_json, StandardDefinition),
             )
 
+    @staticmethod
+    def _parse_payload(evaluation_id: str, field: str, payload: str, model):
+        try:
+            return model.model_validate_json(payload)
+        except ValueError as exc:
+            _log_corruption(evaluation_id, field, exc)
+            raise StorageCorruptionError(
+                f"{RECORD_CORRUPTED_LABEL}：评价记录（{evaluation_id}）的"
+                f"{_PAYLOAD_LABELS.get(field, field)}无法解析，无法打开该记录。"
+                "记录已保留，未被修改或删除；请联系技术支持并保留数据目录。"
+            ) from exc
+
     def list_recent(self, limit: int = 100) -> list[EvaluationSummary]:
+        """List recent records, degrading unreadable rows instead of failing.
+
+        One malformed ``result_json`` must not discard the whole page.  The
+        damaged row stays in the list with ``is_corrupted=True`` and falls back to
+        the database columns that do not depend on the saved payload, so the
+        record is explicitly degraded rather than silently skipped or shown as a
+        normal record.
+        """
         with self.database.session() as session:
             statement = (
                 select(EvaluationRow)
@@ -290,7 +349,23 @@ class SqlEvaluationRepository:
             rows = session.scalars(statement)
             summaries = []
             for row in rows:
-                saved_result = EvaluationResult.model_validate_json(row.result_json)
+                try:
+                    saved_result = EvaluationResult.model_validate_json(row.result_json)
+                except ValueError as exc:
+                    _log_corruption(row.evaluation_id, "result_json", exc)
+                    summaries.append(EvaluationSummary(
+                        evaluation_id=row.evaluation_id,
+                        created_at=row.created_at,
+                        evaluation_date=row.evaluation_date,
+                        standard_id=row.standard_id,
+                        standard_number=row.standard_number,
+                        product_id=row.product_id,
+                        organization_name=row.organization_name,
+                        project_name=row.project_name,
+                        is_corrupted=True,
+                        corruption_reason=_corruption_reason("result_json"),
+                    ))
+                    continue
                 summaries.append(EvaluationSummary(
                     evaluation_id=row.evaluation_id,
                     created_at=row.created_at,

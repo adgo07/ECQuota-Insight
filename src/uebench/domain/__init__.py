@@ -13,7 +13,9 @@ from .models import (
     IndicatorResult,
     InputMode,
     PackageHistoryEntry,
+    RECORD_CORRUPTED_LABEL,
     StandardDefinition,
+    StorageCorruptionError,
 )
 
 __all__ = [
@@ -30,6 +32,8 @@ __all__ = [
     "IndicatorResult",
     "InputMode",
     "PackageHistoryEntry",
+    "RECORD_CORRUPTED_LABEL",
     "StandardDefinition",
+    "StorageCorruptionError",
 ]
 

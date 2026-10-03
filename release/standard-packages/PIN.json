@@ -1,0 +1,54 @@
+{
+  "schema": "ecq.standard-package-pin.v1",
+  "file": "initial-standard-package-published.uebench",
+  "size": 21320540,
+  "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
+  "data_version": "2026.09-published.2",
+  "package_id": "initial-47-current-plus-history-published-20260909",
+  "package_mode": "full",
+  "standard_count": 48,
+  "rule_count": 765,
+  "issued_at": "2026-09-09T01:41:17.924310Z",
+  "signature": {
+    "algorithm": "ed25519",
+    "member": "signature.ed25519",
+    "verifying_key": "src/uebench/resources/update_public_key.pem",
+    "verified_by": "context.application.install_package() 在隔离数据目录中安装成功（PackageInstallResult），并用 update_public_key.pem 完成 Ed25519 校验"
+  },
+  "provenance": {
+    "read_only_source": "dist/standard-packages/initial-standard-package-published.uebench",
+    "read_only_source_sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
+    "note": "本文件是按任务要求从本机只读目录复制的固定 release input；原资产未被修改、未被重建。",
+    "obtained_by": "ECQ-RS05 从本机现有正式签名标准包复制，未使用“统一标准规则确认表.xlsx”重新生成。"
+  },
+  "known_gap": {
+    "severity": "BLOCKER",
+    "summary": "该正式标准包内的 GB29446 定义落后于当前仓库定义，无法驱动 RS04 Product Golden。",
+    "packaged_gb29446_rule_revision": 1,
+    "repository_gb29446_rule_revision": 2,
+    "packaged_gb29446_selection_schema": [],
+    "repository_gb29446_selection_schema": [
+      {
+        "key": "coal_type",
+        "label": "煤种",
+        "required": true
+      }
+    ],
+    "packaged_has_coal_type_selection_values": false,
+    "consequence": [
+      "RS04 Applicability Gate 失败：Golden 声明 rule_revision=2，安装后实际为 1。",
+      "RS04 Gate A 无法构造请求：products[].selection_values 为空，不存在 coal_type，无法按煤种定位产品。",
+      "因此“Candidate 安装后必须用 RS04 Golden 重新验证 GB29446”在当前固定标准包下无法通过。"
+    ],
+    "other_local_packages_checked": {
+      "initial-standard-package-0.1.0.uebench": "2026.08-reviewed.1，GB29446 rule_revision 缺失（更旧）",
+      "initial-standard-package-44-candidate.uebench": "2026.08-reviewed.5，更旧",
+      "initial-standard-package-46-candidate.uebench": "2026.08-reviewed.10，更旧"
+    },
+    "resolution_requires_human_decision": [
+      "方案 A：维持本任务书指定的固定标准包，RS05 该项如实记为 BLOCKED，等待正式发布新的标准包。",
+      "方案 B：由项目负责人批准，用当前 data/definitions 生成并签名一个新的正式标准包（新的 data_version），再重跑 RS04 Golden。",
+      "注意：work/signing/development-private-key.pem 与 src/uebench/resources/update_public_key.pem 经核实为同一密钥对，因此方案 B 技术上可行，但它会改变正式标准包，属于治理决定，不作由本任务单方面执行。"
+    ]
+  }
+}

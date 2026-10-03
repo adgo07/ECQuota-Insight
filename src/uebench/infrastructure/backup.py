@@ -29,6 +29,28 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def create_sqlite_snapshot(source_path: Path, destination_path: Path) -> None:
+    """Write a transactionally consistent copy of ``source_path`` to ``destination_path``.
+
+    The live database runs in WAL mode with ``synchronous=FULL``, so the
+    ``-wal``/``-shm`` sidecar files hold committed data that a raw file copy
+    would silently drop (or capture torn).  The sqlite3 online backup API
+    instead reads through a normal connection, which is the only safe way to
+    snapshot an active database.  Both backup creation and pre-migration
+    backups share this single implementation.
+    """
+
+    destination_path = Path(destination_path)
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    source = sqlite3.connect(Path(source_path))
+    destination = sqlite3.connect(destination_path)
+    try:
+        source.backup(destination)
+    finally:
+        destination.close()
+        source.close()
+
+
 def _safe_member(name: str) -> bool:
     pure = PurePosixPath(name)
     # ZIP member names are POSIX paths.  Reject Windows separators as well so
@@ -46,7 +68,12 @@ def _safe_member(name: str) -> bool:
 class BackupService:
     BACKUP_ROOTS = ("standards", "imports", "logs")
 
-    def __init__(self, paths: AppPaths, database: DatabaseManager, audit: AuditRepository | None = None) -> None:
+    def __init__(
+        self,
+        paths: AppPaths | None,
+        database: DatabaseManager,
+        audit: AuditRepository | None = None,
+    ) -> None:
         self.paths = paths
         self.database = database
         self.audit = audit or AuditRepository(database)
@@ -57,26 +84,21 @@ class BackupService:
         with tempfile.TemporaryDirectory(prefix="uebench-backup-") as temporary:
             temporary_path = Path(temporary)
             database_copy = temporary_path / "uebench.sqlite3"
-            source = sqlite3.connect(self.database.path)
-            destination = sqlite3.connect(database_copy)
-            try:
-                source.backup(destination)
-            finally:
-                destination.close()
-                source.close()
+            create_sqlite_snapshot(self.database.path, database_copy)
 
             files: dict[str, str] = {"uebench.sqlite3": _sha256(database_copy)}
             source_files: list[tuple[str, Path]] = []
-            for root_name in self.BACKUP_ROOTS:
-                root = getattr(self.paths, root_name)
-                if not root.exists():
-                    continue
-                for item in root.rglob("*"):
-                    if not item.is_file():
+            if self.paths is not None:
+                for root_name in self.BACKUP_ROOTS:
+                    root = getattr(self.paths, root_name)
+                    if not root.exists():
                         continue
-                    archive_name = (PurePosixPath(root_name) / item.relative_to(root).as_posix()).as_posix()
-                    source_files.append((archive_name, item))
-                    files[archive_name] = _sha256(item)
+                    for item in root.rglob("*"):
+                        if not item.is_file():
+                            continue
+                        archive_name = (PurePosixPath(root_name) / item.relative_to(root).as_posix()).as_posix()
+                        source_files.append((archive_name, item))
+                        files[archive_name] = _sha256(item)
             manifest = {
                 "schema_version": "1.0",
                 "backup_id": str(uuid4()),

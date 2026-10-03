@@ -1,23 +1,60 @@
 param(
+    [string]$PythonExe,
     [switch]$SkipTests,
-    [switch]$SkipInstaller
+    [switch]$SkipInstaller,
+    [switch]$SkipDevelopmentManifestCheck
 )
 
+# ECQ-RS05: the build must not depend on a repository-local .venv.
+#   -PassThru style explicit selection: -PythonExe <path> wins.
+# Otherwise fall back to the project venv (developer convenience), then to the
+# Python launcher, then to whatever "python" resolves to.  CI passes an explicit
+# interpreter from actions/setup-python.
 $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$PythonExe = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
-if (-not (Test-Path -LiteralPath $PythonExe)) {
-    throw "未找到项目虚拟环境：$PythonExe"
+
+function Resolve-PythonExecutable {
+    param([string]$Explicit, [string]$Root)
+
+    if (-not [string]::IsNullOrWhiteSpace($Explicit)) {
+        if (-not (Test-Path -LiteralPath $Explicit -PathType Leaf)) {
+            throw "指定的 Python 解释器不存在：$Explicit"
+        }
+        return (Resolve-Path -LiteralPath $Explicit).Path
+    }
+    $venv = Join-Path $Root ".venv\Scripts\python.exe"
+    if (Test-Path -LiteralPath $venv -PathType Leaf) { return $venv }
+    $launcher = Get-Command "py" -ErrorAction SilentlyContinue
+    if ($launcher) { return $launcher.Source }
+    $python = Get-Command "python" -ErrorAction SilentlyContinue
+    if ($python) { return $python.Source }
+    throw "未找到可用的 Python 解释器；请显式传入 -PythonExe。"
 }
 
-# 发布前确认Git中的统一开发标准库索引仍与scope-63定义一致。
-& $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
+$PythonExe = Resolve-PythonExecutable -Explicit $PythonExe -Root $ProjectRoot
+Write-Host "使用 Python：$PythonExe"
+& $PythonExe -c "import sys; print('Python', sys.version)"
+if ($LASTEXITCODE -ne 0) { throw "Python 解释器不可用：$PythonExe" }
+
+# ECQ-RS05: refuse to build a release whose version artifacts have drifted from
+# pyproject.toml.  This is the version consistency Gate.
+& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --check
 if ($LASTEXITCODE -ne 0) {
-    throw "统一开发标准库索引校验失败，停止构建。"
+    throw "版本一致性校验失败，停止构建。请运行 tools/release_version.py --generate。"
 }
+
+if (-not $SkipDevelopmentManifestCheck) {
+    # 发布前确认Git中的统一开发标准库索引仍与scope-63定义一致。
+    & $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
+    if ($LASTEXITCODE -ne 0) {
+        throw "统一开发标准库索引校验失败，停止构建。"
+    }
+}
+
 if (-not $SkipTests) {
     # 使用项目内临时目录，避免构建机系统 TEMP 权限异常。
     $TestBase = Join-Path $ProjectRoot ("work\pytest-release-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
+    New-Item -ItemType Directory -Path $TestBase -Force | Out-Null
     try {
         & $PythonExe -m pytest -q -p no:cacheprovider --basetemp $TestBase
         if ($LASTEXITCODE -ne 0) {
@@ -47,6 +84,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 if (-not $SkipInstaller) {
+    # The installer ships the GB 29446 import template, so it must exist before
+    # ISCC runs.  Generate it headlessly through the real application facade -
+    # never by asking a human to open the GUI and save a workbook.
+    & $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") `
+        --output-dir (Join-Path $ProjectRoot "dist\release")
+    if ($LASTEXITCODE -ne 0) {
+        throw "Excel 模板生成失败，停止安装程序构建。"
+    }
+
     $Iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
     if (-not $Iscc) {
         $Candidates = @(

@@ -4,7 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "uebench"
-version = "0.1.0"
+# Authoritative product version.  Everything else in the release chain is
+# generated from this by tools/release_version.py; never edit a derived copy by
+# hand.  `python tools/release_version.py --check` fails the release if any
+# derived artifact drifts from this value.
+version = "0.2.0"
 description = "Windows offline unit-product energy consumption benchmarking application"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"

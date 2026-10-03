@@ -4,8 +4,19 @@ import argparse
 from pathlib import Path
 import zipfile
 
+# Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
+# `tools.<name>` from a test module.
+try:
+    from release_version import artifact_names, project_version
+except ModuleNotFoundError:  # pragma: no cover - package-import style
+    from tools.release_version import artifact_names, project_version
+
 
 INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development"]
+
+#: Root-level files shipped in the source package.  ECQ-RS05 additionally
+#: requires the governance/state documents so a source recipient can reproduce
+#: the exact released state without consulting another repository.
 ROOT_FILES = [
     "README.md",
     "pyproject.toml",
@@ -15,7 +26,29 @@ ROOT_FILES = [
     "uebench.spec",
     "alembic.ini",
     ".gitignore",
+    # Governance / state documents (ECQ-RS05 §18).
+    "AGENTS.md",
+    "platform-lock.json",
+    "PLATFORM_BASELINE.md",
+    "TASK_STATE.md",
+    "HANDOFF.md",
+    "STANDARD_ISSUES_REGISTER.md",
+    "参考标准开发路线.md",
 ]
+
+#: Subset of ROOT_FILES whose absence must fail the build rather than be
+#: silently skipped (these are the ECQ-RS05 §18 governance documents).
+MANDATORY_ROOT_FILES = frozenset(
+    {
+        "AGENTS.md",
+        "platform-lock.json",
+        "PLATFORM_BASELINE.md",
+        "TASK_STATE.md",
+        "HANDOFF.md",
+        "STANDARD_ISSUES_REGISTER.md",
+        "参考标准开发路线.md",
+    }
+)
 
 
 def project_root() -> Path:
@@ -42,10 +75,15 @@ def build_source_zip(output: Path) -> Path:
                 and path.suffix not in {".pyc", ".pyo"}
             ):
                 files.append(path)
+    missing_required: list[str] = []
     for name in ROOT_FILES:
         path = root / name
         if path.exists():
             files.append(path)
+        elif name in MANDATORY_ROOT_FILES:
+            missing_required.append(name)
+    if missing_required:
+        raise SystemExit(f"源码包缺少必需文件：{missing_required}")
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(set(files)):
@@ -58,7 +96,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("dist/release/UEBench-source-0.1.0.zip"),
+        default=Path("dist/release") / artifact_names(project_version())["source"],
     )
     args = parser.parse_args()
     output = build_source_zip(args.output)
