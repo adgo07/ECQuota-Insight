@@ -24,9 +24,9 @@ from pathlib import Path
 # Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
 # `tools.<name>` from a test module.
 try:
-    from release_version import artifact_names, project_version
+    from release_version import ensure_utf8_console, artifact_names, project_version
 except ModuleNotFoundError:  # pragma: no cover - package-import style
-    from tools.release_version import artifact_names, project_version
+    from tools.release_version import ensure_utf8_console, artifact_names, project_version
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -137,6 +137,7 @@ def generate(output_dir: Path, standard_ids: tuple[str, ...] = REQUIRED_STANDARD
 
 
 def main() -> None:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(description="无头生成正式 Excel 导入模板")
     parser.add_argument("--output-dir", type=Path, default=Path("dist/release"))
     parser.add_argument(

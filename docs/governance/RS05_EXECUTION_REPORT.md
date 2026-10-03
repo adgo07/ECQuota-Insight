@@ -434,6 +434,52 @@ ISCC 编译日志显示 `dist\UEBench\_internal\migrations\versions\__pycache__\
 `__pycache__`。**本阶段未修复**（会要求再次完整重建），如实记录供后续收口。
 ---
 
+### 9A.6 CI 失败根因：发布工具的 cp1252 控制台（已修复）
+
+首次推送后 `Windows Release Candidate` workflow 在
+**"Read the authoritative version and artifact names"** 步骤失败
+（run 37144561418）：
+
+```text
+File "tools\release_version.py", line 200, in main
+    print(f"版本一致性校验通过：{version}")
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-9
+```
+
+根因与前两次完全相同：GitHub Windows runner 的控制台是 **cp1252**，
+`print()` 中文即崩溃。这是本项目第三次被同一模式击中（RS03 ingress probe、
+RS04 lifecycle probe、本次发布工具）。
+
+修复：`tools/release_version.py` 新增 `ensure_utf8_console()`，
+在 stdout/stderr 支持 `reconfigure` 且当前编码非 UTF-8 时改为
+`utf-8 + backslashreplace`；六个发布工具（`release_version` /
+`audit_release` / `write_build_info` / `build_payload_manifest` /
+`build_release_templates` / `build_legacy_0_1_0_fixture`）的 `main()` 开头调用它。
+该函数对 pytest 捕获对象与已 UTF-8 的流是**无操作**，因此不会干扰测试捕获。
+
+新增持续回归：`tests/test_release_tools_console.py`（11 passed），
+以**真实子进程 + `PYTHONIOENCODING=cp1252`** 运行各工具，
+确保未来新增工具若忘记调用会在本地失败，而不是在发布 workflow 里失败。
+
+### 9A.7 Artifact Gate 检出执行者自己造成的发布目录不一致
+
+在执行 cp1252 验证时，我直接以 `--output` 覆盖了 `dist\release\` 内的
+`release-build-info.json` 等文件，而 `SHA256SUMS.txt` 未同步重算，
+Artifact Gate 随即报出：
+
+```text
+FAILED tests/test_release_artifacts.py::test_sha256sums_hash_matches_recomputed[source]
+FAILED tests/test_release_artifacts.py::test_audit_release_reports_valid
+```
+
+重新运行 `scripts/sync_release.ps1` 后恢复一致（Artifact Gate 58 passed）。
+**这说明 Artifact Gate 确实能抓住发布目录被后续动作改坏的情形**，不是形式化绿灯。
+
+同时把 `sync_release.ps1` 的旧产物清理从静默 `-ErrorAction SilentlyContinue`
+改为 try/catch + `Write-Warning`：此前它在文件被占用时会打印“已清理”但实际未删除，
+属于会误导验收的日志。
+---
+
 ## 10. 状态
 
 ```text

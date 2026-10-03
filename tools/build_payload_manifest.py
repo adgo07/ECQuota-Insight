@@ -26,9 +26,9 @@ from typing import Any
 # Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
 # `tools.<name>` from a test module.
 try:
-    from release_version import project_version
+    from release_version import ensure_utf8_console, project_version
 except ModuleNotFoundError:  # pragma: no cover - package-import style
-    from tools.release_version import project_version
+    from tools.release_version import ensure_utf8_console, project_version
 
 SCHEMA = "ecq.payload-manifest.v1"
 DEFAULT_ROOT_NAME = "UEBench"
@@ -100,6 +100,7 @@ def write_manifest(manifest: dict[str, Any], output: Path) -> Path:
 
 
 def main() -> None:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(description="生成 UEBench payload 同源清单")
     parser.add_argument("--payload-dir", type=Path, default=Path("dist/UEBench"))
     parser.add_argument("--output", type=Path, default=Path("dist/release/payload-manifest.json"))

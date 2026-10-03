@@ -28,9 +28,9 @@ from typing import Any
 # Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
 # `tools.<name>` from a test module.
 try:
-    from release_version import artifact_names, project_version
+    from release_version import ensure_utf8_console, artifact_names, project_version
 except ModuleNotFoundError:  # pragma: no cover - package-import style
-    from tools.release_version import artifact_names, project_version
+    from tools.release_version import ensure_utf8_console, artifact_names, project_version
 
 #: Present in older delivery folders; deliberately not a correctness input.
 LEGACY_FILES = ("统一标准规则确认表.xlsx",)
@@ -288,6 +288,7 @@ def audit_release(root: Path, version: str | None = None) -> dict[str, Any]:
 
 
 def main() -> None:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(description="审计UEBench最终交付目录，不修改任何数据")
     parser.add_argument("release_dir", type=Path)
     parser.add_argument("--output", type=Path)

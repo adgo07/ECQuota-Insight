@@ -34,6 +34,31 @@ VERSION_ISS = Path("packaging/version.iss")
 _SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 
+def ensure_utf8_console() -> None:
+    """Make Chinese output safe on non-UTF-8 consoles (ECQ-RS05).
+
+    The GitHub Windows runner provides a **cp1252** console, so ``print()`` of
+    any Chinese text raises ``UnicodeEncodeError`` and the release step exits
+    non-zero.  Every release tool calls this first.
+
+    It is deliberately defensive: under pytest, ``sys.stdout`` is a capture
+    object without ``reconfigure``, and streams already set to UTF-8 are left
+    alone.  Failures are ignored rather than masked, because a console that
+    cannot be reconfigured should not abort a build that otherwise works.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        encoding = (getattr(stream, "encoding", "") or "").lower()
+        if encoding.replace("-", "") == "utf8":
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="backslashreplace")
+        except Exception:  # pragma: no cover - depends on the host console
+            pass
+
+
 def project_version(pyproject: Path | None = None) -> str:
     """Return the authoritative version from ``pyproject.toml``."""
     path = pyproject or PYPROJECT
@@ -174,6 +199,7 @@ def generate(root: Path | None = None, version: str | None = None) -> list[Path]
 
 
 def main(argv: list[str] | None = None) -> int:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(description="UEBench 产品版本单一来源工具")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--print", action="store_true", help="打印权威版本号")

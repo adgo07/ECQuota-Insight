@@ -33,9 +33,9 @@ from pathlib import Path
 # Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
 # `tools.<name>` from a test module.
 try:
-    from release_version import project_version
+    from release_version import ensure_utf8_console, project_version
 except ModuleNotFoundError:  # pragma: no cover - package-import style
-    from tools.release_version import project_version
+    from tools.release_version import ensure_utf8_console, project_version
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "ecq.release-build-info.v1"
@@ -152,6 +152,7 @@ def build_info(names: dict[str, str], *, built_at: str | None = None) -> dict[st
 
 
 def main() -> None:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(description="生成 Candidate 构建信息（含未签名声明）")
     parser.add_argument("--names", required=True, help="tools/release_version.py --names 的 JSON")
     parser.add_argument("--output", type=Path, required=True)

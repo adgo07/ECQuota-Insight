@@ -72,8 +72,17 @@ $StalePatterns = @(
 foreach ($Pattern in $StalePatterns) {
     Get-ChildItem -LiteralPath $Release -File -Filter $Pattern -ErrorAction SilentlyContinue |
         ForEach-Object {
-            Write-Host ("清理旧交付产物：{0}" -f $_.Name)
-            Remove-Item -LiteralPath $_.FullName -Force
+            try {
+                Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop
+                Write-Host ("清理旧交付产物：{0}" -f $_.Name)
+            }
+            catch {
+                # A file still open (for example by an antivirus scanner or an
+                # archive viewer) cannot be removed.  Say so instead of logging a
+                # deletion that did not happen; later steps overwrite by name and
+                # SHA256SUMS is regenerated from whatever is actually on disk.
+                Write-Warning ("无法删除旧交付产物（将被覆盖）：{0} - {1}" -f $_.Name, $_.Exception.Message)
+            }
         }
 }
 

@@ -57,6 +57,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT / "src") not in sys.path:  # ``python tools/...`` run outside pytest
     sys.path.insert(0, str(REPO_ROOT / "src"))
 
+# Importable both as ``python tools/build_legacy_0_1_0_fixture.py`` and as
+# ``tools.build_legacy_0_1_0_fixture`` from a test module.
+try:  # noqa: E402
+    from release_version import ensure_utf8_console
+except ModuleNotFoundError:  # pragma: no cover - package-import style
+    from tools.release_version import ensure_utf8_console
+
 from uebench.domain.engine import EvaluationEngine  # noqa: E402
 from uebench.domain.models import (  # noqa: E402
     EvaluationRequest,
@@ -466,6 +473,7 @@ def build_fixture(
 
 
 def main(argv: list[str] | None = None) -> int:
+    ensure_utf8_console()
     parser = argparse.ArgumentParser(
         description="生成 0.1.0 → 0.2.0 升级校验用的合成旧版数据目录（不含任何真实用户数据）",
     )
