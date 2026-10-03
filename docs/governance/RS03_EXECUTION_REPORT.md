@@ -399,6 +399,59 @@ Adapter 仍然**没有**第二套标准选择规则——它复用的就是正�
 
 保留原有的手工构造对照用例，作为独立于 Qt 的回归保护。
 
+## 6.2 ECQ-RS03-R1 — Architecture Boundary Gate 绝对 ImportFrom 解析修复
+
+独立复验发现 `tests/test_architecture_boundaries.py` 的 `_resolve_from_base()` 对**绝对** `from ... import ...` 解析错误：`node.level == 0` 时仍把当前 package 前缀附加到 `node.module` 上，导致门禁存在漏检。本次只修这一个问题，未触碰 Excel 业务逻辑。
+
+### 实测到的三种漏检
+
+| 被检模块 | import | 修复前解析为 | 结果 |
+|---|---|---|---|
+| `uebench.application.facade` | `from openpyxl import Workbook` | `uebench.application.openpyxl` | **漏检** |
+| `uebench.application.facade` | `from uebench.infrastructure.excel import X` | `uebench.application.uebench.infrastructure.excel` | **漏检** |
+| `uebench.application`（`__init__`） | `from ..infrastructure import excel` | `infrastructure.excel` | **漏检** |
+
+第三种来自另一个独立缺陷：`_ImportCollector` 不知道自己在检查 package 的 `__init__.py`，相对导入锚点因此高了一层。
+
+### 修复
+
+- `node.level == 0` → **绝对导入**，只返回 `node.module`，不再附加当前 package；
+- `node.level > 0` → **相对导入**，锚点为"包含它的 package"：普通模块取其父 package，`__init__.py` 取该 package 自身；据此按 `level - 1` 逐级上移；
+- `_ImportCollector` 新增 `is_package`，由 `_is_package_file()` 判定（文件名是否为 `__init__.py`）；
+- **未**使用 hard-code 已知字符串的方式；`import a.b` 仍记录全部点分前缀。
+
+### 新增反例与正例测试
+
+| 场景 | 测试 |
+|---|---|
+| 绝对导入不被当前 package 前缀污染（含函数内部） | `test_absolute_import_from_is_not_prefixed_with_current_package` |
+| Application 顶层绝对 `from openpyxl import Workbook` | `test_application_absolute_openpyxl_import_is_a_violation` |
+| Application 函数内部绝对 `from openpyxl import Workbook` | `test_application_function_level_absolute_openpyxl_import_is_a_violation` |
+| UI 绝对导入 infrastructure（含 deferred） | `test_ui_absolute_infrastructure_import_is_a_violation` |
+| Infrastructure 绝对导入 UI | `test_infrastructure_absolute_ui_import_is_a_violation` |
+| 相对违规导入仍被抓到 | `test_application_relative_infrastructure_import_is_a_violation` |
+| `__init__.py` 相对导入锚点正确 | `test_package_init_relative_imports_resolve_against_the_package` |
+| 同层相对导入**不得**误报 | `test_relative_import_that_stays_inside_the_layer_is_not_a_violation` |
+| 合法 domain / stdlib / `TYPE_CHECKING` 导入不误报 | `test_legitimate_imports_are_not_flagged` |
+| 相对 lazy import 漏检回归 | `test_relative_import_resolution_catches_evasion`（改为内存源码，不再依赖 `tmp_path`） |
+| 前缀展开 | `test_prefix_helper_covers_intermediate_packages` |
+
+### 修复后核查
+
+- 独立探针（未提交文件）逐项确认四类绝对/相对违规全部被报出；
+- 增强后的门禁对**真实 `src/`** 仍为 **0 violations**（domain / application / ui / infrastructure 四层全部 0）→ **未发现生产代码违规**，因此未改动任何业务代码。
+
+### R1 测试结果
+
+```text
+tests/test_architecture_boundaries.py -q -ra        17 passed
+tests/test_gb29446_excel_adapter.py -q -ra          61 passed
+tests/test_excel.py -q -ra                           6 passed
+literal full suite (-q -ra)                          524 tests, 0 failures, 0 errors, 4 xfailed
+```
+
+`test_portable_release_does_not_bundle_incompatible_poppler_icu` 在**本机**仍然通过，因为工作区存在 `dist/release/UEBench-0.1.0-win-x64.zip`（被 Git 忽略）；CI 干净 checkout 下该测试仍因旧 ZIP 缺失而失败，属 §6 已登记的 historical release asset failure，留至 RS05。本次**未创建**任何旧发布资产。
+
 
 
 ## 7. GUI / Excel 等价证据

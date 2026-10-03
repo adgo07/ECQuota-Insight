@@ -22,10 +22,16 @@ PACKAGE_ROOT = SRC.parent  # ``src`` contains the top-level package ``uebench``
 
 
 class _ImportCollector(ast.NodeVisitor):
-    def __init__(self, module: str) -> None:
+    def __init__(self, module: str, *, is_package: bool = False) -> None:
         #: Fully qualified name of the module being inspected, for example
-        #: ``uebench.ui.main_window``.
+        #: ``uebench.ui.main_window``.  For a package ``__init__.py`` this is the
+        #: package itself, for example ``uebench.application``.
         self.module = module
+        #: ``True`` when inspecting a package ``__init__.py``.  Relative imports
+        #: are anchored differently there: ``from . import x`` targets a sibling
+        #: of the package, while in a module it targets a sibling of the parent
+        #: package.
+        self.is_package = is_package
         self.runtime: set[str] = set()
         self.type_only: set[str] = set()
         self._type_checking_depth = 0
@@ -70,24 +76,30 @@ class _ImportCollector(ast.NodeVisitor):
     def _resolve_from_base(self, node: ast.ImportFrom) -> str | None:
         """Return the fully qualified module a ``from ... import`` targets.
 
-        ``node.module`` is ``None`` for ``from . import x``, so the base is
-        derived from the importing module's own package and ``node.level``.
-        Without this, a relative import inside a function resolves to a partial
-        name such as ``infrastructure.excel`` that never matches the
-        ``uebench.infrastructure`` prefix.
+        Follows real Python import semantics:
+
+        * ``node.level == 0`` is an **absolute** import: only ``node.module``
+          counts.  Prefixing it with the importing module's package produced
+          names such as ``uebench.application.openpyxl``, which never matched the
+          ``openpyxl`` rule and silently bypassed the gate.
+        * ``node.level > 0`` is **relative**.  The anchor is the containing
+          package: the parent package of a plain module, or the package itself
+          for ``__init__.py``.  ``node.module`` is ``None`` for ``from . import x``.
         """
-        package_parts = self.module.split(".")[:-1]
-        if node.level:
-            # level 1 stays in the current package, level 2 goes one package up.
-            drop = node.level - 1
-            if drop > len(package_parts):
-                return None
-            package_parts = package_parts[: len(package_parts) - drop] if drop else package_parts
-        if node.module:
-            package_parts = [*package_parts, *node.module.split(".")]
-        if not package_parts:
+        if node.level == 0:
+            return node.module or None
+
+        anchor_parts = self.module.split(".") if self.is_package else self.module.split(".")[:-1]
+        drop = node.level - 1
+        if drop > len(anchor_parts):
             return None
-        return ".".join(package_parts)
+        if drop:
+            anchor_parts = anchor_parts[: len(anchor_parts) - drop]
+        if node.module:
+            anchor_parts = [*anchor_parts, *node.module.split(".")]
+        if not anchor_parts:
+            return None
+        return ".".join(anchor_parts)
 
 
 def _prefixes(name: str) -> set[str]:
@@ -113,8 +125,12 @@ def _module_name(path: Path) -> str:
     return ".".join(parts)
 
 
+def _is_package_file(path: Path) -> bool:
+    return path.name == "__init__.py"
+
+
 def _collect(path: Path) -> _ImportCollector:
-    collector = _ImportCollector(_module_name(path))
+    collector = _ImportCollector(_module_name(path), is_package=_is_package_file(path))
     collector.visit(ast.parse(path.read_text(encoding="utf-8"), filename=str(path)))
     return collector
 
@@ -134,20 +150,39 @@ def _violations(directory: Path, forbidden: tuple[str, ...], *, include_type_onl
     return sorted(set(found))
 
 
+def _violations_in_source(source: str, path: Path, forbidden: tuple[str, ...]) -> list[str]:
+    """Run the layer rule over an in-memory source using an explicit file path.
+
+    ``_violations`` derives the module name from the file's location, so a
+    temporary file would be named after ``tmp_path``.  This helper keeps the
+    path-based module derivation intact by pointing at a real dotted location
+    while supplying synthetic content.
+    """
+    collector = _ImportCollector(_module_name(path), is_package=_is_package_file(path))
+    collector.visit(ast.parse(source, filename=str(path)))
+    return sorted(name for name in collector.runtime if name.startswith(forbidden))
+
+
+def _resolve(module: str, source: str, *, is_package: bool = False) -> set[str]:
+    """Resolve the imports of an in-memory source for a given module name."""
+    collector = _ImportCollector(module, is_package=is_package)
+    collector.visit(ast.parse(source))
+    return collector.runtime
+
+
 # ---------------------------------------------------------------------------
 # Positive control: the resolver itself must catch relative imports.
 # ---------------------------------------------------------------------------
 
 
-def test_relative_import_resolution_catches_evasion(tmp_path: Path) -> None:
+def test_relative_import_resolution_catches_evasion() -> None:
     """A deferred relative import must resolve to its real dotted module path.
 
     This is the regression guard for the boundary gate itself: absolute imports
     were already detected, but ``from ..infrastructure.excel import X`` inside a
     function previously resolved to ``infrastructure.excel`` and slipped through.
     """
-    sample = tmp_path / "probe_module.py"
-    sample.write_text(
+    source = (
         "from __future__ import annotations\n"
         "\n"
         "\n"
@@ -163,14 +198,10 @@ def test_relative_import_resolution_catches_evasion(tmp_path: Path) -> None:
         "\n"
         "def lazy_relative_package() -> object:\n"
         "    from .. import infrastructure\n"
-        "    return infrastructure\n",
-        encoding="utf-8",
+        "    return infrastructure\n"
     )
-    collector = _ImportCollector("uebench.ui.probe_module")
-    collector.visit(ast.parse(sample.read_text(encoding="utf-8"), filename=str(sample)))
-
     forbidden = ("uebench.infrastructure",)
-    matched = {name for name in collector.runtime if name.startswith(forbidden)}
+    matched = {name for name in _resolve("uebench.ui.probe_module", source) if name.startswith(forbidden)}
     assert "uebench.infrastructure.excel" in matched, "absolute deferred import must be caught"
     assert "uebench.infrastructure.excel.WorkbookImportService" in matched, (
         "relative 'from ..infrastructure.excel import X' must resolve to uebench.infrastructure..."
@@ -186,6 +217,154 @@ def test_prefix_helper_covers_intermediate_packages() -> None:
         "uebench.infrastructure",
     }
     assert _prefixes("uebench") == set()
+
+
+# ---------------------------------------------------------------------------
+# Absolute ImportFrom must be resolved by Python import semantics
+# ---------------------------------------------------------------------------
+
+
+def test_absolute_import_from_is_not_prefixed_with_current_package() -> None:
+    """``level == 0`` is absolute: only ``node.module`` counts.
+
+    Regression guard for the bypass where ``from openpyxl import Workbook``
+    inside ``uebench.application.facade`` resolved to
+    ``uebench.application.openpyxl`` and therefore never matched the
+    ``openpyxl`` rule.
+    """
+    for module, source, expected in (
+        ("uebench.application.facade", "from openpyxl import Workbook\n", "openpyxl"),
+        ("uebench.application.facade", "def x():\n    from openpyxl import Workbook\n", "openpyxl"),
+        (
+            "uebench.ui.main_window",
+            "from uebench.infrastructure.excel import WorkbookImportService\n",
+            "uebench.infrastructure",
+        ),
+        (
+            "uebench.infrastructure.excel",
+            "from uebench.ui.main_window import MainWindow\n",
+            "uebench.ui",
+        ),
+    ):
+        collector = _ImportCollector(module)
+        collector.visit(ast.parse(source))
+        matched = sorted(name for name in collector.runtime if name.startswith(expected))
+        assert matched, f"{module}: {source.strip()!r} must resolve to a {expected}... name"
+        assert not any(name.startswith(module + ".") for name in collector.runtime), (
+            f"{module}: absolute import must not be prefixed with the importing package"
+        )
+
+
+APPLICATION_FORBIDDEN = (
+    "PySide6",
+    "sqlalchemy",
+    "openpyxl",
+    "uebench.infrastructure",
+    "uebench.ui",
+    "uebench.bootstrap",
+)
+UI_FORBIDDEN = ("uebench.infrastructure", "uebench.bootstrap")
+INFRASTRUCTURE_FORBIDDEN = ("uebench.ui", "uebench.bootstrap")
+
+
+def test_application_absolute_openpyxl_import_is_a_violation() -> None:
+    path = SRC / "application" / "facade.py"
+    assert _violations_in_source("from openpyxl import Workbook\n", path, APPLICATION_FORBIDDEN)
+
+
+def test_application_function_level_absolute_openpyxl_import_is_a_violation() -> None:
+    path = SRC / "application" / "facade.py"
+    source = "def lazy():\n    from openpyxl import Workbook\n    return Workbook\n"
+    assert _violations_in_source(source, path, APPLICATION_FORBIDDEN)
+
+
+def test_ui_absolute_infrastructure_import_is_a_violation() -> None:
+    path = SRC / "ui" / "main_window.py"
+    source = "from uebench.infrastructure.excel import WorkbookImportService\n"
+    assert _violations_in_source(source, path, UI_FORBIDDEN)
+    # A deferred absolute import must be caught too.
+    deferred = "def lazy():\n    from uebench.infrastructure.excel import X\n"
+    assert _violations_in_source(deferred, path, UI_FORBIDDEN)
+
+
+def test_infrastructure_absolute_ui_import_is_a_violation() -> None:
+    path = SRC / "infrastructure" / "excel.py"
+    source = "from uebench.ui.main_window import MainWindow\n"
+    assert _violations_in_source(source, path, INFRASTRUCTURE_FORBIDDEN)
+
+
+def test_application_relative_infrastructure_import_is_a_violation() -> None:
+    """Relative and absolute forms of the same violation must both be caught.
+
+    ``..`` from ``uebench.application.*`` / ``uebench.application`` escapes the
+    layer into ``uebench.infrastructure``, which the Application rule forbids.
+    """
+    source = "from ..infrastructure import excel\n"
+    assert "uebench.infrastructure" in _resolve("uebench.application", source, is_package=True)
+    assert "uebench.infrastructure" in _resolve("uebench.application.facade", source)
+    assert _violations_in_source(source, SRC / "application" / "facade.py", APPLICATION_FORBIDDEN)
+
+
+def test_relative_import_that_stays_inside_the_layer_is_not_a_violation() -> None:
+    """The gate must not over-report a same-layer relative import.
+
+    ``from .infrastructure import excel`` inside ``uebench.application`` targets
+    ``uebench.application.infrastructure`` (its own subpackage), not the
+    infrastructure layer.
+    """
+    resolved = _resolve("uebench.application", "from .infrastructure import excel\n", is_package=True)
+    assert "uebench.application.infrastructure" in resolved
+    assert not any(name.startswith("uebench.infrastructure") for name in resolved)
+    assert _violations_in_source(
+        "from .infrastructure import excel\n",
+        SRC / "application" / "__init__.py",
+        APPLICATION_FORBIDDEN,
+    ) == []
+
+
+def test_package_init_relative_imports_resolve_against_the_package() -> None:
+    """A package ``__init__.py`` is the package itself, not a submodule."""
+    assert _module_name(SRC / "application" / "__init__.py") == "uebench.application"
+    assert _is_package_file(SRC / "application" / "__init__.py")
+    assert not _is_package_file(SRC / "application" / "facade.py")
+
+    # level 1 from the package -> the package itself
+    resolved = _resolve("uebench.application", "from . import services\n", is_package=True)
+    assert "uebench.application.services" in resolved
+
+    # level 2 from the package -> its parent package
+    resolved = _resolve("uebench.application", "from ..infrastructure import excel\n", is_package=True)
+    assert "uebench.infrastructure" in resolved
+
+    # A module one level deeper also anchors level 1 at its package.
+    resolved = _resolve("uebench.application.nested.mod", "from . import sibling\n")
+    assert "uebench.application.nested.sibling" in resolved
+
+    # The package file itself would be reported by the layer rule.
+    assert _violations_in_source(
+        "from ..infrastructure import excel\n",
+        SRC / "application" / "__init__.py",
+        APPLICATION_FORBIDDEN,
+    )
+
+
+def test_legitimate_imports_are_not_flagged() -> None:
+    """Normal same-layer and stdlib imports must not be reported."""
+    path = SRC / "application" / "facade.py"
+    source = (
+        "from __future__ import annotations\n"
+        "from decimal import Decimal\n"
+        "from typing import TYPE_CHECKING\n"
+        "from uebench.domain.models import Grade\n"
+        "from .ports import TemplatePort\n"
+        "from .services import EvaluationService\n"
+        "\n"
+        "if TYPE_CHECKING:\n"
+        "    from pathlib import Path\n"
+    )
+    assert _violations_in_source(source, path, APPLICATION_FORBIDDEN) == []
+    assert _violations_in_source(source, path, UI_FORBIDDEN) == []
+    assert _violations_in_source(source, path, INFRASTRUCTURE_FORBIDDEN) == []
 
 
 # ---------------------------------------------------------------------------
