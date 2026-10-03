@@ -22,12 +22,21 @@ function Resolve-PythonExecutable {
         }
         return (Resolve-Path -LiteralPath $Explicit).Path
     }
+    # ``actions/setup-python`` exports pythonLocation and installs the pinned
+    # dependencies into that interpreter.  Prefer it, then PATH "python", and
+    # only then "py": on a GitHub runner "py" resolves to the newest installed
+    # Python (for example 3.14), which lacks the requirements and fails with
+    # "No module named pytest".
+    if (-not [string]::IsNullOrWhiteSpace($env:pythonLocation)) {
+        $ci = Join-Path $env:pythonLocation "python.exe"
+        if (Test-Path -LiteralPath $ci -PathType Leaf) { return $ci }
+    }
     $venv = Join-Path $Root ".venv\Scripts\python.exe"
     if (Test-Path -LiteralPath $venv -PathType Leaf) { return $venv }
-    $launcher = Get-Command "py" -ErrorAction SilentlyContinue
-    if ($launcher) { return $launcher.Source }
     $python = Get-Command "python" -ErrorAction SilentlyContinue
     if ($python) { return $python.Source }
+    $launcher = Get-Command "py" -ErrorAction SilentlyContinue
+    if ($launcher) { return $launcher.Source }
     throw "未找到可用的 Python 解释器；请显式传入 -PythonExe。"
 }
 

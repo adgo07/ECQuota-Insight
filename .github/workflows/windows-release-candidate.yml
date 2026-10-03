@@ -100,7 +100,12 @@ jobs:
         env:
           NAMES_JSON: ${{ steps.version.outputs.names }}
         run: |
-          scripts/build_candidate.ps1 -NamesJson $env:NAMES_JSON -OutputDir "dist/candidate"
+          # Pass the interpreter explicitly: actions/setup-python installs the
+          # pinned requirements into $env:pythonLocation, while the "py"
+          # launcher on the runner resolves to the newest installed Python
+          # (for example 3.14), which has no pytest.  The script also prefers
+          # pythonLocation on its own, so this is belt-and-braces.
+          scripts/build_candidate.ps1 -PythonExe "$env:pythonLocation\python.exe" -NamesJson $env:NAMES_JSON -OutputDir "dist/candidate"
 
       - name: Verify the Candidate artifacts with the Artifact Gate
         shell: pwsh
