@@ -45,6 +45,8 @@ EVALUATION_DATE = date(2026, 6, 1)
 
 GOLDEN = json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))
 
+PROVENANCE_STANDARD = "GB 29446-2019"
+
 #: Frozen business keys.  Everything not listed is deliberately excluded so the
 #: Golden does not pin environment, identity or presentation details.
 FROZEN_TOP_LEVEL = (
@@ -81,6 +83,11 @@ def _dec_text(value) -> str | None:
     if value is None:
         return None
     return format(Decimal(str(value)).normalize(), "f")
+
+
+def _dash_normal(text: str) -> str:
+    """Normalise the en/em dash variants standards use in numbers."""
+    return str(text).replace("—", "-").replace("–", "-").strip()
 
 
 def business_projection(result, request: EvaluationRequest) -> dict:
@@ -200,6 +207,10 @@ def product_of(definition: dict, coal_type: str) -> dict:
     return next(
         p for p in definition["products"] if p["selection_values"]["coal_type"] == coal_type
     )
+
+
+def product_id_of(case: dict) -> str:
+    return product_of(definition_json(), case["inputs"]["coal_type"])["id"]
 
 
 def coefficient_of(definition: dict, coal_type: str, process: str) -> Decimal:
@@ -575,9 +586,14 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
     """12 coefficient clusters + 1 full-value trap case = 13 normal cases.
 
     The 12 clusters cover 附录A 的全部 12 个 k（炼焦煤 5 + 动力煤 7）以及 6 个
-    exact threshold。第 13 个是 full-value trap：它必须使用非阈值精确值的
-    ``500.00004 × 1.00 ÷ 100 = 5.0000004``，无法并入任何一个 exact-threshold
-    案例，因此是满足任务书全部覆盖要求所需的最小案例数。
+    exact threshold。第 13 个是 full-value trap。
+
+    Note: 13 is **not** a mathematical minimum.  The trap could be folded into
+    another coefficient case as a second E_d input.  It is kept separate because
+    its ``source_type`` is 技术判断 (it depends on the ECQ-STD-GB29446-001
+    position) while the 12 clusters are 标准原文事实; mixing two different
+    authority classes in one case would weaken provenance traceability.  This
+    assertion pins both numbers so a silent shrink is caught.
     """
     cases = normal_cases()
     assert len(cases) == 13, f"正常案例应为 12 个系数簇 + 1 个 trap，实际 {len(cases)}"
@@ -585,6 +601,71 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
     assert len(cluster_keys) == 12, f"系数簇数量应为 12，实际 {len(cluster_keys)}"
     trap = case_by_id("gb29446-coking-full-value-trap")
     assert trap in cases
+    # The 12 clusters are 原文事实; the trap is the single 技术判断 business case.
+    technical = [case for case in cases if case["source_type"] == "技术判断"]
+    assert technical == [trap], "技术判断类正常案例应只有 full-value trap"
+
+
+def test_expected_sources_match_the_definition(definition: dict) -> None:
+    """The frozen provenance set must be exactly what the Definition declares.
+
+    This is the drift guard for the whitelist provenance dimension: it fails if
+    either the Golden or the Definition changes the clause/table set for a coal
+    type.
+    """
+    expected_by_coal: dict[str, list[list[str]]] = {}
+    for case in normal_cases():
+        coal = case["inputs"]["coal_type"]
+        declared = [list(entry) for entry in case["expected_sources"]]
+        if coal in expected_by_coal:
+            assert declared == expected_by_coal[coal], f"同煤种来源不一致：{coal}"
+        expected_by_coal[coal] = declared
+    assert set(expected_by_coal) == {"炼焦煤", "动力煤"}
+
+    for coal, declared in expected_by_coal.items():
+        actual = [
+            [ref["clause"], ref["table"]]
+            for ref in product_of(definition, coal)["indicators"][0]["source_references"]
+        ]
+        assert declared == actual, (
+            f"{coal} 来源依据与 Definition 不一致：\n  实际={actual}\n  期望={declared}"
+        )
+        # Every declared reference must be complete, and the coal-specific grade
+        # table must actually be the one for this coal type.
+        assert declared, coal
+        grade_table = "表1" if coal == "炼焦煤" else "表2"
+        assert any(table == grade_table for _, table in declared), coal
+        wrong_table = "表2" if coal == "炼焦煤" else "表1"
+        assert not any(table == wrong_table for _, table in declared), (
+            f"{coal} 不得引用 {wrong_table}"
+        )
+        assert any(table == "表A.1" for _, table in declared), coal
+
+
+def test_case_source_clause_and_table_agree_with_expected_sources() -> None:
+    """Each case's declared 依据 must actually appear in its frozen source set.
+
+    Convention: ``source_clause`` starts with the clause number and
+    ``source_table`` starts with the primary table for that clause, so the
+    declared provenance can be matched mechanically against the frozen set.
+    """
+    for case in normal_cases():
+        clauses = [clause for clause, _ in case["expected_sources"]]
+        tables = {table for _, table in case["expected_sources"]}
+        head = case["source_clause"].split("；")[0].split(" ")[0]
+        assert any(clause.startswith(head) for clause in clauses), (
+            f"{case['case_id']}: source_clause 起始条款 {head!r} 不在冻结来源中"
+        )
+        primary_table = case["source_table"].split("；")[0]
+        assert primary_table in tables, (
+            f"{case['case_id']}: source_table {primary_table!r} 不在冻结来源中"
+        )
+
+
+def test_expected_indicator_id_matches_definition(definition: dict) -> None:
+    for case in normal_cases():
+        actual = product_of(definition, case["inputs"]["coal_type"])["indicators"][0]["id"]
+        assert case["expected_indicator_id"] == actual, case["case_id"]
 
 
 # ===========================================================================
@@ -593,32 +674,76 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
 
 
 def assert_matches_golden(projection: dict, case: dict) -> None:
+    """Full whitelist business comparison against one Golden case.
+
+    This is the single assertion used by Gate A (live evaluation) and Gate B
+    (record restored after a real process restart), so both paths are held to the
+    same independent expected business projection.
+    """
     expected = case["expected"]
     indicator = projection["indicators"][0]
     assert projection["standard_id"] == GOLDEN["standard_id"]
+    assert _dash_normal(projection["standard_number"]) == _dash_normal(GOLDEN["standard_number"]), (
+        f"标准号不符：{projection['standard_number']!r}"
+    )
     assert projection["standard_version"] == GOLDEN["standard_version"]
     assert projection["rule_revision"] == GOLDEN["rule_revision"]
     assert projection["numeric_profile_id"] == GOLDEN["numeric_profile_id"]
     assert projection["numeric_contract_version"] == GOLDEN["numeric_contract_version"]
+
+    # Frozen product / process identity.
+    assert projection["product_id"] == product_id_of(case), f"product 不符：{case['case_id']}"
+    assert indicator["indicator_id"] == case["expected_indicator_id"], (
+        f"指标身份不符：{case['case_id']}"
+    )
     assert projection["process"] == case["inputs"]["washing_process"]
+
+    # Frozen inputs: the authoritative lexical values must not drift.
+    assert _dec_text(projection["e_d_input"]) == _dec_text(
+        case["inputs"]["electricity_consumption"]
+    ), f"E_d 输入不符：{case['case_id']}"
+    assert _dec_text(projection["m_input"]) == _dec_text(case["inputs"]["raw_coal_input"]), (
+        f"m 输入不符：{case['case_id']}"
+    )
+
+    # Frozen calculation and conclusion.
     assert _dec_text(indicator["k"]) == _dec_text(expected["k"]), f"k 不符：{case['case_id']}"
     assert _dec_text(indicator["actual_value"]) == _dec_text(expected["e_d"]), (
         f"e_d 不符：{case['case_id']}"
     )
     assert indicator["grade"] == expected["grade"], f"等级不符：{case['case_id']}"
     assert indicator["unit"] == GOLDEN["business_data_summary"]["unit"]
+
+    # Frozen thresholds for the case's own product (not just "some thresholds").
+    limits = GOLDEN["business_data_summary"]["thresholds_kwh_per_t"][projection["product_id"]]
+    assert {
+        key.upper(): _dec_text(value) for key, value in indicator["corrected_thresholds"].items()
+    } == {key.upper(): _dec_text(value) for key, value in limits.items()}, (
+        f"阈值不符：{case['case_id']}"
+    )
+    assert {
+        key.upper(): _dec_text(value) for key, value in indicator["base_thresholds"].items()
+    } == {key.upper(): _dec_text(value) for key, value in limits.items()}, (
+        f"基础阈值不符：{case['case_id']}"
+    )
+
+    # Frozen provenance: the exact (standard, clause, table) set for this coal type.
+    actual_sources = [
+        [entry[0], entry[1], entry[2]] if len(entry) == 3 else [PROVENANCE_STANDARD, entry[0], entry[1]]
+        for entry in indicator["sources"]
+    ]
+    assert actual_sources == [
+        [PROVENANCE_STANDARD, clause, table] for clause, table in case["expected_sources"]
+    ], (
+        f"来源依据不符：{case['case_id']}\n  实际={actual_sources}"
+        f"\n  期望={case['expected_sources']}"
+    )
+
+    # Frozen business trace invariants.
     assert indicator["warnings_empty"] is True, f"正常案例不应有 warning：{case['case_id']}"
     assert indicator["has_grade_comparison"] is True
     assert indicator["has_explicit_rounding_step"] is False
     assert projection["round_places_declared"] is False
-    limits = GOLDEN["business_data_summary"]["thresholds_kwh_per_t"][projection["product_id"]]
-    assert {
-        key.upper(): _dec_text(value) for key, value in indicator["corrected_thresholds"].items()
-    } == {key.upper(): _dec_text(value) for key, value in limits.items()}
-    sources = {tuple(entry) for entry in indicator["sources"]}
-    assert any(entry[0] == "GB 29446-2019" for entry in sources), sources
-    assert any(entry[2] in {"表1", "表2"} for entry in sources), sources
-    assert any(entry[2] == "表A.1" for entry in sources), sources
 
 
 @pytest.mark.parametrize("case", normal_cases(), ids=lambda c: c["case_id"])
@@ -654,17 +779,86 @@ def test_gate_a_safety_semantics(ctx, case) -> None:
 
 
 def test_gate_b_product_lifecycle_real_restart(ctx, tmp_path) -> None:
-    """Formal record → real process restart → history projection == Golden."""
+    """Formal record → real process restart → history projection == Golden.
+
+    The restored record is held to the **same** full whitelist business
+    projection as Gate A; nothing is compared by hand-picked subset.
+    """
     case = case_by_id("gb29446-coking-grade2-exact-l2")
     standard = ctx.application.get_published_standard(STANDARD_ID)
     result = ctx.application.evaluate(build_request(case, standard))
     evaluation_id = result.evaluation_id
     data_root = tmp_path / "中文数据"
-    script = _restart_script(evaluation_id, data_root)
+    script = _lifecycle_probe_script(data_root)
     ctx.database.dispose()
 
+    payload = _run_lifecycle_probe(script, "read", evaluation_id)
+    assert payload["engine_calls"] == 0, "查看历史不得重新运行 Engine"
+    assert payload["restored"] is True
+    assert payload["evaluation_id"] == evaluation_id
+    assert payload["rule_snapshot_revision"] == GOLDEN["rule_revision"]
+    assert payload["step_operations_include_grade_comparison"] is True
+    assert_projection_matches_golden(payload["projection"], case)
+
+
+def test_gate_b_detects_corrupted_saved_business_data(ctx, tmp_path) -> None:
+    """A corrupted stored result must fail the restored business projection.
+
+    Each mutation below is a business fact the Golden freezes.  If any of them
+    can pass, the lifecycle gate is not actually protecting the Golden.
+    """
+    case = case_by_id("gb29446-coking-grade2-exact-l2")
+    standard = ctx.application.get_published_standard(STANDARD_ID)
+    result = ctx.application.evaluate(build_request(case, standard))
+    evaluation_id = result.evaluation_id
+    data_root = tmp_path / "中文数据"
+    script = _lifecycle_probe_script(data_root)
+    ctx.database.dispose()
+
+    mutations = {
+        "wrong_standard_number": ("standard_number", '"GB 29446—2018"'),
+        "wrong_standard_id": ("standard_id", '"gb-29446-2099"'),
+        "wrong_rule_revision": ("rule_revision", "999"),
+        "wrong_numeric_profile": ("numeric_profile_id", '"SOME_OTHER_PROFILE"'),
+        "wrong_unit": ("results[0].unit", "'kg/t'"),
+        "wrong_thresholds": (
+            "results[0].corrected_thresholds",
+            '{"LEVEL_1":"999","LEVEL_2":"999","LEVEL_3":"999"}',
+        ),
+        "cleared_sources": ("results[0].source_references", "[]"),
+        "wrong_indicator_id": ("results[0].indicator_id", "'unrelated.indicator'"),
+        "wrong_grade": ("results[0].grade", "'LEVEL_1'"),
+        "wrong_actual_value": ("results[0].actual_value", "1.234"),
+        "wrong_k": ("results[0].display_values.process_factor", "9.99"),
+    }
+    for label, (column, literal) in mutations.items():
+        payload = _run_lifecycle_probe(
+            script, "mutate", evaluation_id, column, literal, expect_success=False
+        )
+        if payload is None:
+            continue  # the record no longer deserialises: corruption detected
+        projection = payload["projection"]
+        try:
+            assert_projection_matches_golden(projection, case)
+        except AssertionError:
+            continue  # detected, as required
+        raise AssertionError(f"Gate B 未检出业务损坏：{label}")
+
+
+def _run_lifecycle_probe(
+    script: Path,
+    action: str,
+    evaluation_id: str,
+    column: str | None = None,
+    literal: str | None = None,
+    *,
+    expect_success: bool = True,
+) -> dict | None:
+    args = [sys.executable, "-B", str(script), action, evaluation_id]
+    if column is not None:
+        args += [column, literal or ""]
     completed = subprocess.run(
-        [sys.executable, "-B", str(script)],
+        args,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -672,31 +866,50 @@ def test_gate_b_product_lifecycle_real_restart(ctx, tmp_path) -> None:
         cwd=str(ROOT),
         timeout=240,
     )
-    assert completed.returncode == 0, f"{completed.stdout}\n{completed.stderr}"
-    payload = json.loads(completed.stdout.strip().splitlines()[-1])
-    assert payload["engine_calls"] == 0, "查看历史不得重新运行 Engine"
-    assert payload["restored"] is True
-    assert payload["evaluation_id"] == evaluation_id
-    # The restored business projection still equals the Golden.
-    assert payload["grade"] == case["expected"]["grade"]
-    assert _dec_text(payload["actual_value"]) == _dec_text(case["expected"]["e_d"])
-    assert _dec_text(payload["k"]) == _dec_text(case["expected"]["k"])
-    assert payload["rule_revision"] == GOLDEN["rule_revision"]
-    assert payload["numeric_profile_id"] == GOLDEN["numeric_profile_id"]
-    assert payload["step_operations_include_grade_comparison"] is True
-    assert payload["has_explicit_rounding_step"] is False
-    assert payload["rule_snapshot_revision"] == GOLDEN["rule_revision"]
+    if not expect_success:
+        # A corrupted record may fail to deserialise at all.  That is itself a
+        # detection, so report it as such instead of crashing the test.
+        if completed.returncode != 0:
+            return None
+    else:
+        assert completed.returncode == 0, f"{completed.stdout}\n{completed.stderr}"
+    lines = [line for line in completed.stdout.strip().splitlines() if line.strip()]
+    return json.loads(lines[-1])
 
 
-def _restart_script(evaluation_id: str, data_root: Path) -> Path:
-    script = data_root / "_rs04_restart_probe.py"
+def assert_projection_matches_golden(projection: dict, case: dict) -> None:
+    """Compare a **read-back** projection (Gate B) against one Golden case.
+
+    Uses the same frozen whitelist as Gate A, including the exact provenance
+    set, thresholds, unit, indicator identity and frozen input values.
+    """
+    flat = dict(projection)
+    flat["indicators"] = [
+        {
+            **projection["indicators"][0],
+            "has_grade_comparison": projection["step_operations_include_grade_comparison"],
+            "has_explicit_rounding_step": projection["has_explicit_rounding_step"],
+        }
+    ]
+    assert_matches_golden(flat, case)
+
+
+def _lifecycle_probe_script(data_root: Path) -> Path:
+    script = data_root / "_rs04_lifecycle_probe.py"
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(
         "import json, sys\n"
         "from pathlib import Path\n"
-        "sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))\n"
+        "from decimal import Decimal\n"
+        "sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))\n"
+        "from sqlalchemy import text\n"
         "from uebench.bootstrap import create_context\n"
         "from uebench.domain import engine as engine_mod\n"
+        "\n"
+        "def dec(value):\n"
+        "    if value is None:\n"
+        "        return None\n"
+        "    return format(value if isinstance(value, Decimal) else Decimal(str(value)), 'f')\n"
         "\n"
         "calls = {'n': 0}\n"
         "original = engine_mod.EvaluationEngine.evaluate\n"
@@ -705,27 +918,65 @@ def _restart_script(evaluation_id: str, data_root: Path) -> Path:
         "    return original(self, *a, **k)\n"
         "engine_mod.EvaluationEngine.evaluate = spy\n"
         "\n"
-        f"context = create_context(Path(r'{data_root}'))\n"
+        f"data_root = Path(r'{data_root}')\n"
+        "action = sys.argv[1]\n"
+        "evaluation_id = sys.argv[2]\n"
+        "context = create_context(data_root)\n"
         "try:\n"
-        f"    loaded = context.application.get_evaluation({evaluation_id!r})\n"
+        "    if action == 'mutate':\n"
+        "        column, literal = sys.argv[3], sys.argv[4]\n"
+        "        with context.database.session() as session:\n"
+        "            session.execute(\n"
+        "                text(f'UPDATE evaluations SET result_json = json_set(result_json, :p, json(:v)) '\n"
+        "                     'WHERE evaluation_id = :eid'),\n"
+        "                {'p': '$.' + column, 'v': literal, 'eid': evaluation_id},\n"
+        "            )\n"
+        "            session.commit()\n"
+        "        mutated = True\n"
+        "    else:\n"
+        "        mutated = False\n"
+        "    loaded = context.application.get_evaluation(evaluation_id)\n"
         "    if loaded is None:\n"
         "        print(json.dumps({'restored': False}))\n"
         "        raise SystemExit(0)\n"
         "    request, result, snapshot = loaded\n"
         "    item = result.results[0]\n"
         "    ops = [step.operation for step in item.calculation_trace]\n"
-        "    print(json.dumps({\n"
-        "        'restored': True,\n"
-        "        'evaluation_id': result.evaluation_id,\n"
-        "        'grade': str(item.grade),\n"
-        "        'actual_value': format(item.actual_value, 'f'),\n"
-        "        'k': format(item.display_values['process_factor'], 'f'),\n"
+        "    projection = {\n"
+        "        'standard_id': result.standard_id,\n"
+        "        'standard_number': result.standard_number,\n"
+        "        'standard_version': result.standard_version,\n"
         "        'rule_revision': result.rule_revision,\n"
+        "        'product_id': result.product_id,\n"
+        "        'numeric_contract_version': result.numeric_contract_version,\n"
         "        'numeric_profile_id': result.numeric_profile_id,\n"
-        "        'rule_snapshot_revision': snapshot.rule_revision,\n"
+        "        'process': request.inputs['washing_process'].value,\n"
+        "        'e_d_input': request.inputs['electricity_consumption'].value,\n"
+        "        'm_input': request.inputs['raw_coal_input'].value,\n"
+        "        'indicators': [{\n"
+        "            'indicator_id': item.indicator_id,\n"
+        "            'actual_value': dec(item.actual_value),\n"
+        "            'unit': item.unit,\n"
+        "            'k': dec(item.display_values.get('process_factor')),\n"
+        "            'base_thresholds': {k: dec(v) for k, v in sorted(item.base_thresholds.items())},\n"
+        "            'corrected_thresholds': {k: dec(v) for k, v in sorted(item.corrected_thresholds.items())},\n"
+        "            'grade': str(item.grade),\n"
+        "            'warnings_empty': item.warnings == [],\n"
+        "            'sources': sorted([ref.standard_number, ref.clause, ref.table]\n"
+        "                              for ref in item.source_references),\n"
+        "        }],\n"
         "        'step_operations_include_grade_comparison': 'grade_comparison' in ops,\n"
         "        'has_explicit_rounding_step': any('round' in op.lower() for op in ops),\n"
+        "        'round_places_declared': False,\n"
+        "    }\n"
+        "    print(json.dumps({\n"
+        "        'restored': True,\n"
+        "        'mutated': mutated,\n"
+        "        'evaluation_id': result.evaluation_id,\n"
+        "        'rule_snapshot_revision': snapshot.rule_revision,\n"
+        "        'step_operations_include_grade_comparison': 'grade_comparison' in ops,\n"
         "        'engine_calls': calls['n'],\n"
+        "        'projection': projection,\n"
         "    }, ensure_ascii=False))\n"
         "finally:\n"
         "    context.database.dispose()\n",

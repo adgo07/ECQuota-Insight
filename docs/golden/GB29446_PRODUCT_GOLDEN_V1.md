@@ -67,10 +67,13 @@ Golden 的 expected **不是**由当前软件输出反向生成的。每一个 e
 | 13 | `…power-grade1-exact-l1-second` | 动力煤 | 重介、跳汰、浮选联合 | 0.72 | 260 | 93.6 | **2.0** | 1级 | 最后一个系数 |
 
 **为什么是 13 而不是 12**：12 个系数簇已满足“每个系数至少一条”。第 13 个（#6）是
-**full-value trap**，它必须使用非阈值精确值 `500.00004 × 1.00 ÷ 100 = 5.0000004`，
-在数学上不可能与任何一个 exact-threshold 案例合并，因此 13 是满足任务书**全部**覆盖要求的
-最小案例数。门禁 `test_normal_case_count_is_twelve_coefficient_clusters_plus_trap`
-同时断言“13 个正常案例”与“12 个系数簇”。
+**full-value trap**，它使用非阈值精确值 `500.00004 × 1.00 ÷ 100 = 5.0000004`。
+**13 不是数学上的最小案例数**：trap 完全可以与另一个系数案例（例如 #2 跳汰）合并为
+“同一系数、两个 E_d 输入”的形式，从而压到 12 个案例。本 Golden 选择独立成例，是因为
+trap 的 `source_type` 是 `技术判断`（依赖 `ECQ-STD-GB29446-001` 口径），而 12 个系数簇
+都是 `标准原文事实` —— 把两类依据不同的期望放在同一个案例里会削弱来源可追溯性。
+这是**可读性与证据分离**的取舍，不是覆盖能力的下限。门禁同时断言“13 个正常案例”
+与“12 个系数簇”，因此压缩案例数会被立即发现。
 
 **m 不统一为 100**：实际使用 100 / 63 / 28 / 100 / 100 / 100 / 65 / 117.5 / 60 / 100 / 178 / 76 / 93.6。
 
@@ -116,15 +119,27 @@ e_d = 500.00004 × 1.00 ÷ 100 = 5.0000004
 
 | 类别 | 冻结内容 |
 |---|---|
-| 标准身份 | `standard_id` / `standard_version` / `rule_revision` / `numeric_profile_id` / `numeric_contract_version` |
-| 产品与选择 | `product_id`（煤种）、`process`（选煤工艺） |
+| 标准身份 | `standard_id` / `standard_number` / `standard_version` / `rule_revision` / `numeric_profile_id` / `numeric_contract_version` |
+| 产品与选择 | `product_id`（煤种）、`process`（选煤工艺）、`indicator_id`（指标身份） |
 | 输入 | `e_d_input`（E_d 原 lexical 文本）、`m_input` |
 | 计算 | `k`（表A.1 系数）、`actual_value`（精确 e_d） |
-| 阈值 | `corrected_thresholds`（LEVEL_1/2/3） |
-| 结论 | `grade` |
-| 依据 | 相关 `source_reference` 的 标准号 / clause / table |
+| 阈值 | `base_thresholds` 与 `corrected_thresholds`（LEVEL_1/2/3，且必须等于**该煤种自己的**阈值） |
+| 结论 | `grade`、`unit` |
+| 依据 | 相关 `source_reference` 的**完整精确集合**（标准号 / clause / table），逐条相等，不只是“存在某类来源” |
 | 正常案例 | `warnings_empty == True` |
 | 业务 trace 不变量 | `has_grade_comparison == True`；`has_explicit_rounding_step == False`；trace 中无 `round_places` 声明 |
+
+**来源冻结是逐条精确比较**：每个案例在 Golden 中登记 `expected_sources`（该煤种对应的
+完整 clause/table 集合）与 `expected_indicator_id`，由
+[`test_expected_sources_match_the_definition`](../../tests/test_gb29446_product_golden.py)
+核对 Golden 与 Definition 一致，并由
+[`test_expected_sources_match_the_definition`](../../tests/test_gb29446_product_golden.py)
+保证炼焦煤不得引用 表2、动力煤不得引用 表1。
+
+> 早期版本只断言“存在 GB 29446 标准号 + 存在任意 表1/表2 + 存在 表A.1”，
+> 因此把炼焦煤来源改成**错误条款 + 动力煤表2**仍能通过。该缺陷已修复：
+> 现在比较的是**精确来源集合**，且 `indicator_id`、冻结输入 lexical 值、
+> `standard_number` 均参与比较。
 
 ## 5. 明确不冻结什么
 
@@ -190,7 +205,8 @@ Golden 内含 `business_data_summary`：12 个 k、6 个等级阈值、关键 cl
 | Gate | 内容 | 实现 |
 |---|---|---|
 | **A — Business Golden** | 全部正常案例 + 安全案例：Golden 输入 → 正式 Application/Engine → 白名单投影 → expected | `test_gate_a_business_golden`、`test_gate_a_safety_semantics` |
-| **B — Product Lifecycle** | 正常案例正式评价 → Record → **真实独立进程重启** → history；保存后业务投影仍等于 Golden；查看历史不得重跑 Engine（`engine_calls == 0`） | `test_gate_b_product_lifecycle_real_restart` |
+| **B — Product Lifecycle** | 正常案例正式评价 → Record → **真实独立进程重启** → history；恢复出的记录使用**与 Gate A 完全相同的完整白名单业务投影**核对；`engine_calls == 0` | `test_gate_b_product_lifecycle_real_restart` |
+| **B′ — 损坏可检出** | 在真实 SQLite 中把已保存 `result_json` 改成错误标准号 / 错误 `standard_id` / 错误 `rule_revision` / 错误 Numeric Profile / 单位 `kg/t` / 阈值全 `999` / 来源清空 / 无关指标身份 / 错误等级 / 错误 actual / 错误 k，逐一证明 Gate B **必须失败** | `test_gate_b_detects_corrupted_saved_business_data` |
 | **C — Excel Golden** | 一个普通案例 + 一个 full-value boundary 案例；GUI Request == Excel Request；两条路径的 Result 业务投影均等于 Golden | `test_gate_c_excel_golden`、`test_gate_c_excel_request_equals_gui_form_request`、`test_gate_c_excel_ingress_safety` |
 | **D — Regression** | RS01 / RS02 / RS03 Gate、GB29446、N01-A、Frozen Numeric v1、Generic Excel、Architecture、Document hygiene、literal full suite | 由测试命令单独执行；Golden **不替代**既有 Gate |
 
@@ -272,3 +288,76 @@ RS05 = NOT STARTED   RS06 = NOT STARTED
 ```
 
 `READY FOR RS05 WINDOWS ACCEPTANCE` 不等于“可发布”。
+
+---
+
+## 13. R1 返工记录（独立验收后）
+
+独立验收判定 **FAIL — REWORK REQUIRED**，提出两个 blocker，均成立并已修复。
+两个 blocker 都属于本仓 **LOCAL DEFECT（验收门禁缺陷）**：不改生产代码、
+不改标准解释、不需要修改中央 Contract。
+
+### Blocker 1 — Gate A 未保护声明的完整业务白名单
+
+**问题**：断言只检查“存在标准号 + 存在任意 表1/表2 + 存在 表A.1”，
+没有核对正确条款与煤种对应表。独立故障注入实证三处漏检：
+
+| 注入 | 修复前 |
+|---|---|
+| 炼焦煤来源改为**错误条款（3.2）+ 动力煤表2** | 仍通过 |
+| 指标身份改为无关指标 | 仍通过 |
+| 声明冻结的输入 lexical 值改错 | 仍通过 |
+
+**修复**：为每个正常案例登记从 Definition 推导的 `expected_sources`
+（该煤种完整 clause/table 集合）与 `expected_indicator_id`，
+`assert_matches_golden()` 现在逐条精确比较：
+
+- 完整来源集合（标准号 + clause + table），逐条相等；
+- `standard_number`（此前完全未断言）；
+- `indicator_id`（指标身份）；
+- `e_d_input` / `m_input`（冻结的 lexical 输入）；
+- `base_thresholds` **与** `corrected_thresholds`，且必须等于该煤种自己的阈值。
+
+新增守护测试：`test_expected_sources_match_the_definition`（Golden 与 Definition 一致、
+炼焦煤不得引用表2、动力煤不得引用表1）、
+`test_case_source_clause_and_table_agree_with_expected_sources`、
+`test_expected_indicator_id_matches_definition`。
+
+**复验**：三类注入现在全部被捕获（来源依据不符 / 指标身份不符 / E_d 输入不符）。
+
+### Blocker 2 — Gate B 未证明历史业务投影等于 Golden
+
+**问题**：真实重启测试只比较等级、actual、k 与部分版本、trace 标记。
+独立验收在真实 SQLite 中于重启前把已保存结果改成
+错误标准号 / 单位 `kg/t` / 阈值全 `999` / 来源引用清空，**Gate B 仍通过**。
+
+**修复**：
+
+- 重启探针改为返回**完整恢复投影**（顶层身份 + 冻结输入 + `indicator_id` /
+  `actual_value` / `unit` / `k` / `base_thresholds` / `corrected_thresholds` /
+  `grade` / `warnings_empty` / 精确来源集合）；
+- Gate B 通过 `assert_projection_matches_golden()` 复用**与 Gate A 相同的**
+  `assert_matches_golden()`，两条路径不再各自维护一份弱断言；
+- 新增 `test_gate_b_detects_corrupted_saved_business_data`：在真实 SQLite 中注入
+  11 种业务损坏（含错误标准号、`standard_id`、`rule_revision`、Numeric Profile、
+  单位、阈值、来源清空、指标身份、等级、actual、k），逐一证明 Gate B **必须失败**。
+
+### 其他更正
+
+- 撤回“13 是数学上的最小案例数”的说法；13 是可读性与证据分离的取舍（见 §2）；
+- `HANDOFF.md` 中遗留的“本任务停在 RS03，未开始 RS04”已更正为停在 RS04；
+- 全文测试计数改为如实区分 passed / xfailed，不再把两者相加后混称。
+
+### R1 后测试
+
+```text
+tests/test_gb29446_product_golden.py -q -ra    35 passed
+
+literal full suite -q -ra
+  tests = 559   passed = 555   xfailed = 4   failed = 0   errors = 0   exit = 0
+```
+
+R1 之前（即本次验收的 final head `2781696`）：`tests = 555`、`passed = 551`、
+`xfailed = 4`。**该 head 的完成报告把“总数 555”写成了“passed 555”**，与独立验收
+实测的 `551 passed` 不一致；正确写法是 `551 passed, 4 xfailed`（合计 555）。本次已更正，
+全文不再把 xfailed 计入 passed。

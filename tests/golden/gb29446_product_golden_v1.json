@@ -21,11 +21,43 @@
     "软件实现决定": "本软件选择的实现口径"
   },
   "coverage_dimensions": {
-    "coal_types": ["炼焦煤", "动力煤"],
-    "k_coefficients_all_12": ["1.26", "1.00", "1.12", "0.83", "0.78", "1.04", "0.94", "0.80", "0.85", "0.89", "0.76", "0.72"],
-    "grades": ["LEVEL_1", "LEVEL_2", "LEVEL_3", "NOT_QUALIFIED"],
-    "exact_thresholds": ["炼焦煤 level_1=5.0", "炼焦煤 level_2=7.0", "炼焦煤 level_3=8.5", "动力煤 level_1=2.0", "动力煤 level_2=3.0", "动力煤 level_3=4.5"],
-    "safety_semantics": ["E_d 缺失", "E_d = 0", "XLSX numeric/formula 不得成为权威输入"]
+    "coal_types": [
+      "炼焦煤",
+      "动力煤"
+    ],
+    "k_coefficients_all_12": [
+      "1.26",
+      "1.00",
+      "1.12",
+      "0.83",
+      "0.78",
+      "1.04",
+      "0.94",
+      "0.80",
+      "0.85",
+      "0.89",
+      "0.76",
+      "0.72"
+    ],
+    "grades": [
+      "LEVEL_1",
+      "LEVEL_2",
+      "LEVEL_3",
+      "NOT_QUALIFIED"
+    ],
+    "exact_thresholds": [
+      "炼焦煤 level_1=5.0",
+      "炼焦煤 level_2=7.0",
+      "炼焦煤 level_3=8.5",
+      "动力煤 level_1=2.0",
+      "动力煤 level_2=3.0",
+      "动力煤 level_3=4.5"
+    ],
+    "safety_semantics": [
+      "E_d 缺失",
+      "E_d = 0",
+      "XLSX numeric/formula 不得成为权威输入"
+    ]
   },
   "not_frozen": [
     "evaluation_id",
@@ -48,12 +80,34 @@
     "purpose": "业务事实漂移探测；刻意不使用整份 Definition hash 作为业务 Golden。",
     "formula": "e_d = E_d × k ÷ m",
     "thresholds_kwh_per_t": {
-      "gb_29446-2019-coking-coal": {"level_1": "5.0", "level_2": "7.0", "level_3": "8.5"},
-      "gb_29446-2019-power-coal": {"level_1": "2.0", "level_2": "3.0", "level_3": "4.5"}
+      "gb_29446-2019-coking-coal": {
+        "level_1": "5.0",
+        "level_2": "7.0",
+        "level_3": "8.5"
+      },
+      "gb_29446-2019-power-coal": {
+        "level_1": "2.0",
+        "level_2": "3.0",
+        "level_3": "4.5"
+      }
     },
     "coefficients_by_coal_type": {
-      "炼焦煤": {"跳汰": "1.26", "跳汰、浮选联合": "1.00", "重介": "1.12", "重介、浮选联合": "0.83", "重介、跳汰、浮选联合": "0.78"},
-      "动力煤": {"干法选煤": "1.04", "跳汰": "0.94", "跳汰、浮选联合": "0.80", "跳汰、重介联合": "0.85", "重介": "0.89", "重介、浮选联合": "0.76", "重介、跳汰、浮选联合": "0.72"}
+      "炼焦煤": {
+        "跳汰": "1.26",
+        "跳汰、浮选联合": "1.00",
+        "重介": "1.12",
+        "重介、浮选联合": "0.83",
+        "重介、跳汰、浮选联合": "0.78"
+      },
+      "动力煤": {
+        "干法选煤": "1.04",
+        "跳汰": "0.94",
+        "跳汰、浮选联合": "0.80",
+        "跳汰、重介联合": "0.85",
+        "重介": "0.89",
+        "重介、浮选联合": "0.76",
+        "重介、跳汰、浮选联合": "0.72"
+      }
     },
     "key_clauses": [
       "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
@@ -65,7 +119,12 @@
       "5.2 选煤电力单耗计算方法",
       "附录A 选煤工艺类型折算系数"
     ],
-    "key_tables": ["表1", "表2", "式（1）", "表A.1"],
+    "key_tables": [
+      "表1",
+      "表2",
+      "式（1）",
+      "表A.1"
+    ],
     "unit": "kW·h/t"
   },
   "cases": [
@@ -91,7 +150,30 @@
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 500 × 1.00 ÷ 100 = 5.0；表1 1级为 ≤5.0，5.0 ≤ 5.0 命中 1级。此案例同时冻结“恰等于等级阈值时判为更优等级”的边界语义。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1（full-value exact 比较，无隐式修约）"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1（full-value exact 比较，无隐式修约）",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-coking-grade2-exact-l2",
@@ -115,7 +197,30 @@
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 350 × 1.26 ÷ 63 = 441 ÷ 63 = 7.0；5.0 < 7.0 ≤ 7.0 命中 2级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-coking-grade3-exact-l3",
@@ -139,7 +244,30 @@
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 212.5 × 1.12 ÷ 28 = 238 ÷ 28 = 8.5（Decimal 精确）；7.0 < 8.5 ≤ 8.5 命中 3级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-coking-not-qualified-above-l3",
@@ -163,7 +291,30 @@
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 1100 × 0.83 ÷ 100 = 913 ÷ 100 = 9.13（Decimal 精确）；9.13 > 8.5，不满足最低等级，判 NOT_QUALIFIED。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-coking-grade2-above-l1",
@@ -187,7 +338,30 @@
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 710 × 0.78 ÷ 100 = 553.8 ÷ 100 = 5.538（Decimal 精确）；5.0 < 5.538 ≤ 7.0 命中 2级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-coking-full-value-trap",
@@ -208,10 +382,33 @@
       },
       "source_type": "技术判断",
       "confirmation_degree": "受 ECQ-STD-GB29446-001（PROVISIONAL）约束的软件实现口径；未发现标准要求比较前统一六位小数修约的依据。无发布机构正式解释。",
-      "source_clause": "与 3.1 等级边界比较相关；标准原文未规定比较前的统一修约",
-      "source_table": "表1；式（1）",
+      "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级（等级边界比较；标准原文未规定比较前的统一修约）",
+      "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 500.00004 × 1.00 ÷ 100 = 5.0000004（Decimal 精确）；表1 1级为 ≤5.0，5.0000004 > 5.0，故不得判 1级。5.0 < 5.0000004 ≤ 7.0 → 2级。若在比较前做六位小数 ROUND_HALF_UP，5.0000004 会被抹平为 5.000000 而误判 1级；本案例即冻结该差异。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1；ECQ-STD-GB29446-001 (PROVISIONAL)"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1；ECQ-STD-GB29446-001 (PROVISIONAL)",
+      "expected_sources": [
+        [
+          "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
+          "表1"
+        ],
+        [
+          "4.1.1 现有炼焦煤选煤企业限定值",
+          "表1"
+        ],
+        [
+          "4.1.2 新建或改扩建炼焦煤选煤企业准入值",
+          "表1"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.coking-coal"
     },
     {
       "case_id": "gb29446-power-grade1-exact-l1",
@@ -235,7 +432,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 125 × 1.04 ÷ 65 = 130 ÷ 65 = 2.0；表2 1级为 ≤2.0，2.0 ≤ 2.0 命中 1级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-grade2-exact-l2",
@@ -259,7 +479,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 375 × 0.94 ÷ 117.5 = 352.5 ÷ 117.5 = 3.0（Decimal 精确）；2.0 < 3.0 ≤ 3.0 命中 2级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-grade3-exact-l3",
@@ -283,7 +526,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 337.5 × 0.80 ÷ 60 = 270 ÷ 60 = 4.5（Decimal 精确）；3.0 < 4.5 ≤ 4.5 命中 3级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-not-qualified-above-l3",
@@ -307,7 +573,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 600 × 0.85 ÷ 100 = 510 ÷ 100 = 5.1（Decimal 精确）；5.1 > 4.5，判 NOT_QUALIFIED。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-grade1-boundary-above-l1",
@@ -331,7 +620,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 400 × 0.89 ÷ 178 = 356 ÷ 178 = 2.0（Decimal 精确）；2.0 ≤ 2.0 命中 1级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-grade3-below-l3",
@@ -355,7 +667,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 440 × 0.76 ÷ 76 = 334.4 ÷ 76 = 4.4（Decimal 精确）；3.0 < 4.4 ≤ 4.5 命中 3级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-power-grade1-exact-l1-second",
@@ -379,7 +714,30 @@
       "source_clause": "3.2 动力煤选煤企业选煤电力单耗限额等级；5.2 选煤电力单耗计算方法；附录A",
       "source_table": "表2；式（1）；表A.1",
       "derivation": "e_d = 260 × 0.72 ÷ 93.6 = 187.2 ÷ 93.6 = 2.0（Decimal 精确）；2.0 ≤ 2.0 命中 1级。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "expected_sources": [
+        [
+          "3.2 动力煤选煤企业选煤电力单耗限额等级",
+          "表2"
+        ],
+        [
+          "4.2.1 现有动力煤选煤企业限定值",
+          "表2"
+        ],
+        [
+          "4.2.2 新建或改扩建动力煤选煤企业准入值",
+          "表2"
+        ],
+        [
+          "5.2 选煤电力单耗计算方法",
+          "式（1）"
+        ],
+        [
+          "附录A 选煤工艺类型折算系数",
+          "表A.1"
+        ]
+      ],
+      "expected_indicator_id": "GB_29446-2019.power-coal"
     },
     {
       "case_id": "gb29446-safety-missing-ed",
@@ -393,8 +751,16 @@
         "single_coal_single_process": true
       },
       "expected": {
-        "grade_in": ["INCOMPLETE", "NOT_APPLICABLE"],
-        "must_not_be_any_of": ["LEVEL_1", "LEVEL_2", "LEVEL_3", "NOT_QUALIFIED"],
+        "grade_in": [
+          "INCOMPLETE",
+          "NOT_APPLICABLE"
+        ],
+        "must_not_be_any_of": [
+          "LEVEL_1",
+          "LEVEL_2",
+          "LEVEL_3",
+          "NOT_QUALIFIED"
+        ],
         "record_persistence_frozen": false
       },
       "source_type": "软件实现决定",
@@ -416,8 +782,16 @@
         "single_coal_single_process": true
       },
       "expected": {
-        "grade_in": ["INCOMPLETE", "NOT_APPLICABLE"],
-        "must_not_be_any_of": ["LEVEL_1", "LEVEL_2", "LEVEL_3", "NOT_QUALIFIED"],
+        "grade_in": [
+          "INCOMPLETE",
+          "NOT_APPLICABLE"
+        ],
+        "must_not_be_any_of": [
+          "LEVEL_1",
+          "LEVEL_2",
+          "LEVEL_3",
+          "NOT_QUALIFIED"
+        ],
         "record_persistence_frozen": false
       },
       "source_type": "软件实现决定",
@@ -431,8 +805,20 @@
   "excel_safety_semantics": {
     "case_id": "gb29446-excel-authoritative-ingress",
     "coverage_dimension": "XLSX numeric cell / Excel 公式不得成为 GB29446 authoritative Decimal 输入",
-    "must_reject": ["XLSX numeric int", "XLSX numeric float", "Excel formula", "Excel formula with cached value", "NaN", "Infinity", "text with separators or units", "blank", "bool"],
-    "must_accept": ["decimal lexical text"],
+    "must_reject": [
+      "XLSX numeric int",
+      "XLSX numeric float",
+      "Excel formula",
+      "Excel formula with cached value",
+      "NaN",
+      "Infinity",
+      "text with separators or units",
+      "blank",
+      "bool"
+    ],
+    "must_accept": [
+      "decimal lexical text"
+    ],
     "source_type": "软件实现决定",
     "confirmation_degree": "本仓 Excel ingress Contract 收紧（RS03）；中央统一 lossless XLSX 公共方案仍 OPEN（D-ECQ-006），本 Golden 不声称该公共方案已冻结",
     "source_clause": "不适用（软件入口契约）",

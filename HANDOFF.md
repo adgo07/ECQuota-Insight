@@ -114,7 +114,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - Request / Result / Rule Snapshot 历史模型与 evaluate() 保存语义保持兼容；Calculator、Numeric、阈值、标准解释与数据库 Schema 不变；
 - 验收载体：RS03 = PR #11；RS04 = PR #12；旧便携 ZIP 缺失仍是已知历史发布资产问题。
 
-本任务停在 RS03，未开始 RS04。Reference Standard Product Closure 仍为 `PARTIAL`。
+本任务停在 RS04，未开始 RS05。Reference Standard Product Closure 仍为 `PARTIAL`。
 
 ## 10. 历史材料索引
 
