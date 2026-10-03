@@ -125,6 +125,15 @@ if (-not (Test-Path -LiteralPath $PayloadDir -PathType Container)) {
 }
 
 # --- installer ---------------------------------------------------------------
+# The installer ships the GB 29446 import template, and packaging\installer.iss
+# reads it from dist\release.  It must therefore exist BEFORE ISCC runs, even
+# when the Candidate is assembled into a different -OutputDir.  Generating it
+# here (rather than only during assembly below) is what makes the build order
+# correct; the tool is deterministic, so the later call is a cheap no-op.
+& $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") `
+    --output-dir (Join-Path $ProjectRoot "dist\release")
+if ($LASTEXITCODE -ne 0) { throw "Excel 模板生成失败，停止安装程序构建。" }
+
 $Iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
 if (-not $Iscc) {
     $Candidates = @(
