@@ -344,6 +344,15 @@ RS05 = NOT STARTED   RS06 = NOT STARTED
 
 ### 其他更正
 
+- **CI 修复（cp1252 控制台）**：新增的重启探针把中文条款字符串打印到 stdout，
+  而 GitHub Windows runner 的控制台是 cp1252，探针因
+  `UnicodeEncodeError: 'charmap' codec can't encode characters in position 467-468`
+  退出 1，使 Gate B 只在 CI 失败（本地 UTF-8 控制台不失败）。同一失败模式 RS03 的
+  ingress probe 已遇到过一次。修复：探针显式
+  `sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")`（stderr 同理），
+  并新增 `test_gate_b_probe_survives_a_cp1252_console` 在 `PYTHONIOENCODING=cp1252`
+  与 `utf-8` 两种控制台下各跑一次探针。**已实证**：去掉 reconfigure 的探针在 cp1252 下
+  `rc=1` 并复现同一条 UnicodeEncodeError；修复版 `rc=0` 且恢复出 `LEVEL_2`。
 - 撤回“13 是数学上的最小案例数”的说法；13 是可读性与证据分离的取舍（见 §2）；
 - `HANDOFF.md` 中遗留的“本任务停在 RS03，未开始 RS04”已更正为停在 RS04；
 - 全文测试计数改为如实区分 passed / xfailed，不再把两者相加后混称。
@@ -351,10 +360,10 @@ RS05 = NOT STARTED   RS06 = NOT STARTED
 ### R1 后测试
 
 ```text
-tests/test_gb29446_product_golden.py -q -ra    35 passed
+tests/test_gb29446_product_golden.py -q -ra    36 passed
 
 literal full suite -q -ra
-  tests = 559   passed = 555   xfailed = 4   failed = 0   errors = 0   exit = 0
+  tests = 560   passed = 556   xfailed = 4   failed = 0   errors = 0   exit = 0
 ```
 
 R1 之前（即本次验收的 final head `2781696`）：`tests = 555`、`passed = 551`、

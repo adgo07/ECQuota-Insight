@@ -14,6 +14,7 @@ Gate D  Regression           - existing gates keep passing (run separately)
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -816,24 +817,25 @@ def test_gate_b_detects_corrupted_saved_business_data(ctx, tmp_path) -> None:
     ctx.database.dispose()
 
     mutations = {
-        "wrong_standard_number": ("standard_number", '"GB 29446—2018"'),
-        "wrong_standard_id": ("standard_id", '"gb-29446-2099"'),
-        "wrong_rule_revision": ("rule_revision", "999"),
-        "wrong_numeric_profile": ("numeric_profile_id", '"SOME_OTHER_PROFILE"'),
-        "wrong_unit": ("results[0].unit", "'kg/t'"),
-        "wrong_thresholds": (
-            "results[0].corrected_thresholds",
-            '{"LEVEL_1":"999","LEVEL_2":"999","LEVEL_3":"999"}',
-        ),
-        "cleared_sources": ("results[0].source_references", "[]"),
-        "wrong_indicator_id": ("results[0].indicator_id", "'unrelated.indicator'"),
-        "wrong_grade": ("results[0].grade", "'LEVEL_1'"),
-        "wrong_actual_value": ("results[0].actual_value", "1.234"),
-        "wrong_k": ("results[0].display_values.process_factor", "9.99"),
+        "wrong_standard_number": {"standard_number": "GB 29446—2018"},
+        "wrong_standard_id": {"standard_id": "gb-29446-2099"},
+        "wrong_rule_revision": {"rule_revision": 999},
+        "wrong_numeric_profile": {"numeric_profile_id": "SOME_OTHER_PROFILE"},
+        "wrong_unit": {"results[0]": {"unit": "kg/t"}},
+        "wrong_thresholds": {
+            "results[0]": {"corrected_thresholds": {"LEVEL_1": "999", "LEVEL_2": "999", "LEVEL_3": "999"}}
+        },
+        "cleared_sources": {"results[0]": {"source_references": []}},
+        "wrong_indicator_id": {"results[0]": {"indicator_id": "unrelated.indicator"}},
+        "wrong_grade": {"results[0]": {"grade": "LEVEL_1"}},
+        "wrong_actual_value": {"results[0]": {"actual_value": "1.234"}},
+        "wrong_k": {"results[0]": {"display_values": {"process_factor": "9.99"}}},
     }
-    for label, (column, literal) in mutations.items():
+    for label, patch in mutations.items():
+        corrupted = result.model_dump(mode="json")
+        _apply_patch(corrupted, patch)
         payload = _run_lifecycle_probe(
-            script, "mutate", evaluation_id, column, literal, expect_success=False
+            script, "mutate", evaluation_id, _dump=json.dumps(corrupted, ensure_ascii=False)
         )
         if payload is None:
             continue  # the record no longer deserialises: corruption detected
@@ -845,18 +847,58 @@ def test_gate_b_detects_corrupted_saved_business_data(ctx, tmp_path) -> None:
         raise AssertionError(f"Gate B 未检出业务损坏：{label}")
 
 
+def _apply_patch(document: dict, patch: dict) -> None:
+    """Apply a nested patch whose keys may address list elements (``results[0]``).
+
+    A value that is itself a dict is merged one level deeper; anything else is a
+    leaf assignment.
+    """
+    for key, value in patch.items():
+        if "[" in key:
+            name, _, index = key.partition("[")
+            target = document[name][int(index.rstrip("]"))]
+        else:
+            target = document[key]
+        if isinstance(value, dict):
+            _apply_patch(target, value)
+        else:
+            document[key] = value
+
+
 def _run_lifecycle_probe(
     script: Path,
     action: str,
     evaluation_id: str,
-    column: str | None = None,
-    literal: str | None = None,
     *,
-    expect_success: bool = True,
+    _dump: str | None = None,
+    extra_env: dict[str, str] | None = None,
 ) -> dict | None:
     args = [sys.executable, "-B", str(script), action, evaluation_id]
-    if column is not None:
-        args += [column, literal or ""]
+    if _dump is not None:
+        args.append(_dump)
+    payload, returncode, stdout, stderr = _invoke_probe(args, extra_env)
+    if returncode != 0:
+        # A corrupted record may fail to deserialise at all.  That is itself a
+        # detection, so report it as such instead of crashing the test.
+        if _dump is not None:
+            return None
+        raise AssertionError(f"生命周期探针失败（{action}）：\n{stdout}\n{stderr}")
+    return payload
+
+
+def _invoke_probe(
+    args: list[str], extra_env: dict[str, str] | None = None
+) -> tuple[dict | None, int, str, str]:
+    # Make the probe independent of venv layout and of deriving paths from the
+    # temp directory: hand it the project root explicitly.  PYTHONIOENCODING is
+    # deliberately NOT forced here so the test exercises the console encoding a
+    # real Windows CI runner actually provides.
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.pathsep.join(
+        [str(ROOT / "src"), str(ROOT), env.get("PYTHONPATH", "")]
+    ).rstrip(os.pathsep)
+    if extra_env:
+        env.update(extra_env)
     completed = subprocess.run(
         args,
         capture_output=True,
@@ -864,17 +906,37 @@ def _run_lifecycle_probe(
         encoding="utf-8",
         errors="replace",
         cwd=str(ROOT),
+        env=env,
         timeout=240,
     )
-    if not expect_success:
-        # A corrupted record may fail to deserialise at all.  That is itself a
-        # detection, so report it as such instead of crashing the test.
-        if completed.returncode != 0:
-            return None
-    else:
-        assert completed.returncode == 0, f"{completed.stdout}\n{completed.stderr}"
     lines = [line for line in completed.stdout.strip().splitlines() if line.strip()]
-    return json.loads(lines[-1])
+    payload = json.loads(lines[-1]) if lines and completed.returncode == 0 else None
+    return payload, completed.returncode, completed.stdout, completed.stderr
+
+
+def test_gate_b_probe_survives_a_cp1252_console(ctx, tmp_path) -> None:
+    """The lifecycle probe must not die on a non-UTF-8 Windows console.
+
+    GitHub's Windows runner provides a cp1252 console.  Printing the Chinese
+    clause strings from the probe used to raise UnicodeEncodeError and fail
+    Gate B only on CI, so this test pins the fix.
+    """
+    case = case_by_id("gb29446-coking-grade2-exact-l2")
+    standard = ctx.application.get_published_standard(STANDARD_ID)
+    result = ctx.application.evaluate(build_request(case, standard))
+    data_root = tmp_path / "中文数据"
+    script = _lifecycle_probe_script(data_root)
+    ctx.database.dispose()
+
+    args = [sys.executable, "-B", str(script), "read", result.evaluation_id]
+    for console in ("cp1252", "utf-8"):
+        payload, returncode, stdout, stderr = _invoke_probe(
+            args, {"PYTHONIOENCODING": console}
+        )
+        assert returncode == 0, f"console={console}\n{stdout}\n{stderr}"
+        assert payload is not None, f"console={console}: 探针未输出可解析 JSON"
+        assert payload["restored"] is True, console
+        assert_projection_matches_golden(payload["projection"], case)
 
 
 def assert_projection_matches_golden(projection: dict, case: dict) -> None:
@@ -906,6 +968,11 @@ def _lifecycle_probe_script(data_root: Path) -> Path:
         "from uebench.bootstrap import create_context\n"
         "from uebench.domain import engine as engine_mod\n"
         "\n"
+        "# Windows CI consoles may be cp1252, which cannot encode the Chinese\n"
+        "# clause strings in the payload.  Emit through UTF-8 explicitly.\n"
+        "sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')\n"
+        "sys.stderr.reconfigure(encoding='utf-8', errors='backslashreplace')\n"
+        "\n"
         "def dec(value):\n"
         "    if value is None:\n"
         "        return None\n"
@@ -924,12 +991,12 @@ def _lifecycle_probe_script(data_root: Path) -> Path:
         "context = create_context(data_root)\n"
         "try:\n"
         "    if action == 'mutate':\n"
-        "        column, literal = sys.argv[3], sys.argv[4]\n"
+        "        payload = sys.argv[3]\n"
         "        with context.database.session() as session:\n"
         "            session.execute(\n"
-        "                text(f'UPDATE evaluations SET result_json = json_set(result_json, :p, json(:v)) '\n"
+        "                text('UPDATE evaluations SET result_json = :payload '\n"
         "                     'WHERE evaluation_id = :eid'),\n"
-        "                {'p': '$.' + column, 'v': literal, 'eid': evaluation_id},\n"
+        "                {'payload': payload, 'eid': evaluation_id},\n"
         "            )\n"
         "            session.commit()\n"
         "        mutated = True\n"
