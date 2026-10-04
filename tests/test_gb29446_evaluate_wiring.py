@@ -72,15 +72,19 @@ def _silence_dialogs(monkeypatch):
 
 @pytest.fixture()
 def window(qt_app: QApplication, tmp_path: Path):
-    """A real MainWindow whose library holds GB 29446 r1 *and* r2."""
+    """A real MainWindow; holds GB 29446 r2, and r1 too when the archive is present."""
     context = create_context(tmp_path / "appdata", public_key_path=PUBLIC_KEY)
     application = context.application
     if not application.has_package_service():
         pytest.skip("标准包服务不可用（缺少更新公钥）")
-    for package in (LEGACY_PACKAGE, BUNDLED_PACKAGE):
-        if not package.is_file():
-            pytest.skip(f"缺少固定标准包：{package.name}")
-        application.install_package(package)
+    # 当前正式包是必需的；旧包只用于让库中同时存在 r1+r2。旧包已移出仓库、只存在
+    # 于项目外只读归档，CI 上不可用，因此它是**可选**的：否则按钮接线这类与旧包
+    # 无关的回归会在 CI 上整片 skip，等于丢失覆盖。
+    if not BUNDLED_PACKAGE.is_file():
+        pytest.skip(f"缺少当前正式标准包：{BUNDLED_PACKAGE.name}")
+    if LEGACY_PACKAGE.is_file():
+        application.install_package(LEGACY_PACKAGE)
+    application.install_package(BUNDLED_PACKAGE)
 
     win = MainWindow(context)
     win.eval_standard.setCurrentIndex(win.eval_standard.findData(STANDARD_ID))
@@ -118,6 +122,8 @@ def test_setup_has_both_revisions_installed(window) -> None:
         for item in window.context.application.list_all_standards()
         if item.id == STANDARD_ID
     }
+    if not LEGACY_PACKAGE.is_file():
+        pytest.skip("旧包归档不可用（CI 无项目外只读归档），无法构造 r1+r2 并存状态")
     assert revisions == {1, 2}, f"夹具应同时装有 r1 与 r2，实际 {revisions}"
 
 
@@ -204,9 +210,14 @@ def test_library_has_one_entry_per_standard_while_rows_retain_history(window) ->
     application = window.context.application
     identifiers = [item.id for item in application.list_library_standards()]
     assert len(identifiers) == len(set(identifiers)), "标准库不应出现重复标准"
-    assert len(application.list_all_standards()) > len(identifiers), (
-        "list_all_standards 应保留 r1 历史行，因此多于标准库条目数"
-    )
+    rows = len(application.list_all_standards())
+    assert rows >= len(identifiers), "标准库条目不应多于已安装标准行数"
+    if LEGACY_PACKAGE.is_file():
+        assert rows > len(identifiers), (
+            "list_all_standards 应保留 r1 历史行，因此多于标准库条目数"
+        )
+    else:
+        assert rows == len(identifiers), "仅装 r2 时行数与标准库条目数相同"
 
 
 def test_diagnostics_reports_the_current_revision(window) -> None:
