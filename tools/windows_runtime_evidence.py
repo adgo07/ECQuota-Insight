@@ -113,36 +113,64 @@ def bundled_identity() -> dict:
     return {"package_id": manifest["package_id"], "data_version": manifest["data_version"]}
 
 
+def _build_request(standard, organization: str, notes: str) -> EvaluationRequest:
+    """Build a valid GB29446 request for whichever rule revision is installed.
+
+    r1 and r2 are genuinely different definitions and we must NOT paper over
+    that: the legacy revision predates the coal-type selection schema and uses
+    ``energy.total_standard_coal`` / ``production.total_equivalent``, whereas r2
+    selects a product by 煤种 and takes the r2 input keys.  Using each revision's
+    own declared inputs is what "preserve the original saved semantics" means.
+    """
+    legacy = standard.rule_revision < 2
+    if legacy:
+        product = standard.products[0]
+        indicator = product.indicators[0]
+        # Legacy revisions declare a single direct input (e.g.
+        # ``actual.coking-coal``) and no r2-style input schema, so use DIRECT
+        # mode with that key.  6.0 kW·h/t falls in the 5.0 < x <= 7.0 band.
+        direct_key = indicator.direct_input_key or "actual.coking-coal"
+        supplied = {direct_key: InputValue(value="6.0", unit="kW·h/t")}
+        mode = InputMode.DIRECT
+    else:
+        product = next(
+            p for p in standard.products
+            if (p.selection_values or {}).get("coal_type") == "炼焦煤"
+        )
+        supplied = {
+            "washing_process": InputValue(value="跳汰"),
+            "single_coal_single_process": InputValue(value="是"),
+            "enterprise_status": InputValue(value="现有企业"),
+            "electricity_consumption": InputValue(value="350", unit="kW·h"),
+            "raw_coal_input": InputValue(value="100", unit="t"),
+        }
+        mode = InputMode.DETAIL
+    return EvaluationRequest(
+        evaluation_date=date(2026, 6, 1),
+        standard_id=standard.id,
+        product_id=product.id,
+        selection_mode=StandardSelectionMode.CURRENT,
+        input_mode=mode,
+        inputs=supplied,
+        organization_name=organization,
+        notes=notes,
+    )
+
+
 def save_real_evaluation(data_dir: Path) -> dict:
     """Save one genuine GB29446 evaluation so we have real history to preserve."""
     ctx = create_context(data_dir, public_key_path=PUBLIC_KEY)
     try:
         app = ctx.application
         standard = app.get_published_standard("gb-29446-2019")
-        product = next(p for p in standard.products
-                       if (p.selection_values or {}).get("coal_type") == "炼焦煤")
-        result = app.evaluate(EvaluationRequest(
-            evaluation_date=date(2026, 6, 1),
-            standard_id=standard.id,
-            product_id=product.id,
-            selection_mode=StandardSelectionMode.CURRENT,
-            input_mode=InputMode.DETAIL,
-            inputs={
-                "washing_process": InputValue(value="跳汰"),
-                "single_coal_single_process": InputValue(value="是"),
-                "enterprise_status": InputValue(value="现有企业"),
-                "electricity_consumption": InputValue(value="350", unit="kW·h"),
-                "raw_coal_input": InputValue(value="100", unit="t"),
-            },
-            organization_name="RS05 升级取证企业",
-            notes="核算周期：全年\n备注：ECQ-RS05 legacy 升级取证",
-        ))
+        result = app.evaluate(_build_request(
+            standard, "RS05 升级取证企业", "核算周期：全年\n备注：ECQ-RS05 legacy 升级取证"))
         item = result.results[0]
         return {
             "rule_revision_at_save": standard.rule_revision,
             "grade": str(item.grade),
             "actual_value": str(item.actual_value),
-            "evaluation_id": result.evaluation_id if hasattr(result, "evaluation_id") else None,
+            "evaluation_id": getattr(result, "evaluation_id", None),
         }
     finally:
         ctx.database.dispose()
@@ -155,23 +183,14 @@ def evaluate_under_installed(data_dir: Path) -> dict:
     try:
         app = ctx.application
         standard = app.get_published_standard("gb-29446-2019")
-        coal = next((p for p in standard.products
-                     if (p.selection_values or {}).get("coal_type") == "炼焦煤"), None)
-        if coal is None:
-            return {"rule_revision": standard.rule_revision, "evaluable": False,
-                    "reason": "无 coal_type 选择结构（旧 r1 定义）"}
-        result = app.evaluate(EvaluationRequest(
-            evaluation_date=date(2026, 6, 1), standard_id=standard.id, product_id=coal.id,
-            selection_mode=StandardSelectionMode.CURRENT, input_mode=InputMode.DETAIL,
-            inputs={
-                "washing_process": InputValue(value="跳汰"),
-                "single_coal_single_process": InputValue(value="是"),
-                "enterprise_status": InputValue(value="现有企业"),
-                "electricity_consumption": InputValue(value="350", unit="kW·h"),
-                "raw_coal_input": InputValue(value="100", unit="t"),
-            },
-            organization_name="RS05 运行期取证企业",
-            notes="核算周期：全年\n备注：ECQ-RS05 runtime evidence"))
+        if standard.rule_revision >= 2:
+            coal = next((p for p in standard.products
+                         if (p.selection_values or {}).get("coal_type") == "炼焦煤"), None)
+            if coal is None:
+                return {"rule_revision": standard.rule_revision, "evaluable": False,
+                        "reason": "r2 定义缺少 coal_type 选择结构"}
+        result = app.evaluate(_build_request(
+            standard, "RS05 运行期取证企业", "核算周期：全年\n备注：ECQ-RS05 runtime evidence"))
         item = result.results[0]
         return {"rule_revision": standard.rule_revision, "evaluable": True,
                 "grade": str(item.grade), "actual_value": str(item.actual_value)}

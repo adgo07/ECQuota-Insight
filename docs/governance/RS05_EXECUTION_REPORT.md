@@ -554,6 +554,143 @@ FAILED tests/test_release_artifacts.py::test_audit_release_reports_valid
 另已 grep 确认 `tests/` 中不再有指向仓库根的 `chdir`。
 ---
 
+## 11. Runtime Standard Package Reconciliation & Candidate Identity Closure
+
+本节记录在本分支 `cdbd359` 之上追加的一轮工作，关闭两个 blocker：
+
+1. 软件升级后旧用户数据目录的标准规则不会自动升到当前 bundled package；
+2. 不同内容的 Candidate 可以拥有相同文件名与版本资源，人工测试无法可靠区分。
+
+### 11.1 启动期标准包对账（替代一次性初始化）
+
+原 `install_bundled_package()` 只要标准库非空就整体跳过，因此老用户数据库的规则
+永远停在旧包。现改为**每次正常启动都执行确定性对账**：
+
+| 情形 | 判定 | 动作 |
+|---|---|---|
+| A 从未安装过标准包 | 标准库为空 | `INSTALL` 安装内置包 |
+| B 内置包与已安装包完全相同 | 同 `package_id` **且** 同 `package_sha256` | `NOOP`（不重复备份、不重复安装、不写审计） |
+| C 已安装严格旧于内置 | `_data_version_key` 比较 | `UPGRADE` 安全升级 |
+| D 已安装严格新于内置 | 同上 | `NO_DOWNGRADE` 不降级 |
+| E 同版本但身份/内容冲突，或任一侧版本无法排序 | — | `CONFLICT` 不覆盖并显式上报 |
+| F 内置包验签/清单/文件校验失败 | — | `INVALID` 不安装，存量数据不动 |
+
+实现与约束：
+
+- **没有第二套版本算法**：排序复用既有 `uebench.infrastructure.packages._data_version_key`。
+  application 层受架构门禁约束不得导入 infrastructure，故由组合根
+  （`main.reconcile_standard_package`）把该实现注入 `PackageReconciliationService`，
+  测试注入同一份实现，语义不会分叉。
+- **内置包发现是确定性的**：多个候选时按 `data_version` 取最高者，
+  而非文件名字典序最后者；无法解析版本的候选不会胜出。
+- `preview()` 同时包含**包自身完整性**错误与**依赖当前数据库状态**的安装闸门错误
+  （如「该标准包已安装」「禁止降级」）。对账必须区分二者，否则 B/D 会被误判为 F。
+  实现把它们分成 `errors`（完整性 → INVALID）与 `install_blockers`（安装闸门 →
+  交给决策表处理）。
+- **内容冲突不得被当作无害闸门**：`标准版本已存在：…如需变更必须递增标准包/规则版本`
+  表示已安装的同 `(standard_id, version, rule_revision)` 行内容不同，属 §三 E 的
+  "内容冲突" → `CONFLICT` / `installed-content-conflict`，且**不得**调用 `install()`。
+- 决策函数 `decide(installed, bundled, *, data_version_key)` 是纯函数，不访问数据库与
+  文件系统，预期情形从不抛异常；结果类型 `ReconciliationOutcome` 可序列化，
+  含 `action` / `reason` / 中文 `message` / `executed` / 前后身份 / `backup_path` /
+  `standards_installed` / `errors`，并有 `summary()` 供日志与诊断视图复用。
+- 桌面启动路径对账失败**只记日志、不阻断界面启动**（对账未成功时也不会对外宣称"已更新"）。
+
+### 11.2 升级数据安全
+
+- 升级前使用**现有**安全备份能力：`StandardPackageService.install` 先经
+  `BackupService`（SQLite 在线备份 API，不直接复制活动 WAL）生成
+  `pre-package-<时间>.uebackup`；
+- 定义写入在**单个数据库会话**内完成，异常时回滚并删除已复制的包目录，
+  **不留半升级状态**；
+- 历史评价记录及其 `rule_snapshot_json` **不被新规则重算**；
+- 未提交任何真实用户数据库；回归全部由已知旧正式包与确定性 fixture 构造。
+
+### 11.3 GB29446 规则不兼容 fail-fast
+
+`gb29446_rule_is_compatible(definition)`：当定义缺少 `coal_type` 选择层级、
+或某产品没有非空 `selection_values.coal_type`、或选煤电力单耗指标没有可用
+`process_factor` 查表行时判定为不兼容。此时：
+
+- 显示中文「标准规则数据不完整或版本不兼容，请更新标准数据后再评价。」；
+- 隐藏并禁用煤种 / 选煤工艺 / 折算系数控件，禁用计算按钮；
+- **禁止正式计算与 Excel 导入评价**（在进入 `application.evaluate` 之前返回，
+  不产生记录）；
+- **不再用 `product.name` 冒充煤种**，也不再给出看似正常但空的工艺下拉框。
+
+正常 r2 路径业务语义与 Golden 完全不变（未触碰 domain engine、数值、阈值与 Golden）。
+
+### 11.4 Candidate 身份与构建溯源
+
+产品版本仍为 **0.2.0**（不因 Candidate 迭代改名），但资产必须唯一可区分：
+
+```text
+UEBench-0.2.0-rc-<short7>-win-x64.zip
+UEBench-Setup-0.2.0-rc-<short7>-x64.exe
+UEBench-source-0.2.0-rc-<short7>.zip
+```
+
+- `<short7>` 由构建时的 `git rev-parse HEAD` 推导；CI artifact 名同样携带身份；
+- 正式 release cut 才回到不带后缀的名字；
+- `packaging/installer.iss` 经 `#ifndef MyAppCandidateSuffix` + ISCC `/D` 注入后缀，
+  且不再含任何版本字面量；`version.iss` / `_version.py` / `version_info.txt`
+  仍与提交无关（`--check` 通过，`--generate` 结果与提交前逐字节一致）。
+
+`release-build-info.json` 增加必需字段：`product_version`、`candidate_id`、
+`source_commit`（完整 40 位）、`source_dirty`、`standard_package_id`、
+`standard_data_version`、`standard_package_sha256`、`payload_tree_sha256`、
+`build_time_utc`。正式 Candidate 要求 `source_dirty = false`：三个构建脚本默认
+拒绝 dirty 工作树，`audit_release` 断言 `source_dirty is false` 且
+`payload_tree_sha256` 与 payload manifest 一致，CI 新增步骤断言
+`source_commit` 与 workflow exact head 完全一致。
+
+**一处必须解决的循环**：`release-build-info.json` 含 `payload_tree_sha256`，
+描述整个应用载荷，因此**不可能**同时位于它所描述的载荷之内。处理方式：载荷内改嵌
+**子集** `_internal/uebench/resources/build-identity.json`（同样的身份字段，
+**不含** `payload_tree_sha256`），在 PyInstaller 之后、`build_payload_manifest.py`
+之前写入，从而它本身也被同源载荷清单覆盖与校验。
+
+### 11.5 应用内诊断信息
+
+菜单「帮助 → 关于 / 诊断信息…」只读展示并可一键复制：产品版本、Candidate 身份、
+源码提交（完整 40 位）、`source_dirty`、构建时间、内置/已安装标准包
+`package_id` + `data_version` + SHA256、当前 GB29446 `rule_revision`、
+数据库 schema 版本（实读 Alembic 版本，不硬编码）、当前数据目录，
+以及**最近一次标准包对账**（动作 / 原因 / 中文说明 / 前后身份 / 备份路径）。
+不读取也不输出任何私钥材料。当对账未达期望状态时，状态栏给出可关闭的非模态中文提示
+（不阻断启动，不改变页面布局）。
+
+### 11.6 单一 ACTIVE Candidate
+
+- 归档前先记录 SHA256 证据，再移动：`dist/candidate` →
+  `dist/archive/SUPERSEDED-candidate-2026-10-04-before-identity`，
+  并写出 `dist/archive/SUPERSEDED-INVENTORY.json`（**不删除历史证据**）；
+- 构建脚本在组装前**清空**目标交付目录（锁文件即硬失败，不再
+  `-ErrorAction SilentlyContinue`），避免旧载荷混入；
+- 成功后写 `ACTIVE-CANDIDATE.json`，其 `payload_tree_sha256` **读自** payload manifest，
+  因此不可能与 manifest 不一致；该标记在 audit 失败时会被撤销。
+
+### 11.7 本轮 Gate
+
+新增/加强的真实 Gate（命令与结果见 PR 描述与本轮完成报告）：
+
+1. Clean First-run Gate（空数据目录 → 内置包 → GB29446 r2 可评价）；
+2. Legacy Upgrade Gate（published r1 数据目录 → 自动升级到 bundled r2）；
+3. Already-current NO-OP Gate（第二次启动不重复备份、不重复安装）；
+4. No-downgrade Gate；
+5. Same-version / content-conflict Gate（不覆盖、不抛异常、向用户暴露）；
+6. Upgrade failure / backup safety；
+7. 历史评价与 rule snapshot 不被新规则改写；
+8. GB29446 incompatible-rule fail-fast；
+9. Candidate Identity Gate；
+10. Build Info Provenance Gate（含 `source_commit` 与 exact head 一致性）；
+11. **bundled package → 启动/安装 → Application/Domain → GB29446** 的真实产品链
+    （冻结 EXE `--self-check` 与运行期取证脚本均走该链路，而不是直接安装
+    `data/definitions` 后测试）；
+12. packaged EXE self-check。
+
+---
+
 ## 10. 状态
 
 ```text
@@ -569,3 +706,28 @@ RS06 = NOT STARTED
 
 **本阶段不得写 `RS05 = DONE` 或 `UEBench 0.2.0 = RELEASED`。**
 只有独立验收 + merge + final release cut 之后才能宣布 `DONE`。
+
+### 10.1 Blocker 状态（截至 §11 这一轮）
+
+已关闭：
+
+- **内置标准包 GB29446 落后**（原 Blocker 1）：按批准的方案 B，以已签名
+  `2026.09-published.2` 为父基线，只替换 GB29446 定义（r1 → r2），其余标准逐字节不变，
+  重新签名生成 `2026.10-published.3`（见 §5.2A）。
+- **升级后旧用户数据目录规则不自动更新**：改为启动期标准包对账（见 §11.1）；真实
+  published r1 数据目录实测 `upgrade` 到 bundled r2，第二次启动 `noop` 且不重复备份。
+- **不同内容 Candidate 同名不可区分**：Candidate 资产名与 CI artifact 名携带
+  `-rc-<short7>`，并由 build-info / ACTIVE 标记记录完整 `source_commit`（见 §11.4）。
+
+仍未关闭（由环境决定，如实记录）：
+
+- **Windows 验收证据不完整**：本机仅 Windows 10 Build 19045、单显示器，
+  缺 Windows 11 实机、多显示器跨屏拖动与 DPI 100/125/150/175/200 实测；
+  离线运行只观测到 `OBSERVED-ONLINE`。取证工具不再由显示器数量推断通过
+  （≥2 显示器且无实测声明记为 `PENDING-MANUAL`）。
+
+由本轮发现、记录但不扩展实现（按任务书 §十二）：
+
+- 旧的 `reviewed` 阶段标准库与当前正式包存在**同标准版本不同内容**时，对账判定为
+  `conflict` 并明确提示、不覆盖；该行为已有回归覆盖。这类库需管理员确认后迁移，
+  产品不自动改写标准内容。
