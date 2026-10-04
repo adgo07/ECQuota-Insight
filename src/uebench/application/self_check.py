@@ -69,8 +69,8 @@
 ``standard_package``
     ``package_path`` / ``package_sha256`` / ``public_key_path`` /
     ``public_key_sha256`` / ``signature_verified`` / ``package_id`` /
-    ``data_version`` / ``package_mode`` / ``issued_at`` / ``standard_count`` /
-    ``rule_count`` / ``preview_valid`` / ``definition_count`` /
+    ``data_version`` / ``package_mode`` / ``source_policy`` / ``issued_at`` /
+    ``standard_count`` / ``rule_count`` / ``preview_valid`` / ``definition_count`` /
     ``packaged_golden_rule_revision`` / ``install_verified`` /
     ``installed_standard_count``。
 
@@ -713,6 +713,7 @@ class _Runner:
             "issued_at",
             "minimum_app_version",
             "rule_engine_version",
+            "source_policy",
             "standard_count",
             "rule_count",
         ):

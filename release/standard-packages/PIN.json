@@ -1,36 +1,75 @@
 {
   "schema": "ecq.standard-package-pin.v1",
   "file": "initial-standard-package-published.uebench",
-  "size": 21322203,
-  "sha256": "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0",
-  "data_version": "2026.10-published.3",
-  "package_id": "gb29446-r2-from-2026.09-published.2",
+  "size": 132837,
+  "sha256": "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff",
+  "data_version": "2026.10-published.4",
+  "package_id": "gb29446-r2-provenance-only-from-2026.10-published.3",
   "package_mode": "full",
+  "source_policy": "provenance-only",
+  "source_policy_note": "本包不包含任何 sources/* 成员：0.2.0 起产品不分发、不存储、不打开标准原文 PDF，安装该包不会向用户数据目录写入任何 PDF。标准来源仍以 StandardDefinition 的 source_file / source_sha256 及各指标的 source_references 完整保留。旧包（含 sources/*）仍可正常 preview()/install()。",
   "standard_count": 48,
   "rule_count": 765,
-  "issued_at": "2026-10-04T00:00:00Z",
+  "issued_at": "2026-10-05T00:00:00Z",
   "minimum_app_version": "0.2.0",
   "signature": {
     "algorithm": "ed25519",
     "member": "signature.ed25519",
     "verifying_key": "src/uebench/resources/update_public_key.pem",
-    "verified_by": "context.application.install_package() 在隔离数据目录中安装成功（48 项标准），并用 update_public_key.pem 完成 Ed25519 校验"
+    "private_key": "work/signing/development-private-key.pem（本地开发私钥，不随仓库分发，也不得从 CI 引用）",
+    "verified_by": "构建工具自校验 + 用随产品发布的 update_public_key.pem 完成 Ed25519 校验并在隔离数据目录中安装成功（48 项标准，写入 0 个 PDF）"
   },
   "parent_baseline": {
+    "status": "SUPERSEDED / REFERENCE ONLY",
+    "file": "initial-standard-package-2026.10-published.3.uebench",
+    "sha256": "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0",
+    "size": 21322203,
+    "package_id": "gb29446-r2-from-2026.09-published.2",
+    "data_version": "2026.10-published.3",
+    "source_policy": "embedded",
+    "archive_relative_path": "superseded-packages/SUPERSEDED-2026-10-05-before-source-free/initial-standard-package-2026.10-published.3.uebench",
+    "archive_pointer": "release/standard-packages/LEGACY-REFERENCE.json#source_bearing_predecessor",
+    "shipped_with_release": false,
+    "note": "最后一个随包分发标准原文（48 个 sources/* PDF）的包，已 SUPERSEDED。它不再作为运行/构建/打包/发布输入；仅作为“2026.10-published.4 只移除 sources/*、其余逐字节不变”的直接父基线证据。复核时须先复制到独立临时目录。"
+  },
+  "ancestor_baseline": {
     "status": "REFERENCE ONLY",
     "file": "initial-standard-package-2026.09-published.2.uebench",
     "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
     "size": 21320540,
     "package_id": "initial-47-current-plus-history-published-20260909",
     "data_version": "2026.09-published.2",
-    "archived_at": "G:\\ECQuota-Archive\\ECQ-RS05-LEGACY-REFERENCE-ONLY\\standard-packages\\initial-standard-package-2026.09-published.2.uebench",
-    "archive_index": "G:\\ECQuota-Archive\\ECQ-RS05-LEGACY-REFERENCE-ONLY\\LEGACY-ARCHIVE.json",
+    "source_policy": "embedded",
+    "archive_relative_path": "standard-packages/initial-standard-package-2026.09-published.2.uebench",
+    "archive_pointer": "release/standard-packages/LEGACY-REFERENCE.json#parent_baseline",
     "shipped_with_release": false,
-    "note": "旧标准包已移出仓库，不随 0.2.0 发布、也不得被运行时选用；仅作为“2026.10-published.3 只替换 GB29446 定义”的历史父基线证据，保存在项目外只读归档区。复核时须先复制到独立临时目录。"
+    "note": "2026.10-published.3 的父基线（GB29446 r1→r2 的来源）；对当前固定包而言是间接祖先。"
+  },
+  "source_removal_resolution": {
+    "decision": "项目负责人决定：0.2.0 不分发、不存储、不打开标准原文 PDF",
+    "summary": "以已签名 2026.10-published.3 为直接父基线，逐字节保留全部 definitions/*.json 与 corrections.json，仅移除全部 48 个 sources/* 成员，重新签名生成新的完整正式标准包；manifest 以 source_policy=provenance-only 自述该模式，并设新 data_version 2026.10-published.4。",
+    "tool": "tools/build_gb29446_package_revision.py --drop-sources",
+    "parent_package_id": "gb29446-r2-from-2026.09-published.2",
+    "parent_data_version": "2026.10-published.3",
+    "removed_members": "全部 48 个 sources/* 成员（清单见归档构建报告）",
+    "removed_member_count": 48,
+    "added_members": [],
+    "changed_members": [],
+    "unchanged_member_count": 49,
+    "verification": [
+      "同源校验：除 sources/* 外，父包与候选包的每个成员逐字节一致（changed_members 为空、added_members 为空）。",
+      "definitions/ 成员集合与逐字节内容完全一致：48/48 相同（工具在构建期与校验期各断言一次）。",
+      "corrections.json 逐字节一致。",
+      "标准数量 48 → 48、规则数量 765 → 765 均未变化。",
+      "data_version 2026.10-published.4 在 _data_version_key 排序中位于 2026.10-published.3 之后。",
+      "候选包 source_policy = provenance-only，清单中 source 条目数为 0，包内 sources/* 成员数为 0。",
+      "安装到隔离数据目录后 standards/<package_id>/ 只有 corrections.json，写入 0 个 PDF。"
+    ],
+    "not_used": "整个过程未读取、未使用 统一标准规则确认表.xlsx（LEGACY_REFERENCE_ONLY），未从该表重建任何规则。"
   },
   "revision_gap_resolution": {
-    "decision": "ECQ-RS05 方案 B（由项目负责人批准）",
-    "summary": "以已签名 2026.09-published.2 为父基线，只把经 RS04 验证的 GB29446 定义由 r1 替换为当前 r2，其余标准内容逐字节保持不变，重新签名生成新的完整正式标准包，并设新 data_version 2026.10-published.3。",
+    "decision": "ECQ-RS05 方案 B（由项目负责人批准，历史记录）",
+    "summary": "以已签名 2026.09-published.2 为父基线，只把经 RS04 验证的 GB29446 定义由 r1 替换为 r2，其余标准内容逐字节保持不变，重新签名生成 2026.10-published.3。",
     "tool": "tools/build_gb29446_package_revision.py",
     "removed_members": [
       "definitions/gb-29446-2019-2019.json"
@@ -39,29 +78,24 @@
       "definitions/gb-29446-2019-2019-r2.json"
     ],
     "changed_members": [],
-    "unchanged_member_count": 96,
-    "verification": [
-      "同源校验：除上述一个定义成员外，父包与候选包的每个成员逐字节一致（changed_members 为空）。",
-      "安装后对比：新包安装出的 48 项标准中，除 GB29446 外其余 47 项与父包定义逐字节一致（差异数 0）。",
-      "GB29446 安装后 rule_revision = 2 且 selection_schema 含 coal_type，与 RS04 Product Golden 声明一致。",
-      "RS04 Product Golden 对已安装新标准包回放：15 例全部通过（含 5.0000004 → 2级 的 full-value trap）。"
-    ],
     "not_used": "整个过程未读取、未使用 统一标准规则确认表.xlsx（LEGACY_REFERENCE_ONLY），未从该表重建任何规则。"
   },
   "notes": [
     "PackageManifest.validate_lineage 禁止 package_mode='full' 携带 parent_package_id，因此父基线关系无法写入完整包的 manifest，改由本文件记录。",
-    "minimum_app_version 由父基线的 0.1.0 提升为 0.2.0：新的 GB29446 r2 定义使用 r2 才引入的煤种选择 schema 与专属模板，0.1.0 应用无法正确处理；提升该下限可阻止旧应用安装不兼容的标准包。这是本次除 GB29446 定义外唯一有意偏离父基线的字段，属清单元数据而非标准内容。",
-    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.3 排在 2026.09-published.2 之后。",
-    "2026.10-published.3 是仓库与正式打包路径中**唯一**的标准包；旧包 2026.09-published.2 已归档为 REFERENCE ONLY（见 LEGACY-REFERENCE.json）。"
+    "source_policy 是 PackageManifest 的自述字段：缺省（旧包）= embedded（随包分发 sources/*），provenance-only = 不随包分发标准原文。旧包因此完全向后兼容。",
+    "minimum_app_version 保持 0.2.0：安装去原文包不改变任何业务规则，0.2.0 应用即可处理。",
+    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.4 排在 2026.10-published.3 之后。",
+    "2026.10-published.4 是仓库与正式打包路径中**唯一**的标准包；2026.10-published.3 已归档为 SUPERSEDED / REFERENCE ONLY（见 LEGACY-REFERENCE.json）。"
   ],
   "cleanup_policy": {
     "decided_by": "项目负责人",
-    "decided_on": "2026-10-04",
+    "decided_on": "2026-10-05",
     "rules": [
       "旧标准包与旧用户库不得作为当前产品的运行、构建、打包或发布输入。",
       "旧资产统一标记为 LEGACY / SUPERSEDED / REFERENCE ONLY。",
       "归档原件只读；需要时复制到独立临时目录后使用，禁止直接使用原件。",
-      "旧用户库不自动迁移、不直接修改；原件已改名移出运行路径。"
+      "归档资产一律不删除。",
+      "无论新旧，标准包都不得把标准原文 PDF 写入用户数据目录。"
     ]
   }
 }

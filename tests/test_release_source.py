@@ -269,12 +269,32 @@ def pin() -> dict[str, Any]:
 
 
 def test_pinned_package_exists_and_is_not_empty() -> None:
+    """The pinned input must really carry the catalogue — not be a placeholder.
+
+    ECQ-RS05 Phase 7: the pinned package no longer ships standard原文 PDFs (owner
+    decision for 0.2.0), so its own archive size is no longer a meaningful lower
+    bound — it dropped from ~21 MB to ~130 KB while the *content* stayed the same.
+    The placeholder guard is therefore expressed against the content the manifest
+    declares: 48 definitions and > 1 MiB of uncompressed definition payload.
+    """
     _require_tracked_source(
         f"release/standard-packages/{PINNED_PACKAGE_FILE}",
         "固定正式标准包是发布输入",
     )
     package = PINNED_PACKAGE_DIR / PINNED_PACKAGE_FILE
-    assert package.stat().st_size > 1 << 20, "固定标准包过小，疑似占位文件"
+    assert package.stat().st_size > 0, "固定标准包为空文件"
+    with zipfile.ZipFile(package) as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+        missing = [entry["path"] for entry in manifest["files"] if not archive.read(entry["path"])]
+    definitions = [entry for entry in manifest["files"] if entry["kind"] == "definition"]
+    assert len(definitions) >= 40, (
+        f"固定标准包仅登记 {len(definitions)} 个标准定义，疑似占位文件：{package}"
+    )
+    assert not missing, f"固定标准包清单登记了空文件：{missing}"
+    declared_bytes = sum(entry["size"] for entry in manifest["files"])
+    assert declared_bytes > 1 << 20, (
+        f"固定标准包内容字节数过小（{declared_bytes}），疑似占位文件：{package}"
+    )
 
 
 def test_pinned_package_sha256_matches_pin(pin: dict[str, Any]) -> None:

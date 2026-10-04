@@ -65,6 +65,20 @@ class PackageFile(BaseModel):
         return self
 
 
+#: How a package relates to the standard source documents its definitions cite.
+#:
+#: ``embedded``
+#:     The package ships ``sources/*`` members next to the definitions.  This is
+#:     the historical behaviour and remains the default, so every already
+#:     published/archived package keeps loading and installing unchanged.
+#: ``provenance-only``
+#:     The package ships **no** ``sources/*`` member.  Every definition still
+#:     carries its ``source_file`` / ``source_sha256`` provenance, but the
+#:     standard原文 itself is never distributed, stored or opened by the product
+#:     (owner decision, 0.2.0: full standard PDFs must not be distributed).
+SourcePolicy = Literal["embedded", "provenance-only"]
+
+
 class PackageManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -76,6 +90,10 @@ class PackageManifest(BaseModel):
     package_mode: Literal["full", "incremental"] = "full"
     rule_engine_version: str = RULE_ENGINE_VERSION
     parent_package_id: str | None = None
+    #: Self-describing distribution mode of the standard原文 (see SourcePolicy).
+    #: Defaults to the legacy value: a manifest without this field is an
+    #: ``embedded`` package and is verified exactly as before.
+    source_policy: SourcePolicy = "embedded"
     standard_count: int = Field(ge=0)
     rule_count: int = Field(ge=0)
     files: list[PackageFile]
@@ -211,7 +229,7 @@ class StandardPackageBuilder:
         self,
         output: Path,
         definitions: list[StandardDefinition],
-        source_files: dict[str, Path],
+        source_files: dict[str, Path] | None = None,
         *,
         parent_package: Path,
         data_version: str,
@@ -220,6 +238,7 @@ class StandardPackageBuilder:
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
+        distribute_sources: bool = True,
     ) -> Path:
         """Build a signed package containing only definitions changed from parent.
 
@@ -227,6 +246,10 @@ class StandardPackageBuilder:
         or replaced complete catalogue must use the full build method.
         The parent package id is copied from the inspected manifest so callers
         cannot accidentally attach the diff to another lineage.
+
+        ``distribute_sources=False`` builds a **provenance-only** incremental
+        package: no ``sources/*`` member is written, and ``source_files`` may be
+        omitted entirely.
         """
         parent_manifest, parent_definitions, parent_corrections_data = _load_parent_package(parent_package)
         parent_by_key = {
@@ -278,12 +301,13 @@ class StandardPackageBuilder:
             corrections=corrections,
             package_id=package_id,
             issued_at=issued_at,
+            distribute_sources=distribute_sources,
         )
     def build(
         self,
         output: Path,
         definitions: list[StandardDefinition],
-        source_files: dict[str, Path],
+        source_files: dict[str, Path] | None = None,
         *,
         data_version: str,
         minimum_app_version: str = "0.1.0",
@@ -293,11 +317,35 @@ class StandardPackageBuilder:
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
+        distribute_sources: bool = True,
     ) -> Path:
+        """Build a signed standard package.
+
+        Two distribution modes exist and are both recorded in the manifest as
+        ``source_policy`` (self-describing, so a consumer can tell them apart
+        without guessing):
+
+        * ``distribute_sources=True`` (default) — ``embedded``: every definition
+          must have its standard原文 provided in ``source_files`` and it is
+          written to a ``sources/*`` member.  This is the historical behaviour
+          and is unchanged.
+        * ``distribute_sources=False`` — ``provenance-only``: definitions keep
+          their ``source_file`` / ``source_sha256`` provenance, but **no**
+          ``sources/*`` member is written and no standard原文 is required.  The
+          owner decision for 0.2.0 is that a formal package must not distribute,
+          store or open full standard PDFs.
+
+        A definition is never silently dropped: an ``embedded`` package still
+        hard-fails on a missing or hash-mismatching原文.
+        """
         output = output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
         package_id = package_id or str(uuid4())
         issued_at = issued_at or datetime.now(timezone.utc)
+        if not distribute_sources and source_files:
+            raise StandardPackageError(
+                "provenance-only 标准包不写入 sources/*，不得提供标准原文文件"
+            )
         entries: dict[str, bytes] = {}
         rule_count = 0
         definition_keys: set[tuple[str, str, int]] = set()
@@ -313,7 +361,10 @@ class StandardPackageBuilder:
             data = _canonical_json(definition.model_dump(mode="json"))
             entries[path] = data
             rule_count += sum(len(product.indicators) for product in definition.products)
-            source = source_files.get(definition.source_file)
+            if not distribute_sources:
+                # Provenance stays on the definition; only the file is not shipped.
+                continue
+            source = (source_files or {}).get(definition.source_file)
             if source is None:
                 raise StandardPackageError(f"缺少标准原文：{definition.source_file}")
             source_data = source.read_bytes()
@@ -346,6 +397,7 @@ class StandardPackageBuilder:
             package_mode=package_mode,
             rule_engine_version=rule_engine_version,
             parent_package_id=parent_package_id,
+            source_policy="embedded" if distribute_sources else "provenance-only",
             standard_count=len(definitions),
             rule_count=rule_count,
             files=package_files,
@@ -496,6 +548,14 @@ class StandardPackageService:
                     errors.append(f"标准包包含未登记文件：{', '.join(sorted(extras))}")
                 if missing:
                     errors.append(f"标准包缺少文件：{', '.join(sorted(missing))}")
+                listed_source_paths = sorted(
+                    item.path for item in manifest.files if item.kind == "source"
+                )
+                if manifest.source_policy == "provenance-only" and listed_source_paths:
+                    errors.append(
+                        "标准包自述不随包分发标准原文（source_policy=provenance-only），"
+                        f"但清单仍登记原文：{', '.join(listed_source_paths)}"
+                    )
                 for item in manifest.files:
                     data = archive.read(item.path)
                     if len(data) != item.size or _sha256_bytes(data) != item.sha256:
@@ -574,6 +634,16 @@ class StandardPackageService:
                             warnings.append(f"标准 {definition.number} 声明替代 {superseded} 不在本包中；请确认是否另包提供")
                 for definition in definitions:
                     source = source_entries.get(definition.source_file)
+                    if manifest.source_policy == "provenance-only":
+                        # No standard原文 is distributed with this package.  The
+                        # definition's provenance (source_file/source_sha256 and
+                        # per-indicator source_references) is still verified above
+                        # and below; only the file's presence/hash is not demanded.
+                        if source is not None and source.sha256 != definition.source_sha256.lower():
+                            errors.append(
+                                f"标准原文哈希与定义不一致：{definition.source_file}"
+                            )
+                        continue
                     if source is None:
                         errors.append(f"标准定义缺少原文：{definition.source_file}")
                     elif source.sha256 != definition.source_sha256.lower():
@@ -681,7 +751,7 @@ class StandardPackageService:
                     "STANDARD_PACKAGE_INSTALL",
                     "standard_package",
                     manifest.package_id,
-                    {"data_version": manifest.data_version, "package_mode": manifest.package_mode, "rule_engine_version": manifest.rule_engine_version, "parent_package_id": manifest.parent_package_id, "standard_count": manifest.standard_count},
+                    {"data_version": manifest.data_version, "package_mode": manifest.package_mode, "rule_engine_version": manifest.rule_engine_version, "parent_package_id": manifest.parent_package_id, "standard_count": manifest.standard_count, "source_policy": manifest.source_policy},
                     session=session,
                 )
         except Exception:

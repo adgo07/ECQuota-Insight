@@ -8,6 +8,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication, QMessageBox
 
+from uebench.application import evaluation_support
+from uebench.application.evaluation_support import (
+    FORMAL_EVALUATION_SUPPORTED_LABEL,
+    FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+)
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
 from uebench.domain.models import (
@@ -21,6 +26,21 @@ from uebench.domain.models import (
 )
 
 from .test_engine import make_standard
+
+
+def _in_formal_scope(monkeypatch, *standard_ids: str) -> None:
+    """Declare ``standard_ids`` as formally evaluable for this test.
+
+    正式评价范围是应用层的固定常量，**与“标准库里有没有这个标准”无关**。需要正式
+    评价入口（「新建评价」下拉框、基于记录重新评价、选择控件联动）的用例必须显式把
+    自己使用的标准放进注册表，而不是依赖夹具标准恰好落在范围内——那正是 RS05 §三
+    修掉的缺陷。这里扩展的是真正的注册表本身，因此界面行为仍然完全由注册表驱动。
+    """
+
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | set(standard_ids)
+    monkeypatch.setattr(
+        evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
+    )
 
 
 def test_main_window_starts_with_empty_database(tmp_path: Path) -> None:
@@ -41,7 +61,11 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     window.refresh_all()
     assert window.home_standard_count.text() == "1/1"
     assert window.standard_table.rowCount() == 1
-    assert window.eval_standard.count() == 1
+    # 库里“有”这个标准 ≠ 软件“正式支持评价”这个标准（RS05 §三）：标准库照旧列出它，
+    # 但「新建评价」下拉框一个都不提供，可评价性由独立的支持状态列承载。
+    assert window.eval_standard.count() == 0
+    assert window.eval_standard.currentData() is None
+    assert window.standard_table.item(0, 5).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
     window.navigation.setCurrentRow(1)
     assert window.pages.currentIndex() == 1
     window.standard_table.selectRow(0)
@@ -52,11 +76,13 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     context.database.dispose()
 
 
-def test_record_request_can_be_loaded_for_copy_or_recalculation(tmp_path: Path) -> None:
+def test_record_request_can_be_loaded_for_copy_or_recalculation(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     standard = make_standard()
     context.standards.install(standard)
+    # 重新评价属于正式评价入口，因此该标准必须在正式评价范围内。
+    _in_formal_scope(monkeypatch, standard.id)
     request = EvaluationRequest(
         evaluation_date=standard.effective_date,
         standard_id=standard.id,
@@ -67,12 +93,49 @@ def test_record_request_can_be_loaded_for_copy_or_recalculation(tmp_path: Path) 
     )
     context.evaluation_service.evaluate(request)
     window = MainWindow(context)
+    assert window.eval_standard.findData(standard.id) >= 0
     window.refresh_records()
     assert window._load_request_into_form(request)
     assert window.eval_standard.currentData() == standard.id
     assert window.eval_product.currentData() == "product"
     assert window.eval_inputs.item(0, 2).text() == "15"
     assert window.eval_notes.text() == "回归测试备注"
+    window.close()
+    context.database.dispose()
+
+
+def test_record_of_out_of_scope_standard_cannot_be_re_evaluated(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """RS05 §三：正式评价范围之外的标准不得经“基于此记录重新评价”回到正式评价。"""
+
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    standard = make_standard()
+    context.standards.install(standard)
+    request = EvaluationRequest(
+        evaluation_date=standard.effective_date,
+        standard_id=standard.id,
+        product_id="product",
+        input_mode=InputMode.DIRECT,
+        inputs={"actual": InputValue(value="15", unit="kgce/t")},
+    )
+    context.evaluation_service.evaluate(request)
+    window = MainWindow(context)
+    warnings: list[str] = []
+    monkeypatch.setattr(
+        QMessageBox, "warning", lambda _parent, _title, message: warnings.append(message)
+    )
+    window.refresh_records()
+    window.record_table.selectRow(0)
+    window.recalculate_selected_record()
+
+    # 拒绝：没有进入表单、没有切换页面、没有生成新的结果。
+    assert warnings, "被拒绝的重新评价必须给出明确原因"
+    assert FORMAL_EVALUATION_UNSUPPORTED_LABEL in warnings[0]
+    assert window.eval_standard.currentData() is None
+    assert window.last_result_id is None
+    assert window.navigation.currentRow() != 2
     window.close()
     context.database.dispose()
 
@@ -97,7 +160,7 @@ def test_result_view_shows_grade_count_without_overall_grade(tmp_path: Path, mon
     window.close()
     context.database.dispose()
 
-def test_duplicate_product_names_show_indicator_hint(tmp_path: Path) -> None:
+def test_duplicate_product_names_show_indicator_hint(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     standard = make_standard()
@@ -108,6 +171,8 @@ def test_duplicate_product_names_show_indicator_hint(tmp_path: Path) -> None:
     duplicate.indicators[0].name = "单位产品电耗"
     standard.products.append(duplicate)
     context.standards.install(standard)
+    # 产品选择控件属于正式评价路径，标准必须在正式评价范围内。
+    _in_formal_scope(monkeypatch, standard.id)
     window = MainWindow(context)
     labels = [window.eval_product.itemText(index) for index in range(window.eval_product.count())]
     assert any("测试产品（指标：单位产品能耗）" == label for label in labels)
@@ -183,7 +248,9 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
     context.standards.install(pending)
     window = MainWindow(context)
     assert window.standard_table.rowCount() == 1
-    assert window.standard_table.item(0, 2).text() == "待确认（不可正式评价）"
+    # 「标准状态」只描述标准文档本身的效力；软件能否正式评价由独立列承载。
+    assert window.standard_table.item(0, 2).text() == "待确认"
+    assert window.standard_table.item(0, 5).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
     window.standard_table.selectRow(0)
     assert "需独立复核后使用" in window.standard_indicator_table.item(0, 6).text()
     assert "requires_independent_review" not in window.standard_indicator_table.item(0, 6).text()
@@ -191,16 +258,23 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
     context.database.dispose()
 
 
-def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path) -> None:
+def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
-    context.standards.install(make_standard())
+    standard = make_standard()
+    context.standards.install(standard)
+    _in_formal_scope(monkeypatch, standard.id)
     window = MainWindow(context)
     assert not window.eval_date.isVisible()
     assert not window.eval_project.isVisible()
     assert window.eval_standard.isEditable()
-    assert window.eval_standard_open.text() == "查看原文"
-    assert window.eval_standard_status.text().startswith("GB 00000-2026")
+    assert window.eval_standard_open.text() == "查看标准原文"
+    # 下拉框要能完整读出“编号 + 名称”，状态标签只显示状态，不再重复编号/名称。
+    assert window.eval_standard.itemText(0) == f"{standard.number} {standard.title}"
+    assert window.eval_standard.minimumWidth() >= 360
+    assert window.eval_standard_status.text() == "当前有效"
+    assert standard.number not in window.eval_standard_status.text()
+    assert window.eval_support_label.text() == FORMAL_EVALUATION_SUPPORTED_LABEL
     window.detail_mode_button.click()
     assert window.eval_mode.currentData() == InputMode.DETAIL.value
     window.direct_mode_button.click()
@@ -209,7 +283,7 @@ def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path)
     context.database.dispose()
 
 
-def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path: Path) -> None:
+def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     standard = make_standard()
@@ -231,6 +305,8 @@ def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path:
     }
     standard.products.append(second)
     context.standards.install(standard)
+    # 选择控件属于正式评价路径，标准必须在正式评价范围内。
+    _in_formal_scope(monkeypatch, standard.id)
     window = MainWindow(context)
 
     assert [level.label for level, _combo in window.selection_widgets] == ["产品类别", "产品规格/工序"]
@@ -244,7 +320,7 @@ def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path:
     context.database.dispose()
 
 
-def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_path: Path) -> None:
+def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     current = make_standard()
@@ -256,6 +332,8 @@ def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_
     })
     context.standards.install(current)
     context.standards.install(future)
+    # 两个版本都要在正式评价范围内，才能在各自的版本选择方式里出现。
+    _in_formal_scope(monkeypatch, current.id, future.id)
     window = MainWindow(context)
     assert window.eval_standard.currentData() == current.id
     window.eval_selection_mode.setCurrentIndex(2)

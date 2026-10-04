@@ -52,12 +52,25 @@ from uebench.application.build_identity import (
     reconciliation_facts,
     render_diagnostics,
 )
+from uebench.application.evaluation_support import (
+    FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+    evaluation_support_label,
+    filter_formally_evaluable,
+    supports_formal_evaluation,
+)
 from uebench.application.gb29446 import (
     GB29446_PERIOD_OPTIONS,
     GB29446_STANDARD_ID,
     PERIOD_CUSTOM,
     decode_period_notes,
     encode_period_notes,
+)
+from uebench.application.official_sources import (
+    NO_OFFICIAL_SOURCE_LABEL,
+    OFFICIAL_SOURCE_PLATFORM_HOME,
+    OFFICIAL_SOURCE_PLATFORM_NAME,
+    VIEW_OFFICIAL_SOURCE_BUTTON_TEXT,
+    official_source_url,
 )
 from uebench.domain.models import (
     EnergyLine,
@@ -78,6 +91,7 @@ from uebench.domain.models import (
     StandardDefinition,
     StorageCorruptionError,
 )
+from uebench.ui.presentation import format_local_date, format_local_datetime
 
 
 APP_STYLE = """
@@ -280,6 +294,91 @@ def gb29446_rule_is_compatible(definition) -> bool:
     return True
 
 
+# ---------------------------------------------------------------------------
+# 标准库「评价范围」（ECQ-RS05 §六）
+# ---------------------------------------------------------------------------
+#
+# 「评价范围」只能来自**已确认的既有标准元数据**，UI 不得自行编写范围文字：
+#
+# * GB 29446—2019 已经完成梳理，因此可以如实展示范围：覆盖煤种取自定义自身的
+#   ``selection_schema`` / ``selection_values["coal_type"]``；统计边界取自定义中
+#   ``electricity_consumption`` 输入的说明（“统计边界按标准第5.1条”）；单次评价
+#   只支持单一煤种、单一工艺取自定义中 ``single_coal_single_process`` 输入的说明。
+# * 其余标准尚未重新梳理，没有可靠范围，只能如实显示
+#   :data:`EVALUATION_SCOPE_PENDING_LABEL`，不得由 UI 或实现者代写范围。
+EVALUATION_SCOPE_PENDING_LABEL = "评价范围尚待梳理"
+
+#: GB 29446 统计范围已确认文本（标准第5.1条）。此前只内联在「新建评价」的
+#: 「统计范围说明」里；现在「统计范围说明」与标准库「评价范围」共用同一份已确认
+#: 内容，避免两处各自漂移。
+GB29446_STATISTICS_SCOPE_LINES = (
+    "原煤输送至选煤厂 → 选煤产品运输出选煤厂",
+    "统计内容包括：选煤机械、照明、化验室、相关线路电损失、相关变压器电损失。",
+)
+
+#: 标准库表格用的边界短文本；与定义中 ``electricity_consumption`` 的说明一致。
+GB29446_STATISTICS_BOUNDARY_REFERENCE = "统计边界按标准第5.1条"
+
+
+def _gb29446_statistics_scope_text() -> str:
+    """「统计范围说明」按钮展开后的确认文本（保持既有换行展示）。"""
+
+    return "\n".join(GB29446_STATISTICS_SCOPE_LINES)
+
+
+def _gb29446_scope_metadata(definition) -> tuple[list[str], str, bool]:
+    """从已安装的 GB 29446 定义中读出已确认的范围元数据。
+
+    返回 ``(覆盖煤种, 统计边界依据, 是否限制单一煤种单一工艺)``。读不到的部分留空，
+    由调用方如实省略，不在这里补写任何业务文字。
+    """
+
+    coal_types: list[str] = []
+    boundary = ""
+    single_coal_single_process = False
+    for product in definition.products:
+        value = str(product.selection_values.get(GB29446_COAL_TYPE_KEY) or "").strip()
+        if value and value not in coal_types:
+            coal_types.append(value)
+        for item in product.input_definitions:
+            if item.key == "single_coal_single_process":
+                single_coal_single_process = True
+        for indicator in product.indicators:
+            for item in indicator.input_definitions:
+                if item.key == "electricity_consumption" and item.description and not boundary:
+                    boundary = item.description.split("；", 1)[0].strip()
+    return coal_types, boundary, single_coal_single_process
+
+
+def evaluation_scope_summary(definition) -> str:
+    """标准库表格用的「评价范围」短文本；没有可靠范围时返回如实状态。"""
+
+    if definition is None or definition.id != GB29446_STANDARD_ID:
+        return EVALUATION_SCOPE_PENDING_LABEL
+    coal_types, boundary, _single = _gb29446_scope_metadata(definition)
+    parts: list[str] = []
+    if coal_types:
+        parts.append("覆盖煤种：" + "、".join(coal_types))
+    parts.append(boundary or GB29446_STATISTICS_BOUNDARY_REFERENCE)
+    return "；".join(parts)
+
+
+def evaluation_scope_text(definition) -> str:
+    """标准库详情用的完整「评价范围」；内容全部来自已确认的标准元数据。"""
+
+    if definition is None or definition.id != GB29446_STANDARD_ID:
+        return EVALUATION_SCOPE_PENDING_LABEL
+    coal_types, boundary, single_coal_single_process = _gb29446_scope_metadata(definition)
+    parts: list[str] = []
+    if coal_types:
+        parts.append("覆盖煤种：" + "、".join(coal_types))
+    boundary_text = "；".join(line.rstrip("。") for line in GB29446_STATISTICS_SCOPE_LINES)
+    parts.append(f"{boundary}：{boundary_text}" if boundary else boundary_text)
+    if single_coal_single_process:
+        parts.append("单次评价仅支持单一煤种、单一工艺")
+    return "；".join(parts)
+
+
 class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
@@ -357,10 +456,17 @@ class MainWindow(QMainWindow):
         page, layout = self._page("首页")
         metrics = QHBoxLayout()
         self.home_standard_count = QLabel("0")
+        self.home_formal_scope_count = QLabel("0 项")
         self.home_evaluation_count = QLabel("0")
         self.home_package_version = QLabel("未安装")
+        self.home_standard_count.setToolTip(
+            "已发布且当前有效的标准数量（标准文档状态）；不等于可正式评价的标准数量，"
+            "正式评价范围见「正式评价范围」。"
+        )
+        self.home_formal_scope_count.setToolTip("本机标准库中已纳入正式评价范围、可给出正式评价结论的标准数量。")
         for title, widget in (
             ("已发布标准", self.home_standard_count),
+            ("正式评价范围", self.home_formal_scope_count),
             ("评价记录", self.home_evaluation_count),
             ("标准包", self.home_package_version),
         ):
@@ -370,6 +476,15 @@ class MainWindow(QMainWindow):
             card_layout.addWidget(widget)
             metrics.addWidget(card)
         layout.addLayout(metrics)
+        scope_row = QHBoxLayout()
+        self.home_scope_label = QLabel("")
+        self.home_scope_label.setWordWrap(True)
+        self.home_start_evaluation = QPushButton("开始正式评价")
+        self.home_start_evaluation.setObjectName("homeStartFormalEvaluation")
+        self.home_start_evaluation.clicked.connect(self.start_formal_evaluation)
+        scope_row.addWidget(self.home_scope_label, 1)
+        scope_row.addWidget(self.home_start_evaluation)
+        layout.addLayout(scope_row)
         card, card_layout = self._card()
         card_layout.addWidget(QLabel("最近评价"))
         self.home_recent = QTableWidget(0, 3)
@@ -385,23 +500,49 @@ class MainWindow(QMainWindow):
         self.standard_search = QLineEdit()
         self.standard_search.setPlaceholderText("按标准编号、名称或产品搜索")
         self.standard_search.textChanged.connect(self.refresh_standards)
-        open_button = QPushButton("打开标准原文")
-        open_button.clicked.connect(self.open_selected_standard)
+        self.standard_evaluate_button = QPushButton("用该标准新建评价")
+        self.standard_evaluate_button.setObjectName("standardLibraryEvaluateButton")
+        self.standard_evaluate_button.setToolTip("仅正式评价范围内的标准可以发起正式评价。")
+        self.standard_evaluate_button.clicked.connect(self.start_evaluation_for_selected_standard)
+        self.standard_official_button = QPushButton(VIEW_OFFICIAL_SOURCE_BUTTON_TEXT)
+        self.standard_official_button.setObjectName("standardLibraryOfficialSourceButton")
+        self.standard_official_button.clicked.connect(self.open_selected_standard)
+        self.standard_official_status = QLabel(NO_OFFICIAL_SOURCE_LABEL)
+        self.standard_official_status.setObjectName("standardLibraryOfficialSourceStatus")
         controls.addWidget(self.standard_search, 1)
-        controls.addWidget(open_button)
+        controls.addWidget(self.standard_evaluate_button)
+        controls.addWidget(self.standard_official_button)
+        controls.addWidget(self.standard_official_status)
         layout.addLayout(controls)
-        self.standard_table = QTableWidget(0, 7)
-        self.standard_table.setHorizontalHeaderLabels(["标准编号", "标准名称", "状态", "版本", "实施日期", "产品/工序数", "原文SHA-256"])
+        # 普通页面只保留业务信息：标准编号/名称/状态/版本/实施日期，以及软件评价支持
+        # 状态、评价范围和官方来源。原文 SHA-256、页码、条款/表号、产品/工序数属于
+        # 内部可追溯信息，不再占用普通页面。
+        self.standard_table = QTableWidget(0, 8)
+        self.standard_table.setHorizontalHeaderLabels(
+            [
+                "标准编号",
+                "标准名称",
+                "标准状态",
+                "版本",
+                "实施日期",
+                "软件评价支持状态",
+                "评价范围",
+                "官方来源",
+            ]
+        )
         self._configure_table(self.standard_table)
         self.standard_table.itemSelectionChanged.connect(self.refresh_standard_detail)
         self.standard_table.itemDoubleClicked.connect(lambda *_: self.open_selected_standard())
-        self.standard_table.setToolTip("双击标准行直接打开已安装且校验通过的标准原文")
+        self.standard_table.setToolTip(
+            f"双击标准行打开{OFFICIAL_SOURCE_PLATFORM_NAME}上已登记的官方来源；未登记地址的标准不可用。"
+        )
         layout.addWidget(self.standard_table, 1)
-        self.standard_detail_label = QLabel("选择标准后查看指标、限额和原文依据")
+        self.standard_detail_label = QLabel("选择标准后查看指标、限额和评价范围")
+        self.standard_detail_label.setWordWrap(True)
         layout.addWidget(self.standard_detail_label)
-        self.standard_indicator_table = QTableWidget(0, 9)
+        self.standard_indicator_table = QTableWidget(0, 7)
         self.standard_indicator_table.setHorizontalHeaderLabels(
-            ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额", "适用条件/说明", "页码", "条款/表号"]
+            ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额", "适用条件/说明"]
         )
         self._configure_table(self.standard_indicator_table)
         layout.addWidget(self.standard_indicator_table, 2)
@@ -409,6 +550,21 @@ class MainWindow(QMainWindow):
 
     def _build_evaluation(self) -> QWidget:
         page, page_layout = self._page("新建评价")
+        # 页面右上角：当前标准的软件评价支持状态 + 官方来源入口。两个入口都只使用
+        # 已登记的官方来源服务，不在页面里硬编码任何地址。
+        header = QHBoxLayout()
+        self.eval_support_label = QLabel(FORMAL_EVALUATION_UNSUPPORTED_LABEL)
+        self.eval_support_label.setObjectName("evaluationSupportStatus")
+        self.eval_official_status = QLabel(NO_OFFICIAL_SOURCE_LABEL)
+        self.eval_official_status.setObjectName("evaluationOfficialSourceStatus")
+        self.eval_standard_open = QPushButton(VIEW_OFFICIAL_SOURCE_BUTTON_TEXT)
+        self.eval_standard_open.setObjectName("evaluationOfficialSourceButton")
+        self.eval_standard_open.clicked.connect(self.open_selected_standard_for_evaluation)
+        header.addWidget(self.eval_support_label)
+        header.addStretch()
+        header.addWidget(self.eval_official_status)
+        header.addWidget(self.eval_standard_open)
+        page_layout.addLayout(header)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -431,6 +587,12 @@ class MainWindow(QMainWindow):
         self.eval_standard.setEditable(True)
         self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         self.eval_standard.setPlaceholderText("输入标准编号或名称后选择")
+        # 下拉框必须能完整显示“标准编号 + 标准名称”，否则用户无法确认自己选的是哪一项。
+        self.eval_standard.setMinimumWidth(420)
+        self.eval_standard.setMinimumContentsLength(34)
+        self.eval_standard.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
         completer = self.eval_standard.completer()
         if completer is not None:
             completer.setFilterMode(Qt.MatchFlag.MatchContains)
@@ -439,8 +601,6 @@ class MainWindow(QMainWindow):
         self.eval_standard_status = QLabel("评价日期自动读取今天")
         self.eval_standard_status.setWordWrap(True)
         self.eval_standard_status.setMinimumWidth(250)
-        self.eval_standard_open = QPushButton("查看原文")
-        self.eval_standard_open.clicked.connect(self.open_selected_standard_for_evaluation)
         self.eval_product = QComboBox()
         self.eval_product.currentIndexChanged.connect(self._product_changed)
         self.eval_product.setVisible(False)
@@ -528,7 +688,6 @@ class MainWindow(QMainWindow):
         standard_row.addWidget(QLabel("版本"))
         standard_row.addWidget(self.eval_selection_mode, 2)
         standard_row.addWidget(self.eval_standard_status, 3)
-        standard_row.addWidget(self.eval_standard_open)
         form.addRow(standard_row)
         form_layout.addLayout(form)
         form_layout.addWidget(self.generic_form_container)
@@ -659,10 +818,7 @@ class MainWindow(QMainWindow):
         basis_layout.addWidget(self.gb29446_basis_open, 0, Qt.AlignmentFlag.AlignLeft)
         self.gb29446_scope_toggle = QPushButton("统计范围说明 ▸")
         self.gb29446_scope_toggle.setCheckable(True)
-        self.gb29446_scope_details = QLabel(
-            "原煤输送至选煤厂 → 选煤产品运输出选煤厂\n"
-            "统计内容包括：选煤机械、照明、化验室、相关线路电损失、相关变压器电损失。"
-        )
+        self.gb29446_scope_details = QLabel(_gb29446_statistics_scope_text())
         self.gb29446_scope_details.setWordWrap(True)
         self.gb29446_scope_details.setVisible(False)
         self.gb29446_scope_toggle.toggled.connect(
@@ -828,6 +984,18 @@ class MainWindow(QMainWindow):
         records = self.context.application.list_recent_evaluations(10)
         scoped_standards = [item for item in all_standards if item.lifecycle_status is not LifecycleStatus.OBSOLETE]
         self.home_standard_count.setText(f"{len(standards)}/{len(scoped_standards)}")
+        # 「可正式评价」只由正式评价范围注册表决定，与标准文档是否已发布无关。
+        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        self.home_formal_scope_count.setText(f"{len(evaluable)} 项")
+        if evaluable:
+            scope_names = "、".join(f"{item.number} {item.title}" for item in evaluable)
+            self.home_scope_label.setText(
+                f"正式评价范围：{scope_names}。软件只对已纳入正式评价范围的标准给出正式评价结论。"
+            )
+            self.home_start_evaluation.setEnabled(True)
+        else:
+            self.home_scope_label.setText("本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。")
+            self.home_start_evaluation.setEnabled(False)
         self.home_evaluation_count.setText(str(self.context.application.count_evaluations()))
         package_manifest = self.context.application.latest_package_manifest()
         self.home_package_version.setText(
@@ -837,7 +1005,12 @@ class MainWindow(QMainWindow):
         for record in records:
             row = self.home_recent.rowCount()
             self.home_recent.insertRow(row)
-            values = [record.created_at, record.standard_number, record.organization_name or record.project_name or ""]
+            # 存储为 UTC；普通页面按本机时区显示到秒，不显示微秒。
+            values = [
+                format_local_datetime(record.created_at),
+                record.standard_number,
+                record.organization_name or record.project_name or "",
+            ]
             for column, value in enumerate(values):
                 cell = _item(value)
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
@@ -860,47 +1033,86 @@ class MainWindow(QMainWindow):
                 continue
             row = self.standard_table.rowCount()
             self.standard_table.insertRow(row)
+            # 「标准状态」只描述标准文档本身的效力，不再用它表达软件能否正式评价；
+            # 软件评价支持状态是独立的一列，来源是正式评价范围注册表。
             if standard.publication_status is not PublicationStatus.PUBLISHED:
-                status = "待确认（不可正式评价）"
+                status = "待确认"
             elif standard.effective_date > date.today():
                 status = "尚未实施（仅预览）"
             elif standard.is_effective_on(date.today()):
                 status = "当前有效"
             else:
                 status = "历史/已替代"
+            official_url = official_source_url(standard.id)
             values = [
                 standard.number,
                 standard.title,
                 status,
                 standard.version,
-                standard.effective_date,
-                len(standard.products),
-                standard.source_sha256,
+                format_local_date(standard.effective_date),
+                evaluation_support_label(standard),
+                evaluation_scope_summary(standard),
+                OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL,
             ]
             for column, value in enumerate(values):
                 item = _item(value)
                 item.setData(Qt.ItemDataRole.UserRole, standard.id)
+                if column == 6:
+                    item.setToolTip(evaluation_scope_text(standard))
+                elif column == 7:
+                    item.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
                 self.standard_table.setItem(row, column, item)
         self.refresh_standard_detail()
 
-    def refresh_standard_detail(self) -> None:
-        """Show the selected standard's products, limits and source citations."""
-        if not hasattr(self, "standard_indicator_table"):
-            return
-        self.standard_indicator_table.setRowCount(0)
+    def _selected_library_standard_id(self) -> str | None:
+        """当前标准库选中的标准 id；未选择时返回 ``None``。"""
+
         row = self.standard_table.currentRow()
-        selected_item = self.standard_table.item(row, 0) if row >= 0 else None
-        standard_id = selected_item.data(Qt.ItemDataRole.UserRole) if selected_item else None
-        standard = next(
+        cell = self.standard_table.item(row, 0) if row >= 0 else None
+        return cell.data(Qt.ItemDataRole.UserRole) if cell is not None else None
+
+    def _library_standard(self, standard_id: str | None) -> StandardDefinition | None:
+        if not standard_id:
+            return None
+        return next(
             (item for item in self.context.application.list_library_standards() if item.id == standard_id),
             None,
         )
-        if standard is None:
-            self.standard_detail_label.setText("选择标准后查看指标、限额和原文依据")
+
+    def refresh_standard_detail(self) -> None:
+        """Show the selected standard's products, limits, scope and official source."""
+        if not hasattr(self, "standard_indicator_table"):
             return
-        indicator_count = sum(len(product.indicators) for product in standard.products)
-        status = "已发布" if standard.publication_status is PublicationStatus.PUBLISHED else "待确认，不能正式评价"
-        self.standard_detail_label.setText(f"{standard.number}：{indicator_count} 个指标；{status}")
+        self.standard_indicator_table.setRowCount(0)
+        standard_id = self._selected_library_standard_id()
+        standard = self._library_standard(standard_id)
+        if standard is None:
+            self.standard_detail_label.setText("选择标准后查看指标、限额和评价范围")
+            self.standard_evaluate_button.setEnabled(False)
+            self.standard_official_button.setEnabled(False)
+            self.standard_official_status.setText("请先选择标准")
+            return
+        # 「软件评价支持状态」只来自正式评价范围注册表；「标准状态」只描述文档效力。
+        status = "已发布" if standard.publication_status is PublicationStatus.PUBLISHED else "待确认"
+        self.standard_detail_label.setText(
+            f"{standard.number} {standard.title}；标准状态：{status}；"
+            f"软件评价支持状态：{evaluation_support_label(standard)}；"
+            f"评价范围：{evaluation_scope_text(standard)}"
+        )
+        official_url = official_source_url(standard.id)
+        self.standard_official_button.setEnabled(official_url is not None)
+        self.standard_official_button.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
+        self.standard_official_status.setText(
+            OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL
+        )
+        # 未纳入正式评价范围的标准不提供可执行的评价入口。
+        supported = supports_formal_evaluation(standard.id)
+        self.standard_evaluate_button.setEnabled(supported)
+        self.standard_evaluate_button.setToolTip(
+            "用该标准发起正式评价。"
+            if supported
+            else f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能发起正式评价。"
+        )
 
         def limit_value(expression):
             if expression is None:
@@ -910,11 +1122,6 @@ class MainWindow(QMainWindow):
         for product in standard.products:
             for indicator in product.indicators:
                 base = indicator.base_thresholds or indicator.thresholds
-                references = indicator.source_references
-                pages = ", ".join(str(reference.page) for reference in references)
-                clauses = "; ".join(
-                    filter(None, {reference.clause for reference in references} | {reference.table for reference in references})
-                )
                 notes = "；".join(
                     translated
                     for translated in (_translate_note(note) for note in indicator.notes)
@@ -933,8 +1140,6 @@ class MainWindow(QMainWindow):
                     limit_value(base.level_2),
                     limit_value(base.level_3),
                     notes,
-                    pages,
-                    clauses,
                 ]
                 detail_row = self.standard_indicator_table.rowCount()
                 self.standard_indicator_table.insertRow(detail_row)
@@ -948,11 +1153,27 @@ class MainWindow(QMainWindow):
     def _standards_for_selection(self) -> list[StandardDefinition]:
         return self.context.application.list_standards_for_selection(date.today(), self._selection_mode())
 
+    def _formally_evaluable_standards(self) -> list[StandardDefinition]:
+        """当前选择方式下**可以正式评价**的标准（正式评价范围注册表决定）。"""
+
+        return filter_formally_evaluable(self._standards_for_selection())
+
+    def _formal_scope_hint(self) -> str:
+        """用于说明“为什么只有这些标准可选”的中文提示（来自注册表，不写死编号）。"""
+
+        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        if not evaluable:
+            return "本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。"
+        names = "、".join(f"{item.number} {item.title}" for item in evaluable)
+        return f"本版本正式评价范围：{names}。"
+
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None
         self.eval_standard.blockSignals(True)
         self.eval_standard.clear()
-        for standard in self._standards_for_selection():
+        # 库里“有”这个标准 ≠ 软件“正式支持评价”这个标准。下拉框只提供正式评价
+        # 范围内的标准，其余标准仍留在标准库中作为目录/参考资料。
+        for standard in self._formally_evaluable_standards():
             self.eval_standard.addItem(f"{standard.number} {standard.title}", standard.id)
         restored = False
         if selected:
@@ -966,6 +1187,7 @@ class MainWindow(QMainWindow):
             # the first standard in the newly selected version scope.
             self.eval_standard.setCurrentIndex(0)
         self.eval_standard.blockSignals(False)
+        self.eval_standard.setToolTip(self._formal_scope_hint())
         self._standard_changed()
 
     @staticmethod
@@ -1184,7 +1406,22 @@ class MainWindow(QMainWindow):
         self.gb29446_result_section.setVisible(is_gb29446)
         self.gb29446_explanation_section.setVisible(is_gb29446)
         self.gb29446_basis_section.setVisible(is_gb29446)
-        self.eval_standard_open.setVisible(not is_gb29446)
+
+    def _refresh_official_source_controls(self) -> None:
+        """「查看标准原文」只使用已登记的官方来源；未登记时禁用并如实说明。"""
+
+        standard_id = self.eval_standard.currentData() if hasattr(self, "eval_standard") else None
+        url = official_source_url(standard_id) if standard_id else None
+        button = getattr(self, "eval_standard_open", None)
+        if button is not None:
+            button.setEnabled(url is not None)
+            button.setToolTip(url or NO_OFFICIAL_SOURCE_LABEL)
+        status = getattr(self, "eval_official_status", None)
+        if status is not None:
+            status.setText(OFFICIAL_SOURCE_PLATFORM_NAME if url else NO_OFFICIAL_SOURCE_LABEL)
+        support = getattr(self, "eval_support_label", None)
+        if support is not None:
+            support.setText(evaluation_support_label(standard_id) if standard_id else "—")
 
     @staticmethod
     def _gb29446_factor_map(product) -> dict[str, Decimal]:
@@ -1300,13 +1537,12 @@ class MainWindow(QMainWindow):
                 self.eval_product.addItem(display_name, product.id)
             self.eval_date.setDate(QDate.currentDate())
             warning = self.current_standard.selection_warning(date.today())
-            if warning:
-                self.eval_standard_status.setText(f"{self.current_standard.number} {self.current_standard.title}；{warning}")
-            else:
-                self.eval_standard_status.setText(f"{self.current_standard.number} {self.current_standard.title}；当前有效")
+            # 标准编号与名称已经在下拉框里显示，这里只显示状态，避免同一句话重复两遍。
+            self.eval_standard_status.setText(warning if warning else "当前有效")
         else:
-            self.eval_standard_status.setText("当前选择方式下没有可用标准")
+            self.eval_standard_status.setText("当前选择方式下没有可正式评价的标准")
         self.eval_product.blockSignals(False)
+        self._refresh_official_source_controls()
         self._rebuild_selection_widgets()
         self._set_evaluation_view()
         self._apply_gb29446_rule_compatibility()
@@ -1790,7 +2026,12 @@ class MainWindow(QMainWindow):
     def _gb29446_saved_explanation(
         request: EvaluationRequest, result: EvaluationResult, item: IndicatorResult,
     ) -> str:
-        """展示保存的结果与输入，不执行公式或重新判级。"""
+        """用普通用户语言说明本次代入的数据、公式、阈值和判定结果。
+
+        只展示保存下来的输入与结果：不重新执行公式，也不重新判级。计算依据（E_d、m、
+        选煤工艺与 k、``e_d = E_d × k / m``、分级阈值、判定结果、标准条款）全部保留，
+        但不再堆叠内部追踪术语（rule_id / numeric_behavior 之类不出现在这里）。
+        """
         actual = item.actual_value
         grade_label = MainWindow._gb29446_grade_label(item.grade)
         supplied_electricity = request.inputs.get("electricity_consumption")
@@ -1807,26 +2048,50 @@ class MainWindow(QMainWindow):
         )
         e0 = item.display_values.get("unadjusted_power_consumption")
         factor = item.display_values.get("process_factor")
-        e0_line = (
-            f"未折算单位电耗 E_d/m：{MainWindow._format_result_number(e0)} kW·h/t"
-            if request.input_mode is InputMode.DETAIL
-            else "未折算单位电耗 E_d/m：— kW·h/t"
-        )
         process = request.inputs.get("washing_process")
         process_name = str(process.value) if process is not None else "—"
-        factor_line = (
+        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
+
+        lines: list[str] = []
+        if request.input_mode is InputMode.DETAIL:
+            electricity_text = (
+                f"{MainWindow._format_explanation_number(electricity)} kW·h"
+                if electricity is not None
+                else "未填写"
+            )
+            raw_coal_text = (
+                f"{MainWindow._format_explanation_number(raw_coal)} t"
+                if raw_coal is not None
+                else "未填写"
+            )
+            lines.append(
+                f"本次评价输入：煤种 {coal_type}；选煤工艺 {process_name}；"
+                f"统计期选煤电力消耗量 E_d = {electricity_text}；"
+                f"统计期入选原煤量 m = {raw_coal_text}。"
+            )
+            if e0 is not None:
+                lines.append(
+                    f"未折算单位电耗 E_d/m：{MainWindow._format_result_number(e0)} kW·h/t"
+                )
+        else:
+            # 直接录入口径：没有 E_d / m 明细，但公式依据照样说明。
+            lines.append("本次评价输入：直接录入选煤电力单耗 e_d（已按 e_d = E_d × k / m 折算）。")
+        lines.append(
             f"折算系数 k：{MainWindow._format_result_number(factor)}"
-            f"（{result.product_name}，{process_name}；按附录A表A.1自动匹配）"
+            f"（煤种 {coal_type}，选煤工艺 {process_name}；按标准附录A表A.1自动匹配）"
         )
         if electricity is not None and raw_coal is not None and factor is not None:
-            formula_line = (
+            lines.append(
                 f"本次代入：e_d = {MainWindow._format_explanation_number(electricity)} × "
                 f"{MainWindow._format_explanation_number(factor)} / "
                 f"{MainWindow._format_explanation_number(raw_coal)} = "
                 f"{MainWindow._format_explanation_number(actual)} kW·h/t"
             )
         else:
-            formula_line = "计算公式：e_d = E_d × k / m"
+            lines.append("计算公式：e_d = E_d × k / m")
+        lines.append(
+            f"本次电耗 e_d = {MainWindow._format_result_number(actual)} kW·h/t；判级结果：{grade_label}。"
+        )
 
         thresholds = item.corrected_thresholds
         threshold_names = (("LEVEL_1", "1级"), ("LEVEL_2", "2级"), ("LEVEL_3", "3级"))
@@ -1859,11 +2124,12 @@ class MainWindow(QMainWindow):
                 f"{raw_value_line}\n当时保存的结果：{grade_label}。"
                 "正式比较语义见原记录技术详情。"
             )
-        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
-        return "\n".join((
-            e0_line, factor_line, formula_line,
-            f"{coal_type}分级阈值：{threshold_text}", current_grade_line,
-        ))
+        lines.extend((f"{coal_type}分级阈值：{threshold_text}", current_grade_line))
+        # 标准依据属于本次说明的一部分，必须保留；与「四、标准依据」卡片同源。
+        basis = MainWindow._gb29446_basis_for_display(item)
+        if basis:
+            lines.append("标准依据：" + "；".join(basis.splitlines()))
+        return "\n".join(lines)
 
     def refresh_records(self) -> None:
         self.record_table.setRowCount(0)
@@ -1871,8 +2137,8 @@ class MainWindow(QMainWindow):
             row = self.record_table.rowCount()
             self.record_table.insertRow(row)
             values = [
-                record.created_at,
-                record.evaluation_date,
+                format_local_datetime(record.created_at),
+                format_local_date(record.evaluation_date),
                 f"{record.standard_number} {record.standard_title}".strip(),
                 record.organization_name,
                 record.project_name,
@@ -1919,8 +2185,8 @@ class MainWindow(QMainWindow):
         content.setReadOnly(True)
         lines = [
             f"{result.standard_number} {result.standard_title}",
-            f"评价时间：{result.evaluated_at}",
-            f"评价日期：{request.evaluation_date}",
+            f"评价时间：{format_local_datetime(result.evaluated_at)}",
+            f"评价日期：{format_local_date(request.evaluation_date)}",
             f"企业名称：{request.organization_name or '—'}",
             f"产品/煤种：{result.product_name}",
         ]
@@ -1984,11 +2250,18 @@ class MainWindow(QMainWindow):
         layout.addWidget(toggle)
         layout.addWidget(technical)
         buttons = QHBoxLayout()
-        source = QPushButton("查看原评价标准原文")
+        # 普通界面不再打开本机 PDF，只打开已登记的官方来源页面。
+        official = official_source_url(result.standard_id)
+        source = QPushButton(VIEW_OFFICIAL_SOURCE_BUTTON_TEXT)
+        source.setObjectName("recordOfficialSourceButton")
+        source.setEnabled(official is not None)
+        source.setToolTip(official or NO_OFFICIAL_SOURCE_LABEL)
         source.clicked.connect(lambda: self.open_evaluation_standard_source(evaluation_id))
         close = QPushButton("关闭")
         close.clicked.connect(dialog.accept)
         buttons.addWidget(source)
+        if official is None:
+            buttons.addWidget(QLabel(NO_OFFICIAL_SOURCE_LABEL))
         buttons.addStretch()
         buttons.addWidget(close)
         layout.addLayout(buttons)
@@ -2000,15 +2273,18 @@ class MainWindow(QMainWindow):
         dialog.open()
 
     def open_evaluation_standard_source(self, evaluation_id: str) -> None:
+        """打开该评价所依据标准的**官方来源页面**（普通界面不再打开本机 PDF）。"""
+
         try:
-            path = self.context.application.find_evaluation_standard_source(evaluation_id)
+            loaded = self.context.application.get_evaluation(evaluation_id)
         except StorageCorruptionError as exc:
             QMessageBox.warning(self, RECORD_CORRUPTED_LABEL, str(exc))
             return
-        if path is None:
-            QMessageBox.warning(self, "原文不可用", "原评价标准原文当前不可用。")
+        if loaded is None:
+            QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+        _request, result, _snapshot = loaded
+        self.open_official_source(result.standard_id)
 
     def _load_request_into_form(self, request: EvaluationRequest) -> bool:
         """Populate the wizard from a saved request without changing its data."""
@@ -2020,7 +2296,19 @@ class MainWindow(QMainWindow):
             self.eval_selection_mode.setCurrentIndex(mode_index)
         standard_index = self.eval_standard.findData(request.standard_id)
         if standard_index < 0:
-            QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法基于此记录重新评价。")
+            # “库里没有”“软件不正式支持”“当前选择方式取不到”是三件事，提示必须区分。
+            # 后两种情况的调用方（基于此记录重新评价）在调用本方法之前已经给出模态提示，
+            # 因此这里只更新页面上的状态文字：同一件事不说两遍，也不从加载函数里弹框。
+            if self._library_standard(request.standard_id) is None:
+                QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法基于此记录重新评价。")
+            elif not supports_formal_evaluation(request.standard_id):
+                self.eval_standard_status.setText(
+                    f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能重新发起正式评价；原记录仍可查看。"
+                )
+            else:
+                self.eval_standard_status.setText(
+                    "该标准在当前的“版本”选择方式下不可正式评价，请切换选择方式后重试。"
+                )
             return False
         self.eval_standard.setCurrentIndex(standard_index)
         if not self._select_product_by_id(request.product_id):
@@ -2115,6 +2403,14 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
         request, _result, snapshot = loaded
+        # 未纳入正式评价范围的标准不能通过“基于此记录重新评价”绕开正式评价范围。
+        if not supports_formal_evaluation(request.standard_id):
+            QMessageBox.warning(
+                self,
+                FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+                f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能重新发起正式评价；原记录仍可查看。",
+            )
+            return
         current = self.context.application.get_standard_for_evaluation(request.standard_id, date.today())
         if current is None:
             QMessageBox.warning(self, "标准不可用", "当前没有可正式评价的适用标准，原记录仍可查看。")
@@ -2193,6 +2489,16 @@ class MainWindow(QMainWindow):
             self.import_issues.insertRow(row)
             for column, value in enumerate((issue.severity, issue.sheet, issue.cell, issue.message)):
                 self.import_issues.setItem(row, column, _item(value))
+        # FAIL-FAST（§三）：Excel 是正式评价入口之一，唯一能评价的范围同样由正式评价
+        # 范围注册表决定。未纳入范围的标准即使工作簿本身合法，也不能被当成正式评价。
+        if self.pending_import_id is not None and not supports_formal_evaluation(self.pending_import_standard_id):
+            self.pending_import_id = None
+            self.import_commit_button.setEnabled(False)
+            self.import_status.setText(self._excel_scope_rejection())
+            self.import_summary.setVisible(False)
+            self.import_summary.setText("")
+            QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
+            return
         # FAIL-FAST：即使工作簿本身校验通过，只要当前 GB 29446 规则不完整/不兼容，
         # 也不能通过 Excel 路径生成正式评价记录。
         if self.pending_import_standard_id is not None:
@@ -2204,6 +2510,13 @@ class MainWindow(QMainWindow):
                 self.import_summary.setVisible(False)
                 self.import_summary.setText("")
                 QMessageBox.warning(self, "标准规则不兼容", reason)
+
+    @staticmethod
+    def _excel_scope_rejection() -> str:
+        return (
+            f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，Excel 导入不能作为它的正式评价入口；"
+            "请在标准库中确认软件评价支持状态。"
+        )
 
     def _show_import_summary(self, report) -> None:
         """Show the recognisable business summary of a validated workbook.
@@ -2217,6 +2530,7 @@ class MainWindow(QMainWindow):
             self.import_summary.setText("")
             return
         lines = []
+        support_line = f"软件评价支持状态：{evaluation_support_label(request.standard_id)}"
         if request.standard_id == GB29446_STANDARD_ID:
             period, custom_period, _note = self._decode_gb29446_notes(request.notes)
             standard = self.context.application.get_standard(request.standard_id)
@@ -2232,8 +2546,9 @@ class MainWindow(QMainWindow):
             process = request.inputs.get("washing_process")
             lines = [
                 f"标准：{standard.number if standard else 'GB 29446—2019'}",
+                support_line,
                 f"企业：{request.organization_name or '—'}",
-                f"评价日期：{request.evaluation_date.isoformat()}",
+                f"评价日期：{format_local_date(request.evaluation_date)}",
                 f"核算周期：{custom_period if period == PERIOD_CUSTOM else period}",
                 f"煤种：{coal or '—'}",
                 f"选煤工艺：{process.value if process else '—'}",
@@ -2244,8 +2559,9 @@ class MainWindow(QMainWindow):
             standard = self.context.application.get_standard(request.standard_id)
             lines = [
                 f"标准：{standard.number if standard else request.standard_id}",
+                support_line,
                 f"企业：{request.organization_name or '—'}",
-                f"评价日期：{request.evaluation_date.isoformat()}",
+                f"评价日期：{format_local_date(request.evaluation_date)}",
                 f"产品/工序：{request.product_id}",
             ]
         self.import_summary.setText("\n".join(lines))
@@ -2254,6 +2570,12 @@ class MainWindow(QMainWindow):
     def evaluate_import(self) -> None:
         """Formal Excel evaluation: same application use case as the GUI path."""
         if not self.pending_import_id:
+            return
+        if not supports_formal_evaluation(self.pending_import_standard_id):
+            self.pending_import_id = None
+            self.import_commit_button.setEnabled(False)
+            self.import_status.setText(self._excel_scope_rejection())
+            QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
             return
         if self.pending_import_standard_id is not None:
             reason = self._gb29446_rule_incompatibility(self.pending_import_standard_id)
@@ -2290,6 +2612,13 @@ class MainWindow(QMainWindow):
             return
         try:
             draft = self.context.application.commit_workbook(self.pending_import_id)
+            # 与「确认导入并评价」同一门禁：正式评价范围之外的不得经 Excel 生成正式记录。
+            if not supports_formal_evaluation(getattr(draft.request, "standard_id", None)):
+                self.pending_import_id = None
+                self.import_commit_button.setEnabled(False)
+                self.import_status.setText(self._excel_scope_rejection())
+                QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
+                return
             self.calculate_evaluation(draft.request)
             self.pending_import_id = None
             self.import_commit_button.setEnabled(False)
@@ -2303,7 +2632,7 @@ class MainWindow(QMainWindow):
             row = self.package_history_table.rowCount()
             self.package_history_table.insertRow(row)
             values = (
-                entry.installed_at.strftime("%Y-%m-%d %H:%M:%S"),
+                format_local_datetime(entry.installed_at),
                 entry.data_version,
                 mode_labels.get(entry.package_mode, entry.package_mode),
                 entry.parent_package_id or "—",
@@ -2322,7 +2651,15 @@ class MainWindow(QMainWindow):
         for entry in self.context.application.list_audit(500):
             row = self.audit_table.rowCount()
             self.audit_table.insertRow(row)
-            for column, value in enumerate((entry.created_at, entry.action, entry.entity_type, entry.entity_id, entry.details_json)):
+            for column, value in enumerate(
+                (
+                    format_local_datetime(entry.created_at),
+                    entry.action,
+                    entry.entity_type,
+                    entry.entity_id,
+                    entry.details_json,
+                )
+            ):
                 self.audit_table.setItem(row, column, _item(value))
 
     def discover_standard_packages(self) -> None:
@@ -2543,45 +2880,103 @@ class MainWindow(QMainWindow):
         self.diagnostics_content = content
         dialog.open()
 
-    def open_selected_standard(self) -> None:
-        row = self.standard_table.currentRow()
-        if row < 0:
-            return
-        standard_id = self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
-        standard = next(
-            (item for item in self.context.application.list_library_standards() if item.id == standard_id),
-            None,
-        )
-        if standard is None:
-            return
-        source = self.context.application.find_standard_source(standard_id)
-        if source is None:
-            QMessageBox.warning(
+    # ------------------------------------------------------------------
+    # 官方来源（ECQ-RS05 §四）：普通界面只打开已登记的官方页面
+    # ------------------------------------------------------------------
+
+    def open_official_source(self, standard_id: str | None) -> bool:
+        """打开 ``standard_id`` 已登记的官方标准来源页面。
+
+        这是普通界面唯一的“查看标准原文”实现：地址只来自
+        :func:`uebench.application.official_sources.official_source_url`，不做任何
+        运行时检索、拼接或猜测，也**不打开本机 PDF**。未登记地址时如实拒绝并提示
+        :data:`NO_OFFICIAL_SOURCE_LABEL`。
+        """
+
+        url = official_source_url(standard_id) if standard_id else None
+        if url is None:
+            QMessageBox.information(
                 self,
-                "原文缺失或不匹配",
-                "本机标准库中未找到与该标准版本 SHA-256 一致的PDF；请先安装包含该原文的标准包。",
+                "官方来源",
+                f"{NO_OFFICIAL_SOURCE_LABEL}。可在{OFFICIAL_SOURCE_PLATFORM_NAME}"
+                f"（{OFFICIAL_SOURCE_PLATFORM_HOME}）自行检索该标准。",
             )
+            return False
+        QDesktopServices.openUrl(QUrl(url))
+        return True
+
+    def open_selected_standard(self) -> None:
+        """标准库：打开所选标准的官方来源页面（不再打开本机 PDF）。"""
+
+        standard_id = self._selected_library_standard_id()
+        if standard_id is None:
+            QMessageBox.warning(self, "未选择", "请先在标准库中选择一个标准。")
             return
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(source)))
+        self.open_official_source(standard_id)
 
     def open_selected_standard_for_evaluation(self) -> None:
+        """新建评价页 / 标准依据：打开当前所选标准的官方来源页面。"""
+
         standard_id = self.eval_standard.currentData()
         if not standard_id:
-            QMessageBox.warning(self, "未选择标准", "请先选择标准后再打开原文。")
+            QMessageBox.warning(self, "未选择标准", "请先选择标准后再查看标准原文。")
             return
-        source = self.context.application.find_standard_source(
-            standard_id,
-            evaluation_date=date.today(),
-            selection_mode=self._selection_mode(),
-        )
-        if source is None:
-            QMessageBox.warning(
-                self,
-                "原文缺失或不匹配",
-                "本机标准库中未找到与该标准版本 SHA-256 一致的PDF；请先安装包含该原文的标准包。",
+        self.open_official_source(standard_id)
+
+    # ------------------------------------------------------------------
+    # 从标准库进入「新建评价」（ECQ-RS05 §六/§七）
+    # ------------------------------------------------------------------
+
+    def start_formal_evaluation(self) -> None:
+        """首页「开始正式评价」：进入新建评价并选中正式评价范围内的标准。"""
+
+        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        if not evaluable:
+            QMessageBox.information(
+                self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。"
             )
             return
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(source)))
+        self.open_evaluation_for_standard(evaluable[0].id)
+
+    def start_evaluation_for_selected_standard(self) -> None:
+        """标准库「用该标准新建评价」：只有正式评价范围内的标准可用。"""
+
+        standard_id = self._selected_library_standard_id()
+        if standard_id is None:
+            QMessageBox.warning(self, "未选择", "请先在标准库中选择一个标准。")
+            return
+        self.open_evaluation_for_standard(standard_id)
+
+    def open_evaluation_for_standard(self, standard_id: str | None) -> bool:
+        """在「新建评价」中选中 ``standard_id``；范围之外的标准不提供评价入口。
+
+        返回 ``True`` 表示已经带着该标准进入「新建评价」页面。
+        """
+
+        if not supports_formal_evaluation(standard_id):
+            QMessageBox.information(
+                self,
+                FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+                f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，本版本不能发起正式评价；"
+                "标准原文仍可在标准库中查看。",
+            )
+            return False
+        current_mode = self.eval_selection_mode.findData(StandardSelectionMode.CURRENT.value)
+        if current_mode >= 0 and self.eval_selection_mode.currentIndex() != current_mode:
+            self.eval_selection_mode.setCurrentIndex(current_mode)
+        self.refresh_standard_combo()
+        combo_index = self.eval_standard.findData(standard_id)
+        if combo_index < 0:
+            QMessageBox.warning(
+                self,
+                "标准不可用",
+                "该标准当前不在可正式评价的标准列表中，请先更新标准数据后重试。",
+            )
+            return False
+        self.eval_standard.setCurrentIndex(combo_index)
+        self._standard_changed()
+        self.navigation.setCurrentRow(2)
+        return True
 
 
 def create_main_window(context: AppContext) -> MainWindow:

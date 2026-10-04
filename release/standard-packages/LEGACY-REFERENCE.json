@@ -10,7 +10,17 @@
     "size": 21320540,
     "data_version": "2026.09-published.2",
     "package_id": "initial-47-current-plus-history-published-20260909",
-    "role": "2026.10-published.3 的父基线；仅用于复核“只替换 GB29446 定义（r1→r2）”"
+    "role": "2026.10-published.3 的父基线；仅用于复核“只替换 GB29446 定义（r1→r2）”。对当前固定包（2026.10-published.4）而言是**间接**祖先，逐字节对比请用 source_bearing_predecessor。"
+  },
+  "source_bearing_predecessor": {
+    "relative_path": "superseded-packages/SUPERSEDED-2026-10-05-before-source-free/initial-standard-package-2026.10-published.3.uebench",
+    "file_name": "initial-standard-package-2026.10-published.3.uebench",
+    "sha256": "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0",
+    "size": 21322203,
+    "data_version": "2026.10-published.3",
+    "package_id": "gb29446-r2-from-2026.09-published.2",
+    "status": "SUPERSEDED",
+    "role": "当前固定包 2026.10-published.4 的**直接**父基线（含 sources/*）。仅用于复核“只移除 sources/*，其余逐字节不变”。它是最后一个随包分发标准原文的包，自 0.2.0 起不再随产品分发。"
   },
   "user_library": {
     "relative_path": "user-library/UEBench-reviewed-202608",

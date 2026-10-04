@@ -181,3 +181,48 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - 历史便携 ZIP 缺失仍是已知发布资产问题；具体执行证据见对应 PR，不据此宣布 Windows 最终交付完成。
 
 本任务停在 RS05 候选阶段，未开始 RS06。
+
+## Phase 7 收口进度（进行中，未验收）
+
+> 本节为**追加**记录，不改写上文历史。上文关于 `2026.10-published.3` 的叙述是其时事实；
+> 自本轮起，**当前正式标准包已变更为不含标准 PDF 的 `2026.10-published.4`**。
+
+### 新正式标准包（去 PDF，provenance-only）
+
+| 项目 | 值 |
+|---|---|
+| `package_id` | `gb29446-r2-provenance-only-from-2026.10-published.3` |
+| `data_version` | `2026.10-published.4`（排序晚于 `.3`） |
+| `minimum_app_version` | `0.2.0` |
+| size / SHA256 | 132,837 B / `023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff` |
+| 标准 / 规则 | 48 / 765（业务内容不变） |
+| 成员 | 48 × `definitions/*.json` + `corrections.json` + manifest + signature；**0** 个 `sources/*`、**0** 个 PDF |
+
+- 去 PDF 方式：manifest 新增自描述字段 `source_policy ∈ {"embedded","provenance-only"}`，
+  **默认 `embedded`** —— 因此所有历史/归档包仍按原语义校验，legacy 读取兼容未被破坏。
+- 定义 provenance（`source_file` / `source_sha256` / `source_references`）**保留**，
+  仅不再分发原文文件；`install()` 因而不再把 PDF 写入用户数据目录。
+- 逐字节证据（对归档基线以 `--verify-only` 复核）：
+  `removed_source_count=48, added=[], changed=[], unchanged_member_count=49` ——
+  48 个定义与 `corrections.json` 逐字节一致，仅 `manifest.json` / `signature.ed25519` 变化。
+- 旧 `2026.10-published.3` 已按既有规则归档为 SUPERSEDED / REFERENCE ONLY。
+- 新增 Gate：`tools/audit_release.py` 的 `no_standard_pdf` 一节 + Artifact Gate 四项
+  （发布目录 / 标准包 / 便携 ZIP / payload 清单均不得出现标准 PDF 或 `sources/*`）。
+
+### 支持范围 / 官方来源 / 时间显示（基础模块已完成）
+
+- `application/evaluation_support.py`：单一软件评价支持范围 = `{"gb-29446-2019"}`，
+  **不读 `publication_status`**（有 AST 守卫测试）。
+- `application/official_sources.py`：仅固定常量，**一个已核实**官方地址
+  `https://std.samr.gov.cn/gb/search/gbDetailed?id=9A0A4FA998CDD4A5E05397BE0A0AD02D`
+  （两次独立抓取 HTTP 200、内容与本仓标准快照逐项吻合）；其余标准一律未登记。
+- `ui/presentation.py`：`naive → UTC → 系统本地时区`，显示 `YYYY-MM-DD HH:MM:SS`、无微秒。
+
+### 尚未完成（因此本轮不构成完成报告）
+
+UI 收口（标准库信息结构 / 新建评价页 / 时间显示接入 / 声明原文入口）、
+release 文档中"当前包为 .3 / 48 项标准"表述的统一更新、重建 Candidate、
+Source/Artifact Gate + RS04 Golden + self-check + Numeric v1 + N01-A + Generic Excel +
+legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实产品链人工验证。
+**注意**：`dist/release` 仍是用旧包构建的 Candidate，新增"无 PDF"断言对它必然失败，
+必须重建后才转绿（不得以删断言或 skip 掩盖）。

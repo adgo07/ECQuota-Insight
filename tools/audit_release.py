@@ -20,6 +20,12 @@ ECQ-RS05 changed four things here:
    payload manifest.  The audited directory's Candidate identity is read from
    that document, so a Candidate release directory is audited under its own
    Candidate file names instead of being compared against formal-release names.
+5. **No standard PDF anywhere.**  ``no_standard_pdf`` is a first-class audited
+   fact: a formal delivery must contain no ``*.pdf`` at all — not as a candidate
+   artifact, not in the portable ZIP, not in the payload manifest, and the
+   standard package must ship no ``sources/*`` member.  The product's owner
+   decision for 0.2.0 is that full standard原文 must not be distributed, stored
+   or opened, so a single PDF here is an error, not a warning.
 """
 
 from __future__ import annotations
@@ -486,10 +492,11 @@ def _audit_standard_package(package: Path) -> tuple[dict[str, Any], list[str]]:
         return report, errors
     try:
         with zipfile.ZipFile(package) as archive:
+            names = archive.namelist()
             manifest = json.loads(archive.read("manifest.json"))
             definitions = [
                 json.loads(archive.read(name))
-                for name in archive.namelist()
+                for name in names
                 if name.startswith("definitions/") and name.endswith(".json")
             ]
         current = [d for d in definitions if d.get("lifecycle_status", "active") != "obsolete"]
@@ -499,13 +506,26 @@ def _audit_standard_package(package: Path) -> tuple[dict[str, Any], list[str]]:
             for definition in current
             for product in definition.get("products", [])
         )
+        source_members = sorted(name for name in names if name.startswith("sources/"))
+        pdf_members = sorted(name for name in names if name.lower().endswith(".pdf"))
+        source_entries = sorted(
+            entry.get("path")
+            for entry in (manifest.get("files") or [])
+            if isinstance(entry, dict) and entry.get("kind") == "source"
+        )
         report = {
             "standard_count": manifest.get("standard_count"),
             "rule_count": manifest.get("rule_count"),
             "data_version": manifest.get("data_version"),
+            "package_id": manifest.get("package_id"),
+            "source_policy": manifest.get("source_policy", "embedded"),
             "current_standard_count": len(current),
             "historical_standard_count": len(history),
             "current_rule_count": expected_current_rules,
+            "source_member_count": len(source_members),
+            "pdf_member_count": len(pdf_members),
+            "source_manifest_entry_count": len(source_entries),
+            "manifest_member_count": len(names),
         }
         if not isinstance(manifest.get("standard_count"), int) or not isinstance(
             manifest.get("rule_count"), int
@@ -514,6 +534,88 @@ def _audit_standard_package(package: Path) -> tuple[dict[str, Any], list[str]]:
     except Exception as exc:
         errors.append(f"标准包无法读取：{exc}")
     return report, errors
+
+
+def _audit_no_standard_pdf(
+    root: Path, names: dict[str, str], package_report: dict[str, Any]
+) -> dict[str, Any]:
+    """ECQ-RS05 —— 正式交付不得包含任何标准原文 PDF。
+
+    Four independent places are checked, because any one of them alone can miss a
+    leak: the release directory tree, the standard package archive, the portable
+    ZIP, and the payload manifest's own file list.
+    """
+    errors: list[str] = []
+
+    release_pdfs = sorted(
+        str(path.relative_to(root)).replace("\\", "/")
+        for path in root.rglob("*")
+        if path.is_file() and path.suffix.lower() == ".pdf"
+    )
+    if release_pdfs:
+        errors.append(
+            f"正式交付目录包含 PDF 文件（0.2.0 不得分发标准原文）："
+            f"{release_pdfs[:5]}（共 {len(release_pdfs)}）"
+        )
+
+    source_member_count = int(package_report.get("source_member_count") or 0)
+    source_entry_count = int(package_report.get("source_manifest_entry_count") or 0)
+    package_pdf_count = int(package_report.get("pdf_member_count") or 0)
+    if package_report and (source_member_count or source_entry_count or package_pdf_count):
+        errors.append(
+            "正式标准包仍包含标准原文："
+            f"sources/* 成员 {source_member_count} 个、清单 source 条目 {source_entry_count} 条、"
+            f"PDF 成员 {package_pdf_count} 个；标准包必须为 source_policy=provenance-only"
+        )
+
+    portable_pdfs: list[str] = []
+    portable = root / names["portable"]
+    if portable.is_file():
+        try:
+            with zipfile.ZipFile(portable) as archive:
+                portable_pdfs = sorted(
+                    info.filename.replace("\\", "/")
+                    for info in archive.infolist()
+                    if not info.is_dir() and info.filename.lower().endswith(".pdf")
+                )
+        except zipfile.BadZipFile as exc:
+            errors.append(f"便携包无法读取，无法核对 PDF：{exc}")
+    if portable_pdfs:
+        errors.append(
+            f"便携包含 PDF 文件：{portable_pdfs[:5]}（共 {len(portable_pdfs)}）"
+        )
+
+    manifest_pdfs: list[str] = []
+    manifest_path = root / names["payload_manifest"]
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_pdfs = sorted(
+                str(entry.get("path"))
+                for entry in (manifest.get("files") or [])
+                if isinstance(entry, dict)
+                and str(entry.get("path", "")).lower().endswith(".pdf")
+            )
+        except Exception as exc:  # noqa: BLE001 - reported as an audit error
+            errors.append(f"{names['payload_manifest']} 无法解析，无法核对 PDF：{exc}")
+    if manifest_pdfs:
+        errors.append(
+            f"payload 清单登记了 PDF 文件：{manifest_pdfs[:5]}（共 {len(manifest_pdfs)}）"
+        )
+
+    return {
+        "release_pdf_count": len(release_pdfs),
+        "release_pdfs": release_pdfs[:5],
+        "package_source_member_count": source_member_count,
+        "package_source_manifest_entry_count": source_entry_count,
+        "package_pdf_member_count": package_pdf_count,
+        "portable_pdf_count": len(portable_pdfs),
+        "portable_pdfs": portable_pdfs[:5],
+        "payload_manifest_pdf_count": len(manifest_pdfs),
+        "payload_manifest_pdfs": manifest_pdfs[:5],
+        "clean": not errors,
+        "errors": errors,
+    }
 
 
 def audit_release(
@@ -587,6 +689,9 @@ def audit_release(
     package_report, package_errors = _audit_standard_package(root / names["standard_package"])
     errors.extend(package_errors)
 
+    pdf_report = _audit_no_standard_pdf(root, names, package_report)
+    errors.extend(pdf_report["errors"])
+
     # Legacy reference material: reported, never a PASS condition.
     legacy_present = [name for name in LEGACY_FILES if (root / name).exists()]
 
@@ -599,6 +704,7 @@ def audit_release(
         "payload": payload_report,
         "build_info": build_info_report,
         "published_package": package_report,
+        "no_standard_pdf": {key: value for key, value in pdf_report.items() if key != "errors"},
         "legacy_reference_only": {
             "files_present": legacy_present,
             "correctness_basis": False,

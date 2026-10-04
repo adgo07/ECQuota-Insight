@@ -312,6 +312,84 @@ def test_audit_release_reports_valid(artifact_dir: Path) -> None:
         "tools/audit_release.py 审计失败：\n" + "\n".join(report.get("errors", []))
     )
     assert report["legacy_reference_only"]["correctness_basis"] is False
+    assert report["no_standard_pdf"]["clean"] is True, (
+        "audit_release 的 no_standard_pdf 检查未通过："
+        + json.dumps(report["no_standard_pdf"], ensure_ascii=False)
+    )
+
+
+# --------------------------------------------------------------------------
+# 3b. ECQ-RS05 —— no standard PDF in a formal Candidate (owner decision 0.2.0)
+# --------------------------------------------------------------------------
+
+
+def test_release_directory_contains_no_pdf_anywhere(
+    artifact_dir: Path, names: dict[str, str]
+) -> None:
+    """A Candidate must not distribute standard原文: no ``*.pdf`` at all.
+
+    The check is recursive and excludes nothing, so a PDF dropped next to the
+    package, into a subfolder, or under the payload tree is caught.  The standard
+    package itself is one of the files scanned here, which is exactly the leak
+    this gate exists for.
+    """
+    pdfs = sorted(
+        str(path.relative_to(artifact_dir)).replace("\\", "/")
+        for path in artifact_dir.rglob("*")
+        if path.is_file() and path.suffix.lower() == ".pdf"
+    )
+    assert not pdfs, (
+        f"Candidate 目录包含 {len(pdfs)} 个 PDF（0.2.0 不得分发标准原文）：{pdfs[:5]}"
+    )
+    assert names["standard_package"] in {path.name for path in artifact_dir.iterdir()}
+
+
+def test_standard_package_contains_no_sources_member(
+    artifact_dir: Path, names: dict[str, str]
+) -> None:
+    """The shipped standard package must be source_policy=provenance-only."""
+    package = artifact_dir / names["standard_package"]
+    assert package.is_file(), f"缺少标准包：{package}"
+    with zipfile.ZipFile(package) as archive:
+        members = [info.filename for info in archive.infolist() if not info.is_dir()]
+        manifest = json.loads(archive.read("manifest.json"))
+    source_members = sorted(name for name in members if name.startswith("sources/"))
+    assert not source_members, (
+        f"标准包仍包含 sources/* 成员：{source_members[:5]}（共 {len(source_members)}）"
+    )
+    assert not [name for name in members if name.lower().endswith(".pdf")]
+    source_entries = [
+        entry for entry in manifest.get("files", []) if entry.get("kind") == "source"
+    ]
+    assert not source_entries, f"标准包清单仍登记 source 条目：{source_entries[:5]}"
+    assert manifest.get("source_policy") == "provenance-only", (
+        f"标准包必须声明 source_policy=provenance-only，实际 {manifest.get('source_policy')!r}"
+    )
+
+
+def test_portable_zip_contains_no_pdf_member(
+    portable_members: list[str],
+) -> None:
+    offenders = sorted(
+        member for member in portable_members if Path(member).suffix.lower() == ".pdf"
+    )
+    assert not offenders, (
+        f"便携包含 PDF 成员：{offenders[:5]}（共 {len(offenders)}）"
+    )
+
+
+def test_payload_manifest_lists_no_pdf(
+    artifact_dir: Path, names: dict[str, str]
+) -> None:
+    manifest = json.loads(
+        (artifact_dir / names["payload_manifest"]).read_text(encoding="utf-8")
+    )
+    offenders = sorted(
+        str(entry.get("path"))
+        for entry in manifest["files"]
+        if str(entry.get("path", "")).lower().endswith(".pdf")
+    )
+    assert not offenders, f"payload 清单登记了 PDF：{offenders[:5]}（共 {len(offenders)}）"
 
 
 # --------------------------------------------------------------------------

@@ -11,8 +11,10 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import QApplication, QLabel, QMessageBox
 
+from uebench.application.official_sources import NO_OFFICIAL_SOURCE_LABEL, official_source_url
 from uebench.bootstrap import create_context
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import Grade, InputMode, InputValue, StandardDefinition, parse_decimal
@@ -25,9 +27,40 @@ ROOT = Path(__file__).parents[1]
 GB29446_STANDARD_PATH = ROOT / "data" / "definitions" / "gb-29446-2019.json"
 
 
+@pytest.fixture(autouse=True)
+def _silence_dialogs(monkeypatch):
+    """任何可达的模态框都必须被截获，否则 offscreen 运行会永久卡在嵌套事件循环。
+
+    普通流程确实会弹提示（校验失败、范围拒绝、来源不可用……）。这里统一把三个静态
+    入口置为无操作；关心提示文字的用例在自己的测试体内重新 patch，仍然拿到真实文本。
+    """
+
+    for name in ("warning", "information", "critical"):
+        monkeypatch.setattr(QMessageBox, name, staticmethod(lambda *args, **kwargs: QMessageBox.Ok))
+    yield
+
+
 def _gb29446_standard() -> StandardDefinition:
     return StandardDefinition.model_validate_json(GB29446_STANDARD_PATH.read_text(encoding="utf-8"))
 
+
+
+@pytest.fixture(autouse=True)
+def _silence_message_boxes(monkeypatch):
+    """No modal box may ever block a headless run.
+
+    Phase 7 added rejection paths that call ``QMessageBox.warning`` (standard
+    outside the formal evaluation scope, no registered official source, source
+    hash mismatch, record cannot be re-evaluated).  A real modal box runs a
+    nested Qt event loop, which hangs pytest indefinitely.  Neutralise all three
+    statics here; a test that needs to assert a dialog re-patches the specific
+    static inside itself, so its expectation still holds.
+    """
+    for _name in ("warning", "information", "critical"):
+        monkeypatch.setattr(
+            QMessageBox, _name, staticmethod(lambda *a, **k: QMessageBox.Ok)
+        )
+    yield
 
 def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkeypatch) -> None:
     application = QApplication.instance() or QApplication([])
@@ -388,6 +421,14 @@ def test_gb29446_discovery_to_new_evaluation(reference_window):
 
 @pytest.mark.parametrize("entry", ["library", "evaluation"])
 def test_gb29446_source_open_verifies_test_file_hash(tmp_path: Path, monkeypatch, entry):
+    """普通界面「查看标准原文」只打开已登记的官方来源页面（RS05 §四）。
+
+    变更前：界面先按本机原文的 SHA-256 校验，再打开本机 PDF。
+    变更后：普通界面只打开 :mod:`uebench.application.official_sources` 中预登记的官方
+    页面，绝不产生 ``file://`` 地址或 ``.pdf``；应用层来源服务（``find_standard_source``）
+    仍然保留并继续按 SHA-256 校验本机原文——本机确实存在一份 hash 吻合的 PDF，普通界面
+    依然不打开它。未登记官方来源的标准则禁用控件并如实显示“官方来源地址尚未登记”。
+    """
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "source-appdata")
     original = _gb29446_standard()
@@ -403,30 +444,80 @@ def test_gb29446_source_open_verifies_test_file_hash(tmp_path: Path, monkeypatch
                 reference.source_sha256 = standard.source_sha256
     context.standards.install(standard)
     window = MainWindow(context)
-    opened, warnings, calls = [], [], []
-    monkeypatch.setattr("uebench.ui.main_window.QDesktopServices.openUrl", lambda url: opened.append(url.toLocalFile()) or True)
+    opened, warnings, informations, calls = [], [], [], []
+    monkeypatch.setattr("uebench.ui.main_window.QDesktopServices.openUrl", lambda url: opened.append(url) or True)
     monkeypatch.setattr(QMessageBox, "warning", lambda _parent, _title, message: warnings.append(message))
+    monkeypatch.setattr(QMessageBox, "information", lambda _parent, _title, message: informations.append(message))
+    monkeypatch.setattr(QMessageBox, "critical", lambda _parent, _title, message: pytest.fail(f"意外严重提示：{message}"))
     find_source = context.application.find_standard_source
     def observed_source(standard_id, **kwargs):
         calls.append((standard_id, kwargs))
         return find_source(standard_id, **kwargs)
     monkeypatch.setattr(context.application, "find_standard_source", observed_source)
+    official = official_source_url(standard.id)
     try:
-        window.standard_table.selectRow(0)
-        open_source = window.open_selected_standard if entry == "library" else window.open_selected_standard_for_evaluation
+        # 应用层来源服务仍然保留：本机原文与该版本 SHA-256 吻合时照旧解析到它。
+        assert official is not None and QUrl(official).host() == "std.samr.gov.cn"
         assert find_source(standard.id) == source.resolve()
-        open_source()
-        assert [Path(path) for path in opened] == [source.resolve()]
-        assert calls[0][0] == standard.id
         if entry == "evaluation":
-            assert calls[0][1]["evaluation_date"] == date.today()
+            assert find_source(standard.id, evaluation_date=date.today()) == source.resolve()
+
+        # 普通界面打开的是**已登记的官方页面**，不是本机原文。
+        window.standard_table.selectRow(0)
+        assert window.standard_table.item(0, 0).data(Qt.ItemDataRole.UserRole) == standard.id
+        calls.clear()
+        open_source = window.open_selected_standard if entry == "library" else window.open_selected_standard_for_evaluation
+        open_source()
+        assert [url.toString() for url in opened] == [official]
+        for url in opened:
+            assert url.scheme() == "https"
+            assert url.isLocalFile() is False
+            assert url.host() == "std.samr.gov.cn"
+            assert "file://" not in url.toString().lower()
+            assert ".pdf" not in url.toString().lower()
+        assert calls == [], "普通界面不再查询/打开本机原文"
+        assert warnings == [] and informations == []
+
+        # 本机原文失配只影响应用层来源服务；普通界面的官方来源入口不依赖本机文件。
         source.write_bytes(b"wrong hash for the selected standard")
         assert find_source(standard.id) is None
         open_source()
-        assert len(opened) == 1
-        assert warnings and "未找到" in warnings[-1]
+        assert [url.toString() for url in opened] == [official, official]
+        assert calls == []
+        assert warnings == [] and informations == []
         assert original.source_file == "28.GB 29446-2019选煤电力消耗限额.pdf"
         assert original.source_sha256 == "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d"
+
+        if entry == "library":
+            # 未登记官方来源的标准：控件禁用、如实显示未登记，并且不打开任何地址。
+            unregistered = standard.model_copy(deep=True, update={
+                "id": "gb-29446-2019-unregistered-source",
+                "number": "GB 29446-2019（未登记官方来源）",
+                "standard_family_id": "GB 29446-UNREGISTERED",
+            })
+            context.standards.install(unregistered)
+            window.refresh_standards()
+            row = next(
+                index
+                for index in range(window.standard_table.rowCount())
+                if window.standard_table.item(index, 0).data(Qt.ItemDataRole.UserRole) == unregistered.id
+            )
+            official_column = next(
+                column
+                for column in range(window.standard_table.columnCount())
+                if window.standard_table.horizontalHeaderItem(column).text() == "官方来源"
+            )
+            assert official_source_url(unregistered.id) is None
+            assert window.standard_table.item(row, official_column).text() == NO_OFFICIAL_SOURCE_LABEL
+            window.standard_table.clearSelection()
+            window.standard_table.setCurrentCell(-1, -1)
+            window.standard_table.selectRow(row)
+            application.processEvents()
+            assert window.standard_official_status.text() == NO_OFFICIAL_SOURCE_LABEL
+            assert window.standard_official_button.isEnabled() is False
+            window.standard_official_button.click()
+            assert [url.toString() for url in opened] == [official, official]
+            assert warnings == [] and informations == []
     finally:
         window.close()
         context.database.dispose()
