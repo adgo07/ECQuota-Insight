@@ -61,10 +61,12 @@ from uebench.domain.models import (
     InputMode,
     InputValue,
     PublicationStatus,
+    RECORD_CORRUPTED_LABEL,
     SelectionLevel,
     StandardSelectionMode,
     ProductionLine,
     StandardDefinition,
+    StorageCorruptionError,
 )
 
 
@@ -1642,14 +1644,20 @@ class MainWindow(QMainWindow):
             values = [
                 record.created_at,
                 record.evaluation_date,
-                f"{record.standard_number} {record.standard_title}",
+                f"{record.standard_number} {record.standard_title}".strip(),
                 record.organization_name,
                 record.project_name,
-                record.product_name,
+                record.product_name or "",
             ]
             for column, value in enumerate(values):
                 cell = _item(value)
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
+                if record.is_corrupted and column == 5:
+                    # Explicit degradation: the row stays visible and states why
+                    # its stored conclusion cannot be shown, instead of looking
+                    # like a normal record.
+                    cell.setText(f"{RECORD_CORRUPTED_LABEL}（{record.corruption_reason}）")
+                    cell.setToolTip(record.corruption_reason)
                 self.record_table.setItem(row, column, cell)
 
     def _selected_record_id(self) -> str | None:
@@ -1662,7 +1670,13 @@ class MainWindow(QMainWindow):
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
             return
-        loaded = self.context.application.get_evaluation(evaluation_id)
+        try:
+            loaded = self.context.application.get_evaluation(evaluation_id)
+        except StorageCorruptionError as exc:
+            # Corrupted storage is not a deletion: never reuse the "不存在" wording
+            # and never blame the user's input data.
+            QMessageBox.warning(self, RECORD_CORRUPTED_LABEL, str(exc))
+            return
         if loaded is None:
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
@@ -1757,7 +1771,11 @@ class MainWindow(QMainWindow):
         dialog.open()
 
     def open_evaluation_standard_source(self, evaluation_id: str) -> None:
-        path = self.context.application.find_evaluation_standard_source(evaluation_id)
+        try:
+            path = self.context.application.find_evaluation_standard_source(evaluation_id)
+        except StorageCorruptionError as exc:
+            QMessageBox.warning(self, RECORD_CORRUPTED_LABEL, str(exc))
+            return
         if path is None:
             QMessageBox.warning(self, "原文不可用", "原评价标准原文当前不可用。")
             return
@@ -1859,7 +1877,11 @@ class MainWindow(QMainWindow):
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
             return
-        loaded = self.context.application.get_evaluation(evaluation_id)
+        try:
+            loaded = self.context.application.get_evaluation(evaluation_id)
+        except StorageCorruptionError as exc:
+            QMessageBox.warning(self, RECORD_CORRUPTED_LABEL, str(exc))
+            return
         if loaded is None:
             QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
             return
@@ -2003,7 +2025,12 @@ class MainWindow(QMainWindow):
         self.import_status.setText("评价已完成并保存记录。")
         self.refresh_all()
         if result.standard_id == GB29446_STANDARD_ID:
-            request = self.context.application.get_evaluation(result.evaluation_id)
+            try:
+                request = self.context.application.get_evaluation(result.evaluation_id)
+            except StorageCorruptionError:
+                # A record saved by this very process is corrupt on disk; the
+                # calculation result stays on screen and no detail is fabricated.
+                request = None
             if request is not None:
                 self._show_gb29446_result(request[0], result)
 

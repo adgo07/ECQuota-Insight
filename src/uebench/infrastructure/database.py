@@ -2,13 +2,34 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from datetime import date, datetime, timezone
+import logging
 from pathlib import Path
 import sys
-from typing import Iterator
+from typing import TYPE_CHECKING, Iterator
 
+from alembic import command
+from alembic.config import Config
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from alembic.util.exc import CommandError
 from sqlalchemy import Date, DateTime, ForeignKey, Index, Integer, String, Text, create_engine, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+
+if TYPE_CHECKING:  # pragma: no cover - import cycle guard
+    from .paths import AppPaths
+
+logger = logging.getLogger(__name__)
+
+MANAGED_TABLES = frozenset(
+    {
+        "standards",
+        "evaluations",
+        "audit_log",
+        "standard_packages",
+        "import_batches",
+    }
+)
 
 
 class Base(DeclarativeBase):
@@ -110,8 +131,10 @@ class ImportBatchRow(Base):
 
 
 class DatabaseManager:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, paths: "AppPaths | None" = None) -> None:
         self.path = path.resolve()
+        self.paths = paths
+        self.last_migration_backup: Path | None = None
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.engine = create_engine(f"sqlite:///{self.path.as_posix()}", future=True)
         event.listen(self.engine, "connect", self._configure_sqlite)
@@ -125,9 +148,17 @@ class DatabaseManager:
         cursor.execute("PRAGMA synchronous=FULL")
         cursor.close()
 
-    def initialize(self) -> None:
-        from alembic import command
-        from alembic.config import Config
+    def initialize(self, *, allow_pre_migration_backup: bool = True) -> Path | None:
+        """Bring the schema to the Alembic head, backing the database up first.
+
+        A pre-migration backup is written *only* when a real schema change is
+        pending (or when a complete legacy database is about to be adopted).
+        A database that is already at head is never backed up again, so repeated
+        launches do not fill ``backups/`` with identical copies.
+
+        Returns the path of the pre-migration backup, or ``None`` when no backup
+        was needed.  The same value is kept on ``last_migration_backup``.
+        """
 
         # PyInstaller 6 one-folder builds may expose ``_MEIPASS`` as either
         # the collected ``_internal`` directory or the application folder,
@@ -156,28 +187,92 @@ class DatabaseManager:
         # adopt: stamp the initial migration instead of attempting to create
         # tables that already exist.  Partial databases are refused so we do
         # not silently mask a damaged or incompatible data directory.
-        managed_tables = {
-            "standards",
-            "evaluations",
-            "audit_log",
-            "standard_packages",
-            "import_batches",
-        }
         existing_tables = set(inspect(self.engine).get_table_names())
         needs_stamp = False
-        if managed_tables.issubset(existing_tables):
+        if MANAGED_TABLES.issubset(existing_tables):
             if "alembic_version" not in existing_tables:
                 needs_stamp = True
             else:
                 with self.engine.connect() as connection:
                     has_version = connection.execute(text("SELECT 1 FROM alembic_version LIMIT 1")).first()
                 needs_stamp = has_version is None
+        script = ScriptDirectory.from_config(config)
+        self.last_migration_backup = (
+            self._create_pre_migration_backup(script)
+            if allow_pre_migration_backup
+            else None
+        )
         if needs_stamp:
             # 旧版无Alembic标记的完整数据库按0001接管，再执行增量迁移；
             # 若生命周期字段已经存在，则直接标记为最新，避免重复加列。
             standard_columns = {column["name"] for column in inspect(self.engine).get_columns("standards")}
             command.stamp(config, "head" if "lifecycle_status" in standard_columns else "0001")
         command.upgrade(config, "head")
+        return self.last_migration_backup
+
+    def current_revision(self) -> str | None:
+        """Return the applied Alembic revision, or ``None`` when unknown.
+
+        ``None`` means "no usable ``alembic_version`` marker" (fresh database,
+        pre-Alembic database) or "marker not present in this script directory".
+        Both cases are treated as a pending migration.
+        """
+
+        with self.engine.connect() as connection:
+            context = MigrationContext.configure(connection)
+            return context.get_current_revision()
+
+    def script_head(self, script: ScriptDirectory) -> str | None:
+        head = script.get_current_head()
+        return str(head) if head is not None else None
+
+    def _create_pre_migration_backup(self, script: ScriptDirectory) -> Path | None:
+        """Back the database up when ``command.upgrade`` is about to change it."""
+
+        if not self.path.exists():
+            logger.info("数据库尚不存在，跳过迁移前备份：%s", self.path)
+            return None
+        existing_tables = set(inspect(self.engine).get_table_names())
+        if not existing_tables.intersection(MANAGED_TABLES):
+            logger.info("数据库尚无业务表，跳过迁移前备份：%s", self.path)
+            return None
+        try:
+            current = self.current_revision()
+        except CommandError as exc:
+            logger.warning("无法读取数据库当前版本，将按需迁移：%s", exc)
+            current = None
+        try:
+            head = self.script_head(script)
+        except CommandError as exc:
+            logger.warning("无法读取迁移脚本目标版本，将执行迁移：%s", exc)
+            head = None
+        if current is not None and current == head:
+            logger.info("数据库已在迁移目标版本 %s，无需迁移前备份", current)
+            return None
+        backup_path = self._pre_migration_backup_path()
+        # Reuse the sqlite online backup API through BackupService so the
+        # snapshot is transactionally consistent: copying the live
+        # ``.sqlite3``/``-wal``/``-shm`` files directly can lose committed
+        # data or capture a torn database.
+        from .backup import BackupService
+
+        logger.info(
+            "检测到数据库迁移（当前版本 %s → 目标版本 %s），创建迁移前备份：%s",
+            current if current is not None else "无标记",
+            head if head is not None else "未知",
+            backup_path,
+        )
+        return BackupService(self.paths, self).create(backup_path)
+
+    def _pre_migration_backup_path(self) -> Path:
+        """Resolve ``backups/pre-migration-{YYYYmmdd-HHMMSS}.uebackup``."""
+
+        if self.paths is not None:
+            backups_dir = self.paths.backups
+        else:
+            backups_dir = self.path.parent / "backups"
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        return backups_dir / f"pre-migration-{stamp}.uebackup"
 
     @contextmanager
     def session(self) -> Iterator[Session]:

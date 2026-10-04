@@ -38,7 +38,7 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`；GB29446 Excel Adapter = `COMPLETE`；**GB29446 Product Golden = `ADOPTED (v1)`**。RS01 / RS02 / RS03 / RS04 已完成，验收载体分别为 PR #9、PR #10、PR #11、PR #12。**Reference Standard 产品证据 = `READY FOR RS05 WINDOWS ACCEPTANCE`**；尚欠 Windows V1 最终验收。详见 `参考标准开发路线.md` 与 `docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`。
+当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`；GB29446 Excel Adapter = `COMPLETE`；**GB29446 Product Golden = `ADOPTED (v1)`**。RS01 / RS02 / RS03 / RS04 已完成（验收载体 PR #9–#12）。**RS05 = IN PROGRESS / RELEASE CANDIDATE**（验收载体 PR #13）：正在构建 `UEBench 0.2.0` Windows Release Candidate。**Reference Standard 产品证据 = `READY FOR RS05 WINDOWS ACCEPTANCE`**；尚欠 Windows V1 最终验收。详见 `参考标准开发路线.md` 与 `docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`。
 
 > `READY FOR RS05 WINDOWS ACCEPTANCE` **不等于“可发布”**；Windows 正式交付证据尚未建立。
 
@@ -74,7 +74,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Windows V1 最终验收与发布                     NOT STARTED  ← 下一阶段
+→ RS05 Windows V1 最终验收与发布                     IN PROGRESS / RELEASE CANDIDATE  ← 当前阶段
 → RS06 第二标准架构验证                              NOT STARTED
 ```
 
@@ -95,17 +95,21 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - `ECQ-STD-GB29446-001` —— 状态 `PROVISIONAL`，见 `STANDARD_ISSUES_REGISTER.md`。
   RS04 **未关闭**该问题，也**未**写成官方解释。
 
-**RS05 Release Gate（RS04 登记，未修复）**：
+**RS05 已修复（RS04 登记的 Release Gate）**：
 
-- corrupted historical `result_json` 会使 `list_recent()` 整体失败
-  （`src/uebench/infrastructure/repositories.py:293` 无异常隔离）。
-  分类 `LOCAL DEFECT`，须在 RS05 Windows 正式交付前处理；
-  详见 [`docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`](docs/golden/GB29446_PRODUCT_GOLDEN_V1.md) §11.2。
+- corrupted historical `result_json`：RS05 已按行隔离反序列化，单条损坏记录降级显示并记录 WARNING，
+  不再中断“评价记录”页、首页或应用启动；detail 明确提示“记录损坏”。
+
+**RS05 Blocker 状态**：
+
+- 已关闭：内置标准包的 GB29446 落后问题已按批准的方案 B 修复（父基线只替换该定义并重新签名，`2026.10-published.3`；RS04 Golden 15/15、冻结自检 exit 0）。以下为由环境决定的未关闭项：`n- （原 Blocker）内置正式标准包 `2026.09-published.2` 的 GB29446 定义落后于当前源码（包内 `rule_revision=1`、无煤种维度），
+  导致“Candidate 安装后用 RS04 Golden 重新验证 GB29446”无法通过；详见 `release/standard-packages/PIN.json`。
+- Windows 验收证据不完整：无 Windows 11 环境、单显示器，无法实测多 DPI 与跨屏拖动（如实记为 BLOCKED）。
 
 ## 9. 下一步
 
 - `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；
-- 下一阶段 = **`RS05` — Windows V1 最终验收与发布**（`NOT STARTED`）；RS06 未开始；
+- 当前阶段 = **`RS05` — Windows V1 最终验收与发布**（`IN PROGRESS / RELEASE CANDIDATE`）；RS06 未开始；
 - RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；RS02 生命周期 Gate：`tests/test_gb29446_record_lifecycle.py`；RS03 Excel Adapter Gate：`tests/test_gb29446_excel_adapter.py`；**RS04 Product Golden Gate：`tests/test_gb29446_product_golden.py`**；
 - Golden v1 数据：`tests/golden/gb29446_product_golden_v1.json`；说明：`docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`；
 - Golden 使用白名单业务投影比较，**禁止** `result.model_dump_json() == expected`；expected 由标准原文 / Definition / Numeric Contract 独立推导，**不得**由软件输出反向生成；
@@ -114,7 +118,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - Request / Result / Rule Snapshot 历史模型与 evaluate() 保存语义保持兼容；Calculator、Numeric、阈值、标准解释与数据库 Schema 不变；
 - 验收载体：RS03 = PR #11；RS04 = PR #12；旧便携 ZIP 缺失仍是已知历史发布资产问题。
 
-本任务停在 RS04，未开始 RS05。Reference Standard Product Closure 仍为 `PARTIAL`。
+本任务停在 RS05 候选阶段，未开始 RS06。Reference Standard Product Closure 仍为 `PARTIAL`。
 
 ## 10. 历史材料索引
 

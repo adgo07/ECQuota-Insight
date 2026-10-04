@@ -20,13 +20,20 @@ binaries.extend(
     if path.name not in {"shiboken6.abi3.dll"}
     and not path.name.lower().startswith(("qt6webengine", "qt6webview"))
 )
+# ECQ-RS05: the standard package is bundled from a PINNED, tracked release
+# input rather than from dist/.  A clean checkout has no dist/ directory, so
+# reading it from there made a reproducible build impossible.  The pinned copy
+# is byte-identical to the published asset and its hash is locked by
+# release/standard-packages/PIN.json.  Keep the relative path as one canonical
+# string so the Source Gate can audit it.
+STANDARD_PACKAGE_RELATIVE_PATH = (
+    "release/standard-packages/initial-standard-package-published.uebench"
+)
+
 datas = [
     (str(project_root / "migrations"), "migrations"),
     (str(project_root / "src" / "uebench" / "resources"), "uebench/resources"),
-    (
-        str(project_root / "dist" / "standard-packages" / "initial-standard-package-published.uebench"),
-        "uebench/resources",
-    ),
+    (str(project_root / STANDARD_PACKAGE_RELATIVE_PATH), "uebench/resources"),
 ]
 
 a = Analysis(

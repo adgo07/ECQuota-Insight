@@ -100,23 +100,10 @@ jobs:
           New-Item -ItemType Directory -Force work | Out-Null
           python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-full
 
-      - name: Verify all tests except the proven release asset failure
+      - name: Verify all tests
         shell: pwsh
         run: |
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-clean `
-            --deselect tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu
-
-      - name: Prove excluded release failure exists on actual PR base
-        if: github.event_name == 'pull_request'
-        shell: pwsh
-        run: |
-          git worktree add ../numeric-v1-base ${{ github.event.pull_request.base.sha }}
-          Push-Location ../numeric-v1-base
-          python -m pytest tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu -q -p no:cacheprovider
-          $releaseExit = $LASTEXITCODE
-          if ($releaseExit -ne 1) { throw "Unexpected base exit for frozen-release test: $releaseExit" }
-          Pop-Location
-          exit 0
+          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-clean
 
       - name: Record resolved Numeric dependency versions
         shell: pwsh
@@ -127,4 +114,4 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "On pull requests the release failure is independently proven on the actual PR base; all other tests must pass."
+          Write-Host "Release-asset checks now live in the Source Gate (tests/test_release_source.py) and the Artifact Gate (tests/test_release_artifacts.py, enabled by UEBENCH_ARTIFACT_DIR); neither is deselected here."

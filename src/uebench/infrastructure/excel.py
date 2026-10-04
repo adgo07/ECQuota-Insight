@@ -1436,6 +1436,11 @@ class WorkbookExportService:
         self.audit = audit or evaluations.audit
 
     def export(self, evaluation_id: str, path: Path) -> Path:
+        # A record whose stored payload no longer parses propagates
+        # ``StorageCorruptionError`` from the repository untouched.  Its message is
+        # Chinese and names the corruption, so the UI reports a storage defect
+        # instead of the generic "check your input data and units" wording that
+        # ``_friendly_error`` produces for ASCII-only library messages.
         loaded = self.evaluations.get(evaluation_id)
         if loaded is None:
             raise LookupError("评价记录不存在")

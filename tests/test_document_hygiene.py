@@ -16,11 +16,19 @@ def test_user_facing_documents_have_no_hidden_control_characters() -> None:
             assert line == line.rstrip(), (path, number)
 
 
+#: Recognised lifecycle states for a stage.  ``IN PROGRESS / RELEASE CANDIDATE``
+#: was added in ECQ-RS05: a release-candidate phase is genuinely neither DONE nor
+#: NOT STARTED, and the RS05 mandate requires exactly this wording in the stable
+#: documents.  Keeping it in one place preserves the cross-document consistency
+#: check that is the real value of this test.
+_STATE = r"(DONE|NOT STARTED|PARTIAL|BLOCKED|IN PROGRESS / RELEASE CANDIDATE)"
+
+
 def _stage_states(content: str) -> dict[str, str]:
     states = {}
     for line in content.splitlines():
-        table = re.match(r"^\| (RS0[1-6]) \| \x60(DONE|NOT STARTED|PARTIAL|BLOCKED)\x60 \|", line)
-        flow = re.match(r"^(?:→ )?(ECQ-GOV01|RS0[1-6]) .*?\s+(DONE|NOT STARTED|PARTIAL|BLOCKED)(?:\s|$)", line)
+        table = re.match(r"^\| (RS0[1-6]) \| \x60" + _STATE + r"\x60 \|", line)
+        flow = re.match(r"^(?:→ )?(ECQ-GOV01|RS0[1-6]) .*?\s+" + _STATE + r"(?:\s|$)", line)
         match = table or flow
         if match:
             stage, state = match.groups()

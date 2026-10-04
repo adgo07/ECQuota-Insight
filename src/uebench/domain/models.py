@@ -473,7 +473,14 @@ class IndicatorResult(StrictModel):
 
 
 class EvaluationSummary(StrictModel):
-    """UI-neutral summary of a saved evaluation record."""
+    """UI-neutral summary of a saved evaluation record.
+
+    ``is_corrupted`` marks a stored row whose saved payload can no longer be read
+    back.  The record is deliberately kept in the list and explicitly degraded
+    instead of being dropped: silently hiding it would disguise storage damage as
+    a normal deletion.  Only the columns that do not depend on the unreadable
+    payload are shown for such a row.
+    """
 
     evaluation_id: str
     created_at: datetime
@@ -485,6 +492,8 @@ class EvaluationSummary(StrictModel):
     product_name: str = ""
     organization_name: str | None = None
     project_name: str | None = None
+    is_corrupted: bool = False
+    corruption_reason: str = ""
 
 
 class PackageHistoryEntry(StrictModel):
@@ -531,6 +540,22 @@ class EvaluationResult(StrictModel):
     results: list[IndicatorResult]
     rule_snapshot_sha256: str
     warnings: list[str] = Field(default_factory=list)
+
+
+#: User-facing marker for a stored record whose saved payload no longer parses.
+RECORD_CORRUPTED_LABEL = "记录损坏"
+
+
+class StorageCorruptionError(RuntimeError):
+    """A persisted record exists but its stored payload can no longer be read.
+
+    This is deliberately separate from ``None``: ``Repository.get`` returns
+    ``None`` for a missing or soft-deleted record, while a row that is present
+    but unreadable raises.  Callers must therefore never treat storage damage as
+    a deletion, and must never fall back to recomputing the missing business
+    facts.  The message always contains ``损坏`` so that the UI can report
+    corruption instead of blaming the user's input data.
+    """
 
 
 def parse_decimal(value: Scalar, *, field_name: str) -> Decimal:
