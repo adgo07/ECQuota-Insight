@@ -192,6 +192,37 @@ def git_provenance(root: Path | None = None) -> tuple[str | None, bool]:
     return source_commit(base), source_dirty(base)
 
 
+def verified_source_commit(explicit: str | None = None, root: Path | None = None) -> str:
+    """Return the commit that the built tree REALLY is at, refusing a mismatch.
+
+    ECQ-RS05 provenance blocker: an explicitly supplied commit used to *win*
+    outright, so a Candidate could be named and stamped ``rc-<some other commit>``
+    while its bytes came from the current HEAD — with ``source_dirty = false``,
+    because dirtiness is measured against the real tree.  Every identity field was
+    present and self-consistent, yet the identity was not bound to the source.
+
+    The only defensible rule is: an explicit commit is accepted **only** if it
+    equals ``git rev-parse HEAD``.  Anything else is a refusal, not a warning.
+    """
+    head = source_commit(root)
+    if head is None:
+        raise ValueError(
+            "无法确定当前提交（git rev-parse HEAD 失败）；候选身份必须绑定真实源码提交。"
+        )
+    if explicit is None or not str(explicit).strip():
+        return head
+    candidate = str(explicit).strip().lower()
+    if not SOURCE_COMMIT_RE.match(candidate):
+        raise ValueError(f"显式提交必须是 40 位小写十六进制：{explicit!r}")
+    if candidate != head:
+        raise ValueError(
+            "显式提交与当前 git HEAD 不一致，拒绝生成身份："
+            f"显式={candidate}，HEAD={head}。候选身份必须绑定被构建的实际提交；"
+            "若确实要构建另一个提交，请先 checkout 到该提交。"
+        )
+    return head
+
+
 # --------------------------------------------------------------------------
 # diagnostic blocks
 # --------------------------------------------------------------------------
@@ -492,13 +523,11 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
+        commit = verified_source_commit(args.source_commit)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
-    commit = args.source_commit or source_commit()
-    if commit is not None:
-        commit = commit.strip().lower()
     dirty = source_dirty()
 
     if dirty and args.require_clean and not args.allow_dirty:

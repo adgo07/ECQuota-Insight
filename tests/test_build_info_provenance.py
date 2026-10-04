@@ -369,6 +369,9 @@ def test_dirty_tree_is_recorded_with_allow_dirty(
     tmp_path: Path,
     candidate_names: dict[str, str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: True)
     manifest = _manifest_file(tmp_path, candidate_names, TREE_SHA256)
     output = tmp_path / candidate_names["build_info"]
@@ -389,6 +392,9 @@ def test_formal_run_refuses_a_dirty_tree(
     tmp_path: Path,
     candidate_names: dict[str, str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: True)
     manifest = _manifest_file(tmp_path, candidate_names, TREE_SHA256)
     output = tmp_path / candidate_names["build_info"]
@@ -406,6 +412,9 @@ def test_clean_tree_passes_the_formal_run(
     candidate_names: dict[str, str],
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
     manifest = _manifest_file(tmp_path, candidate_names, TREE_SHA256)
     output = tmp_path / candidate_names["build_info"]
@@ -424,6 +433,9 @@ def test_embedded_identity_is_written_to_the_payload_before_the_manifest(
     tmp_path: Path,
     candidate_names: dict[str, str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
     payload = tmp_path / "dist" / "UEBench"
     payload.mkdir(parents=True)
@@ -459,6 +471,9 @@ def test_embedded_identity_is_refused_without_a_commit(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """An untraceable payload must fail instead of embedding a hollow identity."""
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
     payload = tmp_path / "dist" / "UEBench"
     payload.mkdir(parents=True)
@@ -482,6 +497,9 @@ def test_active_marker_is_written_for_a_clean_candidate(
     version: str,
     candidate_names: dict[str, str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
     manifest = _manifest_file(tmp_path, candidate_names, TREE_SHA256)
     marker_path = tmp_path / "ACTIVE-CANDIDATE.json"
@@ -519,6 +537,9 @@ def test_active_marker_is_refused_on_a_dirty_tree(
     tmp_path: Path,
     candidate_names: dict[str, str],
 ) -> None:
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: True)
     manifest = _manifest_file(tmp_path, candidate_names, TREE_SHA256)
     marker = tmp_path / "ACTIVE-CANDIDATE.json"
@@ -548,6 +569,9 @@ def test_active_marker_is_refused_without_the_payload_digest(
     candidate_names: dict[str, str],
 ) -> None:
     """ACTIVE means "this payload tree"; without the digest it means nothing."""
+    # ECQ-RS05：显式提交必须等于真实 HEAD。这些用例用合成提交 COMMIT，
+    # 因此把模块的 HEAD 也固定为 COMMIT，其余契约保持不变。
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
     monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
     marker = tmp_path / "ACTIVE-CANDIDATE.json"
     rc = write_build_info.main(
@@ -720,10 +744,24 @@ def _build_release_dir(
     names = release_version.artifact_names(version, candidate_id)
     root.mkdir(parents=True, exist_ok=True)
 
+    # ECQ-RS05 溯源：候选必须在**载荷内部**携带完整身份，否则外部声明可被单独
+    # 改写而不被发现。这里的字段必须与下面写出的 release-build-info.json 一致。
+    package_bytes = _standard_package_bytes()
+    embedded_identity = {
+        "schema": "ecq.build-identity.v1",
+        "product_version": version,
+        "candidate_id": candidate_id,
+        "source_commit": COMMIT,
+        "source_dirty": False,
+        "standard_package_id": "pkg-synthetic",
+        "standard_data_version": "2026.10-published.3",
+        "standard_package_sha256": _sha256(package_bytes),
+        "build_time_utc": BUILT_AT,
+    }
     payload_files = {
         "UEBench.exe": b"MZ" + b"\x00" * 64,
         "_internal/uebench/resources/build-identity.json": json.dumps(
-            {"schema": "ecq.build-identity.v1", "candidate_id": candidate_id}
+            embedded_identity, ensure_ascii=False
         ).encode("utf-8"),
     }
     entries = _payload_entries(payload_files)
@@ -754,7 +792,6 @@ def _build_release_dir(
     (root / names["release_notes"]).write_text("# notes\n", encoding="utf-8")
     (root / names["delivery_list"]).write_text("# list\n", encoding="utf-8")
 
-    package_bytes = _standard_package_bytes()
     (root / names["standard_package"]).write_bytes(package_bytes)
 
     info: dict[str, Any] = {

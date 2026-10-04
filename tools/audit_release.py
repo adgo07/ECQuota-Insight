@@ -72,6 +72,25 @@ REQUIRED_BUILD_INFO_KEYS: tuple[str, ...] = (
 SOURCE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
+#: Where the build identity lives INSIDE the portable payload.  Its presence there
+#: is what makes the external declaration tamper-evident: the file is part of the
+#: payload pinned by ``payload_tree_sha256``, which ``SHA256SUMS.txt`` pins in turn.
+EMBEDDED_IDENTITY_MEMBER = "UEBench/_internal/uebench/resources/build-identity.json"
+
+#: Fields the embedded identity must agree on with ``release-build-info.json``.
+EMBEDDED_IDENTITY_KEYS: tuple[str, ...] = (
+    "product_version",
+    "candidate_id",
+    "source_commit",
+    "source_dirty",
+    "standard_package_id",
+    "standard_data_version",
+    "standard_package_sha256",
+)
+
+#: The single-ACTIVE-Candidate marker (ECQ-RS05 §十一).
+ACTIVE_MARKER_NAME = "ACTIVE-CANDIDATE.json"
+
 
 def release_candidate_id(root: Path, build_info_name: str) -> str | None:
     """Candidate identity declared by the directory itself (``None`` = formal).
@@ -320,8 +339,133 @@ def _audit_build_info(
         "authenticode_signed": info.get("authenticode_signed"),
         "unsigned_reason": info.get("unsigned_reason"),
         "built_at": info.get("built_at"),
+        # Raw document, so the identity-binding cross-check reads the same values
+        # rather than a projection that might quietly drop a field.
+        "info": info,
         "errors": errors,
     }
+
+
+def _audit_identity_binding(
+    root: Path, names: dict[str, str], info: dict[str, Any]
+) -> dict[str, Any]:
+    """Cross-check that the identity is bound to the actual source and payload.
+
+    ECQ-RS05 provenance blocker: the audit verified that every field was PRESENT
+    and internally consistent, but never compared the three places the identity is
+    actually declared:
+
+    1. the external ``release-build-info.json`` (and the ACTIVE marker),
+    2. the ``rc-<short7>`` prefix carried by the artifact FILE NAMES,
+    3. the ``build-identity.json`` EMBEDDED INSIDE the portable payload.
+
+    So editing only the external document (and refreshing the checksums) passed
+    every gate while the Candidate still shipped the old commit's bytes.  Fields +
+    hashes + green CI do not by themselves prove the binding; the binding has to be
+    asserted.  Because (3) lives inside the payload that ``payload_tree_sha256``
+    pins, and that digest is itself pinned by ``SHA256SUMS.txt``, agreement across
+    the three closes the loop.
+    """
+    errors: list[str] = []
+    commit = info.get("source_commit")
+    candidate = info.get("candidate_id")
+    report: dict[str, Any] = {"embedded": None, "filename_prefix": None}
+
+    if not (isinstance(commit, str) and SOURCE_COMMIT_RE.match(commit)):
+        return {"errors": [], "note": "source_commit 非法，已由 build_info 审计报错"}
+
+    # A formal release cut has no candidate identity at all: its artifact names carry
+    # no ``-rc-`` suffix and there is nothing embedded to cross-check.  Demanding a
+    # candidate identity here would wrongly fail every formal directory.
+    if candidate is None:
+        formal_errors: list[str] = []
+        for key in ("portable", "installer", "source"):
+            name = names.get(key)
+            if name and re.search(r"-rc-[0-9a-f]{7,40}", name):
+                formal_errors.append(
+                    f"正式发布目录的文件名不得携带候选标识：{name}"
+                )
+        return {"errors": formal_errors, "formal": True, "embedded": None}
+
+    # --- 2. file-name prefix must be this commit ---------------------------
+    prefix = commit[:7]
+    report["filename_prefix"] = prefix
+    for key in ("portable", "installer", "source"):
+        name = names.get(key)
+        if not name:
+            continue
+        match = re.search(r"-rc-([0-9a-f]{7,40})", name)
+        if match is None:
+            errors.append(
+                f"交付文件名未携带候选标识（-rc-<short7>）：{name}；"
+                "候选构建的产物名必须唯一可区分"
+            )
+        elif commit.startswith(match.group(1)):
+            continue
+        elif isinstance(candidate, str) and match.group(1) != candidate[3:]:
+            errors.append(
+                f"{name} 的候选标识 rc-{match.group(1)} 与身份不一致："
+                f"source_commit 前缀为 {prefix}，candidate_id 为 {candidate!r}"
+            )
+        else:
+            errors.append(
+                f"{name} 的候选标识 rc-{match.group(1)} 与 source_commit 不一致：{commit}"
+            )
+
+    # --- 1 vs 3. external declaration vs payload-embedded identity ---------
+    portable = root / names["portable"]
+    embedded: dict[str, Any] | None = None
+    if not portable.is_file():
+        errors.append(f"缺少便携包，无法核对包内身份：{names['portable']}")
+    else:
+        try:
+            with zipfile.ZipFile(portable) as archive:
+                names_inside = archive.namelist()
+                if EMBEDDED_IDENTITY_MEMBER not in names_inside:
+                    errors.append(
+                        "便携包内缺少构建身份文件 "
+                        f"{EMBEDDED_IDENTITY_MEMBER}；正式候选必须把身份嵌入载荷，"
+                        "否则外部声明可被单独改写而不被发现"
+                    )
+                else:
+                    embedded = json.loads(archive.read(EMBEDDED_IDENTITY_MEMBER))
+        except (zipfile.BadZipFile, KeyError, json.JSONDecodeError) as exc:
+            errors.append(f"无法读取便携包内构建身份：{exc}")
+
+    if embedded is not None:
+        report["embedded"] = embedded
+        if not isinstance(embedded, dict):
+            errors.append("包内构建身份必须是 JSON 对象")
+        else:
+            for key in EMBEDDED_IDENTITY_KEYS:
+                external = info.get(key)
+                inside = embedded.get(key)
+                if inside != external:
+                    errors.append(
+                        f"包内构建身份的 {key} 与 {names['build_info']} 不一致："
+                        f"包内={inside!r}，外部={external!r}"
+                    )
+            if "payload_tree_sha256" in embedded:
+                errors.append(
+                    "包内构建身份不得包含 payload_tree_sha256：它描述整个载荷，"
+                    "不可能同时位于该载荷之内（应只写外部文档）"
+                )
+
+    # --- ACTIVE marker must repeat the same identity ----------------------
+    if ACTIVE_MARKER_NAME in {p.name for p in root.glob("*.json")}:
+        marker_path = root / ACTIVE_MARKER_NAME
+        try:
+            marker = json.loads(marker_path.read_text(encoding="utf-8"))
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{ACTIVE_MARKER_NAME} 无法解析：{exc}")
+        else:
+            for key in ("candidate_id", "source_commit", "payload_tree_sha256"):
+                if marker.get(key) != info.get(key):
+                    errors.append(
+                        f"{ACTIVE_MARKER_NAME} 的 {key} 与 {names['build_info']} 不一致："
+                        f"{marker.get(key)!r} != {info.get(key)!r}"
+                    )
+    return {"errors": errors, **report}
 
 
 def _manifest_tree_sha256(manifest_path: Path) -> str | None:
@@ -435,6 +579,10 @@ def audit_release(
 
     build_info_report = _audit_build_info(root, names["build_info"], names)
     errors.extend(build_info_report.get("errors", []))
+
+    identity_report = _audit_identity_binding(root, names, build_info_report.get("info") or {})
+    errors.extend(identity_report.get("errors", []))
+    build_info_report["identity_binding"] = identity_report
 
     package_report, package_errors = _audit_standard_package(root / names["standard_package"])
     errors.extend(package_errors)

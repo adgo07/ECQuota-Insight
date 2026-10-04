@@ -747,6 +747,68 @@ k=1.04），`E_d=1000, m=200 → e_d=5.2 → 超出3级`，正常出结果并保
 
 ---
 
+### 11.9 发布溯源缺陷：身份声明未与真实来源闭合（已修复）
+
+验收者报告的 blocker：Candidate 的字段齐全、哈希自洽、本次 CI 成功，
+但**身份并未与真实 source_commit 绑定**。两个独立缺口：
+
+**缺口 A：显式提交可以覆盖真实 HEAD。**
+`scripts/build_candidate.ps1` 的 `Resolve-SourceCommit` 与
+`tools/write_build_info.py` 的 `commit = args.source_commit or source_commit()`
+都让显式值**直接胜出**。独立实测：在当前干净 HEAD 下传入旧 Base SHA，
+`--require-clean` 仍然成功生成 `rc-fb91ccc` 身份并声明 `source_dirty=false`
+（因为"脏"是按真实工作树测量的）。
+
+修复：显式提交**只能确认** HEAD，不能替换它。不一致即拒绝（生成器 exit 2；
+三个构建脚本 throw）。`write_build_info.verified_source_commit()` 是唯一实现。
+
+**缺口 B：审计与 Artifact Gate 不做三方交叉核对。**
+`audit_release.py` 校验了字段齐备与文档内部自洽，却从未比较身份的**三个声明处**：
+
+1. 外部 `release-build-info.json`（与 ACTIVE 标记）；
+2. 交付**文件名**里的 `rc-<short7>` 前缀；
+3. **便携载荷内部**的 `_internal/uebench/resources/build-identity.json`。
+
+因此只改外部文档（并同步刷新校验和）即可通过全部 Gate，而候选实际仍携带旧提交的字节。
+独立负例：仅把外部 `source_commit` 改成旧 Base、同步校验和、保留 `rc-88b6f05`
+与包内当前 Head → 原为 `valid=true`。
+
+修复：新增 `_audit_identity_binding()`，要求三者一致，并且：
+
+- 候选包的便携包内**必须**存在内嵌身份（否则外部声明可被单独改写而不被发现）；
+- 内嵌身份须与外部文档在 `product_version` / `candidate_id` / `source_commit` /
+  `source_dirty` / `standard_package_id` / `standard_data_version` /
+  `standard_package_sha256` 上逐字段一致；
+- 内嵌身份**不得**含 `payload_tree_sha256`（它描述整个载荷，不可能同时位于该载荷内）；
+- 产物名必须携带 `-rc-<前缀>`，且前缀等于 `source_commit` 的前 7 位；
+- ACTIVE 标记须与外部文档在 `candidate_id` / `source_commit` / `payload_tree_sha256` 上一致；
+- **正式发布目录**（`candidate_id` 为 `null`）反过来要求文件名**不带**候选标识，且不做内嵌核对。
+
+由于 (3) 位于被 `payload_tree_sha256` 钉住的载荷之内、而该摘要又被 `SHA256SUMS.txt` 钉住，
+三者一致即形成闭合链条。**字段齐全 + 哈希一致 + CI 绿，本身不足以证明绑定；绑定必须被断言。**
+
+**修复后实测（负例脚本，`dist/release` 的临时副本）：**
+
+| 场景 | valid |
+|---|---|
+| 未改动的副本（对照） | `True` |
+| 负例 1：仅外部 `source_commit` 改成旧 Base（文件名与包内身份保持当前 Head） | **`False`**（报出文件名前缀不符、包内 `source_commit` 不符、ACTIVE 不符共 5 条） |
+| 负例 2：外部与文件名都改成旧 Base（包内身份仍为当前 Head） | **`False`** |
+
+**新增 Gate**：`tests/test_identity_binding.py`（19 项）——显式提交必须等于 HEAD
+（含 CLI 负例、格式负例）、不得写出任何文件；外部↔文件名前缀↔包内身份三方一致的
+正例与逐字段负例（对 7 个内嵌字段参数化）、缺失内嵌身份、内嵌身份误含
+`payload_tree_sha256`、ACTIVE 标记不一致、以及三个构建脚本不得再"原样采用"显式提交。
+
+### 11.10 报告计数口径更正
+
+此前把 **strict XFAIL 计入 skipped**，分类不准确。pytest 自己的汇总口径为
+**`failed` / `passed` / `skipped` / `xfailed` 分开统计**；JUnit XML 会把 xfail 编码为
+一个 `skipped` 元素，因此按 XML 统计会得到 65，而按 pytest 汇总应为
+**61 skipped + 4 xfailed**。本报告此后统一采用 pytest 口径，并在需要时同时给出 XML 口径。
+
+---
+
 ## 10. 状态
 
 ```text

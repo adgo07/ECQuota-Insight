@@ -69,22 +69,32 @@ Write-Host "使用 Python：$PythonExe"
 # name and the embedded build identity carry rc-<commit prefix>, and a Candidate
 # that claims to be formal must come from a clean checkout.
 function Resolve-SourceCommit {
+    # ECQ-RS05 发布溯源：显式提交**只能确认**当前 HEAD，不能替换它。
+    # 旧实现让 -SourceCommit 直接覆盖 git rev-parse HEAD，于是可以在一棵干净的
+    # 新源码树上生成 rc-<旧提交> 的身份并声明 source_dirty=false —— 字段齐全、
+    # 校验和自洽，却没有绑定真实来源。这里改为：显式值必须等于 HEAD，否则拒绝。
     param([string]$Explicit, [string]$Root)
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         throw "未找到 git；候选构建必须能追溯到精确提交。"
     }
-    $commit = $Explicit
-    if ([string]::IsNullOrWhiteSpace($commit)) {
-        $commit = (& git -C $Root rev-parse HEAD 2>$null | Select-Object -First 1)
+    $head = (& git -C $Root rev-parse HEAD 2>$null | Select-Object -First 1)
+    if ($null -ne $head) { $head = ([string]$head).Trim().ToLowerInvariant() }
+    if ([string]::IsNullOrWhiteSpace($head) -or $head -notmatch '^[0-9a-f]{40}$') {
+        throw "无法确定当前提交（git rev-parse HEAD）；候选构建必须能追溯到精确提交。"
     }
-    if ($null -ne $commit) { $commit = ([string]$commit).Trim() }
-    if ([string]::IsNullOrWhiteSpace($commit)) {
-        throw "无法确定源提交（git rev-parse HEAD）；请显式传入 -SourceCommit。"
+    if ([string]::IsNullOrWhiteSpace($Explicit)) {
+        return $head
     }
-    if ($commit -notmatch '^[0-9a-fA-F]{40}$') {
+    $commit = ([string]$Explicit).Trim().ToLowerInvariant()
+    if ($commit -notmatch '^[0-9a-f]{40}$') {
         throw "源提交必须是 40 位十六进制 SHA：$commit"
     }
-    return $commit.ToLowerInvariant()
+    if ($commit -ne $head) {
+        throw ("显式 -SourceCommit 与当前 git HEAD 不一致，拒绝构建：" +
+               "显式=$commit，HEAD=$head。候选身份必须绑定被构建的实际提交；" +
+               "若确实要构建另一个提交，请先 checkout 到该提交。")
+    }
+    return $head
 }
 
 function Test-SourceDirty {
