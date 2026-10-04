@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import logging
 from collections import Counter
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING
 from uuid import uuid4
+
+_LOGGER = logging.getLogger(__name__)
 
 from PySide6.QtCore import QDate, Qt, QUrl
 from PySide6.QtGui import QAction, QDesktopServices
@@ -586,7 +589,8 @@ class MainWindow(QMainWindow):
         add_product.clicked.connect(lambda: self._append_blank_row(self.production_table, [str(uuid4())[:8], "", "", "", "t", "1", "是", ""]))
         calculate = QPushButton("计算并判级")
         self.calculate_button = calculate
-        calculate.clicked.connect(self.calculate_evaluation)
+        # clicked 会传 checked(bool)；用无参 lambda 接线，避免它落进 request 参数。
+        calculate.clicked.connect(lambda: self.calculate_evaluation())
         buttons.addWidget(add_energy)
         buttons.addWidget(add_product)
         input_controls_layout.addLayout(buttons)
@@ -1553,7 +1557,32 @@ class MainWindow(QMainWindow):
             notes=notes,
         )
 
-    def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
+    def calculate_evaluation(
+        self, request: EvaluationRequest | None = None, checked: bool = False
+    ) -> None:
+        """计算并判级（GB 29446 专用页与通用页共用）。
+
+        ``QPushButton.clicked`` 会附带 ``checked: bool`` 作为第一个位置参数。本方法
+        的首个参数是**可选**的 ``EvaluationRequest``，所以 Qt 会把 ``False`` 当作
+        request 传进来；若不识别，就会在 ``request.standard_id`` 上抛
+        ``AttributeError``。该异常发生在下面的 ``try`` 之前，又会被 PySide6 吞掉，
+        于是用户只看到"点了没反应"——既没有结果也没有记录。这里显式把 Bool 当作
+        "没有请求"，并加一层兜底，保证槽函数永远不会静默失败。
+        """
+        if isinstance(request, bool):
+            # QPushButton.clicked(bool) 传来的勾选状态，不是评价请求。
+            request = None
+        try:
+            self._calculate_evaluation(request)
+        except Exception as exc:  # noqa: BLE001 - 兜底，绝不静默
+            _LOGGER.exception("计算评价时发生未预期错误")
+            QMessageBox.critical(
+                self,
+                "计算失败",
+                f"计算未完成（{type(exc).__name__}）。详细信息已写入日志，请重试。",
+            )
+
+    def _calculate_evaluation(self, request: EvaluationRequest | None) -> None:
         is_gb29446 = self._is_gb29446() if request is None else request.standard_id == GB29446_STANDARD_ID
         if is_gb29446:
             self._clear_gb29446_result()

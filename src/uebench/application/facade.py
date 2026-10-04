@@ -33,6 +33,15 @@ from .package_reconciliation import ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
 
 
+def _library_sort_key(definition: StandardDefinition) -> tuple[date, int, str]:
+    """Order installed revisions of one standard so the newest one wins.
+
+    Mirrors the repository's own ``desc(effective_date), desc(rule_revision)``
+    intent, but states it explicitly instead of depending on row order.
+    """
+    return (definition.effective_date, definition.rule_revision, definition.version)
+
+
 class ApplicationFacade:
     """UI-neutral application use cases shared by desktop and future adapters."""
 
@@ -86,9 +95,21 @@ class ApplicationFacade:
         never returned by the evaluation-selection methods.  This allows a
         newly added, pending-confirmation standard to be discoverable in the
         library without weakening the ``published`` calculation gate.
+
+        One entry per standard id is returned, and it must be the **newest rule
+        revision** of that standard.  A standard can legitimately have several
+        revisions installed at once (RS01 keeps superseded revisions so historic
+        evaluations stay reproducible), so collapsing them with a bare
+        ``{item.id: item}`` would silently keep whichever row the repository
+        happened to yield last -- the repository orders by ``desc(rule_revision)``,
+        so that was the *oldest* revision.  The library page and the diagnostics
+        view then reported the superseded rule as if it were the current one.
         """
-        installed = self._standards.list_all()
-        by_id = {item.id: item for item in installed}
+        by_id: dict[str, StandardDefinition] = {}
+        for item in self._standards.list_all():
+            current = by_id.get(item.id)
+            if current is None or _library_sort_key(item) > _library_sort_key(current):
+                by_id[item.id] = item
         for item in self._load_catalogue_standards():
             by_id.setdefault(item.id, item)
         return sorted(by_id.values(), key=lambda item: (item.number, item.effective_date, item.rule_revision))

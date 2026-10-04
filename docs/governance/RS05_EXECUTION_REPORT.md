@@ -691,6 +691,62 @@ UEBench-source-0.2.0-rc-<short7>.zip
 
 ---
 
+### 11.8 人工验收发现的两个真实缺陷（本轮修复）
+
+人工验收 packaged Candidate 时发现「计算并判级」完全无反应。定位到**两个独立真实缺陷**：
+
+**缺陷 A：按钮槽函数被 PySide6 传入的 bool 打崩，且异常被静默吞掉。**
+
+```python
+calculate.clicked.connect(self.calculate_evaluation)          # clicked(bool checked)
+def calculate_evaluation(self, request: EvaluationRequest | None = None)
+```
+
+`QPushButton.clicked` 会把 `checked: bool` 作为**第一个位置参数**传入；而
+`calculate_evaluation` 的首参是**可选**的 `EvaluationRequest`，于是 Qt 把 `False`
+当成 request 传了进来，`request.standard_id` 抛 `AttributeError`。该异常发生在方法
+自身 `try` **之前**，被 PySide6 吞掉，因此用户看到的是"点了完全没反应"——
+没有结果、没有对话框、没有评价记录。
+
+为什么既有测试没抓到：既有测试都**直接调用方法**（`window.calculate_evaluation()`），
+而 `request is None` 时才走正常分支；只有**经信号触发**才会暴露。这正是"必须真实经过
+产品链"的意义。我的运行期取证脚本同样直接调 facade，也没覆盖它。
+
+修复：
+- `calculate_evaluation(self, request=None, checked=False)`，`isinstance(request, bool)`
+  时视为"无请求"；
+- 接线改为无参 lambda，从源头避免 bool 落入 request；
+- 增加**兜底**：`_calculate_evaluation` 外包一层 `try/except`，任何未预期异常都记录日志
+  并弹出可见提示，**槽函数永不静默失败**（这类"静默无反应"本身就是缺陷）。
+
+**缺陷 B：标准库取到了被取代的旧修订。**
+
+`ApplicationFacade.list_library_standards` 用 `by_id = {item.id: item}` 折叠已安装修订，
+保留的是仓库返回的**最后一条**；而仓库按 `desc(rule_revision)` 排序，于是**最旧**的修订胜出。
+后果：标准库页显示 GB 29446 `rule_revision 1`（而非包内的 r2），
+诊断信息也报 `rule_revision: 1`，与"已安装包 = 2026.10-published.3"自相矛盾。
+
+修复：改为按 `(effective_date, rule_revision, version)` 显式取**最新**修订，
+不再依赖行顺序；`list_all_standards()` 仍返回全部历史行（49 行 = 48 标准 + GB29446 r1 历史行）。
+
+> 说明：标准库按"每个标准一条"展示，因此升级后条目数仍是 **48**（不是 49）；
+> 数据库内标准行数为 **49**。两者含义不同，已在文档中澄清。
+
+**一个曾被我误判的方向（如实记录）**：我最初的复现脚本驱动的是通用评价页的选择器，
+而不是 GB 29446 专用页的 `gb29446_coal_type`，导致状态不一致并报出
+「选煤工艺类型 不在允许选项中」。改用页面真实控件后确认：
+动力煤 + 干法选煤**是合法组合**（干法选煤在动力煤的 `choices` 与附录A k 表中，
+k=1.04），`E_d=1000, m=200 → e_d=5.2 → 超出3级`，正常出结果并保存记录。
+引擎按所选 product 作用域解析输入定义（`engine.py:313`），**不存在**该缺陷。
+
+**新增 Gate**：`tests/test_gb29446_evaluate_wiring.py`（9 项）——
+经**真实按钮信号**点击并断言"生成评价记录"、Bool 首参不得被当作请求、
+槽函数抛异常必须可见、标准库必须返回最新修订且每个标准一条、
+诊断信息的 `rule_revision` 必须与当前生效定义一致。
+（该文件的测试对全部消息框做 autouse 拦截，否则模态框会挂住无头测试。）
+
+---
+
 ## 10. 状态
 
 ```text
