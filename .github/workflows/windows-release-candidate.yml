@@ -49,19 +49,32 @@ jobs:
         shell: pwsh
         run: python -m compileall -q src tests tools
 
-      - name: Read the authoritative version and artifact names
+      - name: Read the authoritative version and the Candidate identity
         id: version
         shell: pwsh
         run: |
           python tools/release_version.py --check
           if ($LASTEXITCODE -ne 0) { throw "版本一致性校验失败。" }
           $version = (python tools/release_version.py --print).Trim()
-          $names = (python tools/release_version.py --names) -join "`n"
           if ([string]::IsNullOrWhiteSpace($version)) { throw "未取得产品版本。" }
+          # The Candidate identity comes from the EXACT checked-out head SHA, so
+          # the artifact names, the build info and this workflow cannot disagree
+          # about which commit was built.
+          $sourceCommit = (git rev-parse HEAD).Trim()
+          if ($sourceCommit -notmatch '^[0-9a-f]{40}$') { throw "无法取得精确的 head SHA：$sourceCommit" }
+          $candidateId = (python tools/release_version.py --source-commit $sourceCommit --print-candidate-id).Trim()
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($candidateId)) { throw "未取得候选标识。" }
+          $names = (python tools/release_version.py --names --source-commit $sourceCommit --candidate-id $candidateId) -join "`n"
+          if ($LASTEXITCODE -ne 0) { throw "未取得候选产物文件名。" }
           "version=$version" >> $env:GITHUB_OUTPUT
+          "source_commit=$sourceCommit" >> $env:GITHUB_OUTPUT
+          "candidate_id=$candidateId" >> $env:GITHUB_OUTPUT
           "names<<NAMES_EOF" >> $env:GITHUB_OUTPUT
           $names >> $env:GITHUB_OUTPUT
           "NAMES_EOF" >> $env:GITHUB_OUTPUT
+          Write-Host "Product version: $version"
+          Write-Host "Source commit: $sourceCommit"
+          Write-Host "Candidate id: $candidateId"
 
       - name: Install Inno Setup
         shell: pwsh
@@ -85,7 +98,7 @@ jobs:
 
       - name: Execute release source gate
         shell: pwsh
-        run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py -q -ra -p no:cacheprovider
+        run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py -q -ra -p no:cacheprovider
 
       - name: Execute literal full suite
         id: literal_full_suite
@@ -105,7 +118,71 @@ jobs:
           # launcher on the runner resolves to the newest installed Python
           # (for example 3.14), which has no pytest.  The script also prefers
           # pythonLocation on its own, so this is belt-and-braces.
-          scripts/build_candidate.ps1 -PythonExe "$env:pythonLocation\python.exe" -NamesJson $env:NAMES_JSON -OutputDir "dist/candidate"
+          #
+          # The exact head SHA and the Candidate identity derived from it are
+          # passed explicitly: the script re-derives both from git and refuses
+          # to assemble anything the two disagree about.
+          scripts/build_candidate.ps1 -PythonExe "$env:pythonLocation\python.exe" `
+            -NamesJson $env:NAMES_JSON -OutputDir "dist/candidate" `
+            -SourceCommit "${{ steps.version.outputs.source_commit }}" `
+            -CandidateId "${{ steps.version.outputs.candidate_id }}"
+          if ($LASTEXITCODE -ne 0) { throw "候选构建失败（含 Artifact Gate）。" }
+
+      - name: Verify Candidate provenance against the checked-out head SHA
+        shell: pwsh
+        env:
+          EXPECTED_COMMIT: ${{ steps.version.outputs.source_commit }}
+          EXPECTED_CANDIDATE: ${{ steps.version.outputs.candidate_id }}
+        run: |
+          # The whole point of Candidate identity (ECQ-RS05) is that an artifact
+          # can be traced to one exact commit.  Trusting the build to have done
+          # that is not the same as checking it, so this step fails the run when
+          # release-build-info.json / ACTIVE-CANDIDATE.json disagree with the
+          # head SHA this workflow actually checked out.
+          $headSha = (git rev-parse HEAD).Trim()
+          if ($env:EXPECTED_COMMIT -ne $headSha) {
+            throw "workflow 记录的 source_commit（$env:EXPECTED_COMMIT）与本次检出 head（$headSha）不一致。"
+          }
+          $info = Get-Content -LiteralPath dist/candidate/release-build-info.json -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($info.source_commit -cne $headSha) {
+            throw "release-build-info.json 的 source_commit（$($info.source_commit)）与精确检出 head（$headSha）不一致。"
+          }
+          if ($info.source_commit -cne $env:EXPECTED_COMMIT) {
+            throw "release-build-info.json 的 source_commit 与 workflow 记录的候选提交不一致。"
+          }
+          if ($info.source_dirty -ne $false) {
+            throw "release-build-info.json 声明 source_dirty=$($info.source_dirty)；正式候选必须来自干净检出。"
+          }
+          if ($info.candidate_id -cne $env:EXPECTED_CANDIDATE) {
+            throw "release-build-info.json 的 candidate_id（$($info.candidate_id)）与推导值不一致。"
+          }
+          $manifest = Get-Content -LiteralPath dist/candidate/payload-manifest.json -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($info.payload_tree_sha256 -cne $manifest.payload_tree_sha256) {
+            throw "release-build-info.json 的 payload_tree_sha256 与 payload-manifest.json 不一致。"
+          }
+          # §11 单一 ACTIVE Candidate: the assembled directory must name exactly
+          # one ACTIVE candidate, and it must be the one this workflow built.
+          $markerPath = "dist/candidate/ACTIVE-CANDIDATE.json"
+          if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
+            throw "候选目录缺少 ACTIVE-CANDIDATE.json：$markerPath"
+          }
+          $marker = Get-Content -LiteralPath $markerPath -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($marker.schema -ne "ecq.active-candidate.v1" -or $marker.status -ne "ACTIVE") {
+            throw "ACTIVE-CANDIDATE.json 的 schema/status 非法：$($marker.schema)/$($marker.status)"
+          }
+          if ($marker.candidate_id -cne $env:EXPECTED_CANDIDATE) {
+            throw "ACTIVE-CANDIDATE.json 的候选标识（$($marker.candidate_id)）与本次构建不一致。"
+          }
+          if ($marker.source_commit -cne $headSha) {
+            throw "ACTIVE-CANDIDATE.json 的 source_commit（$($marker.source_commit)）与精确检出 head 不一致。"
+          }
+          if ($marker.source_dirty -ne $false) {
+            throw "ACTIVE-CANDIDATE.json 必须声明 source_dirty=false。"
+          }
+          if ($marker.payload_tree_sha256 -cne $manifest.payload_tree_sha256) {
+            throw "ACTIVE-CANDIDATE.json 的 payload_tree_sha256 与 payload-manifest.json 不一致。"
+          }
+          Write-Host "Provenance verified: $headSha / $env:EXPECTED_CANDIDATE"
 
       - name: Verify the Candidate artifacts with the Artifact Gate
         shell: pwsh
@@ -117,16 +194,17 @@ jobs:
       - name: Upload Candidate artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: UEBench-Candidate-${{ steps.version.outputs.version }}-win-x64
+          name: UEBench-Candidate-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}-win-x64
           path: |
-            dist/candidate/UEBench-${{ steps.version.outputs.version }}-win-x64.zip
-            dist/candidate/UEBench-Setup-${{ steps.version.outputs.version }}-x64.exe
-            dist/candidate/UEBench-source-${{ steps.version.outputs.version }}.zip
+            dist/candidate/UEBench-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}-win-x64.zip
+            dist/candidate/UEBench-Setup-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}-x64.exe
+            dist/candidate/UEBench-source-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}.zip
             dist/candidate/initial-standard-package-published.uebench
             dist/candidate/GB29446选煤电力消耗限额导入模板.xlsx
             dist/candidate/SHA256SUMS.txt
             dist/candidate/payload-manifest.json
             dist/candidate/release-build-info.json
+            dist/candidate/ACTIVE-CANDIDATE.json
             dist/candidate/验收助手.ps1
             dist/candidate/验收助手.cmd
             dist/candidate/安装与发布说明-${{ steps.version.outputs.version }}.md
@@ -138,7 +216,16 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Product version: ${{ steps.version.outputs.version }}"
+          Write-Host "Source commit: ${{ steps.version.outputs.source_commit }}"
           Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
           Write-Host "Candidate directory: dist/candidate"
+          $markerPath = "dist/candidate/ACTIVE-CANDIDATE.json"
+          if (Test-Path -LiteralPath $markerPath -PathType Leaf) {
+            $marker = Get-Content -LiteralPath $markerPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            Write-Host "ACTIVE candidate: $($marker.status) $($marker.candidate_id) product_version=$($marker.product_version) source_commit=$($marker.source_commit) standard_data_version=$($marker.standard_data_version) payload_tree_sha256=$($marker.payload_tree_sha256)"
+          }
+          else {
+            Write-Host "ACTIVE candidate: (ACTIVE-CANDIDATE.json not found)"
+          }
           Get-ChildItem -LiteralPath dist/candidate -File | Sort-Object Name |
             ForEach-Object { Write-Host ("  {0,12}  {1}" -f $_.Length, $_.Name) }

@@ -150,6 +150,29 @@ ECQ-GOV01 治理清理与路线收口                        DONE
   **只登记，不修改任何标准数据**，应在后续独立任务中收口；
 - 历史列表 `result-json` 性能优化（RS02 deferred）仍未处理。
 
+## RS05 本轮补充：运行时标准包对账 与 Candidate 身份闭环
+
+- **已实现启动期标准包对账**（替代原“只要库里有标准就跳过”的一次性初始化）：
+  空库安装 / 已同包 NO-OP（不重复备份、不重复安装）/ 旧包安全升级 /
+  已装更新包不降级 / 同版本或内容冲突不覆盖并提示 / 内置包验签失败不安装。
+  版本排序复用既有 `_data_version_key`，未另造第二套版本算法。
+- **升级数据安全**：升级前用现有安全备份能力（`pre-package-<时间>.uebackup`），
+  安装单事务、失败回滚、不留半升级状态；历史评价及其规则快照不被新规则重算。
+- **GB29446 fail-fast**：当前定义缺少正式 r2 结构（煤种维度 / 工艺系数）时明确提示
+  「标准规则数据不完整或版本不兼容」、禁止正式计算，不再用产品名冒充煤种。
+- **Candidate 身份**：RC 阶段资产名与 CI artifact 名携带 `-rc-<short7>`；
+  `release-build-info.json` 记录 `product_version` / `candidate_id` / `source_commit`(40位) /
+  `source_dirty` / 标准包身份 / `payload_tree_sha256` / `build_time_utc`；
+  正式 Candidate 要求 `source_dirty=false`；CI 校验 `source_commit` 与 exact head 一致。
+- **应用内诊断**：菜单「帮助 → 关于 / 诊断信息…」可查看并复制产品版本、Candidate 身份、
+  源码提交、内置/已安装标准包 id 与数据版本、标准包 SHA256、GB29446 `rule_revision`、
+  DB schema、数据目录与最近一次对账结果。
+- **单一 ACTIVE Candidate**：旧的 `dist/candidate` 已归档为
+  `dist/archive/SUPERSEDED-candidate-2026-10-04-before-identity`（含 SHA256 证据）；
+  构建脚本在组装前清空输出目录并写入 `ACTIVE-CANDIDATE.json`。
+- 状态仍为 **`RS05 = IN PROGRESS / RELEASE CANDIDATE`**；`D-ECQ-006` 继续 OPEN；
+  `Reference Standard Product Closure = PARTIAL`。
+
 ## 下一步
 
 - `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；

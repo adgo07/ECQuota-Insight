@@ -119,8 +119,36 @@ def release_version() -> ModuleType:
 
 
 @pytest.fixture(scope="session")
-def names(release_version: ModuleType) -> dict[str, str]:
-    return release_version.artifact_names(release_version.project_version())
+def build_info(artifact_dir: Path, release_version: ModuleType) -> dict[str, Any]:
+    """The Candidate's own provenance document.
+
+    Every artifact name below is derived from *this* file's ``candidate_id``
+    (ECQ-RS05): a Candidate directory is verified under its Candidate names, and
+    a document that named the wrong identity would fail on the missing files
+    instead of passing against the formal-release names by accident.
+    """
+    name = release_version.artifact_names(release_version.project_version())["build_info"]
+    path = artifact_dir / name
+    assert path.is_file(), f"缺少 {name}：{path}"
+    info = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(info, dict), f"{name} 顶层必须是 JSON 对象"
+    return info
+
+
+@pytest.fixture(scope="session")
+def candidate_id(build_info: dict[str, Any]) -> str | None:
+    value = build_info.get("candidate_id")
+    assert value is None or isinstance(value, str), (
+        f"release-build-info.json 的 candidate_id 类型非法：{value!r}"
+    )
+    return value
+
+
+@pytest.fixture(scope="session")
+def names(
+    release_version: ModuleType, candidate_id: str | None
+) -> dict[str, str]:
+    return release_version.artifact_names(release_version.project_version(), candidate_id)
 
 
 @pytest.fixture(scope="session")
@@ -343,15 +371,103 @@ def test_installer_is_a_real_pe_binary(artifact_dir: Path, names: dict[str, str]
 
 
 def test_build_info_declares_an_unsigned_release(
-    artifact_dir: Path, names: dict[str, str]
+    build_info: dict[str, Any]
 ) -> None:
-    info = json.loads((artifact_dir / names["build_info"]).read_text(encoding="utf-8"))
-    assert info.get("authenticode_signed") is False, (
-        f"{names['build_info']} 必须声明 authenticode_signed = false"
+    assert build_info.get("authenticode_signed") is False, (
+        "release-build-info.json 必须声明 authenticode_signed = false"
     )
-    assert info.get("unsigned_reason") == UNSIGNED_REASON, (
-        f"{names['build_info']} 必须声明 unsigned_reason = {UNSIGNED_REASON}"
+    assert build_info.get("unsigned_reason") == UNSIGNED_REASON, (
+        f"release-build-info.json 必须声明 unsigned_reason = {UNSIGNED_REASON}"
     )
+
+
+def test_build_info_carries_the_full_candidate_provenance(
+    build_info: dict[str, Any], release_version: ModuleType, names: dict[str, str]
+) -> None:
+    """ECQ-RS05: a Candidate must be traceable to one exact commit."""
+    version = release_version.project_version()
+    for key in (
+        "product_version",
+        "candidate_id",
+        "source_commit",
+        "source_dirty",
+        "standard_package_id",
+        "standard_data_version",
+        "standard_package_sha256",
+        "payload_tree_sha256",
+        "build_time_utc",
+    ):
+        assert key in build_info, f"release-build-info.json 缺少溯源字段：{key}"
+    assert build_info["product_version"] == version
+    assert build_info["version"] == version
+    assert re.fullmatch(r"[0-9a-f]{40}", str(build_info["source_commit"])), (
+        f"source_commit 必须是 40 位小写十六进制：{build_info['source_commit']!r}"
+    )
+    assert build_info["source_dirty"] is False, "正式候选必须声明 source_dirty = false"
+    assert re.fullmatch(r"[0-9a-f]{64}", str(build_info["payload_tree_sha256"]))
+    assert re.fullmatch(r"[0-9a-f]{64}", str(build_info["standard_package_sha256"]))
+    if build_info["candidate_id"] is not None:
+        assert build_info["candidate_id"] in names["portable"]
+        assert build_info["candidate_id"] in names["installer"]
+        assert build_info["candidate_id"] in names["source"]
+
+
+# --------------------------------------------------------------------------
+# 6b. §11 — the ACTIVE Candidate marker
+# --------------------------------------------------------------------------
+
+
+ACTIVE_MARKER = "ACTIVE-CANDIDATE.json"
+
+
+@pytest.fixture(scope="session")
+def active_marker(artifact_dir: Path) -> dict[str, Any]:
+    path = artifact_dir / ACTIVE_MARKER
+    assert path.is_file(), (
+        f"候选目录缺少 {ACTIVE_MARKER}；§11 要求装配完成的候选目录声明唯一 ACTIVE 候选"
+    )
+    marker = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(marker, dict)
+    return marker
+
+
+def test_active_marker_declares_one_active_candidate(
+    active_marker: dict[str, Any], build_info: dict[str, Any], release_version: ModuleType
+) -> None:
+    assert active_marker.get("schema") == "ecq.active-candidate.v1"
+    assert active_marker.get("status") == "ACTIVE"
+    assert active_marker.get("candidate_id") == build_info.get("candidate_id")
+    assert active_marker.get("product_version") == release_version.project_version()
+    assert active_marker.get("source_commit") == build_info.get("source_commit")
+    assert re.fullmatch(r"[0-9a-f]{40}", str(active_marker.get("source_commit")))
+    assert active_marker.get("source_dirty") is False
+    assert active_marker.get("standard_package_id") == build_info.get("standard_package_id")
+    assert active_marker.get("standard_data_version") == build_info.get(
+        "standard_data_version"
+    )
+    assert active_marker.get("standard_package_sha256") == build_info.get(
+        "standard_package_sha256"
+    )
+    assert active_marker.get("assembled_at_utc")
+
+
+def test_active_marker_payload_tree_sha256_equals_the_manifest(
+    active_marker: dict[str, Any], artifact_dir: Path, names: dict[str, str]
+) -> None:
+    """The marker must pin the payload it names, not a different build's."""
+    manifest = json.loads(
+        (artifact_dir / names["payload_manifest"]).read_text(encoding="utf-8")
+    )
+    assert active_marker.get("payload_tree_sha256") == manifest["payload_tree_sha256"], (
+        "ACTIVE-CANDIDATE.json 的 payload_tree_sha256 与 payload-manifest.json 不一致"
+    )
+
+
+def test_active_marker_is_not_hashed_by_sha256sums(
+    sha256sums: dict[str, str]
+) -> None:
+    """A document that names the assembly cannot be one of the files it pins."""
+    assert ACTIVE_MARKER not in sha256sums
 
 
 # --------------------------------------------------------------------------
@@ -437,7 +553,10 @@ def test_template_is_a_valid_xlsx_with_the_evaluation_sheet(
 
 
 def test_acceptance_helper_does_not_hard_code_the_previous_version(
-    artifact_dir: Path, names: dict[str, str], release_version: ModuleType
+    artifact_dir: Path,
+    names: dict[str, str],
+    release_version: ModuleType,
+    build_info: dict[str, Any],
 ) -> None:
     text = (artifact_dir / names["helper_ps1"]).read_text(encoding="utf-8")
     version = release_version.project_version()
@@ -447,16 +566,23 @@ def test_acceptance_helper_does_not_hard_code_the_previous_version(
     assert "release-build-info.json" in text, (
         f"{names['helper_ps1']} 必须从 release-build-info.json 读取版本，而不是写死"
     )
-    # The helper must point at the *current* version's artifacts; it derives the
-    # names from the build info it already loaded, so the version itself does not
-    # need to appear literally.
-    assert "UEBench-$version-win-x64.zip" in text
-    assert "UEBench-Setup-$version-x64.exe" in text
-    assert names["portable"] == f"UEBench-{version}-win-x64.zip"
-    assert names["installer"] == f"UEBench-Setup-{version}-x64.exe"
+    # ECQ-RS05: the version alone is not enough any more -- the Candidate
+    # identity is part of the file names, so the helper must read it too, or it
+    # would report every Candidate as "missing files".
+    assert "buildInfo.candidate_id" in text, (
+        f"{names['helper_ps1']} 必须从 release-build-info.json 读取 candidate_id"
+    )
+    assert "$candidateSuffix" in text
+    assert "UEBench-$version$candidateSuffix-win-x64.zip" in text
+    assert "UEBench-Setup-$version$candidateSuffix-x64.exe" in text
+    assert "UEBench-source-$version$candidateSuffix.zip" in text
     assert names["helper_ps1"] == "验收助手.ps1"
 
-    build_info = json.loads((artifact_dir / names["build_info"]).read_text(encoding="utf-8"))
+    # The names the helper composes are exactly the names this Candidate ships.
+    suffix = f"-{build_info['candidate_id']}" if build_info.get("candidate_id") else ""
+    assert names["portable"] == f"UEBench-{version}{suffix}-win-x64.zip"
+    assert names["installer"] == f"UEBench-Setup-{version}{suffix}-x64.exe"
+    assert names["source"] == f"UEBench-source-{version}{suffix}.zip"
     assert build_info.get("version") == version, (
         "release-build-info.json 的版本必须是当前产品版本，验收助手据此定位产物"
     )

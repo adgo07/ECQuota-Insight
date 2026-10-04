@@ -4,6 +4,20 @@
 ; tools/release_version.py generates from the authoritative version in
 ; pyproject.toml.  Editing a version number in this file by hand is forbidden
 ; and `python tools/release_version.py --check` enforces it.
+;
+; MyAppCandidateSuffix is the Candidate identity (ECQ-RS05).  It is supplied by
+; the build script as an Inno preprocessor symbol:
+;
+;     ISCC.exe /DMyAppCandidateSuffix=-rc-abcdef0 packaging\installer.iss
+;
+; and defaults to the empty string, so a formal release cut -- where
+; `release_version.py --names` yields the un-suffixed names -- builds exactly the
+; same installer name as before.  The git SHA itself never enters version.iss or
+; any other generated file, so `--check` stays commit-independent.
+#ifndef MyAppCandidateSuffix
+#define MyAppCandidateSuffix ""
+#endif
+
 #include "version.iss"
 
 #define MyAppName "单位产品能耗对标软件"
@@ -22,7 +36,7 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\dist\installer
-OutputBaseFilename=UEBench-Setup-{#MyAppVersion}-x64
+OutputBaseFilename=UEBench-Setup-{#MyAppVersion}{#MyAppCandidateSuffix}-x64
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
@@ -64,8 +78,10 @@ Source: "uebench.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; producing a release never requires opening the GUI and saving by hand.
 Source: "..\dist\release\GB29446选煤电力消耗限额导入模板.xlsx"; DestDir: "{app}\模板"; Flags: ignoreversion
 Source: "..\docs\用户手册.md"; DestDir: "{app}\文档"; Flags: ignoreversion
-Source: "..\docs\安装与发布说明-0.2.0.md"; DestDir: "{app}\文档"; Flags: ignoreversion
-Source: "..\docs\交付清单-0.2.0.md"; DestDir: "{app}\文档"; Flags: ignoreversion
+; The document file names carry the product version, so they are built from the
+; same macro that names the installer instead of being written out by hand.
+Source: "..\docs\安装与发布说明-{#MyAppVersion}.md"; DestDir: "{app}\文档"; Flags: ignoreversion
+Source: "..\docs\交付清单-{#MyAppVersion}.md"; DestDir: "{app}\文档"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}\文档"; Flags: ignoreversion
 ; Helper scripts come straight from scripts/ so building the installer does not
 ; depend on the release directory having been assembled first.

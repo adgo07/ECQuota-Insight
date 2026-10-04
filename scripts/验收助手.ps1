@@ -17,11 +17,21 @@ $lines.Add("")
 
 $buildInfoPath = Join-Path $root "release-build-info.json"
 $version = $null
+# ECQ-RS05候选标识：同一产品版本可能有多个候选构建，便携包/安装包/源码包的
+# 文件名都带 -rc-<提交前缀>。这里从 release-build-info.json 读取，绝不写死。
+$candidateSuffix = ""
 if (Test-Path -LiteralPath $buildInfoPath -PathType Leaf) {
     try {
         $buildInfo = Get-Content -LiteralPath $buildInfoPath -Raw -Encoding UTF8 | ConvertFrom-Json
         $version = $buildInfo.version
-        $lines.Add(("构建信息版本：{0}" -f $version))
+        if ($buildInfo.candidate_id) {
+            $candidateSuffix = "-" + $buildInfo.candidate_id
+        }
+        $lines.Add(("构建信息版本：{0}{1}" -f $version, $candidateSuffix))
+        if ($buildInfo.source_commit) {
+            $shortCommit = ([string]$buildInfo.source_commit).Substring(0, 7)
+            $lines.Add(("源提交：{0}（工作区有未提交改动：{1}）" -f $shortCommit, $buildInfo.source_dirty))
+        }
         if ($buildInfo.authenticode_signed -eq $false) {
             $lines.Add(("代码签名：未签名（{0}）" -f $buildInfo.unsigned_reason))
             # NOTE: do not use Unicode smart quotes in this file - PowerShell
@@ -46,9 +56,11 @@ function Find-Artifact {
     return $null
 }
 
-$portable = if ($version) { "UEBench-$version-win-x64.zip" } else { Find-Artifact "UEBench-*-win-x64.zip" }
-$installer = if ($version) { "UEBench-Setup-$version-x64.exe" } else { Find-Artifact "UEBench-Setup-*-x64.exe" }
-$sourceZip = if ($version) { "UEBench-source-$version.zip" } else { Find-Artifact "UEBench-source-*.zip" }
+# The Candidate suffix is part of the artifact name, so a helper that ignored it
+# would report every Candidate as "missing files".
+$portable = if ($version) { "UEBench-$version$candidateSuffix-win-x64.zip" } else { Find-Artifact "UEBench-*-win-x64.zip" }
+$installer = if ($version) { "UEBench-Setup-$version$candidateSuffix-x64.exe" } else { Find-Artifact "UEBench-Setup-*-x64.exe" }
+$sourceZip = if ($version) { "UEBench-source-$version$candidateSuffix.zip" } else { Find-Artifact "UEBench-source-*.zip" }
 
 $immutable = @($portable, $installer, $sourceZip, "initial-standard-package-published.uebench") |
     Where-Object { $_ }

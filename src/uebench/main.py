@@ -44,17 +44,36 @@ def configure_application_font(application: "QApplication") -> None:  # noqa: F8
             return
 
 
-def install_bundled_package(context) -> None:
-    if not context.application.has_package_service() or context.application.list_all_standards():
-        return
-    resource_directory = Path(__file__).resolve().parent / "resources"
-    packages = sorted(resource_directory.glob("initial-standard-package-*.uebench"))
-    if not packages:
-        return
-    try:
-        context.application.install_package(packages[-1])
-    except Exception:
-        logging.getLogger(__name__).exception("内置初始标准包安装失败")
+def bundled_package_directory() -> Path:
+    """内置标准包所在目录。
+
+    PyInstaller 会把 ``release/standard-packages/initial-standard-package-published.uebench``
+    收集到 ``uebench/resources``（见 ``uebench.spec``）；打包运行时模块的
+    ``__file__`` 已位于 ``<_MEIPASS>/uebench/``，因此与源码运行使用同一相对位置。
+    """
+    return Path(__file__).resolve().parent / "resources"
+
+
+def reconcile_standard_package(context, bundled_directory: Path | None = None):
+    """ECQ-RS05 启动对账：每次正常启动都比对内置包与已安装包（原一次性初始化）。
+
+    决策与执行都在 application 层（``uebench.application.package_reconciliation``）；
+    组合根只负责注入唯一版本排序实现与内置包目录。返回值同时记录到
+    ``context.application``，供界面与自检读取。
+
+    真正的 I/O / 校验异常会向上传播（``StandardPackageService.install`` 已保证
+    失败回滚、不留半安装状态），由调用方决定如何提示。
+    """
+    from .application.package_reconciliation import PackageReconciliationService
+    from .infrastructure.packages import _data_version_key
+
+    service = PackageReconciliationService(
+        context.package_service,
+        data_version_key=_data_version_key,
+    )
+    outcome = service.reconcile(bundled_directory or bundled_package_directory())
+    context.application.record_package_reconciliation(outcome)
+    return outcome
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +200,12 @@ def _run_desktop_application() -> int:
     resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
     context = create_context(public_key_path=resource_key)
     try:
-        install_bundled_package(context)
+        try:
+            reconcile_standard_package(context)
+        except Exception:
+            # 对账失败绝不能阻止界面启动：standards 安装已由 install 自行回滚，
+            # 存量数据保持可用（旧行为同样是记录日志后继续启动）。
+            logging.getLogger(__name__).exception("内置标准包对账失败")
         window = create_main_window(context)
         window.show()
         return application.exec()

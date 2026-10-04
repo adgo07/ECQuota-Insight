@@ -102,9 +102,18 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 **RS05 Blocker 状态**：
 
-- 已关闭：内置标准包的 GB29446 落后问题已按批准的方案 B 修复（父基线只替换该定义并重新签名，`2026.10-published.3`；RS04 Golden 15/15、冻结自检 exit 0）。以下为由环境决定的未关闭项：`n- （原 Blocker）内置正式标准包 `2026.09-published.2` 的 GB29446 定义落后于当前源码（包内 `rule_revision=1`、无煤种维度），
-  导致“Candidate 安装后用 RS04 Golden 重新验证 GB29446”无法通过；详见 `release/standard-packages/PIN.json`。
-- Windows 验收证据不完整：无 Windows 11 环境、单显示器，无法实测多 DPI 与跨屏拖动（如实记为 BLOCKED）。
+- 已关闭：内置标准包的 GB29446 落后问题已按批准的方案 B 修复 —— 以已签名
+  `2026.09-published.2` 为父基线，只替换 GB29446 定义（r1 → r2），其余标准逐字节不变，
+  重新签名生成 `2026.10-published.3`；RS04 Golden 15/15、冻结自检 `exit 0`。
+  详见 `release/standard-packages/PIN.json` 与执行报告 §5.2A / §7.4。
+- 已关闭：升级后旧用户数据目录的规则不会自动更新 —— 现已改为**每次启动执行标准包对账**
+  （空库安装 / 完全相同 NO-OP / 旧包安全升级 / 不降级 / 冲突不覆盖 / 验签失败不安装）；
+  旧包升级前用安全备份 API，历史评价与规则快照不被重算。
+- 已关闭：不同内容的 Candidate 同名难以区分 —— Candidate 资产名与 CI artifact 名现在携带
+  `-rc-<short7>`，并由 `release-build-info.json` / `ACTIVE-CANDIDATE.json` 记录
+  `source_commit`（完整 40 位）、`source_dirty=false` 与标准包身份。
+- 仍未关闭（由环境决定）：Windows 验收证据不完整 —— 无 Windows 11 环境、单显示器，
+  无法实测多 DPI 与跨屏拖动（如实记为 BLOCKED / PENDING-MANUAL）。
 
 ## 9. 下一步
 

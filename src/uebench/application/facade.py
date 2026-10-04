@@ -29,6 +29,7 @@ from .ports import (
     WorkbookImportPort,
 )
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
+from .package_reconciliation import ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
 
 
@@ -64,6 +65,7 @@ class ApplicationFacade:
         self._catalogue_dir = catalogue_dir.resolve() if catalogue_dir is not None else None
         self._catalogue_cache: list[StandardDefinition] | None = None
         self._catalog = StandardCatalogService(standards)
+        self._package_reconciliation: ReconciliationOutcome | None = None
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.evaluate(request)
@@ -215,6 +217,18 @@ class ApplicationFacade:
 
     def has_package_service(self) -> bool:
         return self._package is not None
+
+    def record_package_reconciliation(self, outcome: ReconciliationOutcome) -> None:
+        """记录最近一次启动标准包对账结果（由组合根在启动时调用）。"""
+        self._package_reconciliation = outcome
+
+    def last_package_reconciliation(self) -> ReconciliationOutcome | None:
+        """返回最近一次启动标准包对账结果；尚未对账时返回 ``None``。
+
+        只读访问器：界面/自检据此说明“本次启动是否安装或升级了内置标准包”，
+        不需要（也不允许）自己重新比较版本。
+        """
+        return self._package_reconciliation
 
     def list_audit(self, limit: int = 200) -> list[AuditEntry]:
         if self._audit is None:

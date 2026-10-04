@@ -1,6 +1,6 @@
 """Audit the user-facing release directory without modifying any project data.
 
-ECQ-RS05 changed three things here:
+ECQ-RS05 changed four things here:
 
 1. **No hard-coded version.**  Required artifact names come from
    ``tools/release_version.py``, which reads ``pyproject.toml``.
@@ -14,6 +14,12 @@ ECQ-RS05 changed three things here:
    ``sha256``/``size`` for every file of the PyInstaller payload plus a
    ``payload_tree_sha256``.  The audit re-derives those from the portable ZIP,
    which proves the ZIP really is a faithful copy of the audited payload tree.
+4. **Candidate provenance.**  ``release-build-info.json`` must carry the
+   Candidate identity, the exact 40-hex source commit, ``source_dirty=false``,
+   the standard-package identity and the **same** ``payload_tree_sha256`` as the
+   payload manifest.  The audited directory's Candidate identity is read from
+   that document, so a Candidate release directory is audited under its own
+   Candidate file names instead of being compared against formal-release names.
 """
 
 from __future__ import annotations
@@ -21,6 +27,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -28,9 +35,19 @@ from typing import Any
 # Importable both as `python tools/<name>.py` (tools/ is sys.path[0]) and as
 # `tools.<name>` from a test module.
 try:
-    from release_version import ensure_utf8_console, artifact_names, project_version
+    from release_version import (
+        CANDIDATE_ID_RE,
+        artifact_names,
+        ensure_utf8_console,
+        project_version,
+    )
 except ModuleNotFoundError:  # pragma: no cover - package-import style
-    from tools.release_version import ensure_utf8_console, artifact_names, project_version
+    from tools.release_version import (
+        CANDIDATE_ID_RE,
+        artifact_names,
+        ensure_utf8_console,
+        project_version,
+    )
 
 #: Present in older delivery folders; deliberately not a correctness input.
 LEGACY_FILES = ("统一标准规则确认表.xlsx",)
@@ -38,9 +55,48 @@ LEGACY_FILES = ("统一标准规则确认表.xlsx",)
 #: The unsigned-release declaration every Candidate build must carry.
 REQUIRED_UNSIGNED_REASON = "no_signing_certificate"
 
+#: Provenance fields ``release-build-info.json`` must carry (ECQ-RS05).
+REQUIRED_BUILD_INFO_KEYS: tuple[str, ...] = (
+    "product_version",
+    "candidate_id",
+    "source_commit",
+    "source_dirty",
+    "standard_package_id",
+    "standard_data_version",
+    "standard_package_sha256",
+    "payload_tree_sha256",
+    "build_time_utc",
+)
 
-def required_files(version: str | None = None) -> tuple[str, ...]:
-    names = artifact_names(version or project_version())
+#: ``source_commit`` must be a full, lowercase, unambiguous commit id.
+SOURCE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def release_candidate_id(root: Path, build_info_name: str) -> str | None:
+    """Candidate identity declared by the directory itself (``None`` = formal).
+
+    Reading it from ``release-build-info.json`` is what lets one audit code path
+    cover both a formal release cut (no identity) and a Candidate (suffixed
+    names) without either hard-coding the other's file names.
+    """
+    path = root / build_info_name
+    if not path.is_file():
+        return None
+    try:
+        info = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    value = info.get("candidate_id") if isinstance(info, dict) else None
+    if isinstance(value, str) and CANDIDATE_ID_RE.match(value.strip().lower()):
+        return value.strip().lower()
+    return None
+
+
+def required_files(
+    version: str | None = None, candidate_id: str | None = None
+) -> tuple[str, ...]:
+    names = artifact_names(version or project_version(), candidate_id)
     return (
         names["portable"],
         names["installer"],
@@ -145,7 +201,10 @@ def _audit_payload_manifest(root: Path, manifest_name: str, portable_name: str) 
     return report
 
 
-def _audit_build_info(root: Path, build_info_name: str) -> dict[str, Any]:
+def _audit_build_info(
+    root: Path, build_info_name: str, names: dict[str, str]
+) -> dict[str, Any]:
+    """Verify the Candidate provenance document (ECQ-RS05)."""
     path = root / build_info_name
     if not path.exists():
         return {}
@@ -153,23 +212,127 @@ def _audit_build_info(root: Path, build_info_name: str) -> dict[str, Any]:
         info = json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
         return {"errors": [f"{build_info_name} 无法解析：{exc}"]}
+    if not isinstance(info, dict):
+        return {"errors": [f"{build_info_name} 顶层必须是 JSON 对象"]}
 
+    version = project_version()
     errors: list[str] = []
-    if info.get("version") != project_version():
+
+    missing = [key for key in REQUIRED_BUILD_INFO_KEYS if key not in info]
+    if missing:
+        errors.append(
+            f"{build_info_name} 缺少必备溯源字段：{missing}；"
+            "候选构建必须记录产品版本、候选标识、源提交、标准包身份与 payload 树哈希"
+        )
+
+    if info.get("version") != version:
         errors.append(f"{build_info_name} 的版本与 pyproject.toml 不一致")
+    if info.get("product_version") != version:
+        errors.append(
+            f"{build_info_name} 的 product_version 必须是 {version}（与 pyproject.toml 一致）"
+        )
+
+    candidate = info.get("candidate_id")
+    if candidate is not None and (
+        not isinstance(candidate, str) or not CANDIDATE_ID_RE.match(candidate)
+    ):
+        errors.append(
+            f"{build_info_name} 的 candidate_id 非法：{candidate!r}；"
+            "应为 rc-<7位十六进制提交前缀> 或 null（正式发布）"
+        )
+
     if info.get("authenticode_signed") is not False:
         errors.append(f"{build_info_name} 必须声明 authenticode_signed = false")
     if info.get("unsigned_reason") != REQUIRED_UNSIGNED_REASON:
         errors.append(
             f"{build_info_name} 必须声明 unsigned_reason = {REQUIRED_UNSIGNED_REASON}"
         )
+
+    # --- source identity ----------------------------------------------------
+    commit = info.get("source_commit")
+    if not isinstance(commit, str) or not SOURCE_COMMIT_RE.match(commit):
+        errors.append(
+            f"{build_info_name} 的 source_commit 必须是 40 位小写十六进制提交号，"
+            f"实际：{commit!r}"
+        )
+    if info.get("source_dirty") is not False:
+        errors.append(
+            f"{build_info_name} 必须声明 source_dirty = false；"
+            "正式候选构建只能来自干净检出"
+        )
+
+    # --- standard package identity -----------------------------------------
+    for key in ("standard_package_id", "standard_data_version"):
+        value = info.get(key)
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{build_info_name} 的 {key} 必须是非空字符串，实际：{value!r}")
+    package_sha256 = info.get("standard_package_sha256")
+    if not isinstance(package_sha256, str) or not SHA256_RE.match(package_sha256):
+        errors.append(
+            f"{build_info_name} 的 standard_package_sha256 必须是 64 位小写十六进制，"
+            f"实际：{package_sha256!r}"
+        )
+    else:
+        shipped = root / names["standard_package"]
+        if shipped.is_file():
+            actual = sha256(shipped)
+            if actual != package_sha256:
+                errors.append(
+                    f"{build_info_name} 的 standard_package_sha256 与交付目录中的 "
+                    f"{names['standard_package']} 不一致：{package_sha256} != {actual}"
+                )
+
+    # --- payload tree digest (must agree with the payload manifest) ---------
+    tree_sha256 = info.get("payload_tree_sha256")
+    if not isinstance(tree_sha256, str) or not SHA256_RE.match(tree_sha256):
+        errors.append(
+            f"{build_info_name} 的 payload_tree_sha256 必须是 64 位小写十六进制，"
+            f"实际：{tree_sha256!r}"
+        )
+    else:
+        recorded = _manifest_tree_sha256(root / names["payload_manifest"])
+        if recorded is None:
+            errors.append(
+                f"无法从 {names['payload_manifest']} 取得 payload_tree_sha256，"
+                f"无法核对 {build_info_name}"
+            )
+        elif recorded != tree_sha256:
+            errors.append(
+                f"{build_info_name} 的 payload_tree_sha256 与 {names['payload_manifest']} "
+                f"不一致：{tree_sha256} != {recorded}"
+            )
+
+    build_time = info.get("build_time_utc")
+    if not isinstance(build_time, str) or not build_time.strip():
+        errors.append(f"{build_info_name} 的 build_time_utc 必须是非空字符串")
+
     return {
         "version": info.get("version"),
+        "product_version": info.get("product_version"),
+        "candidate_id": candidate,
+        "source_commit": commit,
+        "source_dirty": info.get("source_dirty"),
+        "standard_package_id": info.get("standard_package_id"),
+        "standard_data_version": info.get("standard_data_version"),
+        "standard_package_sha256": package_sha256,
+        "payload_tree_sha256": tree_sha256,
+        "build_time_utc": build_time,
         "authenticode_signed": info.get("authenticode_signed"),
         "unsigned_reason": info.get("unsigned_reason"),
         "built_at": info.get("built_at"),
         "errors": errors,
     }
+
+
+def _manifest_tree_sha256(manifest_path: Path) -> str | None:
+    if not manifest_path.is_file():
+        return None
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    value = manifest.get("payload_tree_sha256") if isinstance(manifest, dict) else None
+    return value if isinstance(value, str) else None
 
 
 def _audit_standard_package(package: Path) -> tuple[dict[str, Any], list[str]]:
@@ -209,10 +372,23 @@ def _audit_standard_package(package: Path) -> tuple[dict[str, Any], list[str]]:
     return report, errors
 
 
-def audit_release(root: Path, version: str | None = None) -> dict[str, Any]:
+def audit_release(
+    root: Path, version: str | None = None, candidate_id: str | None = None
+) -> dict[str, Any]:
     resolved = version or project_version()
-    names = artifact_names(resolved)
+    formal_names = artifact_names(resolved)
     errors: list[str] = []
+
+    if candidate_id is None:
+        # The directory declares its own identity; a Candidate release
+        # directory is therefore audited under its Candidate file names.
+        candidate_id = release_candidate_id(root, formal_names["build_info"])
+    if candidate_id is not None and not CANDIDATE_ID_RE.match(candidate_id):
+        errors.append(
+            f"候选标识非法：{candidate_id!r}；应为 rc-<7位十六进制提交前缀>"
+        )
+        candidate_id = None
+    names = artifact_names(resolved, candidate_id)
 
     hashes_path = root / names["sha256sums"]
     expected_hashes: dict[str, str] = {}
@@ -230,7 +406,7 @@ def audit_release(root: Path, version: str | None = None) -> dict[str, Any]:
 
     file_report: dict[str, dict[str, Any]] = {}
     sums_name = names["sha256sums"]
-    for name in required_files(resolved):
+    for name in required_files(resolved, candidate_id):
         path = root / name
         exists = path.exists()
         actual = sha256(path) if exists else None
@@ -257,7 +433,7 @@ def audit_release(root: Path, version: str | None = None) -> dict[str, Any]:
     payload_report = _audit_payload_manifest(root, names["payload_manifest"], names["portable"])
     errors.extend(payload_report.get("errors", []))
 
-    build_info_report = _audit_build_info(root, names["build_info"])
+    build_info_report = _audit_build_info(root, names["build_info"], names)
     errors.extend(build_info_report.get("errors", []))
 
     package_report, package_errors = _audit_standard_package(root / names["standard_package"])
@@ -269,6 +445,7 @@ def audit_release(root: Path, version: str | None = None) -> dict[str, Any]:
     return {
         "valid": not errors,
         "version": resolved,
+        "candidate_id": candidate_id,
         "release_dir": str(root),
         "files": file_report,
         "payload": payload_report,

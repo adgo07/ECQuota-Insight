@@ -13,6 +13,21 @@ Two entry points matter:
 
 ``tests/test_release_version_consistency.py`` runs the ``--check`` logic, and
 ``scripts/build_candidate.ps1`` refuses to build when it fails.
+
+**Candidate identity (ECQ-RS05).**  The product version alone cannot distinguish
+two different Release Candidates: several builds may all be ``0.2.0`` with
+identical PE version resources.  Candidate artifacts therefore carry a
+``candidate_id`` of the form ``rc-<first 7 hex of the source commit>`` inserted
+into the portable / installer / source file names.  The identity is *runtime
+information*: it is derived from the checked-out commit, never from
+``pyproject.toml``.
+
+The formal release cut passes ``candidate_id=None`` and gets exactly the
+un-suffixed names, and **no generated file depends on the commit** -- the git
+SHA never reaches ``_version.py`` / ``version_info.txt`` / ``version.iss``, so
+``--check`` stays deterministic on a clean checkout of any commit.  The suffix
+is passed to Inno Setup by the build script (``/DMyAppCandidateSuffix=``), not
+written into ``version.iss``.
 """
 from __future__ import annotations
 
@@ -32,6 +47,18 @@ VERSION_INFO = Path("packaging/version_info.txt")
 VERSION_ISS = Path("packaging/version.iss")
 
 _SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
+
+#: A git commit as Candidate identity is derived from.  ``git rev-parse HEAD``
+#: yields exactly 40 lowercase hex characters; shorter abbreviations are
+#: accepted so a human can create a Candidate from an abbreviated SHA, but the
+#: *canonical* identity is always ``rc-`` plus the first 7 characters.
+_COMMIT_RE = re.compile(r"^[0-9a-f]{7,40}$")
+
+#: Canonical Candidate identity: ``rc-`` + at least 7 hex characters.
+CANDIDATE_ID_RE = re.compile(r"^rc-[0-9a-f]{7,40}$")
+
+#: Length of the commit prefix embedded in a Candidate identity.
+CANDIDATE_COMMIT_PREFIX = 7
 
 
 def ensure_utf8_console() -> None:
@@ -80,12 +107,76 @@ def version_tuple(version: str) -> tuple[int, int, int, int]:
     return tuple((parts + [0, 0, 0, 0])[:4])  # type: ignore[return-value]
 
 
-def artifact_names(version: str) -> dict[str, str]:
-    """Canonical release artifact file names for ``version``."""
+def candidate_id(commit: str) -> str:
+    """Candidate identity for ``commit``: ``rc-<first 7 hex characters>``.
+
+    This is what makes two Candidates built from different commits
+    distinguishable *by file name* while the product version stays untouched.
+    Uppercase input is normalized to lowercase (git prints lowercase, but a
+    human may paste a SHA from elsewhere); anything that is not 7-40 hex
+    characters is rejected loudly rather than silently producing a bogus
+    identity.
+    """
+    normalized = (commit or "").strip().lower()
+    if not _COMMIT_RE.match(normalized):
+        raise ValueError(
+            f"不是有效的 git commit：{commit!r}；候选标识要求 7-40 位十六进制字符"
+        )
+    return "rc-" + normalized[:CANDIDATE_COMMIT_PREFIX]
+
+
+def normalize_candidate_id(value: str) -> str:
+    """Validate a Candidate identity supplied by a build script."""
+    normalized = (value or "").strip().lower()
+    if not CANDIDATE_ID_RE.match(normalized):
+        raise ValueError(
+            f"不是有效的候选标识：{value!r}；应形如 rc-<7位十六进制提交前缀>"
+        )
+    return normalized
+
+
+def resolve_candidate_id(
+    candidate: str | None = None, source_commit: str | None = None
+) -> str | None:
+    """Combine ``--candidate-id`` and ``--source-commit`` into one identity.
+
+    Passing both is allowed only when they agree: a build script that derives
+    the identity from one commit and names the artifacts with another would
+    destroy exactly the traceability this feature exists to provide.
+    """
+    derived = candidate_id(source_commit) if source_commit else None
+    if candidate:
+        explicit = normalize_candidate_id(candidate)
+        if derived is not None and explicit != derived:
+            raise ValueError(
+                f"--candidate-id {explicit} 与 --source-commit {source_commit} "
+                f"推导出的 {derived} 不一致"
+            )
+        return explicit
+    return derived
+
+
+def artifact_names(version: str, candidate_id: str | None = None) -> dict[str, str]:
+    """Canonical release artifact file names for ``version``.
+
+    With ``candidate_id=None`` these are the **formal release** names, exactly
+    as before ECQ-RS05 Candidate identity.  With a Candidate identity the three
+    build-specific artifacts (portable ZIP / installer / source ZIP) carry it:
+
+    * ``UEBench-<version>-<candidate_id>-win-x64.zip``
+    * ``UEBench-Setup-<version>-<candidate_id>-x64.exe``
+    * ``UEBench-source-<version>-<candidate_id>.zip``
+
+    Everything else keeps its name: the pinned standard package and the GB
+    29446 template are version-less release *inputs*, and the manifest / build
+    info / checksum / helper / document names are per-directory fixed so the
+    audit and the acceptance helper do not have to guess.
+    """
+    suffix = f"-{normalize_candidate_id(candidate_id)}" if candidate_id else ""
     return {
-        "portable": f"UEBench-{version}-win-x64.zip",
-        "installer": f"UEBench-Setup-{version}-x64.exe",
-        "source": f"UEBench-source-{version}.zip",
+        "portable": f"UEBench-{version}{suffix}-win-x64.zip",
+        "installer": f"UEBench-Setup-{version}{suffix}-x64.exe",
+        "source": f"UEBench-source-{version}{suffix}.zip",
         "standard_package": "initial-standard-package-published.uebench",
         "template": "GB29446选煤电力消耗限额导入模板.xlsx",
         "sha256sums": "SHA256SUMS.txt",
@@ -206,13 +297,35 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--generate", action="store_true", help="按权威版本重写派生文件")
     group.add_argument("--check", action="store_true", help="校验派生文件是否与权威版本一致")
     group.add_argument("--names", action="store_true", help="输出正式产物文件名（JSON）")
+    group.add_argument(
+        "--print-candidate-id",
+        action="store_true",
+        help="打印由 --source-commit（或 --candidate-id）确定的候选标识",
+    )
+    parser.add_argument(
+        "--candidate-id",
+        default=None,
+        help="候选标识（rc-<7位提交前缀>）；省略时输出正式发布文件名",
+    )
+    parser.add_argument(
+        "--source-commit",
+        default=None,
+        help="候选构建的源提交 SHA；据此推导候选标识，不写入任何生成文件",
+    )
     parser.add_argument("--root", type=Path, default=None, help="仓库根目录（默认自动定位）")
     args = parser.parse_args(argv)
 
     base = args.root or ROOT
     version = project_version(base / "pyproject.toml")
+    try:
+        resolved_candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
 
     if args.generate:
+        # Deliberately commit-independent: the git SHA never reaches a generated
+        # file, so --check stays deterministic on a checkout of any commit.
         for path in generate(base, version):
             print(f"wrote {path}")
         return 0
@@ -226,7 +339,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"版本一致性校验通过：{version}")
         return 0
     if args.names:
-        print(json.dumps(artifact_names(version), ensure_ascii=False))
+        print(
+            json.dumps(artifact_names(version, resolved_candidate), ensure_ascii=False)
+        )
+        return 0
+    if args.print_candidate_id:
+        if resolved_candidate is None:
+            print(
+                "缺少候选标识：请提供 --source-commit 或 --candidate-id。",
+                file=sys.stderr,
+            )
+            return 2
+        print(resolved_candidate)
         return 0
     print(version)
     return 0

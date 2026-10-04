@@ -215,45 +215,37 @@ def test_installer_iss_includes_version_iss_and_uses_the_macro() -> None:
     text = (ROOT / "packaging" / "installer.iss").read_text(encoding="utf-8")
     assert '#include "version.iss"' in text, "packaging/installer.iss 必须包含 version.iss"
     assert "AppVersion={#MyAppVersion}" in text
-    assert "OutputBaseFilename=UEBench-Setup-{#MyAppVersion}-x64" in text
+    # ECQ-RS05 candidate identity: the output name is the product version plus the
+    # Candidate suffix, which the build script supplies as an ISCC /D symbol and
+    # which defaults to the empty string (formal release cut).
+    assert "#ifndef MyAppCandidateSuffix" in text
+    assert "OutputBaseFilename=UEBench-Setup-{#MyAppVersion}{#MyAppCandidateSuffix}-x64" in text
 
 
 def test_installer_iss_has_no_hard_coded_version_literal() -> None:
-    """Only documentation *file names* may carry a version literal.
+    """Every version-bearing line must be macro-driven.
 
-    The allowed occurrences are ``Source: "..\\docs\\<文档名>-<版本>.md"``
-    entries — a document file name, not a statement about the product version.
-    Any other ``X.Y.Z`` literal in the installer script (an ``AppVersion=``, a
-    ``#define``, ...) is drift and must fail here.
+    ECQ-RS05 removed the last hand-typed version literals (the delivered document
+    file names, which used to say ``-0.2.0.md``) so a version bump and a Candidate
+    build both flow through ``{#MyAppVersion}``.  Any ``X.Y.Z`` here is drift.
     """
     text = (ROOT / "packaging" / "installer.iss").read_text(encoding="utf-8")
-    allowed: list[tuple[int, str]] = []
     offenders: list[str] = []
     for number, line in enumerate(text.splitlines(), start=1):
         if not _VERSION_LITERAL_RE.search(line):
             continue
         stripped = line.strip()
-        if not stripped:
-            continue
-        if stripped.startswith(_COMMENT_PREFIXES):
+        if not stripped or stripped.startswith(_COMMENT_PREFIXES):
             continue  # comment / provenance note, not a directive
-        if (
-            stripped.startswith("Source:")
-            and "..\\docs\\" in stripped
-            and ".md" in stripped
-        ):
-            allowed.append((number, stripped))
-            continue
         offenders.append(f"L{number}: {stripped}")
     assert not offenders, (
-        "packaging/installer.iss 出现硬编码版本字面量（只允许交付文档文件名"
-        f"Source: \"..\\docs\\<文档名>-<版本>.md\"）：{offenders}"
+        "packaging/installer.iss 出现硬编码版本字面量；所有版本相关名称必须来自 "
+        f"{{#MyAppVersion}}/{{#MyAppCandidateSuffix}}：{offenders}"
     )
-    assert len(allowed) >= 1, (
-        "installer.iss 应至少引用一处带版本号的交付文档（docs\\<文档名>-<版本>.md）"
-    )
-    # Those document file names must be the *current* version, not 0.1.0.
-    assert all(_PREVIOUS_PRODUCT_VERSION not in line for _, line in allowed)
+    # The delivered documents are the case that used to be hand-typed.
+    assert "..\\docs\\安装与发布说明-{#MyAppVersion}.md" in text
+    assert "..\\docs\\交付清单-{#MyAppVersion}.md" in text
+    assert "{#MyAppVersion}" in text
 
 
 # --------------------------------------------------------------------------

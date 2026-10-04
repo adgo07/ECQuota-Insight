@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from PySide6.QtCore import QDate, Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QAction, QDesktopServices
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -42,6 +42,13 @@ from PySide6.QtWidgets import (
 if TYPE_CHECKING:
     from uebench.bootstrap import AppContext
 
+from uebench import __version__
+from uebench.application.build_identity import (
+    DiagnosticsFacts,
+    load_build_identity,
+    reconciliation_facts,
+    render_diagnostics,
+)
 from uebench.application.gb29446 import (
     GB29446_PERIOD_OPTIONS,
     GB29446_STANDARD_ID,
@@ -188,6 +195,88 @@ def _friendly_error(exc: Exception, operation: str) -> str:
     return f"{operation}失败，请检查输入数据、单位和适用条件后重试。"
 
 
+# ---------------------------------------------------------------------------
+# GB 29446 规则兼容性（FAIL-FAST）
+# ---------------------------------------------------------------------------
+#
+# 正式 r2 规则要求标准定义自身携带“煤种”选择层级、每个煤种的非空
+# ``selection_values.coal_type``，以及选煤电力单耗指标中按选煤工艺查表的
+# ``process_factor`` 行。旧版/不完整定义缺少这些结构时，界面过去会：
+#
+# * 用 ``product.name`` 冒充“煤种”；
+# * 把“选煤工艺”下拉框渲染成一个看起来正常、实际没有可选项的空控件；
+# * 仍然允许发起正式评价。
+#
+# 上述行为都是“假装可用”。现有做法是**如实拒绝**：显示明确的中文提示、
+# 不渲染假可用的选择器、阻止正式计算。这里不引入第二套业务算法，也不改变
+# 正常 r2 路径的任何取值。
+
+#: 当前 GB 29446 正式规则使用的煤种选择层级 key。
+GB29446_COAL_TYPE_KEY = "coal_type"
+
+#: 选煤电力单耗指标中按选煤工艺查附录A的展示计算 key。
+GB29446_PROCESS_FACTOR_KEY = "process_factor"
+
+#: 规则数据不完整/版本不兼容时的中文提示（必须说明“更新标准数据”）。
+GB29446_RULE_INCOMPATIBLE_MESSAGE = "标准规则数据不完整或版本不兼容，请更新标准数据后再评价。"
+
+#: 启动标准包对账未达到期望状态时的非阻断中文提示前缀（ECQ-RS05 §三 E/F）。
+PACKAGE_RECONCILIATION_NOTICE_PREFIX = "标准数据未更新或标准数据状态异常"
+
+
+def _gb29446_product_has_process_factor_rows(product) -> bool:
+    """该煤种是否存在可用的“选煤工艺 → 折算系数 k”查表行。
+
+    判定条件与选择器读取系数时的条件完全一致：``process_factor`` 的 lookup
+    公式中至少有一行按 ``washing_process`` 相等匹配到常量系数。只要一行都取
+    不到，工艺下拉框就是空的，规则即视为不完整。
+    """
+
+    for indicator in product.indicators:
+        for display in indicator.display_calculations:
+            if display.key != GB29446_PROCESS_FACTOR_KEY or display.formula.op != "lookup":
+                continue
+            for row in display.formula.rows:
+                condition = row.condition
+                expression = row.expression
+                if (
+                    condition.op == "eq"
+                    and condition.field == "washing_process"
+                    and expression.op == "constant"
+                    and condition.value is not None
+                    and expression.value is not None
+                ):
+                    return True
+    return False
+
+
+def gb29446_rule_is_compatible(definition) -> bool:
+    """判断已加载的 GB 29446 定义是否具备正式 r2 规则所需的结构。
+
+    返回 ``True`` 仅当**全部**满足：
+
+    1. ``selection_schema`` 中含 ``coal_type`` 层级；
+    2. 每个煤种都有非空的 ``selection_values["coal_type"]``；
+    3. 每个煤种的选煤电力单耗指标都有可用的 ``process_factor`` 查表行。
+
+    ``None`` 或空定义返回 ``False``。本函数是纯判定，不做任何业务计算。
+    """
+
+    if definition is None:
+        return False
+    if not any(level.key == GB29446_COAL_TYPE_KEY for level in definition.selection_schema):
+        return False
+    if not definition.products:
+        return False
+    for product in definition.products:
+        coal_type = product.selection_values.get(GB29446_COAL_TYPE_KEY)
+        if coal_type is None or not str(coal_type).strip():
+            return False
+        if not _gb29446_product_has_process_factor_rows(product):
+            return False
+    return True
+
+
 class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
@@ -195,6 +284,9 @@ class MainWindow(QMainWindow):
         self.current_standard: StandardDefinition | None = None
         self.last_result_id: str | None = None
         self.pending_import_id: str | None = None
+        self.pending_import_standard_id: str | None = None
+        #: 当前加载的 GB 29446 规则是否满足正式 r2 结构；非 GB29446 标准恒为 True。
+        self.gb29446_rule_compatible = True
         self.setWindowTitle("单位产品能耗对标软件")
         # Leave room for the ten-column energy table on ordinary 1366x768 and
         # 1920x1080 screens.  Users can still resize the window smaller.
@@ -227,7 +319,19 @@ class MainWindow(QMainWindow):
             self.pages.addWidget(builder())
         self.navigation.currentRowChanged.connect(self._page_changed)
         self.navigation.setCurrentRow(0)
+        self._build_help_menu()
         self.refresh_all()
+
+    def _build_help_menu(self) -> None:
+        """Add the read-only 关于 / 诊断信息 entry without touching the page layout."""
+        help_menu = self.menuBar().addMenu("帮助")
+        diagnostics = QAction("关于 / 诊断信息…", self)
+        diagnostics.setObjectName("diagnostics_action")
+        diagnostics.triggered.connect(self.show_diagnostics)
+        help_menu.addAction(diagnostics)
+        # 保留 Python 引用：菜单属于窗口的辅助入口，不应依赖临时包装对象。
+        self.help_menu = help_menu
+        self.diagnostics_action = diagnostics
 
     def _page(self, title: str) -> tuple[QWidget, QVBoxLayout]:
         page = QWidget()
@@ -368,6 +472,8 @@ class MainWindow(QMainWindow):
         self.gb29446_form_container = QWidget()
         gb_form = QFormLayout(self.gb29446_form_container)
         gb_form.setContentsMargins(0, 0, 0, 0)
+        #: 兼容性降级时需要按“行”隐藏煤种/选煤工艺/折算系数输入项。
+        self.gb29446_form_layout = gb_form
         self.gb29446_organization = QLineEdit()
         self.gb29446_organization.setPlaceholderText("可选填写")
         self.gb29446_organization.textChanged.connect(self._gb29446_inputs_changed)
@@ -424,6 +530,13 @@ class MainWindow(QMainWindow):
         form_layout.addLayout(form)
         form_layout.addWidget(self.generic_form_container)
         form_layout.addWidget(self.gb29446_form_container)
+        # 规则数据不完整/版本不兼容时的显式中文提示；正常 r2 规则下始终隐藏。
+        self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
+        self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
+        self.gb29446_incompatibility_message.setWordWrap(True)
+        self.gb29446_incompatibility_message.setStyleSheet("color: #b42318; font-weight: bold;")
+        self.gb29446_incompatibility_message.setVisible(False)
+        form_layout.addWidget(self.gb29446_incompatibility_message)
         layout.addWidget(form_card)
 
         self.input_controls_container = QWidget()
@@ -701,6 +814,8 @@ class MainWindow(QMainWindow):
         self.refresh_records()
         self.refresh_package_history()
         self.refresh_audit()
+        # 启动/刷新后如实暴露标准包对账状态（非阻断，不弹模态框）。
+        self._show_package_reconciliation_notice()
 
     def refresh_home(self) -> None:
         today = date.today()
@@ -876,6 +991,11 @@ class MainWindow(QMainWindow):
         value = product.selection_values.get(level.key)
         if value is not None and str(value).strip():
             return str(value).strip()
+        if level.key == GB29446_COAL_TYPE_KEY:
+            # “煤种”只能来自规则自身的选择元数据。旧定义缺少该字段时，回落到
+            # ``product.name`` 会凭空造出一个不存在的煤种，因此这里如实返回空值，
+            # 由兼容性判定拒绝正式评价。
+            return ""
         # Fallback for legacy rules without selection metadata.
         return product.name
 
@@ -988,7 +1108,68 @@ class MainWindow(QMainWindow):
         self._refresh_input_table()
 
     def _is_gb29446(self) -> bool:
-        return self.current_standard is not None and self.current_standard.id == "gb-29446-2019"
+        return self.current_standard is not None and self.current_standard.id == GB29446_STANDARD_ID
+
+    def _gb29446_definition(self, standard_id: str) -> StandardDefinition | None:
+        """解析用于正式评价的 GB 29446 定义（当前加载的优先，其次已发布/标准库）。"""
+
+        if self.current_standard is not None and self.current_standard.id == standard_id:
+            return self.current_standard
+        definition = self.context.application.get_published_standard(standard_id)
+        if definition is None:
+            definition = self.context.application.get_standard(standard_id)
+        return definition
+
+    def _gb29446_rule_incompatibility(self, standard_id: str | None = None) -> str | None:
+        """GB 29446 规则不可用于正式评价时返回中文原因，否则返回 ``None``。
+
+        未安装该标准时返回 ``None``：那属于既有的“标准不可用”路径，不应改写成
+        规则不兼容。
+        """
+
+        target = standard_id
+        if target is None and self.current_standard is not None:
+            target = self.current_standard.id
+        if target != GB29446_STANDARD_ID:
+            return None
+        try:
+            definition = self._gb29446_definition(target)
+        except Exception:
+            # 兼容性探测本身失败时不改变既有错误路径（不得让界面崩溃）。
+            return None
+        if definition is None:
+            return None
+        if gb29446_rule_is_compatible(definition):
+            return None
+        return GB29446_RULE_INCOMPATIBLE_MESSAGE
+
+    def _apply_gb29446_rule_compatibility(self) -> None:
+        """按当前 GB 29446 规则是否兼容，显示/隐藏选择器与提示。
+
+        不兼容时：显示中文提示、隐藏煤种与选煤工艺选择器（以及自动匹配的折算系数）、
+        清空选择并禁用正式计算按钮；兼容时恢复原样。正常 r2 路径行为不变。
+        """
+
+        incompatible = self._is_gb29446() and not gb29446_rule_is_compatible(self.current_standard)
+        self.gb29446_rule_compatible = not incompatible
+        message = getattr(self, "gb29446_incompatibility_message", None)
+        if message is not None:
+            message.setVisible(incompatible)
+        form = getattr(self, "gb29446_form_layout", None)
+        if form is not None:
+            for widget in (self.gb29446_coal_type, self.gb29446_process, self.gb29446_factor):
+                form.setRowVisible(widget, not incompatible)
+        for widget in (self.gb29446_coal_type, self.gb29446_process, self.gb29446_factor):
+            widget.setEnabled(not incompatible)
+        if incompatible:
+            for combo in (self.gb29446_coal_type, self.gb29446_process):
+                combo.blockSignals(True)
+                combo.clear()
+                combo.blockSignals(False)
+            self.gb29446_factor.setText("")
+            self.gb29446_result_message.setText(GB29446_RULE_INCOMPATIBLE_MESSAGE)
+        if hasattr(self, "calculate_button"):
+            self.calculate_button.setEnabled(not incompatible)
 
     def _set_evaluation_view(self) -> None:
         is_gb29446 = self._is_gb29446()
@@ -1030,8 +1211,8 @@ class MainWindow(QMainWindow):
         if self.current_standard is not None:
             seen: set[str] = set()
             for product in self.current_standard.products:
-                coal_type = product.selection_values.get("coal_type", product.name)
-                coal_type = str(coal_type).strip()
+                # 只使用规则声明的煤种；绝不使用 product.name 冒充煤种。
+                coal_type = str(product.selection_values.get(GB29446_COAL_TYPE_KEY) or "").strip()
                 if coal_type and coal_type not in seen:
                     combo.addItem(coal_type, product.id)
                     seen.add(coal_type)
@@ -1124,14 +1305,21 @@ class MainWindow(QMainWindow):
         self.eval_product.blockSignals(False)
         self._rebuild_selection_widgets()
         self._set_evaluation_view()
+        self._apply_gb29446_rule_compatibility()
         if self._is_gb29446():
-            self._populate_gb29446_coal_types()
-            product_id = self.gb29446_coal_type.currentData()
-            if product_id:
-                self._select_product_by_id(str(product_id))
+            if self.gb29446_rule_compatible:
+                self._populate_gb29446_coal_types()
+                product_id = self.gb29446_coal_type.currentData()
+                if product_id:
+                    self._select_product_by_id(str(product_id))
+                else:
+                    self._refresh_input_table()
             else:
-                self._refresh_input_table()
+                # 规则不完整：不填充假“煤种”，也不渲染空的工艺下拉框。
+                self._refresh_gb29446_processes(None)
             self._clear_gb29446_result()
+            if not self.gb29446_rule_compatible:
+                self.gb29446_result_message.setText(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         else:
             self._refresh_input_table()
 
@@ -1366,9 +1554,21 @@ class MainWindow(QMainWindow):
         )
 
     def calculate_evaluation(self, request: EvaluationRequest | None = None) -> None:
-        is_gb29446 = self._is_gb29446() if request is None else request.standard_id == "gb-29446-2019"
+        is_gb29446 = self._is_gb29446() if request is None else request.standard_id == GB29446_STANDARD_ID
         if is_gb29446:
             self._clear_gb29446_result()
+            # FAIL-FAST：规则数据不完整/版本不兼容时，正式计算（含保存记录）必须
+            # 在这里被明确拒绝，而不是给出笼统的“计算失败”，更不能生成假结论。
+            reason = self._gb29446_rule_incompatibility(
+                request.standard_id if request is not None else None
+            )
+            if reason is not None:
+                self.gb29446_result_message.setText(reason)
+                self.gb29446_explanation.setText(
+                    "当前标准规则不能用于正式评价，因此未执行计算，也未生成评价记录。"
+                )
+                QMessageBox.warning(self, "标准规则不兼容", reason)
+                return
         try:
             if request is None and self._is_gb29446():
                 try:
@@ -1954,6 +2154,7 @@ class MainWindow(QMainWindow):
             return
         report = self.context.application.validate_workbook(Path(path))
         self.pending_import_id = report.import_id if report.valid else None
+        self.pending_import_standard_id = getattr(getattr(report, "request", None), "standard_id", None)
         self.import_commit_button.setEnabled(report.valid)
         self.import_status.setText("校验通过，请确认下方识别摘要后点击“确认导入并评价”。" if report.valid else "校验失败，请修正后重新导入。")
         self._show_import_summary(report)
@@ -1963,6 +2164,17 @@ class MainWindow(QMainWindow):
             self.import_issues.insertRow(row)
             for column, value in enumerate((issue.severity, issue.sheet, issue.cell, issue.message)):
                 self.import_issues.setItem(row, column, _item(value))
+        # FAIL-FAST：即使工作簿本身校验通过，只要当前 GB 29446 规则不完整/不兼容，
+        # 也不能通过 Excel 路径生成正式评价记录。
+        if self.pending_import_standard_id is not None:
+            reason = self._gb29446_rule_incompatibility(self.pending_import_standard_id)
+            if reason is not None:
+                self.pending_import_id = None
+                self.import_commit_button.setEnabled(False)
+                self.import_status.setText(reason)
+                self.import_summary.setVisible(False)
+                self.import_summary.setText("")
+                QMessageBox.warning(self, "标准规则不兼容", reason)
 
     def _show_import_summary(self, report) -> None:
         """Show the recognisable business summary of a validated workbook.
@@ -1984,7 +2196,8 @@ class MainWindow(QMainWindow):
                 product = next((item for item in standard.products if item.id == request.product_id), None)
             coal = ""
             if product is not None:
-                coal = next(iter(product.selection_values.values()), product.name)
+                # 只显示规则声明的煤种；缺少时留空，不用产品名冒充煤种。
+                coal = str(product.selection_values.get(GB29446_COAL_TYPE_KEY) or "").strip()
             electricity = request.inputs.get("electricity_consumption")
             raw_coal = request.inputs.get("raw_coal_input")
             process = request.inputs.get("washing_process")
@@ -2013,6 +2226,14 @@ class MainWindow(QMainWindow):
         """Formal Excel evaluation: same application use case as the GUI path."""
         if not self.pending_import_id:
             return
+        if self.pending_import_standard_id is not None:
+            reason = self._gb29446_rule_incompatibility(self.pending_import_standard_id)
+            if reason is not None:
+                self.pending_import_id = None
+                self.import_commit_button.setEnabled(False)
+                self.import_status.setText(reason)
+                QMessageBox.warning(self, "标准规则不兼容", reason)
+                return
         try:
             result = self.context.application.evaluate_workbook(self.pending_import_id)
         except Exception as exc:
@@ -2138,6 +2359,160 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "恢复完成", "数据已恢复。")
         except Exception as exc:
             QMessageBox.critical(self, "恢复失败", _friendly_error(exc, "恢复备份"))
+
+    # ------------------------------------------------------------------
+    # 关于 / 诊断信息（只读）
+    # ------------------------------------------------------------------
+
+    def build_identity(self):
+        """返回当前构建身份；未嵌入时返回占位身份（不抛异常）。"""
+        return load_build_identity()
+
+    def _gb29446_rule_revision_text(self) -> str:
+        try:
+            standard = self.context.application.get_standard(GB29446_STANDARD_ID)
+        except Exception:
+            return "未知（无法读取标准库）"
+        if standard is None:
+            return f"未安装 {GB29446_STANDARD_ID}"
+        return str(standard.rule_revision)
+
+    def _installed_package_text(self) -> tuple[str, str, str]:
+        """最近一次成功安装的标准包 (package_id, data_version, sha256)。"""
+        try:
+            history = list(self.context.application.list_package_history(1))
+        except Exception:
+            history = []
+        if history:
+            latest = history[0]
+            return (str(latest.package_id), str(latest.data_version), str(latest.package_sha256))
+        try:
+            has_service = bool(self.context.application.has_package_service())
+        except Exception:
+            has_service = False
+        placeholder = "未安装标准包" if has_service else "未配置标准包服务"
+        return (placeholder, placeholder, placeholder)
+
+    def _diagnostics_facts(self) -> DiagnosticsFacts:
+        """Collect the read-only diagnostic facts from the application context."""
+        identity = load_build_identity()
+        installed_id, installed_version, installed_sha256 = self._installed_package_text()
+        try:
+            revision = self.context.database.current_revision()
+        except Exception:
+            revision = None
+        return DiagnosticsFacts(
+            product_version=__version__,
+            data_directory=str(self.context.paths.root),
+            db_schema_revision=(
+                str(revision) if revision else "未知（数据库未写入 Alembic 版本标记）"
+            ),
+            gb29446_rule_revision=self._gb29446_rule_revision_text(),
+            bundled_package_id=identity.standard_package_id,
+            bundled_package_data_version=identity.standard_data_version,
+            installed_package_id=installed_id,
+            installed_package_data_version=installed_version,
+            installed_package_sha256=installed_sha256,
+        )
+
+    def diagnostics_report(self) -> str:
+        """可复制的纯文本诊断信息（不含私钥或任何凭据内容）。"""
+        return render_diagnostics(
+            load_build_identity(),
+            self._diagnostics_facts(),
+            reconciliation_facts(self._package_reconciliation_outcome()),
+        )
+
+    # -- 最近一次标准包对账（只读展示 + 非阻断提示） -----------------------
+
+    def _package_reconciliation_outcome(self):
+        """最近一次启动标准包对账结果；组合根未记录或旧版门面不支持时返回 ``None``。"""
+
+        getter = getattr(self.context.application, "last_package_reconciliation", None)
+        if getter is None:
+            return None
+        try:
+            return getter()
+        except Exception:
+            return None
+
+    def package_reconciliation_notice(self) -> str | None:
+        """对账未达到期望状态时的中文非阻断提示；正常或未对账时返回 ``None``。
+
+        只有 ``succeeded``（install / noop / upgrade）才视为“标准数据可信”，
+        conflict / invalid / no-downgrade / missing / unavailable 都必须让用户看到
+        标准数据尚未更新的提示，而不是让他误以为已经是最新。
+        """
+
+        outcome = self._package_reconciliation_outcome()
+        if outcome is None:
+            return None
+        if bool(getattr(outcome, "succeeded", False)):
+            return None
+        message = str(getattr(outcome, "message", "") or "").strip()
+        notice = PACKAGE_RECONCILIATION_NOTICE_PREFIX
+        if message:
+            notice = f"{notice}：{message}"
+        return f"{notice}（详见“帮助 → 关于 / 诊断信息”）"
+
+    def _clear_package_reconciliation_notice(self) -> None:
+        for attribute in ("package_reconciliation_notice_label", "package_reconciliation_notice_dismiss"):
+            widget = getattr(self, attribute, None)
+            if widget is None:
+                continue
+            widget.setParent(None)
+            widget.deleteLater()
+            setattr(self, attribute, None)
+
+    def _show_package_reconciliation_notice(self) -> None:
+        """在状态栏显示可关闭的非阻断中文提示（不弹模态框、不改页面布局）。"""
+
+        self._clear_package_reconciliation_notice()
+        notice = self.package_reconciliation_notice()
+        if notice is None:
+            return
+        status = self.statusBar()
+        label = QLabel(notice)
+        label.setObjectName("packageReconciliationNotice")
+        label.setStyleSheet("color: #b42318; font-weight: bold;")
+        dismiss = QPushButton("关闭提示")
+        dismiss.setObjectName("packageReconciliationNoticeDismiss")
+        dismiss.clicked.connect(lambda: self._clear_package_reconciliation_notice())
+        status.addWidget(label, 1)
+        status.addPermanentWidget(dismiss)
+        self.package_reconciliation_notice_label = label
+        self.package_reconciliation_notice_dismiss = dismiss
+
+    def _copy_diagnostics(self, text: str) -> None:
+        clipboard = QApplication.clipboard()
+        if clipboard is not None:
+            clipboard.setText(text)
+
+    def show_diagnostics(self) -> None:
+        """Open the read-only 关于 / 诊断信息 dialog."""
+        text = self.diagnostics_report()
+        dialog = QDialog(self)
+        dialog.setWindowTitle("关于 / 诊断信息")
+        dialog.resize(760, 560)
+        layout = QVBoxLayout(dialog)
+        content = QTextEdit()
+        content.setObjectName("diagnostics_content")
+        content.setReadOnly(True)
+        content.setPlainText(text)
+        content.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addWidget(content, 1)
+        buttons = QHBoxLayout()
+        copy = QPushButton("复制到剪贴板")
+        copy.clicked.connect(lambda: self._copy_diagnostics(text))
+        close = QPushButton("关闭")
+        close.clicked.connect(dialog.accept)
+        buttons.addWidget(copy)
+        buttons.addStretch()
+        buttons.addWidget(close)
+        layout.addLayout(buttons)
+        self.diagnostics_dialog = dialog
+        self.diagnostics_content = content
+        dialog.open()
 
     def open_selected_standard(self) -> None:
         row = self.standard_table.currentRow()
