@@ -100,9 +100,9 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - corrupted historical `result_json`：RS05 已按行隔离反序列化，单条损坏记录降级显示并记录 WARNING，
   不再中断“评价记录”页、首页或应用启动；detail 明确提示“记录损坏”。
 
-**RS05 尚未关闭的 Blocker**：
+**RS05 Blocker 状态**：
 
-- 内置正式标准包 `2026.09-published.2` 的 GB29446 定义落后于当前源码（包内 `rule_revision=1`、无煤种维度），
+- 已关闭：内置标准包的 GB29446 落后问题已按批准的方案 B 修复（父基线只替换该定义并重新签名，`2026.10-published.3`；RS04 Golden 15/15、冻结自检 exit 0）。以下为由环境决定的未关闭项：`n- （原 Blocker）内置正式标准包 `2026.09-published.2` 的 GB29446 定义落后于当前源码（包内 `rule_revision=1`、无煤种维度），
   导致“Candidate 安装后用 RS04 Golden 重新验证 GB29446”无法通过；详见 `release/standard-packages/PIN.json`。
 - Windows 验收证据不完整：无 Windows 11 环境、单显示器，无法实测多 DPI 与跨屏拖动（如实记为 BLOCKED）。
 

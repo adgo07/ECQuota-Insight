@@ -30,7 +30,7 @@ Base 上 RS04（PR #12）已合入，因此本阶段的起点包含 `GB29446 Pro
 | 本任务相关 Frozen Contract | Architecture V2.1；Numeric Contract v1（full-value exact、禁止显示值回流与隐式修约） |
 | 适用 MUST | 正式产物可追溯；标准包签名必须校验；不得用实现代码反向生成权威期望；历史结果不得重算 |
 | 适用 MUST NOT | 不自动跟随中央 `main`；不得把 DRAFT 当已发布 Contract；不得用“确认表”替代正式验证 |
-| 是否发现冲突 | 发现 1 项本仓 `LOCAL DEFECT` 级治理不一致（见 §5 Blocker 1），**不需要修改中央 Contract** |
+| 是否发现冲突 | 曾发现 1 项本仓 `LOCAL DEFECT` 级治理不一致（固定标准包内 GB29446 定义落后）；已在方案 B 下关闭（见 §5.2A），**不需要修改中央 Contract** |
 | 是否需要修改中央 Contract | **否** |
 | 相关 Standard Issue | `ECQ-STD-GB29446-001`，**仍为 `PROVISIONAL`**，本阶段**未关闭**、**未**写成官方解释 |
 | 本任务是否改变既有软件解释 | **否**（未改 Calculator、Numeric、阈值、标准解释） |
@@ -197,6 +197,69 @@ Type: filesandordirs; Name: "{app}\模板"
 
 ---
 
+### 5.2A 方案 B：只替换 GB29446 定义的新正式标准包（已批准并执行）
+
+项目负责人批准**方案 B**，约束为：不得依据 `统一标准规则确认表.xlsx` 重建全部规则；
+以已签名 `2026.09-published.2` 为**父基线**，只把经 RS04 验证的 GB29446 由 r1 替换为当前 r2；
+其余标准内容必须保持不变；生成并本地签名新的**完整**正式标准包，设新 `data_version`。
+
+执行方式：`tools/build_gb29446_package_revision.py`
+
+- **不**经过 `StandardPackageBuilder.build()`。该方法会把每个定义重新过一遍当前 pydantic
+  模型再序列化，可能静默改变其余 46 项标准的字节；本工具改为**逐个成员从父包原样复制**，
+  只替换 GB29446 定义成员，然后重新签名 manifest。
+- 全程**未读取也未使用**确认表，未从该表重建任何规则。
+
+结果（父包 `4f025b8a…1727` → 新包 `14db53be…32b0`）：
+
+| 项目 | 值 |
+|---|---|
+| 新 `data_version` | `2026.10-published.3` |
+| 新 `package_id` | `gb29446-r2-from-2026.09-published.2` |
+| `package_mode` | `full` |
+| `standard_count` / `rule_count` | `48` / `765`（均未变） |
+| 移除成员 | `definitions/gb-29446-2019-2019.json`（旧 r1） |
+| 新增成员 | `definitions/gb-29446-2019-2019-r2.json`（新 r2） |
+| **`changed_members`** | **`[]`（空）** |
+| 逐字节未变成员数 | 96 |
+| `minimum_app_version` | `0.1.0` → `0.2.0`（见下） |
+
+独立验证（不是自述，均为实测）：
+
+1. **同源校验**：除上述一个定义成员外，父包与候选包每个成员逐字节一致（`changed_members` 为空）。
+2. **签名校验**：用 `update_public_key.pem` 经 `install_package()` 在隔离数据目录安装成功。
+3. **安装后逐项对比**：新包安装出的 48 项标准中，除 GB29446 外其余 **47 项与父包定义逐字节一致（差异数 0）**。
+4. **GB29446 安装后 `rule_revision = 2`** 且 `selection_schema` 含 `coal_type`。
+5. **RS04 Product Golden 对已安装新标准包回放：15 例全部通过**（含 `5.0000004 → 2级` 的 full-value trap），
+   且 Applicability Gate 由原来的 `2 vs 1 FAIL` 变为 **PASS**。
+
+两项需要明示的判断（非标准内容，属清单元数据）：
+
+- **`minimum_app_version` 由 `0.1.0` 提升为 `0.2.0`**：新 GB29446 r2 使用只有 r2 才引入的
+  煤种选择 schema 与专属模板，0.1.0 应用无法正确处理；提升该下限可阻止旧应用安装不兼容的标准包。
+  这是除 GB29446 定义外**唯一有意偏离**父基线的字段，已记录在 `PIN.json` 的 `notes`。
+- **`parent_package_id` 无法写入完整包 manifest**：`PackageManifest.validate_lineage` 规定
+  `package_mode == "full"` 时该字段必须为 `None`，因此父基线关系记录在
+  `release/standard-packages/PIN.json` 的 `parent_baseline` 中。
+
+父基线未被修改，完整保留为
+`release/standard-packages/initial-standard-package-2026.09-published.2.uebench`
+（SHA256 `4f025b8a…1727`），供逐字节复核。
+
+### 5.12 Windows 验收工具不得由显示器数量推断 PASS（已修正）
+
+原 `tools/windows_acceptance_evidence.ps1` 在检测到 `screen_count >= 2` 时直接判
+「多显示器拖动窗口 = PASS」，这属于**由环境推断结论**，不是实测。已改为：
+
+- 有 2 个及以上显示器且**未**提供实测声明 → `PENDING-MANUAL`，并明确写出
+  “本工具不因显示器数量判定通过”；
+- 仅在操作者显式传入 `-CrossMonitorDragVerified [-CrossMonitorDragNote <说明>]`
+  时才记 `PASS`，并注明该结论来自操作者实测声明；
+- 不足 2 个显示器 → `BLOCKED`。
+
+本机 1 显示器实测输出仍为 `BLOCKED`，未出现任何自动 `PASS`。
+---
+
 ## 6. 逐项结果
 
 ### 6.1 升级前自动备份
@@ -286,36 +349,26 @@ legacy XFAIL 仍为 XFAIL（未被 deselect，也未被改成通过）。
 
 ```text
 dist\UEBench\UEBench.exe --self-check --data-dir <isolated> --output <json>
-exit code = 1
+exit code = 0
 ```
 
 | 检查 | 结果 |
 |---|---|
 | `build_info` | passed（product_version `0.2.0`，`qt_imported=false`） |
-| `standard_package` | passed（Ed25519 校验通过，48 项标准） |
+| `standard_package` | passed（Ed25519 校验通过，48 项标准，`2026.10-published.3`） |
 | `database` | passed（schema 初始化到 head） |
-| `golden_replay` | **failed** |
-| `record_roundtrip` | **failed** |
-| `excel_import_chain` | **failed** |
+| `golden_replay` | **passed** |
+| `record_roundtrip` | **passed** |
+| `excel_import_chain` | **passed** |
 
-失败原因（产品自身输出，原文）：
+`overall_status = passed`，`failed_checks = []`，`warnings = []`。
 
-```text
-失败：已安装 GB 29446 规则版本为 r1，RS04 Product Golden 要求 r2
-失败：gb29446-coking-grade1-exact-l1：标准未声明煤种 炼焦煤
-      （products[].selection_values 缺失，payload 规则过旧）
-失败：record_roundtrip  Golden 回放未产生可读回的评价记录，无法校验记录往返
-失败：excel_import_chain Excel 导入校验未通过：
-      error 评价数据!B6 标准中不存在煤种：炼焦煤
-```
-
-**这就是 §5.2 Blocker 1 在真实冻结产物上的端到端证明**，由产品自检独立给出，
-不是人工推断。同一自检在**源码模式**下会回退到仓库定义并给出 WARNING（因此源码
-模式 passed）；冻结模式没有仓库回退，因而如实失败 —— 这正是发布候选应有的行为。
-
-该报告的 JSON 结构（`uebench.self-check-report` v1）包含 `overall_status`、
-`exit_code`、`failed_checks`、`warnings` 与逐项 `checks`，可作为验收证据附件。
-
+> **对照记录**：在方案 B 之前，同一冻结 EXE 自检为 `exit code = 1`，`golden_replay`
+> 报「已安装 GB 29446 规则版本为 r1，RS04 Product Golden 要求 r2」，
+> `excel_import_chain` 报「评价数据!B6 标准中不存在煤种：炼焦煤」，
+> `record_roundtrip` 因无记录而失败。这曾是该阶段唯一的实质 Blocker；
+> 换成只替换 GB29446 定义的新签名标准包后全部通过，
+> 说明失败根因确实是标准包内容而非软件。
 ### 7.5 未完成 / 无法验证
 
 - **未用真实 0.1.0 安装包在真实用户数据目录上执行升级**；升级验证使用合成 fixture

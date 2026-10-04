@@ -33,17 +33,17 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 - 本质检视结论：**Reference Standard Product Closure 保持 `PARTIAL`**，
   `D-ECQ-006` 仍 **OPEN**。
 
-### RS05 尚未关闭的 Blocker
+### RS05 Blocker 状态
 
-1. **内置正式标准包中的 GB29446 定义落后于当前源码定义。**
-   固定标准包 `2026.09-published.2`（SHA256 `4f025b8a…1727`）内 GB29446 为
-   `rule_revision=1` 且 `selection_schema=[]`、`selection_values` 无 `coal_type`；
-   当前仓库定义与 RS04 Product Golden 为 `rule_revision=2` 且以煤种选择产品。
-   因此**“Candidate 安装后必须用 RS04 Golden 重新验证 GB29446”当前无法通过**
-   （Applicability Gate 失败，且无法按煤种定位产品）。
-   完整证据与两个可选处置方案见 `release/standard-packages/PIN.json` 的 `known_gap`。
-   该处置属于**治理决定**，本任务不单方面执行。
+**已关闭 Blocker 1（固定标准包内 GB29446 定义落后）** —— 项目负责人批准方案 B 后执行：
+以已签名 `2026.09-published.2`（SHA256 `4f025b8a…1727`）为父基线，**只**把 GB29446 定义
+由 `rule_revision=1` 替换为当前 `rule_revision=2`，其余 46 项标准内容逐字节保持不变，
+重新签名生成新的完整正式标准包 `2026.10-published.3`（SHA256 `14db53be…32b0`）。
+全程未使用 `统一标准规则确认表.xlsx`。RS04 Product Golden 回放 15/15 通过，
+冻结 EXE 自检由 `exit 1` 变为 `exit 0`。详见 `release/standard-packages/PIN.json` 与
+`docs/governance/RS05_EXECUTION_REPORT.md` §5.2A/§7.4。
 
+**未关闭 Blocker 2（Windows 验收证据不完整，如实记录）**
 2. **Windows 验收证据不完整（如实记录，不伪造 PASS）**
    - 本机仅有 **Windows 10 Build 19045**，**无 Windows 11 环境** → `BLOCKED`；
    - 本机仅 **1 个显示器**，无法实测“不同 DPI 显示器之间拖动窗口” → `BLOCKED`；

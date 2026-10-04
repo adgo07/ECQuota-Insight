@@ -1,54 +1,52 @@
 {
   "schema": "ecq.standard-package-pin.v1",
   "file": "initial-standard-package-published.uebench",
-  "size": 21320540,
-  "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
-  "data_version": "2026.09-published.2",
-  "package_id": "initial-47-current-plus-history-published-20260909",
+  "size": 21322203,
+  "sha256": "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0",
+  "data_version": "2026.10-published.3",
+  "package_id": "gb29446-r2-from-2026.09-published.2",
   "package_mode": "full",
   "standard_count": 48,
   "rule_count": 765,
-  "issued_at": "2026-09-09T01:41:17.924310Z",
+  "issued_at": "2026-10-04T00:00:00Z",
+  "minimum_app_version": "0.2.0",
   "signature": {
     "algorithm": "ed25519",
     "member": "signature.ed25519",
     "verifying_key": "src/uebench/resources/update_public_key.pem",
-    "verified_by": "context.application.install_package() 在隔离数据目录中安装成功（PackageInstallResult），并用 update_public_key.pem 完成 Ed25519 校验"
+    "verified_by": "context.application.install_package() 在隔离数据目录中安装成功（48 项标准），并用 update_public_key.pem 完成 Ed25519 校验"
   },
-  "provenance": {
-    "read_only_source": "dist/standard-packages/initial-standard-package-published.uebench",
-    "read_only_source_sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
-    "note": "本文件是按任务要求从本机只读目录复制的固定 release input；原资产未被修改、未被重建。",
-    "obtained_by": "ECQ-RS05 从本机现有正式签名标准包复制，未使用“统一标准规则确认表.xlsx”重新生成。"
+  "parent_baseline": {
+    "file": "release/standard-packages/initial-standard-package-2026.09-published.2.uebench",
+    "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
+    "size": 21320540,
+    "package_id": "initial-47-current-plus-history-published-20260909",
+    "data_version": "2026.09-published.2",
+    "note": "已发布的正式签名标准包，作为父基线完整保留（未被修改）。"
   },
-  "known_gap": {
-    "severity": "BLOCKER",
-    "summary": "该正式标准包内的 GB29446 定义落后于当前仓库定义，无法驱动 RS04 Product Golden。",
-    "packaged_gb29446_rule_revision": 1,
-    "repository_gb29446_rule_revision": 2,
-    "packaged_gb29446_selection_schema": [],
-    "repository_gb29446_selection_schema": [
-      {
-        "key": "coal_type",
-        "label": "煤种",
-        "required": true
-      }
+  "revision_gap_resolution": {
+    "decision": "ECQ-RS05 方案 B（由项目负责人批准）",
+    "summary": "以已签名 2026.09-published.2 为父基线，只把经 RS04 验证的 GB29446 定义由 r1 替换为当前 r2，其余标准内容逐字节保持不变，重新签名生成新的完整正式标准包，并设新 data_version 2026.10-published.3。",
+    "tool": "tools/build_gb29446_package_revision.py",
+    "removed_members": [
+      "definitions/gb-29446-2019-2019.json"
     ],
-    "packaged_has_coal_type_selection_values": false,
-    "consequence": [
-      "RS04 Applicability Gate 失败：Golden 声明 rule_revision=2，安装后实际为 1。",
-      "RS04 Gate A 无法构造请求：products[].selection_values 为空，不存在 coal_type，无法按煤种定位产品。",
-      "因此“Candidate 安装后必须用 RS04 Golden 重新验证 GB29446”在当前固定标准包下无法通过。"
+    "added_members": [
+      "definitions/gb-29446-2019-2019-r2.json"
     ],
-    "other_local_packages_checked": {
-      "initial-standard-package-0.1.0.uebench": "2026.08-reviewed.1，GB29446 rule_revision 缺失（更旧）",
-      "initial-standard-package-44-candidate.uebench": "2026.08-reviewed.5，更旧",
-      "initial-standard-package-46-candidate.uebench": "2026.08-reviewed.10，更旧"
-    },
-    "resolution_requires_human_decision": [
-      "方案 A：维持本任务书指定的固定标准包，RS05 该项如实记为 BLOCKED，等待正式发布新的标准包。",
-      "方案 B：由项目负责人批准，用当前 data/definitions 生成并签名一个新的正式标准包（新的 data_version），再重跑 RS04 Golden。",
-      "注意：work/signing/development-private-key.pem 与 src/uebench/resources/update_public_key.pem 经核实为同一密钥对，因此方案 B 技术上可行，但它会改变正式标准包，属于治理决定，不作由本任务单方面执行。"
-    ]
-  }
+    "changed_members": [],
+    "unchanged_member_count": 96,
+    "verification": [
+      "同源校验：除上述一个定义成员外，父包与候选包的每个成员逐字节一致（changed_members 为空）。",
+      "安装后对比：新包安装出的 48 项标准中，除 GB29446 外其余 47 项与父包定义逐字节一致（差异数 0）。",
+      "GB29446 安装后 rule_revision = 2 且 selection_schema 含 coal_type，与 RS04 Product Golden 声明一致。",
+      "RS04 Product Golden 对已安装新标准包回放：15 例全部通过（含 5.0000004 → 2级 的 full-value trap）。"
+    ],
+    "not_used": "整个过程未读取、未使用 统一标准规则确认表.xlsx（LEGACY_REFERENCE_ONLY），未从该表重建任何规则。"
+  },
+  "notes": [
+    "PackageManifest.validate_lineage 禁止 package_mode='full' 携带 parent_package_id，因此父基线关系无法写入完整包的 manifest，改由本文件记录。",
+    "minimum_app_version 由父基线的 0.1.0 提升为 0.2.0：新的 GB29446 r2 定义使用 r2 才引入的煤种选择 schema 与专属模板，0.1.0 应用无法正确处理；提升该下限可阻止旧应用安装不兼容的标准包。这是本次除 GB29446 定义外唯一有意偏离父基线的字段，属清单元数据而非标准内容。",
+    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.3 排在 2026.09-published.2 之后。"
+  ]
 }

@@ -3,7 +3,12 @@ param(
     [string]$OutputDir,
     [string]$SelfCheckExe,
     [string]$DataDir,
-    [switch]$SkipLaunch
+    [switch]$SkipLaunch,
+    # A human operator sets this ONLY after actually dragging the window between
+    # two monitors with different DPI and observing correct behaviour.  This tool
+    # never infers that result from the display count.
+    [switch]$CrossMonitorDragVerified,
+    [string]$CrossMonitorDragNote
 )
 
 # ECQ-RS05 §15: record the real Windows acceptance environment.
@@ -99,8 +104,21 @@ else {
 Add-Finding -Check "Windows 10 实机" -Status $(if ($environment.is_windows_10) { "PASS" } else { "BLOCKED" }) `
     -Detail "$($environment.os_caption) Build $($environment.os_build)"
 
-if ($environment.screen_count -ge 2) {
-    Add-Finding -Check "多显示器拖动窗口" -Status "PASS" -Detail "$($environment.screen_count) 个显示器"
+# ECQ-RS05: detecting a second display is NOT evidence that the cross-monitor
+# drag test passed.  Only a human who actually performed the drag (and observed
+# the window re-scale correctly on both monitors) may attest to it, via
+# -CrossMonitorDragVerified.  Without that attestation this tool reports
+# PENDING-MANUAL even when two monitors are present, and BLOCKED when the
+# hardware cannot support the test at all.
+if ($CrossMonitorDragVerified) {
+    Add-Finding -Check "多显示器拖动窗口" -Status "PASS" `
+        -Detail ("操作者实测声明（$($environment.screen_count) 个显示器）：" +
+                 $(if ([string]::IsNullOrWhiteSpace($CrossMonitorDragNote)) { '未附说明' } else { $CrossMonitorDragNote }))
+}
+elseif ($environment.screen_count -ge 2) {
+    Add-Finding -Check "多显示器拖动窗口" -Status "PENDING-MANUAL" `
+        -Detail ("检测到 $($environment.screen_count) 个显示器，但拖动实测尚未执行/记录；" +
+                 "本工具不因显示器数量判定通过。实测后请用 -CrossMonitorDragVerified -CrossMonitorDragNote 重新运行。")
 }
 else {
     Add-Finding -Check "多显示器拖动窗口" -Status "BLOCKED" `
