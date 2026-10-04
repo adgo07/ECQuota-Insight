@@ -24,7 +24,26 @@ from pathlib import Path
 
 ROOT = Path(r"G:\Python Project\能耗限额")
 EXE = ROOT / "dist" / "UEBench" / "UEBench.exe"
-LEGACY_PACKAGE = ROOT / "release" / "standard-packages" / "initial-standard-package-2026.09-published.2.uebench"
+POINTER = ROOT / "release" / "standard-packages" / "LEGACY-REFERENCE.json"
+
+
+def _legacy_package_copy() -> Path:
+    """COPY the archived parent-baseline package out of the read-only archive.
+
+    归档原件禁止直接使用，必须复制到独立临时目录后再用（操作者决定）。
+    """
+    entry = json.loads(POINTER.read_text(encoding="utf-8"))["parent_baseline"]
+    source = Path(json.loads(POINTER.read_text(encoding="utf-8"))["archive_root"]) / entry["relative_path"]
+    if not source.is_file():
+        raise SystemExit(f"旧标准包归档不可用：{source}")
+    target = Path(os.environ["TEMP"]) / "rs05-runtime-evidence" / entry["file_name"]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, target)
+    target.chmod(0o644)
+    return target
+
+
+LEGACY_PACKAGE = _legacy_package_copy()
 BUNDLED_PACKAGE = ROOT / "release" / "standard-packages" / "initial-standard-package-published.uebench"
 PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
 WORK = Path(os.environ["TEMP"]) / "rs05-runtime-evidence"

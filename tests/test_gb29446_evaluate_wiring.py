@@ -38,8 +38,13 @@ from uebench.ui.main_window import MainWindow
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
-LEGACY_PACKAGE = (ROOT / "release" / "standard-packages"
-                  / "initial-standard-package-2026.09-published.2.uebench")
+#: 旧包已移出仓库（REFERENCE ONLY）；取得的是归档件的**副本**。
+try:  # 测试目录既可能是普通目录，也可能被当作包
+    from _legacy_assets import session_legacy_package
+except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
+    from tests._legacy_assets import session_legacy_package
+
+LEGACY_PACKAGE = session_legacy_package()
 BUNDLED_PACKAGE = (ROOT / "release" / "standard-packages"
                    / "initial-standard-package-published.uebench")
 

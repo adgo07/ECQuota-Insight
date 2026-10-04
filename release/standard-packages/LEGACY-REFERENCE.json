@@ -1,0 +1,22 @@
+{
+  "schema": "ecq.legacy-reference.v1",
+  "status": "REFERENCE ONLY",
+  "note": "ECQ-RS05：旧标准包已移出本仓库，不得作为运行/构建/打包/发布输入。原件保存在项目外只读归档区，只作历史证据；需要时**复制**到独立临时目录后使用，禁止直接使用归档原件。",
+  "archive_root": "G:\\ECQuota-Archive\\ECQ-RS05-LEGACY-REFERENCE-ONLY",
+  "parent_baseline": {
+    "relative_path": "standard-packages/initial-standard-package-2026.09-published.2.uebench",
+    "file_name": "initial-standard-package-2026.09-published.2.uebench",
+    "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
+    "size": 21320540,
+    "data_version": "2026.09-published.2",
+    "package_id": "initial-47-current-plus-history-published-20260909",
+    "role": "2026.10-published.3 的父基线；仅用于复核“只替换 GB29446 定义（r1→r2）”"
+  },
+  "user_library": {
+    "relative_path": "user-library/UEBench-reviewed-202608",
+    "original_path": "%LOCALAPPDATA%\\UEBench",
+    "renamed_original": "%LOCALAPPDATA%\\UEBench.SUPERSEDED-reviewed-202608",
+    "data_version": "2026.08-reviewed.5",
+    "role": "旧 reviewed 用户库；仅用于兼容/升级/迁移测试"
+  }
+}

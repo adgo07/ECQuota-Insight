@@ -44,7 +44,13 @@ PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
 #: 固定（已发布）标准包：旧 = 2026.09-published.2（GB29446 r1），当前 = 2026.10-published.3（r2）。
 CURRENT_PACKAGE = PACKAGE_DIR / "initial-standard-package-published.uebench"
-OLD_PACKAGE = PACKAGE_DIR / "initial-standard-package-2026.09-published.2.uebench"
+#: 旧包已移出仓库（REFERENCE ONLY）；取得的是归档件的**副本**。
+try:  # 测试目录既可能是普通目录，也可能被当作包
+    from _legacy_assets import session_legacy_package
+except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
+    from tests._legacy_assets import session_legacy_package
+
+OLD_PACKAGE = session_legacy_package()
 #: 开发签名私钥（绝不复制进仓库，只按路径引用）。
 DEVELOPMENT_KEY = ROOT / "work" / "signing" / "development-private-key.pem"
 

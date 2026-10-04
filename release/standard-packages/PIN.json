@@ -17,12 +17,16 @@
     "verified_by": "context.application.install_package() 在隔离数据目录中安装成功（48 项标准），并用 update_public_key.pem 完成 Ed25519 校验"
   },
   "parent_baseline": {
-    "file": "release/standard-packages/initial-standard-package-2026.09-published.2.uebench",
+    "status": "REFERENCE ONLY",
+    "file": "initial-standard-package-2026.09-published.2.uebench",
     "sha256": "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727",
     "size": 21320540,
     "package_id": "initial-47-current-plus-history-published-20260909",
     "data_version": "2026.09-published.2",
-    "note": "已发布的正式签名标准包，作为父基线完整保留（未被修改）。"
+    "archived_at": "G:\\ECQuota-Archive\\ECQ-RS05-LEGACY-REFERENCE-ONLY\\standard-packages\\initial-standard-package-2026.09-published.2.uebench",
+    "archive_index": "G:\\ECQuota-Archive\\ECQ-RS05-LEGACY-REFERENCE-ONLY\\LEGACY-ARCHIVE.json",
+    "shipped_with_release": false,
+    "note": "旧标准包已移出仓库，不随 0.2.0 发布、也不得被运行时选用；仅作为“2026.10-published.3 只替换 GB29446 定义”的历史父基线证据，保存在项目外只读归档区。复核时须先复制到独立临时目录。"
   },
   "revision_gap_resolution": {
     "decision": "ECQ-RS05 方案 B（由项目负责人批准）",
@@ -47,6 +51,17 @@
   "notes": [
     "PackageManifest.validate_lineage 禁止 package_mode='full' 携带 parent_package_id，因此父基线关系无法写入完整包的 manifest，改由本文件记录。",
     "minimum_app_version 由父基线的 0.1.0 提升为 0.2.0：新的 GB29446 r2 定义使用 r2 才引入的煤种选择 schema 与专属模板，0.1.0 应用无法正确处理；提升该下限可阻止旧应用安装不兼容的标准包。这是本次除 GB29446 定义外唯一有意偏离父基线的字段，属清单元数据而非标准内容。",
-    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.3 排在 2026.09-published.2 之后。"
-  ]
+    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.3 排在 2026.09-published.2 之后。",
+    "2026.10-published.3 是仓库与正式打包路径中**唯一**的标准包；旧包 2026.09-published.2 已归档为 REFERENCE ONLY（见 LEGACY-REFERENCE.json）。"
+  ],
+  "cleanup_policy": {
+    "decided_by": "项目负责人",
+    "decided_on": "2026-10-04",
+    "rules": [
+      "旧标准包与旧用户库不得作为当前产品的运行、构建、打包或发布输入。",
+      "旧资产统一标记为 LEGACY / SUPERSEDED / REFERENCE ONLY。",
+      "归档原件只读；需要时复制到独立临时目录后使用，禁止直接使用原件。",
+      "旧用户库不自动迁移、不直接修改；原件已改名移出运行路径。"
+    ]
+  }
 }

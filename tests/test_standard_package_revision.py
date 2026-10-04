@@ -25,7 +25,13 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
 PINNED = PACKAGE_DIR / "initial-standard-package-published.uebench"
-PARENT = PACKAGE_DIR / "initial-standard-package-2026.09-published.2.uebench"
+#: 父基线已移出仓库（REFERENCE ONLY，项目外只读归档）；这里取得的是**副本**。
+try:  # 测试目录既可能是普通目录，也可能被当作包
+    from _legacy_assets import session_legacy_package
+except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
+    from tests._legacy_assets import session_legacy_package
+
+PARENT = session_legacy_package()
 PIN = PACKAGE_DIR / "PIN.json"
 
 GHOST = "signature.ed25519"
@@ -57,6 +63,24 @@ def definitions_of(path: Path) -> dict[tuple[str, str, int], tuple[str, bytes]]:
     return out
 
 
+def test_legacy_parent_package_is_not_shipped_in_the_repository() -> None:
+    """ECQ-RS05 清理决定：旧标准包不得再作为仓库/打包输入。
+
+    它已移出仓库、归档为项目外只读证据（REFERENCE ONLY）。若它重新出现在
+    release/standard-packages/ 下，说明清理被回退，必须失败。
+    """
+    legacy = PACKAGE_DIR / "initial-standard-package-2026.09-published.2.uebench"
+    assert not legacy.exists(), (
+        "旧标准包重新出现在仓库中；它应是 REFERENCE ONLY 的外部归档证据"
+    )
+    pointer = PACKAGE_DIR / "LEGACY-REFERENCE.json"
+    assert pointer.is_file(), "缺少旧资产归档指针 LEGACY-REFERENCE.json"
+    record = json.loads(pointer.read_text(encoding="utf-8"))
+    assert record["status"] == "REFERENCE ONLY"
+    assert record["parent_baseline"]["sha256"] == (
+        "4f025b8a45f03fc5539b2d5eb76bdf6c3d127b863e7485b46fbb100b6f221727"
+    )
+
 def test_pinned_package_matches_pin_json() -> None:
     record = pin()
     assert PINNED.is_file(), "缺少固定的标准包 release input"
@@ -87,7 +111,11 @@ def test_pinned_package_gb29446_is_revision_2_with_coal_type() -> None:
 
 def test_only_gb29446_differs_from_the_parent_baseline() -> None:
     record = pin()
-    assert PARENT.is_file(), "缺少父基线标准包"
+    if not PARENT.is_file():
+        pytest.skip(
+            "父基线标准包已归档为 REFERENCE ONLY（项目外只读区）且当前不可用；"
+            "不随仓库分发，需先复制归档副本再复核"
+        )
     assert sha256_of(PARENT) == record["parent_baseline"]["sha256"], (
         "父基线标准包被修改；它必须保持为已发布资产的逐字节副本"
     )
