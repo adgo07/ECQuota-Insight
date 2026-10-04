@@ -382,6 +382,7 @@ def test_source_zip_missing_governance_file_fails_the_build(
 
 def test_source_zip_default_output_name_is_version_derived(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """``--output`` is optional; its default must come from the version tool."""
     from tools import build_source_zip as module
@@ -390,6 +391,10 @@ def test_source_zip_default_output_name_is_version_derived(
 
     def fake_build(output: Path) -> Path:
         captured["output"] = output
+        # ``output`` is the repository-RELATIVE default.  Resolve it under a
+        # temporary working directory (see chdir below) instead of the repo
+        # root: writing it at the repo root would overwrite the real built
+        # Candidate's UEBench-source-<version>.zip with the placeholder bytes.
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_bytes(b"placeholder")
         return output
@@ -411,7 +416,11 @@ def test_source_zip_default_output_name_is_version_derived(
 
     monkeypatch.setattr(module, "build_source_zip", fake_build)
     monkeypatch.setattr(module.zipfile, "ZipFile", FakeArchive)
-    monkeypatch.chdir(ROOT)
+    # Run in a temporary directory so the relative default output is written
+    # somewhere disposable.  Pointing this at the repository root used to
+    # clobber dist/release/UEBench-source-<version>.zip when a Candidate had
+    # already been built.
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(sys, "argv", ["build_source_zip.py"])
     module.main()
 

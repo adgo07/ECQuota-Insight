@@ -533,6 +533,27 @@ FAILED tests/test_release_artifacts.py::test_audit_release_reports_valid
 属于会误导验收的日志。
 ---
 
+### 9A.8 Source Gate 曾破坏已构建的 Candidate 产物（已修复）
+
+`tests/test_release_source.py::test_source_zip_default_output_name_is_version_derived`
+用 `monkeypatch.chdir(ROOT)` 把工作目录切到仓库根，然后让替身函数向**相对**默认路径
+`dist/release/UEBench-source-<版本>.zip` 写入 `b"placeholder"`，
+用于让 `main()` 末尾的 `output.stat()` 能取到大小。
+
+后果：只要已经构建过 Candidate，再跑一次 Source Gate 就会把真实的源码包**覆盖成
+11 字节的 `placeholder`**。本次执行中实际发生——`dist/release/UEBench-source-0.2.0.zip`
+由 1,419,535 字节变成 11 字节，随后由 `scripts/sync_release.ps1` 重新组装修复。
+（该缺陷不影响 CI 的 Artifact Gate：CI 上 Source Gate 在构建之前运行，且产物审计针对
+`dist/candidate`；但它会污染 `dist/release`，并且会破坏开发机上的候选产物。）
+
+修复：把该测试的 `chdir` 目标由仓库根改为 `tmp_path`（并补上 `tmp_path` fixture），
+使相对默认路径落在一次性目录内；断言未削弱（仍要求默认输出名由版本推导且含当前版本）。
+
+验证：运行该测试后 `dist/release/UEBench-source-0.2.0.zip` 的字节数与 SHA256 **不变**；
+`tests/test_release_source.py` 16 passed；全量套件运行后该文件同样保持完好。
+另已 grep 确认 `tests/` 中不再有指向仓库根的 `chdir`。
+---
+
 ## 10. 状态
 
 ```text
