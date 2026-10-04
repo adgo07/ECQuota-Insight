@@ -98,12 +98,12 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-full
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-numeric-v1-full"
 
       - name: Verify all tests
         shell: pwsh
         run: |
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-numeric-v1-clean
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-numeric-v1-clean"
 
       - name: Record resolved Numeric dependency versions
         shell: pwsh

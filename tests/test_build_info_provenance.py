@@ -291,14 +291,42 @@ def test_source_dirty_ignores_gitignored_paths(
     assert write_build_info.source_dirty(git_repo) is False
 
 
-def test_source_provenance_fails_closed_outside_a_repository(
-    write_build_info: ModuleType, tmp_path: Path
+def test_source_provenance_fails_closed_when_git_cannot_answer(
+    write_build_info: ModuleType, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A tree whose provenance cannot be proven must not claim to be clean."""
+    """A tree whose provenance cannot be proven must not claim to be clean.
+
+    This must NOT be simulated by pointing at an arbitrary temporary directory:
+    ``tmp_path`` may well live *inside* the repository (CI runs pytest with a
+    ``--basetemp`` under the checkout), and a subdirectory of a repository is
+    still part of that repository, so git answers normally and nothing is
+    "unprovable".  The contract is about git being *unable to answer*, so break
+    git itself rather than relying on where the temporary directory happens to be.
+    """
+    monkeypatch.setattr(write_build_info, "_run_git", lambda *args, **kwargs: None)
     outside = tmp_path / "not-a-repo"
     outside.mkdir()
     assert write_build_info.source_commit(outside) is None
     assert write_build_info.source_dirty(outside) is True
+
+
+def test_source_commit_rejects_unparseable_git_output(
+    write_build_info: ModuleType, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """git answering with something that is not a 40-hex SHA is still unprovable."""
+    monkeypatch.setattr(
+        write_build_info, "_run_git", lambda *args, **kwargs: "not-a-sha\n"
+    )
+    assert write_build_info.source_commit(tmp_path) is None
+
+
+def test_source_commit_resolves_inside_the_repository(
+    write_build_info: ModuleType,
+) -> None:
+    """The counter-case: a real checkout resolves, and a subdirectory resolves too."""
+    head = write_build_info.source_commit(ROOT)
+    assert head is not None and re.fullmatch(r"[0-9a-f]{40}", head), head
+    assert write_build_info.source_commit(ROOT / "tests") == head
 
 
 # --------------------------------------------------------------------------

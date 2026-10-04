@@ -106,7 +106,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-candidate-full
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-candidate-full"
 
       - name: Build the Windows Release Candidate
         shell: pwsh
@@ -189,7 +189,7 @@ jobs:
         env:
           UEBENCH_ARTIFACT_DIR: dist/candidate
         run: |
-          python -m pytest tests/test_release_artifacts.py -q -ra -p no:cacheprovider --basetemp work/pytest-candidate-artifacts
+          python -m pytest tests/test_release_artifacts.py -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-candidate-artifacts"
 
       - name: Upload Candidate artifacts
         uses: actions/upload-artifact@v4

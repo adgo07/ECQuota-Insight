@@ -61,12 +61,12 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-full
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-n01-a-full"
 
       - name: Verify all tests
         shell: pwsh
         run: |
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-clean
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-n01-a-clean"
 
       - name: Summarize literal full-suite outcome
         shell: pwsh
