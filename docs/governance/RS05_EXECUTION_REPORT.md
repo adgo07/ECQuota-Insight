@@ -894,3 +894,59 @@ Source/Artifact Gate + RS04 Golden + self-check + Numeric v1 + N01-A + Generic E
 legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实产品链人工验证。
 **注意**：`dist/release` 仍是用旧包构建的 Candidate，新增"无 PDF"断言对它必然失败，
 必须重建后才转绿（不得以删断言或 skip 掩盖）。
+
+## Phase 7 独立验收结论：FAIL —— 三项 blocker 与修复（进行中）
+
+> 本节为**追加**记录。它更正上文与前一份完成报告的过强表述，并记录独立验收的实际结论。
+
+### 独立验收结论
+
+- 验收坐标：Base `fb91ccc6f85791bcaf9751c5681cc00c5a0ed213` → Head `4320980645256d446033a8213000b9bea5625599`（15 提交、79 文件）。
+- 结论：**Phase 7 整体未通过**；不允许 merge PR #13，也不允许该 Candidate 放行进入 Win10/Win11 人工发布验收。
+- 已成立并与之相符的证据：全量 `918 passed / 65 skipped / 4 xfailed`、真实 Candidate Artifact Gate `66 passed`、
+  冻结 EXE self-check `exit 0`、reconciliation/package/Golden/Numeric 计数、Candidate 身份旧缺陷已关闭。
+- CI 三个 workflow 在 final-head 均为 success，但**不能替代** Win11/多显示器/DPI/断网人工验收。
+
+### 更正两处过强表述
+
+1. **"正式评价范围已收口"不完整**：收口此前只做在 UI 层。`Application` 正式链路
+   （`EvaluationService.evaluate()`）当时**未**检查支持范围注册表，范围外标准（如 `gb-16780-2021`）
+   仍能形成正式评价记录。因此"只有 GB29446 可正式评价"当时**不覆盖正式 Application 调用链**。
+2. **"用户数据目录无标准 PDF"不完整**：新包/便携 ZIP/源码 ZIP 确实无 PDF，但
+   `install()` 仍会把含 `sources` 的**旧包**的原文写入用户数据目录，因此旧库升级后
+   48 份 PDF 仍在，并被复制进升级前备份。新包无 PDF **不能**证明用户数据生命周期满足要求。
+
+### 三项 blocker 与修复
+
+| # | blocker | 修复 |
+|---|---|---|
+| 1 | 正式评价范围仅在 UI 收口 | `EvaluationService.evaluate()` 在**解析/计算/保存之前**用 `request.standard_id` 直接判范围，范围外抛 `ValueError`（文案取自注册表）且**不写任何记录**；`preview()` 显式保留为对所有标准开放并写入 docstring |
+| 2 | 安装仍把标准原文写入用户数据目录 | `install()` 对任何包都不再复制 `source` 成员（`preview()` 的 `sources/*` 哈希校验**保持**）；并在**创建升级前备份之前**清理旧版本在产品管理目录下遗留的 `standards/<pkg>/sources`（严格限定于该路径），记日志 + 审计动作 `STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED`，清理量经 `removed_source_directory_count` / `removed_source_file_count` 如实上报 |
+| 3 | 安全备份可被静默覆盖 | 备份名改为亚秒精度 `%Y%m%d-%H%M%S-%f` **并加冲突守卫**（同名则追加 `-1/-2/…`），**绝不覆盖**既有备份；保留 `pre-package-*.uebackup` 前缀以兼容既有 glob；测试中的 `time.sleep(1.05)` 规避已移除，改为真实回归 |
+
+### 修复的独立复现证据（以真实当前标准包 + 隔离 SQLite + 归档旧包副本）
+
+```text
+Blocker 1  gb-16780-2021 registry=False
+           evaluate() -> ValueError「尚未纳入正式评价范围：该标准不能形成正式评价记录，仅可预览。」
+           评价记录 0 -> 0；DB 中 gb-16780-2021 评价行 rows=0
+           preview() 对范围外标准仍可用且不落记录
+           GB29446 正式评价仍可用并落记录（LEVEL_1）
+Blocker 2  安装含 sources 的旧包后用户数据目录 PDF = 0
+           人为构造旧版遗留 PDF=3 -> 再次安装后 PDF=0（removed_dirs=1 removed_files=3）
+           升级前备份逐成员清点：members=3 pdf=0 / members=4 pdf=0  -> 备份亦不含 PDF
+Blocker 3  连续两次安装（无 sleep）备份路径不同：
+           pre-package-20261005-111819-684675.uebackup
+           pre-package-20261005-111821-081210.uebackup
+           两个备份都存在，第一个未被覆盖（sha256 不变）
+```
+
+### 待完成
+
+新增 Gate 的完整回归、**重建 final Candidate**、Source/Artifact Gate + RS04 Golden + self-check +
+Numeric v1 + N01-A + Generic Excel + legacy upgrade、**exact-head CI**、本机 Win10 最短真实产品链复验、
+以及修复报告（Base → 新 final Head 为独立验收对象）。
+
+状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
+`Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
+`ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。

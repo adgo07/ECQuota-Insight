@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 import shutil
@@ -27,6 +28,16 @@ from .backup import BackupService
 from .database import DatabaseManager, PackageRow, StandardRow
 from .paths import AppPaths
 from .repositories import AuditRepository, SqlStandardRepository
+
+logger = logging.getLogger(__name__)
+
+#: Audit action recorded when install removes ``sources`` directories that an
+#: earlier version of this product wrote under the user data directory.
+AUDIT_LEGACY_SOURCES_REMOVED = "STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED"
+
+#: Glob-compatible prefix of the pre-install safety backup.  Existing callers
+#: and tools glob ``pre-package-*.uebackup``.
+BACKUP_NAME_PREFIX = "pre-package-"
 
 
 class StandardPackageError(ValueError):
@@ -121,6 +132,37 @@ class PackageInstallResult(BaseModel):
     data_version: str
     standards_installed: int
     backup_path: str
+    #: Number of legacy product-installed ``sources`` directories removed from
+    #: the user data directory before the safety backup was taken.  ``0`` for a
+    #: data directory that never held them.
+    removed_source_directory_count: int = 0
+    #: Number of files that lived inside those directories.
+    removed_source_file_count: int = 0
+
+
+def _backup_path(directory: Path) -> Path:
+    """Return a **new** pre-install safety backup path that does not yet exist.
+
+    The name is unique to the microsecond *and* guarded against collision: if
+    the computed path already exists (same microsecond, restored directory, or
+    a clock that does not advance) a ``-1``/``-2``/… suffix is appended until a
+    free name is found.  A safety backup is never silently replaced.
+
+    ``BackupService.create`` writes to the path it is given, so choosing the
+    name here is what keeps two back-to-back installs from destroying the first
+    backup — the previous implementation was precise only to the second.
+    """
+    directory = Path(directory)
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    candidate = directory / f"{BACKUP_NAME_PREFIX}{stamp}.uebackup"
+    if not candidate.exists():
+        return candidate
+    sequence = 1
+    while True:
+        distinct = directory / f"{BACKUP_NAME_PREFIX}{stamp}-{sequence}.uebackup"
+        if not distinct.exists():
+            return distinct
+        sequence += 1
 
 
 def _canonical_json(value: dict) -> bytes:
@@ -714,12 +756,90 @@ class StandardPackageService:
             package_sha256=package_sha256,
         )
 
+    def _remove_legacy_source_directories(self) -> tuple[int, int]:
+        """Delete legacy product-installed ``sources`` directories under the standards root.
+
+        The owner requirement is that the software must not keep full standard
+        PDFs in the user data directory.  ``install`` no longer copies
+        ``sources/*`` anywhere, but a data directory written by an earlier
+        version still holds ``paths.standards/<package_id>/sources/*``.  Those
+        are removed so the *live* directory - and the pre-upgrade safety backup
+        taken immediately afterwards - no longer carry the standard原文.
+
+        Scope is deliberately narrow: only directories literally named
+        ``sources`` that are **direct** children of a directory under
+        ``paths.standards``.  Nothing outside ``paths.standards`` is ever
+        touched, and symlinked directories are neither followed nor deleted as
+        if they were products of this software.
+
+        Returns ``(directories_removed, files_removed)``.
+        """
+        standards = Path(self.paths.standards)
+        if not standards.is_dir():
+            return 0, 0
+        resolved_standards = standards.resolve()
+        legacy_directories: list[Path] = []
+        file_count = 0
+        for package_directory in sorted(standards.iterdir()):
+            if not package_directory.is_dir() or package_directory.is_symlink():
+                continue
+            resolved_package = package_directory.resolve()
+            # Never follow a package directory out of ``paths.standards`` (on
+            # Windows a junction is not reported by ``is_symlink``).
+            if not resolved_package.is_relative_to(resolved_standards):
+                continue
+            candidate = package_directory / "sources"
+            if not candidate.is_dir() or candidate.is_symlink():
+                continue
+            # A package directory is a direct child of ``paths.standards``, so
+            # the candidate must stay strictly inside the standards root.
+            resolved_candidate = candidate.resolve()
+            if resolved_candidate.parent != resolved_package:
+                continue
+            if not resolved_candidate.is_relative_to(resolved_standards):
+                continue
+            legacy_directories.append(candidate)
+            file_count += sum(
+                1
+                for item in candidate.rglob("*")
+                # Symlinks are never followed and never counted: the reported
+                # count must describe the files this cleanup removes.
+                if not item.is_symlink() and item.is_file()
+            )
+        if not legacy_directories:
+            return 0, 0
+        logger.warning(
+            "移除旧版本写入用户数据目录的标准原文：%d 个目录、%d 个文件，全部位于 %s 内；"
+            "目录：%s",
+            len(legacy_directories),
+            file_count,
+            resolved_standards,
+            "、".join(str(directory) for directory in legacy_directories),
+        )
+        for directory in legacy_directories:
+            shutil.rmtree(directory, ignore_errors=True)
+        self.audit.append(
+            AUDIT_LEGACY_SOURCES_REMOVED,
+            "standard_package",
+            None,
+            {
+                "directories_removed": len(legacy_directories),
+                "files_removed": file_count,
+                "scope": str(resolved_standards),
+            },
+        )
+        return len(legacy_directories), file_count
+
     def install(self, path: Path) -> PackageInstallResult:
         report = self.preview(path)
         if not report.valid or report.manifest is None or report.package_sha256 is None:
             raise StandardPackageError("；".join(report.errors) or "标准包验证失败")
         manifest = report.manifest
-        backup_path = self.paths.backups / f"pre-package-{datetime.now():%Y%m%d-%H%M%S}.uebackup"
+        # Order matters: the legacy原文 directories are removed *before* the
+        # safety backup so the backup itself already satisfies "no full standard
+        # PDFs in the user data directory".
+        removed_directories, removed_files = self._remove_legacy_source_directories()
+        backup_path = _backup_path(self.paths.backups)
         self.backup.create(backup_path)
         destination = (self.paths.standards / manifest.package_id).resolve()
         if destination.parent != self.paths.standards.resolve():
@@ -731,7 +851,12 @@ class StandardPackageService:
                 temporary_path = Path(temporary)
                 with zipfile.ZipFile(path, "r") as archive:
                     for item in manifest.files:
-                        if item.kind in {"source", "correction"}:
+                        # Only non-original artefacts are materialised into the
+                        # user data directory.  ``sources/*`` members stay inside
+                        # the package archive: the product verifies them on
+                        # preview/install but must never store full standard
+                        # PDFs next to the user's data.
+                        if item.kind == "correction":
                             target = temporary_path / PurePosixPath(item.path).name
                             target.write_bytes(archive.read(item.path))
                 shutil.copytree(temporary_path, destination)
@@ -762,4 +887,6 @@ class StandardPackageService:
             data_version=manifest.data_version,
             standards_installed=len(report.definitions),
             backup_path=str(backup_path),
+            removed_source_directory_count=removed_directories,
+            removed_source_file_count=removed_files,
         )

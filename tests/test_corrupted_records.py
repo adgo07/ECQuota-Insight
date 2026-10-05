@@ -26,6 +26,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMessageBox, QTextEdit
 from sqlalchemy import text
 
+from uebench.application import evaluation_support
 from uebench.bootstrap import create_context
 from uebench.domain.models import (
     RECORD_CORRUPTED_LABEL,
@@ -42,6 +43,24 @@ from .test_engine import make_standard
 
 CORRUPTED_RESULT_JSON = '{"evaluation_id": "truncated", "results": ['
 GENERIC_INPUT_MESSAGE = "导出Excel失败，请检查输入数据、单位和适用条件后重试。"
+
+#: 本文件统一使用的夹具标准（``make_standard()`` 的 id）。
+FIXTURE_STANDARD_ID = "gb-00000-2026"
+
+
+@pytest.fixture(autouse=True)
+def _fixture_standard_is_formally_evaluable(monkeypatch):
+    """把夹具标准放进**真正的**正式评价范围注册表（与 ``test_ui.py::_in_formal_scope`` 同模式）。
+
+    本文件覆盖的是损坏记录的读取降级、导出、备份与界面表现，全部需要经
+    ``ctx.application.evaluate`` 走**正式**落库路径来造数据；它不覆盖范围本身。RS05 §三
+    之后，范围外标准无法形成正式记录，因此这里显式扩展注册表本身——产品的正式评价判定
+    仍然完全由注册表驱动，测试没有绕过它。
+    """
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | {FIXTURE_STANDARD_ID}
+    monkeypatch.setattr(
+        evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
+    )
 
 
 @pytest.fixture(scope="module")

@@ -8,6 +8,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication, QMessageBox
 
+import pytest
+
 from uebench.application import evaluation_support
 from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_SUPPORTED_LABEL,
@@ -41,6 +43,41 @@ def _in_formal_scope(monkeypatch, *standard_ids: str) -> None:
     monkeypatch.setattr(
         evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
     )
+
+
+def _seed_legacy_record(context, request: EvaluationRequest):
+    """直接写入一条**历史**正式记录，模拟 RS05 §三 之前版本留下的范围外记录。
+
+    ``EvaluationService.evaluate`` 现在拒绝范围外标准，但真实用户的数据库里仍存有旧版本
+    （把 ``published`` 当可评价）写下的记录——这正是本修复要保护的存量数据。要覆盖“这类
+    记录不得经「基于此记录重新评价」回到正式评价”，记录就必须**绕过正式写入口**直接落到
+    仓储，而不能靠临时放宽注册表去伪造一次正式评价——那恰恰是修复要禁止的行为。
+    """
+    standard = context.application.get_published_standard(request.standard_id)
+    assert standard is not None, f"夹具标准应已安装：{request.standard_id}"
+    result = context.application.preview_evaluation(request)
+    context.evaluations.save(request, result, standard)
+    return result
+
+
+@pytest.fixture(autouse=True)
+def _never_block_on_a_modal_dialog(monkeypatch):
+    """兜底：任何用例都不得因**真实模态对话框**永久阻塞事件循环。
+
+    ``QMessageBox.warning/critical/information`` 的静态方法会进入嵌套事件循环；offscreen
+    下没有用户去点按钮，于是**永远**不返回——一次本应是断言失败的拒绝会变成整套挂死，
+    pytest 连失败清单都写不出来。RS05 §三 新增了范围拒绝路径之后，这种风险从“不可能”变成
+    “很容易”（任何驱动正式评价入口的用例都可能撞上）。
+
+    这里只做**兜底**：需要断言对话框内容的用例在自己的函数体里再 ``monkeypatch.setattr``，
+    函数体的补丁在后、优先级更高，仍然能捕获到标题与正文。
+    """
+    for name, button in (
+        ("warning", QMessageBox.StandardButton.Ok),
+        ("information", QMessageBox.StandardButton.Ok),
+        ("critical", QMessageBox.StandardButton.Ok),
+    ):
+        monkeypatch.setattr(QMessageBox, name, staticmethod(lambda *a, _b=button, **k: _b))
 
 
 def test_main_window_starts_with_empty_database(tmp_path: Path) -> None:
@@ -107,7 +144,12 @@ def test_record_request_can_be_loaded_for_copy_or_recalculation(tmp_path: Path, 
 def test_record_of_out_of_scope_standard_cannot_be_re_evaluated(
     tmp_path: Path, monkeypatch
 ) -> None:
-    """RS05 §三：正式评价范围之外的标准不得经“基于此记录重新评价”回到正式评价。"""
+    """RS05 §三：正式评价范围之外的标准不得经“基于此记录重新评价”回到正式评价。
+
+    记录本身是**存量数据**：旧版本会为范围外标准写下正式记录，新版本必须保留它可查看，
+    但不允许借它重新进入正式评价。因此这里直接把记录写进仓储（见 ``_seed_legacy_record``），
+    而不是经已加门槛的 ``evaluate``。
+    """
 
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
@@ -120,7 +162,8 @@ def test_record_of_out_of_scope_standard_cannot_be_re_evaluated(
         input_mode=InputMode.DIRECT,
         inputs={"actual": InputValue(value="15", unit="kgce/t")},
     )
-    context.evaluation_service.evaluate(request)
+    assert evaluation_support.supports_formal_evaluation(standard.id) is False
+    _seed_legacy_record(context, request)
     window = MainWindow(context)
     warnings: list[str] = []
     monkeypatch.setattr(
@@ -145,6 +188,10 @@ def test_result_view_shows_grade_count_without_overall_grade(tmp_path: Path, mon
     context = create_context(tmp_path / "appdata")
     standard = make_standard()
     context.standards.install(standard)
+    # 本用例覆盖的是「结果页等级计数」，不是范围；结果页需要一次**正式**评价，因此把夹具
+    # 标准显式放进注册表（RS05 §三）。否则 evaluate 会被范围门槛拒绝，界面转而弹出真正的
+    # 模态错误框——在 offscreen 下会永久阻塞事件循环（旧行为里没有这条拒绝路径）。
+    _in_formal_scope(monkeypatch, standard.id)
     window = MainWindow(context)
     monkeypatch.setattr("uebench.ui.main_window.QMessageBox.information", lambda *args, **kwargs: None)
     request = EvaluationRequest(

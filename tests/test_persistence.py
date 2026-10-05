@@ -6,6 +6,7 @@ import zipfile
 import pytest
 from sqlalchemy import text
 
+from uebench.application import evaluation_support
 from uebench.application.services import EvaluationService
 from uebench.domain.models import AuditEntry, EvaluationRequest, EvaluationSummary, Grade, InputMode, InputValue
 from uebench.infrastructure.backup import BackupService, BackupValidationError
@@ -20,6 +21,20 @@ from uebench.infrastructure.repositories import (
 from .test_engine import make_standard
 
 
+def _in_formal_scope(monkeypatch, *standard_ids: str) -> None:
+    """把 ``standard_ids`` 声明为正式可评价（与 ``test_ui.py::_in_formal_scope`` 同模式）。
+
+    正式评价范围是应用层的固定常量，**与“标准库里有没有这个标准”无关**（RS05 §三）。
+    本文件覆盖的是**持久化**——往返一致、软删除可见性、备份恢复——不是范围本身；需要经
+    ``EvaluationService.evaluate`` 真正落库的用例必须显式扩展真正的注册表。这里改的是
+    注册表本身，因此产品行为仍然完全由注册表驱动。
+    """
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | set(standard_ids)
+    monkeypatch.setattr(
+        evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
+    )
+
+
 def setup_database(tmp_path: Path):
     paths = AppPaths.from_root(tmp_path / "appdata")
     paths.ensure()
@@ -29,12 +44,14 @@ def setup_database(tmp_path: Path):
     return paths, database, audit
 
 
-def test_standard_and_evaluation_round_trip(tmp_path: Path) -> None:
+def test_standard_and_evaluation_round_trip(tmp_path: Path, monkeypatch) -> None:
     _, database, audit = setup_database(tmp_path)
     standards = SqlStandardRepository(database, audit)
     evaluations = SqlEvaluationRepository(database, audit)
     standard = make_standard()
     standards.install(standard, "test-package")
+    # 往返一致需要一条**正式**记录，因此把夹具标准显式放进注册表（RS05 §三）。
+    _in_formal_scope(monkeypatch, standard.id)
 
     request = EvaluationRequest(
         evaluation_date=date(2026, 2, 2),
@@ -83,12 +100,14 @@ def test_list_published_returns_latest_version_per_standard(tmp_path: Path) -> N
     assert standards.get_published(first.id).version == "2027"
 
 
-def test_soft_delete_hides_evaluation(tmp_path: Path) -> None:
+def test_soft_delete_hides_evaluation(tmp_path: Path, monkeypatch) -> None:
     _, database, audit = setup_database(tmp_path)
     standards = SqlStandardRepository(database, audit)
     evaluations = SqlEvaluationRepository(database, audit)
     standard = make_standard()
     standards.install(standard)
+    # 软删除需要一条**正式**记录，因此把夹具标准显式放进注册表（RS05 §三）。
+    _in_formal_scope(monkeypatch, standard.id)
     request = EvaluationRequest(
         evaluation_date=date(2026, 2, 2),
         standard_id=standard.id,

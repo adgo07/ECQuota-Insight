@@ -12,7 +12,6 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-import time
 import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -515,9 +514,13 @@ def test_older_installed_package_is_upgraded_to_bundled(context, tmp_path: Path)
     assert installed.action is ReconciliationAction.INSTALL
     assert context.standards.get_published(GB29446).rule_revision == 1
 
-    # 备份文件名精确到秒：先跨过一秒，升级备份才可以被独立观察到。
-    time.sleep(1.05)
+    # 备份名带亚秒精度并带碰撞保护，因此连续两次安装必须各自留下一个可独立
+    # 观察的备份——这里刻意不 sleep，正是要复现“同一秒内覆盖备份”的缺陷。
     backups_before = backup_names(context)
+    assert backups_before, "首次安装必须留下 pre-package-*.uebackup 安全备份"
+    first_backup = next(iter(backups_before))
+    first_backup_bytes = (context.paths.backups / first_backup).read_bytes()
+    first_backup_sha256 = hashlib.sha256(first_backup_bytes).hexdigest()
 
     current_directory = bundled_directory(tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name))
     outcome = service.reconcile(current_directory)
@@ -532,6 +535,14 @@ def test_older_installed_package_is_upgraded_to_bundled(context, tmp_path: Path)
 
     new_backups = backup_names(context) - backups_before
     assert len(new_backups) == 1, "升级必须留下 pre-package-*.uebackup 安全备份"
+    # 回归：升级备份不得覆盖首次安装的备份，且首次备份字节/哈希逐字节不变。
+    assert (context.paths.backups / first_backup).is_file()
+    assert (context.paths.backups / first_backup).read_bytes() == first_backup_bytes
+    assert (
+        hashlib.sha256((context.paths.backups / first_backup).read_bytes()).hexdigest()
+        == first_backup_sha256
+    )
+    assert outcome.backup_path not in backups_before
     # 新规则就位：r2 作为新修订加入，r1 仍然保留（历史评价必须可复算）。
     assert context.application.get_published_standard(GB29446).rule_revision == 2
     gb29446_revisions = sorted(

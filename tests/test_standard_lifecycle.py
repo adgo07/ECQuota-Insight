@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from uebench.application import evaluation_support
 from uebench.application.services import EvaluationService
 from uebench.domain.models import EvaluationRequest, InputMode, InputValue, LifecycleStatus, StandardSelectionMode
 from uebench.infrastructure.database import DatabaseManager
@@ -14,7 +15,22 @@ from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRe
 from .test_engine import make_standard
 
 
-def test_obsolete_standard_is_excluded_from_current_but_available_for_history(tmp_path: Path) -> None:
+def _in_formal_scope(monkeypatch, *standard_ids: str) -> None:
+    """把 ``standard_ids`` 声明为正式可评价（与 ``test_ui.py::_in_formal_scope`` 同模式）。
+
+    正式评价范围是应用层的固定常量，**与“标准库里有没有这个标准”无关**（RS05 §三）。
+    本文件覆盖的是标准的**生命周期与选择模式**（废止/历史、未来），不是范围本身，因此
+    需要走正式评价落库的用例必须显式扩展真正的注册表；产品行为仍由注册表驱动。
+    """
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | set(standard_ids)
+    monkeypatch.setattr(
+        evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
+    )
+
+
+def test_obsolete_standard_is_excluded_from_current_but_available_for_history(
+    tmp_path: Path, monkeypatch
+) -> None:
     paths = AppPaths.from_root(tmp_path / "appdata")
     paths.ensure()
     database = DatabaseManager(paths.database)
@@ -31,6 +47,8 @@ def test_obsolete_standard_is_excluded_from_current_but_available_for_history(tm
         "replaced_by": ["GB 00001-2026"],
     })
     standards.install(old)
+    # 本用例验证的是“废止标准仍可经历史模式正式评价”，不是范围，故显式扩展注册表。
+    _in_formal_scope(monkeypatch, old.id)
     assert standards.list_current(date(2026, 8, 30)) == []
     history = standards.list_historical()
     assert [item.number for item in history] == ["GB 00001-2012"]
@@ -82,7 +100,7 @@ def test_future_selection_never_falls_back_to_current(tmp_path: Path) -> None:
     selected = standards.get_for_evaluation("gb-future-test", date(2026, 8, 31), StandardSelectionMode.FUTURE)
     assert selected is not None and selected.number == "GB 00002-2027"
     database.dispose()
-def test_future_evaluation_is_preview_only(tmp_path: Path) -> None:
+def test_future_evaluation_is_preview_only(tmp_path: Path, monkeypatch) -> None:
     paths = AppPaths.from_root(tmp_path / "appdata")
     paths.ensure()
     database = DatabaseManager(paths.database)
@@ -97,6 +115,9 @@ def test_future_evaluation_is_preview_only(tmp_path: Path) -> None:
         "effective_date": date(2027, 1, 1),
     })
     standards.install(future)
+    # 本用例验证的是 FUTURE 选择模式自身的“只能预览”门槛。若不把它放进正式评价范围，
+    # 先触发的会是范围拒绝（另一条门槛），本用例就测不到自己要测的东西了（RS05 §三）。
+    _in_formal_scope(monkeypatch, future.id)
     request = EvaluationRequest(
         evaluation_date=date(2026, 8, 31),
         standard_id=future.id,

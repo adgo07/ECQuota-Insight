@@ -57,6 +57,21 @@ def forbidden(*args, **kwargs):
     raise AssertionError("历史只读操作不得运行 Engine / 当前标准查询")
 
 
+def seed_legacy_record(context, request):
+    """直接写入一条**历史**正式记录，模拟 RS05 §三 之前版本留下的范围外记录。
+
+    ``EvaluationService.evaluate`` 现在拒绝范围外标准，但真实用户的数据库里仍存有旧版本
+    （把 ``published`` 当可评价）写下的记录——这正是本修复要保护的存量数据。要覆盖“这类
+    记录不得经「基于此记录重新评价」回到正式评价”，记录就必须**绕过正式写入口**直接落到
+    仓储，而不是靠临时放宽注册表伪造一次正式评价——那恰恰是修复要禁止的行为。
+    """
+    standard = context.application.get_published_standard(request.standard_id)
+    assert standard is not None, f"夹具标准应已安装：{request.standard_id}"
+    result = context.application.preview_evaluation(request)
+    context.evaluations.save(request, result, standard)
+    return result
+
+
 @pytest.fixture(scope="module")
 def qt_app():
     return QApplication.instance() or QApplication([])
@@ -426,12 +441,16 @@ def test_shared_based_on_record_entry_keeps_generic_standard(lifecycle, monkeypa
     夹具标准不能被它绕过，必须给出**确切的**范围拒绝理由，且不产生新记录、不改动页面
     状态。把该标准**有意**放进正式评价范围后（monkeypatch 的正是注册表本身，界面因此
     仍完全由注册表驱动），继续覆盖原用例的不变量：通用标准能经此入口正确回填表单。
+
+    记录本身是**存量数据**：旧版本会为范围外标准写下正式记录，新版本必须保留它可查看但不
+    允许借它重新进入正式评价，因此这里直接把记录写进仓储（见 ``seed_legacy_record``）。
     """
     context, window, _request_old, _result, _standard = lifecycle
     standard = make_standard()
     context.standards.install(standard)
     request = EvaluationRequest(evaluation_date=date.today(), standard_id=standard.id, product_id="product", input_mode="DIRECT", inputs={"actual": InputValue(value="15", unit="kgce/t")})
-    result = context.application.evaluate(request)
+    assert evaluation_support.supports_formal_evaluation(standard.id) is False
+    result = seed_legacy_record(context, request)
     select_record(window, result.evaluation_id)
     before = raw_state(context, result.evaluation_id)
     count_before = context.application.count_evaluations()
