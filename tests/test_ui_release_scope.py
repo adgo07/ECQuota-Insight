@@ -16,11 +16,12 @@ What is fenced here:
 * §四 官方来源 — 「查看标准原文」 opens the pre-registered official page from
   :mod:`uebench.application.official_sources`; the ordinary UI never opens a local
   PDF, and an unregistered standard disables the control.
-* §六 标准库信息结构 — support status, evaluation scope and official source are
-  visible; internal traceability noise is gone; the scope of an un-surveyed
-  standard is reported as pending instead of invented.
-* §七 新建评价 — the combo is wide enough to read, the duplicated standard name is
-  gone, and the library can jump into the page with the supported standard selected.
+* §六 标准库信息结构 — support status, the single 适用范围 line and the official source
+  are visible; internal traceability noise is gone; the scope of an un-surveyed standard
+  is reported as pending instead of invented.
+* §七 新建评价 — the combo is wide enough to read, the duplicated standard name and the
+  duplicated 「查看标准原文」 are gone, and the library can jump into the page with the
+  supported standard selected.
 """
 from __future__ import annotations
 
@@ -29,13 +30,14 @@ import hashlib
 import json
 import os
 import re
+from decimal import Decimal
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton, QTextEdit
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QPushButton, QTextEdit
 
 from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_SUPPORTED_LABEL,
@@ -51,7 +53,11 @@ from uebench.application.official_sources import (
 )
 from uebench.bootstrap import create_context
 from uebench.domain.models import StandardDefinition
-from uebench.ui.main_window import MainWindow, gb29446_rule_is_compatible
+from uebench.ui.main_window import (
+    STANDARD_SCOPE_PENDING_LABEL,
+    MainWindow,
+    gb29446_rule_is_compatible,
+)
 from uebench.ui.presentation import format_local_datetime
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,15 +66,20 @@ BUNDLED_PACKAGE = ROOT / "release" / "standard-packages" / "initial-standard-pac
 GB29446_DEFINITION = ROOT / "data" / "definitions" / "gb-29446-2019.json"
 
 GB29446_ID = "gb-29446-2019"
+#: Owner 逐字确认的 GB 29446—2019 适用范围；界面必须原文照登，不得改写。
+GB29446_SCOPE_TEXT = (
+    "适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，以及新建和改扩建企业的电力单耗控制。"
+)
 #: ``YYYY-MM-DD HH:MM:SS`` — the ordinary user-facing timestamp shape.
 SECONDS_PRECISION = re.compile(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}")
 #: Microseconds, i.e. the reported defect ``2026-10-04 15:31:39.338366``.
 MICROSECONDS = re.compile(r"\.\d{3,}")
 
-#: 标准库表格中本任务新增/保留的列（顺序即用户看到的顺序）。
-COLUMN_SUPPORT_STATUS = 5
-COLUMN_EVALUATION_SCOPE = 6
-COLUMN_OFFICIAL_SOURCE = 7
+#: 标准库表格保留的列（顺序即用户看到的顺序）。
+COLUMN_SUPPORT_STATUS = 4
+COLUMN_OFFICIAL_SOURCE = 5
+#: 「计算与判定说明」的富文本行分隔符。
+EXPLANATION_LINE_BREAK = "<br>"
 
 
 @pytest.fixture(scope="module")
@@ -292,12 +303,14 @@ def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None
     assert window.standard_table.item(gb_row, COLUMN_SUPPORT_STATUS).text() == (
         FORMAL_EVALUATION_SUPPORTED_LABEL
     )
-    gb_scope = window.standard_table.item(gb_row, COLUMN_EVALUATION_SCOPE).text()
-    assert "炼焦煤" in gb_scope and "动力煤" in gb_scope
-    assert "统计边界按标准第5.1条" in gb_scope
-    assert "尚待梳理" not in gb_scope
     assert window.standard_table.item(gb_row, COLUMN_OFFICIAL_SOURCE).text() == (
         OFFICIAL_SOURCE_PLATFORM_NAME
+    )
+    # 选中标准后只有一行「适用范围：<scope>」，GB 29446 用 Owner 逐字确认的原文。
+    window.standard_table.selectRow(gb_row)
+    assert window.standard_detail_label.text() == f"适用范围：{GB29446_SCOPE_TEXT}"
+    assert GB29446_SCOPE_TEXT == (
+        "适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，以及新建和改扩建企业的电力单耗控制。"
     )
 
     unsupported_id = _first_unsupported_id(window)
@@ -305,14 +318,13 @@ def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None
     assert window.standard_table.item(other_row, COLUMN_SUPPORT_STATUS).text() == (
         FORMAL_EVALUATION_UNSUPPORTED_LABEL
     )
-    # 未重新梳理的标准只能如实显示“待梳理”，不得由 UI 代写范围文字。
-    assert window.standard_table.item(other_row, COLUMN_EVALUATION_SCOPE).text() == "评价范围尚待梳理"
+    # 未重新梳理的标准只能如实显示 Owner 确认的「适用范围尚待整理」（该文字已点名字段，
+    # 不再重复「适用范围：」前缀），不得由 UI 代写范围文字。
     window.standard_table.selectRow(other_row)
-    assert "评价范围尚待梳理" in window.standard_detail_label.text()
-
-    window.standard_table.selectRow(gb_row)
-    assert FORMAL_EVALUATION_SUPPORTED_LABEL in window.standard_detail_label.text()
-    assert "统计边界" in window.standard_detail_label.text()
+    assert window.standard_detail_label.text() == STANDARD_SCOPE_PENDING_LABEL
+    assert window.standard_detail_label.text() == "适用范围尚待整理"
+    assert STANDARD_SCOPE_PENDING_LABEL == "适用范围尚待整理"
+    assert not window.standard_detail_label.text().startswith("适用范围：适用范围")
 
 
 def test_library_no_longer_shows_internal_traceability_noise(window) -> None:
@@ -320,20 +332,20 @@ def test_library_no_longer_shows_internal_traceability_noise(window) -> None:
         window.standard_table.horizontalHeaderItem(column).text()
         for column in range(window.standard_table.columnCount())
     ]
+    # 「版本」与「评价范围」列已删除；「适用范围」只作为选中标准后的一行说明。
     assert headers == [
         "标准编号",
         "标准名称",
         "标准状态",
-        "版本",
         "实施日期",
         "软件评价支持状态",
-        "评价范围",
         "官方来源",
     ]
     indicator_headers = [
         window.standard_indicator_table.horizontalHeaderItem(column).text()
         for column in range(window.standard_indicator_table.columnCount())
     ]
+    assert "适用条件/说明" not in indicator_headers
     assert "页码" not in indicator_headers
     assert "条款/表号" not in indicator_headers
     assert "原文SHA-256" not in headers
@@ -383,6 +395,30 @@ def test_view_official_source_opens_the_registry_url_from_both_pages(window, mon
     assert [url.toString() for url in opened] == [expected, expected]
     assert QUrl(expected).host() == "std.samr.gov.cn"
     assert opened[0].host() == "std.samr.gov.cn"
+
+
+def test_basis_area_has_no_duplicate_official_source_button(window, monkeypatch) -> None:
+    """「四、标准依据」里重复的「查看标准原文」已删除，页面顶部统一入口仍然可用。"""
+
+    opened: list[QUrl] = []
+    monkeypatch.setattr(
+        "uebench.ui.main_window.QDesktopServices.openUrl",
+        lambda url: opened.append(url) or True,
+    )
+    expected = official_source_url(GB29446_ID)
+    assert expected is not None
+
+    window.navigation.setCurrentRow(2)
+    basis_buttons = [
+        button for button in window.gb29446_basis_section.findChildren(QPushButton)
+    ]
+    assert VIEW_OFFICIAL_SOURCE_BUTTON_TEXT not in [
+        button.text() for button in basis_buttons
+    ]
+    assert not hasattr(window, "gb29446_basis_open")
+
+    window.eval_standard_open.click()
+    assert [url.toString() for url in opened] == [expected]
 
 
 def test_unregistered_standard_disables_the_official_source_control(window, monkeypatch) -> None:
@@ -469,9 +505,9 @@ def test_new_evaluation_page_reads_the_full_standard_and_is_not_duplicated(windo
     assert "GB 29446-2019" in text and "选煤电力消耗限额" in text
     # 下拉框足够宽，编号与名称都能读完。
     assert window.eval_standard.minimumWidth() >= 360
-    # 「当前有效」旁不再重复标准编号/名称。
-    assert window.eval_standard_status.text() == "当前有效"
-    assert "GB 29446-2019" not in window.eval_standard_status.text()
+    # 版本下拉框已经说明选择方式；右侧不再重复一句「当前有效」。
+    assert window.eval_standard_status.text() == ""
+    assert "当前有效" not in window.eval_standard_status.text()
     # 页面右上角有官方来源入口与支持状态。
     assert window.eval_standard_open.text() == VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
     assert window.eval_official_status.text() == OFFICIAL_SOURCE_PLATFORM_NAME
@@ -481,15 +517,95 @@ def test_new_evaluation_page_reads_the_full_standard_and_is_not_duplicated(windo
 def test_calculation_explanation_keeps_the_basis_in_plain_language(window) -> None:
     _evaluate_gb29446(window)
     explanation = window.gb29446_explanation.text()
-    # 输入的 E_d、m、选煤工艺与 k、公式、最终值与等级、标准依据都必须保留。
-    assert "统计期选煤电力消耗量 E_d" in explanation and "560" in explanation
-    assert "统计期入选原煤量 m" in explanation and "100" in explanation
-    assert "重介" in explanation and "折算系数 k" in explanation and "1.12" in explanation
-    assert "e_d = 560 × 1.12 / 100 = 6.272 kW·h/t" in explanation
-    assert "本次电耗 e_d = 6.27 kW·h/t；判级结果：2级" in explanation
-    assert "原始计算值（未修约）：6.272 kW·h/t" in explanation
-    assert "判级比较：6.272 ≤ 7；结果：2级" in explanation
-    assert "标准依据：" in explanation and "第5.2条" in explanation and "附录A表A.1" in explanation
+    # 普通情形只有三行：选煤工艺与折算系数 / 代入计算 / 判定与必要标准依据。
+    lines = explanation.split(EXPLANATION_LINE_BREAK)
+    assert len(lines) == 3, explanation
+    assert lines[0] == "选煤工艺：重介，折算系数 k = 1.12"
+    assert lines[1] == (
+        "计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = 560 × 1.12 ÷ 100 = 6.272 kW·h/t"
+    )
+    assert lines[2].startswith("判定：2级（")
+    # 必要标准依据保留在判定行里（等级依据 / 计算依据 / 折算系数依据）。
+    for basis in ("等级依据：", "计算依据：", "折算系数依据："):
+        assert basis in lines[2]
+    assert "附录A表A.1" in lines[2]
+    # E_d / e_d 是真下标（富文本），不是字面量 “<sub>” 也不是纯 ASCII 的 E_d。
+    assert window.gb29446_explanation.textFormat() is Qt.TextFormat.RichText
+    assert "e<sub>d</sub>" in explanation and "E<sub>d</sub>" in explanation
+    assert "e_d" not in explanation and "E_d" not in explanation
     # 不堆叠内部追踪术语。
     for internal in ("rule_id", "numeric_behavior", "CalculationStep", "field_id", "calculator_version"):
         assert internal not in explanation
+
+
+def test_full_value_boundary_adds_the_display_caveat(window) -> None:
+    """完整计算值与两位小数显示值落在限值两侧时，必须说明判级用的是完整值。"""
+
+    _evaluate_gb29446(window)
+    standard = window.context.application.get_published_standard(GB29446_ID)
+    assert standard is not None
+    coking = next(item for item in standard.products if item.id == "gb_29446-2019-coking-coal")
+    coking_indicator = next(
+        indicator for indicator in coking.indicators if "coking-coal" in indicator.id
+    )
+    base = coking_indicator.base_thresholds or coking_indicator.thresholds
+    level_2 = Decimal(str(base.level_2.value))
+
+    coal = window.gb29446_coal_type
+    coal.setCurrentIndex(coal.findText("炼焦煤"))
+    process = window.gb29446_process
+    # k = 1.00，因此 e_d = E_d ÷ m 可以精确落在 2 级限值之上一点点。
+    process.setCurrentIndex(process.findData("跳汰、浮选联合"))
+    assert window.gb29446_factor.text() == "1.00"
+    window.gb29446_electricity.setText(str(level_2 + Decimal("0.0000000000000001")))
+    window.gb29446_raw_coal.setText("1")
+    window.calculate_button.click()
+
+    assert window.last_result_id is not None
+    # 两位小数的界面显示值看起来仍是 2 级，但完整计算值已经超过 2 级限值。
+    assert window.gb29446_result_ed.text() == f"{level_2:.2f} kW·h/t"
+    assert window.gb29446_result_grade.text() == "3级"
+    explanation = window.gb29446_explanation.text()
+    assert explanation.split(EXPLANATION_LINE_BREAK)[-1] == (
+        "判级使用完整计算值，界面显示值仅作简化展示。"
+    )
+    assert len(explanation.split(EXPLANATION_LINE_BREAK)) == 4, explanation
+
+
+def test_records_page_hides_the_export_and_technical_detail_buttons(window, monkeypatch) -> None:
+    """「导出Excel」按钮与「查看原记录」里的「技术详情」按钮不再出现在普通界面；
+    两者的能力与数据都必须保留。"""
+
+    window.navigation.setCurrentRow(3)
+    record_buttons = [button.text() for button in window.pages.widget(3).findChildren(QPushButton)]
+    assert "导出Excel" not in record_buttons
+    assert "查看原记录" in record_buttons, "查看原记录本身必须保留"
+
+    _evaluate_gb29446(window)
+    window.refresh_records()
+    window.record_table.selectRow(0)
+    evaluation_id = window._selected_record_id()
+    assert evaluation_id is not None
+
+    # 技术要求：底层 trace / rule snapshot / audit 数据必须原样保留。
+    _request, result, snapshot = window.context.application.get_evaluation(evaluation_id)
+    assert result.rule_snapshot_sha256 and result.numeric_profile_id
+    assert snapshot.rule_revision >= 1 and snapshot.source_sha256
+    assert window.context.application.list_audit(500), "审计日志不得因移除按钮而消失"
+
+    window.view_selected_record()
+    dialog = window.record_detail_dialog
+    assert "技术详情" not in [button.text() for button in dialog.findChildren(QPushButton)]
+    assert dialog.findChild(QTextEdit, "record_detail_technical") is None
+    content = dialog.findChild(QTextEdit, "record_detail_content")
+    assert content is not None and content.toPlainText().strip(), "原记录内容仍必须可读"
+
+    # 导出能力本轮不删除：导出入口仍在，只是不再占用普通界面按钮。
+    target = window.context.paths.root / "records-export.xlsx"
+    monkeypatch.setattr(
+        QFileDialog,
+        "getSaveFileName",
+        staticmethod(lambda *args, **kwargs: (str(target), "Excel (*.xlsx)")),
+    )
+    window.export_selected_record()
+    assert target.is_file(), "导出能力必须保持可用（本轮只移除普通界面按钮）"

@@ -6,7 +6,7 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication, QFormLayout, QLineEdit, QMessageBox, QPushButton
 
 import pytest
 
@@ -15,6 +15,7 @@ from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_SUPPORTED_LABEL,
     FORMAL_EVALUATION_UNSUPPORTED_LABEL,
 )
+from uebench.application.official_sources import VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
 from uebench.bootstrap import create_context
 from uebench.ui.main_window import MainWindow
 from uebench.domain.models import (
@@ -60,6 +61,28 @@ def _seed_legacy_record(context, request: EvaluationRequest):
     return result
 
 
+def _exposed_note_inputs(window: MainWindow) -> list[str]:
+    """普通界面上仍然暴露给用户的「备注」输入行标签。
+
+    「备注」输入已从普通界面移除（历史 ``notes`` 字段与兼容读写保留），这里只检查
+    **用户看得见的表单行**：内部承载控件是否仍然存在不属于本函数的判定范围。
+    """
+
+    found: list[str] = []
+    for form in (window.generic_form_container, window.gb29446_form_container):
+        layout = form.layout()
+        for row in range(layout.rowCount()):
+            label_item = layout.itemAt(row, QFormLayout.ItemRole.LabelRole)
+            field_item = layout.itemAt(row, QFormLayout.ItemRole.FieldRole)
+            if label_item is None or field_item is None:
+                continue
+            label = label_item.widget()
+            field = field_item.widget()
+            if isinstance(field, QLineEdit) and label is not None and "备注" in label.text():
+                found.append(label.text())
+    return found
+
+
 @pytest.fixture(autouse=True)
 def _never_block_on_a_modal_dialog(monkeypatch):
     """兜底：任何用例都不得因**真实模态对话框**永久阻塞事件循环。
@@ -102,7 +125,8 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     # 但「新建评价」下拉框一个都不提供，可评价性由独立的支持状态列承载。
     assert window.eval_standard.count() == 0
     assert window.eval_standard.currentData() is None
-    assert window.standard_table.item(0, 5).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
+    # 普通标准库列顺序：编号 / 名称 / 标准状态 / 实施日期 / 软件评价支持状态 / 官方来源。
+    assert window.standard_table.item(0, 4).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
     window.navigation.setCurrentRow(1)
     assert window.pages.currentIndex() == 1
     window.standard_table.selectRow(0)
@@ -136,7 +160,13 @@ def test_record_request_can_be_loaded_for_copy_or_recalculation(tmp_path: Path, 
     assert window.eval_standard.currentData() == standard.id
     assert window.eval_product.currentData() == "product"
     assert window.eval_inputs.item(0, 2).text() == "15"
-    assert window.eval_notes.text() == "回归测试备注"
+    # 「备注」输入已从普通界面移除；但历史记录的 notes 必须仍能原样载入并再次保存。
+    assert _exposed_note_inputs(window) == []
+    reloaded = window._collect_request()
+    assert reloaded.notes == "回归测试备注"
+    window.calculate_evaluation(reloaded)
+    assert window.last_result_id is not None
+    assert context.application.get_evaluation(window.last_result_id)[0].notes == "回归测试备注"
     window.close()
     context.database.dispose()
 
@@ -297,10 +327,26 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
     assert window.standard_table.rowCount() == 1
     # 「标准状态」只描述标准文档本身的效力；软件能否正式评价由独立列承载。
     assert window.standard_table.item(0, 2).text() == "待确认"
-    assert window.standard_table.item(0, 5).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
+    assert window.standard_table.item(0, 4).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
     window.standard_table.selectRow(0)
-    assert "需独立复核后使用" in window.standard_indicator_table.item(0, 6).text()
-    assert "requires_independent_review" not in window.standard_indicator_table.item(0, 6).text()
+    # 未重新梳理的标准只能如实显示 Owner 确认的「适用范围尚待整理」，不得由界面代写范围文字；
+    # 该文字本身已点名「适用范围」，不再重复字段名前缀。
+    assert window.standard_detail_label.text() == "适用范围尚待整理"
+    # 普通标准库不再有「适用条件/说明」列：条件文字与规则里的内部备注代码都不再展示。
+    indicator_headers = [
+        window.standard_indicator_table.horizontalHeaderItem(column).text()
+        for column in range(window.standard_indicator_table.columnCount())
+    ]
+    assert "适用条件/说明" not in indicator_headers
+    library_text = " ".join(
+        [window.standard_detail_label.text()]
+        + [
+            window.standard_indicator_table.item(0, column).text()
+            for column in range(window.standard_indicator_table.columnCount())
+        ]
+    )
+    assert "requires_independent_review" not in library_text
+    assert "需独立复核后使用" not in library_text
     window.close()
     context.database.dispose()
 
@@ -316,12 +362,17 @@ def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path,
     assert not window.eval_project.isVisible()
     assert window.eval_standard.isEditable()
     assert window.eval_standard_open.text() == "查看标准原文"
-    # 下拉框要能完整读出“编号 + 名称”，状态标签只显示状态，不再重复编号/名称。
+    # 下拉框要能完整读出“编号 + 名称”；右侧状态文字只在需要提示时才出现。
     assert window.eval_standard.itemText(0) == f"{standard.number} {standard.title}"
     assert window.eval_standard.minimumWidth() >= 360
-    assert window.eval_standard_status.text() == "当前有效"
-    assert standard.number not in window.eval_standard_status.text()
+    # 版本下拉框已经说明选择方式（“当前有效标准（自动）”）；右侧不再重复一句「当前有效」。
+    assert window.eval_standard_status.text() == ""
     assert window.eval_support_label.text() == FORMAL_EVALUATION_SUPPORTED_LABEL
+    # 「四、标准依据」里不再有重复的「查看标准原文」；页面顶部统一入口保留。
+    assert VIEW_OFFICIAL_SOURCE_BUTTON_TEXT not in [
+        button.text() for button in window.gb29446_basis_section.findChildren(QPushButton)
+    ]
+    assert window.eval_standard_open.text() == VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
     window.detail_mode_button.click()
     assert window.eval_mode.currentData() == InputMode.DETAIL.value
     window.direct_mode_button.click()

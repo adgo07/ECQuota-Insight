@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 import zipfile
 from collections import Counter
 from datetime import datetime, timezone
@@ -134,10 +135,15 @@ class PackageInstallResult(BaseModel):
     backup_path: str
     #: Number of legacy product-installed ``sources`` directories removed from
     #: the user data directory before the safety backup was taken.  ``0`` for a
-    #: data directory that never held them.
+    #: data directory that never held them.  This is the *verified* count: it is
+    #: only ever reported after a post-deletion re-scan proved the targets gone.
     removed_source_directory_count: int = 0
     #: Number of files that lived inside those directories.
     removed_source_file_count: int = 0
+    #: Number of legacy standard原文 PDFs that older versions left **flat** in
+    #: ``standards/<package_id>/`` (no ``sources`` sub-directory).  Also a
+    #: verified count.
+    removed_flat_source_file_count: int = 0
 
 
 def _backup_path(directory: Path) -> Path:
@@ -756,30 +762,55 @@ class StandardPackageService:
             package_sha256=package_sha256,
         )
 
-    def _remove_legacy_source_directories(self) -> tuple[int, int]:
-        """Delete legacy product-installed ``sources`` directories under the standards root.
+    #: How many times a failed legacy原文 deletion is retried before the install
+    #: is aborted.  Windows transient locks (indexer, anti-virus scanner, a
+    #: shell thumbnail handler) routinely release within milliseconds, so a few
+    #: short retries turn a spurious abort into a clean install.  A *permanent*
+    #: lock is never retried into success: the retry is only allowed to make the
+    #: cleanup more robust, never to record a success the filesystem denies.
+    LEGACY_CLEANUP_ATTEMPTS = 3
+    #: Seconds between the deletion attempts above.
+    LEGACY_CLEANUP_RETRY_DELAY = 0.2
 
-        The owner requirement is that the software must not keep full standard
-        PDFs in the user data directory.  ``install`` no longer copies
-        ``sources/*`` anywhere, but a data directory written by an earlier
-        version still holds ``paths.standards/<package_id>/sources/*``.  Those
-        are removed so the *live* directory - and the pre-upgrade safety backup
-        taken immediately afterwards - no longer carry the standard原文.
+    def _scan_legacy_targets(self) -> tuple[list[Path], list[Path], int]:
+        """Detect legacy product-installed standard原文 under ``paths.standards``.
 
-        Scope is deliberately narrow: only directories literally named
-        ``sources`` that are **direct** children of a directory under
-        ``paths.standards``.  Nothing outside ``paths.standards`` is ever
-        touched, and symlinked directories are neither followed nor deleted as
-        if they were products of this software.
+        Two historical layouts really shipped, and both are still found in the
+        field (an old install may even hold both at once, for example when the
+        package changed its layout between two upgrades):
 
-        Returns ``(directories_removed, files_removed)``.
+        ``standards/<package_id>/*.pdf``
+            the **flat** layout an early version wrote;
+        ``standards/<package_id>/sources/**``
+            the later layout, where the whole原文 directory was copied.
+
+        Scope is deliberately narrow.  Only directories that are **direct**
+        children of ``paths.standards`` are considered a package directory, and
+        inside one only (a) a direct ``sources`` directory and (b) direct
+        ``*.pdf`` children are legacy products of this software.  Nothing else
+        is a target: not a PDF at the standards root, not one inside a user
+        sub-directory, not a deeper ``sources`` directory.
+
+        Symlinks and junctions are never followed out of the standards tree:
+        a package directory whose resolved path leaves ``paths.standards`` is
+        skipped entirely, ``sources`` is never entered or deleted through a
+        link, and link members are neither counted nor dereferenced (the
+        ``rglob`` walk does not descend into them).
+
+        This function only **reads** the filesystem; it is used both as the
+        pre-deletion detector and as the post-deletion verifier, so that "what
+        must be gone" and "what is still there" are measured by the same rule
+        and no target can escape verification by being described differently.
+
+        Returns ``(sources_directories, flat_pdf_files, files_inside_directories)``.
         """
         standards = Path(self.paths.standards)
         if not standards.is_dir():
-            return 0, 0
+            return [], [], 0
         resolved_standards = standards.resolve()
-        legacy_directories: list[Path] = []
-        file_count = 0
+        sources_directories: list[Path] = []
+        flat_pdfs: list[Path] = []
+        files_inside = 0
         for package_directory in sorted(standards.iterdir()):
             if not package_directory.is_dir() or package_directory.is_symlink():
                 continue
@@ -789,56 +820,200 @@ class StandardPackageService:
             if not resolved_package.is_relative_to(resolved_standards):
                 continue
             candidate = package_directory / "sources"
-            if not candidate.is_dir() or candidate.is_symlink():
+            if candidate.is_dir() and not candidate.is_symlink():
+                # A package directory is a direct child of ``paths.standards``,
+                # so the candidate must stay strictly inside the standards root.
+                resolved_candidate = candidate.resolve()
+                if resolved_candidate.parent == resolved_package and resolved_candidate.is_relative_to(
+                    resolved_standards
+                ):
+                    sources_directories.append(candidate)
+                    files_inside += sum(
+                        1
+                        for item in candidate.rglob("*")
+                        # Symlinks are never followed and never counted: the
+                        # reported count must describe the files this cleanup
+                        # removes.
+                        if not item.is_symlink() and item.is_file()
+                    )
+            for sibling in sorted(package_directory.iterdir()):
+                if sibling.is_symlink():
+                    continue
+                if (
+                    sibling.is_file()
+                    and sibling.suffix.lower() == ".pdf"
+                    and sibling.resolve().is_relative_to(resolved_package)
+                ):
+                    flat_pdfs.append(sibling)
+        return sources_directories, flat_pdfs, files_inside
+
+    @staticmethod
+    def _delete_legacy_targets(
+        directories: list[Path], flat_files: list[Path]
+    ) -> list[tuple[Path, str]]:
+        """Attempt every removal; return ``(path, reason)`` for what would not go.
+
+        Deletion is best-effort per target and **never** silently ignored: each
+        failure is captured with the underlying OS error so the caller can
+        report a precise reason after its own verification.  ``rmtree`` is
+        called without ``ignore_errors``/``onerror``, so the first failure —
+        a locked PDF, a denied permission — raises ``PermissionError``/
+        ``OSError`` instead of leaving a directory that quietly survives.
+        """
+        failures: list[tuple[Path, str]] = []
+        for directory in directories:
+            if not directory.exists():
                 continue
-            # A package directory is a direct child of ``paths.standards``, so
-            # the candidate must stay strictly inside the standards root.
-            resolved_candidate = candidate.resolve()
-            if resolved_candidate.parent != resolved_package:
+            # Last-line guard: never remove through a link that resolves out of
+            # its own package directory (the scanner already skips those).
+            if not directory.is_symlink() and not directory.resolve().parent == directory.parent.resolve():
+                failures.append((directory, "拒绝删除解析到包目录之外的目标"))
                 continue
-            if not resolved_candidate.is_relative_to(resolved_standards):
+            try:
+                shutil.rmtree(directory)
+            except OSError as exc:
+                failures.append((directory, f"{type(exc).__name__}: {exc}"))
+        for path in flat_files:
+            if not path.exists():
                 continue
-            legacy_directories.append(candidate)
-            file_count += sum(
-                1
-                for item in candidate.rglob("*")
-                # Symlinks are never followed and never counted: the reported
-                # count must describe the files this cleanup removes.
-                if not item.is_symlink() and item.is_file()
+            try:
+                os.remove(path)
+            except OSError as exc:
+                failures.append((path, f"{type(exc).__name__}: {exc}"))
+        return failures
+
+    def _remove_legacy_source_directories(
+        self, *, attempts: int | None = None, retry_delay: float | None = None
+    ) -> tuple[int, int, int]:
+        """Remove legacy standard原文 from the user data directory — **fail-closed**.
+
+        The owner requirement is that the software must not keep full standard
+        PDFs in the user data directory.  ``install`` no longer copies
+        ``sources/*`` anywhere, but a data directory written by an earlier
+        version still holds them, in either historical layout (see
+        ``_scan_legacy_targets``).  Those are removed so the *live* directory —
+        and the pre-upgrade safety backup taken immediately afterwards — no
+        longer carry the standard原文.
+
+        The contract, in order, is:
+
+        1. detect every legacy target;
+        2. attempt deletion, retrying the whole set a few times to ride out
+           transient Windows locks;
+        3. re-scan with the **same** detector and require that every target is
+           really gone;
+        4. only then record the success audit and return the **real** counts.
+
+        If anything is still present after the last attempt, a Chinese
+        ``StandardPackageError`` is raised.  Nothing has been written at this
+        point, so the caller aborts before the safety backup and before any
+        install work: no success audit, no new ``pre-package-*.uebackup`` that
+        would still carry the old PDFs, and no half-upgraded package directory
+        or database.  A no-op (no legacy target at all) records no audit and
+        returns zeros, so the cleanup stays idempotent.
+        """
+        resolved_standards = Path(self.paths.standards).resolve()
+        directories, flat_files, files_inside = self._scan_legacy_targets()
+        if not directories and not flat_files:
+            return 0, 0, 0
+        remaining = len(directories) + len(flat_files)
+        failures: list[tuple[Path, str]] = []
+        total_attempts = max(1, self.LEGACY_CLEANUP_ATTEMPTS if attempts is None else attempts)
+        delay = self.LEGACY_CLEANUP_RETRY_DELAY if retry_delay is None else retry_delay
+        for attempt in range(total_attempts):
+            failures = self._delete_legacy_targets(directories, flat_files)            # Verify with the detector, not with an "if it did not raise" belief:
+            # the re-scan is what decides whether this cleanup succeeded.
+            remaining_targets = self._scan_legacy_targets()
+            remaining = len(remaining_targets[0]) + len(remaining_targets[1])
+            if remaining == 0:
+                break
+            if attempt + 1 < total_attempts:
+                logger.warning(
+                    "旧版本标准原文删除后仍存在 %d 项，稍后重试（%d/%d）：%s",
+                    remaining,
+                    attempt + 1,
+                    total_attempts,
+                    "、".join(str(item) for item in remaining_targets[0] + remaining_targets[1]),
+                )
+                time.sleep(delay)
+        if remaining:
+            surviving = self._scan_legacy_targets()
+            blocked = surviving[0] + surviving[1]
+            reasons = "；".join(f"{path}（{reason}）" for path, reason in failures) or "未知原因"
+            raise StandardPackageError(
+                "无法删除旧版本遗留在用户数据目录中的标准原文，安装已中止："
+                f"尝试 {total_attempts} 次后仍有 {remaining} 项存在。"
+                f"删除失败的目标：{reasons}。"
+                "旧标准原文未清理干净时不得继续安装，否则本次安全备份会继续携带标准原文；"
+                "现有数据库与业务数据保持可用、未做任何改动。"
+                "请关闭可能占用这些 PDF 的程序（例如 PDF 阅读器、同步盘或杀毒软件）后重试。"
+                f"标准数据目录：{resolved_standards}。"
+                f"仍存在的目标：{'、'.join(str(path) for path in blocked)}"
             )
-        if not legacy_directories:
-            return 0, 0
+
+        # Reaching here means the re-scan proved the targets gone; the audit
+        # counts below are the measured pre-cleanup targets, not an estimate.
         logger.warning(
-            "移除旧版本写入用户数据目录的标准原文：%d 个目录、%d 个文件，全部位于 %s 内；"
-            "目录：%s",
-            len(legacy_directories),
-            file_count,
+            "移除旧版本写入用户数据目录的标准原文：%d 个目录、%d 个文件（另有 %d 个平铺 PDF），"
+            "全部位于 %s 内；目录：%s；平铺文件：%s",
+            len(directories),
+            files_inside,
+            len(flat_files),
             resolved_standards,
-            "、".join(str(directory) for directory in legacy_directories),
+            "、".join(str(directory) for directory in directories) or "无",
+            "、".join(str(path) for path in flat_files) or "无",
         )
-        for directory in legacy_directories:
-            shutil.rmtree(directory, ignore_errors=True)
         self.audit.append(
             AUDIT_LEGACY_SOURCES_REMOVED,
             "standard_package",
             None,
             {
-                "directories_removed": len(legacy_directories),
-                "files_removed": file_count,
+                "directories_removed": len(directories),
+                "files_removed": files_inside,
+                "flat_files_removed": len(flat_files),
                 "scope": str(resolved_standards),
+                "verified": True,
             },
         )
-        return len(legacy_directories), file_count
+        return len(directories), files_inside, len(flat_files)
+
+    def cleanup_legacy_sources(self) -> tuple[int, int, int]:
+        """Public face of the legacy原文 cleanup gate — the *same* implementation.
+
+        ``install`` runs this privately as its first step (before it takes the
+        pre-upgrade safety backup), which means a data directory that never needs
+        an install — the NOOP case, and in particular a data directory that a
+        ``BackupService.restore`` just filled with the old ``sources/*`` PDFs —
+        would never be cleaned.  The application-layer reconciliation therefore
+        calls this method on **every** startup, before its decision table, so
+        both call sites pass through one gate.
+
+        The delegate is deliberate: there is exactly one detector
+        (``_scan_legacy_targets``), one deletion/verification loop, one audit row
+        and one failure path, so the install path and the startup path can never
+        drift apart.  The failure semantics are unchanged and stay fail-closed —
+        a target that cannot be removed raises the Chinese ``StandardPackageError``
+        from ``_remove_legacy_source_directories``, writes no success audit, and
+        leaves the database and business data untouched.  A no-op records nothing
+        and returns ``(0, 0, 0)``.
+        """
+        return self._remove_legacy_source_directories()
 
     def install(self, path: Path) -> PackageInstallResult:
         report = self.preview(path)
         if not report.valid or report.manifest is None or report.package_sha256 is None:
             raise StandardPackageError("；".join(report.errors) or "标准包验证失败")
         manifest = report.manifest
-        # Order matters: the legacy原文 directories are removed *before* the
-        # safety backup so the backup itself already satisfies "no full standard
-        # PDFs in the user data directory".
-        removed_directories, removed_files = self._remove_legacy_source_directories()
+        # Order matters, and it is fail-closed:
+        #   detect legacy原文 -> attempt deletion -> verify -> audit success
+        #   -> *then* the safety backup -> *then* install the new package.
+        # The cleanup runs before the backup so the backup itself already
+        # satisfies "no full standard PDFs in the user data directory"; it runs
+        # before *any* write, so a cleanup that cannot be verified aborts the
+        # install with the database and business data untouched.
+        removed_directories, removed_files, removed_flat_files = (
+            self._remove_legacy_source_directories()
+        )
         backup_path = _backup_path(self.paths.backups)
         self.backup.create(backup_path)
         destination = (self.paths.standards / manifest.package_id).resolve()
@@ -889,4 +1064,5 @@ class StandardPackageService:
             backup_path=str(backup_path),
             removed_source_directory_count=removed_directories,
             removed_source_file_count=removed_files,
+            removed_flat_source_file_count=removed_flat_files,
         )

@@ -3,7 +3,7 @@
 产品原先只在**首次初始化**时安装内置标准包：只要数据库里已有任何标准，
 ``install_bundled_package()`` 就整体跳过。结果是老用户数据库里的规则永远停留在
 旧包（Win11 现场证据：用户库仍是 ``2026.09-published.1`` / GB29446
-``rule_revision=1``，而随产品发布的标准包已是 ``2026.10-published.3`` /
+``rule_revision=1``，而随产品发布的标准包已是 ``2026.10-published.4`` /
 revision 2）。
 
 本模块把“一次性初始化”改成**每次正常启动都执行的确定性对账**：把内置标准包与
@@ -37,6 +37,15 @@ revision 2）。
 * 预期情形**从不抛异常**；只有真正的 I/O / 校验异常才向上传播，且安装动作全部
   交给 ``StandardPackageService.install``（它自己负责 ``pre-upgrade`` 备份与
   失败回滚），因此不存在半安装状态。
+* **§五 旧版原文清理闸门先于决策表执行**：对账第一步（单次调用
+  ``StandardPackagePort.cleanup_legacy_sources()``）就清理旧版本遗留在用户数据目录
+  的标准原文，**无论**随后判成 A–F 中的哪一个——包括 NOOP 与 MISSING。这正是缺口
+  所在：``install`` 只在 INSTALL/UPGRADE 时被调用，所以「从老备份恢复 → 恢复回来的
+  ``sources/*`` PDF → 内置包与已安装包完全相同 → NOOP」会让清理永远不执行。
+  闸门与 ``install`` 内部调用的是**同一份**检测/删除/复验代码（应用层只经端口访问，
+  不导入 infrastructure），因此清理失败时的语义完全一致：抛出中文
+  ``StandardPackageError``、不写成功审计、不新增备份、数据库与业务状态可用且未半升级；
+  没有旧版原文时不写审计、返回全零，因此可重复调用。
 
 分层与依赖注入（重要）::
 
@@ -482,7 +491,37 @@ class PackageReconciliationService:
     # -- 编排 -------------------------------------------------------------
 
     def reconcile(self, directory: Path) -> ReconciliationOutcome:
-        """对 ``directory`` 中的内置标准包执行一次对账。"""
+        """对 ``directory`` 中的内置标准包执行一次对账。
+
+        §五 mandatory gate: the legacy原文 cleanup runs here first, **before** the
+        decision table and therefore also for the NOOP decision.  ``install``
+        runs the same gate internally, but it only ever runs for INSTALL/UPGRADE
+        — so a backup restored the old ``sources/*`` PDFs into the live
+        directory and the bundled package is already identical, the decision is
+        NOOP and the cleanup would otherwise never happen.  Running it first
+        makes every normal startup pass the gate regardless of the decision.
+
+        Ordering is fail-closed:
+
+        * the gate is the first thing this method does; a cleanup that cannot be
+          verified raises the Chinese ``StandardPackageError`` out of
+          ``reconcile`` **before** any discovery/decision/install work and before
+          ``_last_outcome`` is touched, so no success audit is written and the
+          database/business state stays usable and not half-upgraded;
+        * the gate is idempotent (nothing to clean → no audit row, ``(0, 0, 0)``),
+          so by the time a decision of INSTALL/UPGRADE reaches ``install`` its own
+          cleanup is a no-op and the install path records no second audit row;
+        * for a decision of NOOP the cleanup is the *only* side effect, and the
+          returned action/reason are unchanged — cleanup never turns a no-op into
+          an install.  It does not add a backup either, because the backup that
+          carried the PDFs already exists on disk and is historical state that
+          must stay byte-identical.
+
+        The gate is reached through the injected ``StandardPackagePort``
+        (``cleanup_legacy_sources``), never by importing infrastructure: this
+        module keeps the architecture-gate rule that the application layer has
+        no ``uebench.infrastructure`` dependency.
+        """
         if self._packages is None:
             outcome = _outcome(
                 ReconciliationAction.UNAVAILABLE,
@@ -490,6 +529,8 @@ class PackageReconciliationService:
                 "标准包服务未配置（缺少更新公钥），跳过标准包对账。",
             )
         else:
+            # §五 cleanup gate: every startup/reconciliation, whatever the decision.
+            self._packages.cleanup_legacy_sources()
             bundled = self.discover_bundled_package(Path(directory))
             installed = self.installed_identity()
             outcome = decide(installed, bundled, data_version_key=self._data_version_key)

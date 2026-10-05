@@ -5,6 +5,20 @@
 
 数据目录一律使用 ``tmp_path`` 隔离（``--basetemp`` 必须指向 ``$env:TEMP``：
 仓库 ``work\\`` 目录存在 ACL 问题，会让 SQLite 写入慢约 200 倍）。
+
+夹具与外部依赖
+--------------
+核心场景（A–F、升级、冲突、损坏包、历史评价、发现确定性）一律使用**仓库内**的
+确定性夹具：
+
+* ``CURRENT_PACKAGE``：仓库内固定的正式标准包（CI 一定有）；
+* 合成包：由测试时临时生成的 Ed25519 密钥签名，公钥经
+  ``create_context(..., public_key_path=...)`` 交给组合根。
+
+因此核心场景既不需要 ``G:\\ECQuota-Archive``，也不需要
+``work/signing/development-private-key.pem``，并且不会因为二者缺失而 skip。
+只有显式以「归档历史证据」为目的的用例（``source_bearing_predecessor`` 逐字节对比、
+真实 r1→r2 取代关系）才在归档不可用时优雅跳过，跳过原因会在 ``-ra`` 摘要里列出。
 """
 
 from __future__ import annotations
@@ -12,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import sys
 import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -33,25 +48,40 @@ from uebench.application.package_reconciliation import (
 from uebench.bootstrap import create_context
 from uebench.domain.models import EvaluationRequest, InputMode, InputValue
 from uebench.infrastructure.logging import close_logging
-from uebench.infrastructure.packages import StandardPackageBuilder, _data_version_key
+from uebench.infrastructure.packages import (
+    AUDIT_LEGACY_SOURCES_REMOVED,
+    StandardPackageBuilder,
+    StandardPackageError,
+    _data_version_key,
+)
 from uebench.main import reconcile_standard_package
 
 from .test_engine import make_standard
 
+try:  # 测试目录既可能是普通目录，也可能被当作包
+    from _legacy_assets import (
+        LEGACY_LAYOUT_BOTH,
+        LEGACY_LAYOUT_FLAT,
+        materialize_legacy_layout,
+        session_legacy_package,
+        synthetic_legacy_library,
+    )
+except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
+    from tests._legacy_assets import (
+        LEGACY_LAYOUT_BOTH,
+        LEGACY_LAYOUT_FLAT,
+        materialize_legacy_layout,
+        session_legacy_package,
+        synthetic_legacy_library,
+    )
+
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
-#: 固定（已发布）标准包：旧 = 2026.09-published.2（GB29446 r1），当前 = 2026.10-published.3（r2）。
+#: 固定（已发布）标准包：当前 = 2026.10-published.4（GB29446 r2，去原文包）。
 CURRENT_PACKAGE = PACKAGE_DIR / "initial-standard-package-published.uebench"
-#: 旧包已移出仓库（REFERENCE ONLY）；取得的是归档件的**副本**。
-try:  # 测试目录既可能是普通目录，也可能被当作包
-    from _legacy_assets import session_legacy_package
-except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
-    from tests._legacy_assets import session_legacy_package
-
+#: 旧包已移出仓库（REFERENCE ONLY）；取得的是归档件的**副本**。核心场景不再依赖它。
 OLD_PACKAGE = session_legacy_package()
-#: 开发签名私钥（绝不复制进仓库，只按路径引用）。
-DEVELOPMENT_KEY = ROOT / "work" / "signing" / "development-private-key.pem"
 
 GB29446 = "gb-29446-2019"
 GB29446_COKING_PRODUCT = "gb_29446-2019-coking-coal"
@@ -64,9 +94,20 @@ AUDIT_ACTION_INSTALL = "STANDARD_PACKAGE_INSTALL"
 
 
 def require_pinned_packages() -> None:
-    for path in (OLD_PACKAGE, CURRENT_PACKAGE):
-        if not path.is_file():
-            pytest.skip(f"缺少固定标准包：{path}（release/standard-packages/）")
+    """固定正式包是仓库内固定件：缺失即硬失败，绝不 skip。"""
+    assert CURRENT_PACKAGE.is_file(), f"缺少固定标准包：{CURRENT_PACKAGE}"
+
+
+def require_archived_old_package() -> None:
+    """归档旧包只作历史证据：不可用时优雅跳过（核心场景不再依赖它）。
+
+    **唯一**允许的跳过类型：不伪造归档件的替代物，也不把它算进核心兼容覆盖。
+    """
+    if not OLD_PACKAGE.is_file():
+        pytest.skip(
+            "历史归档证据用例（evidence-only）：仓内合成夹具无法替代真实归档旧包 "
+            f"（G:\\ECQuota-Archive 不可用：{OLD_PACKAGE}）；不计入核心兼容覆盖"
+        )
 
 
 def manifest_of(path: Path) -> dict:
@@ -112,6 +153,22 @@ def policy_state(context) -> tuple[str | None, set[str], int, dict[str, str]]:
     return newest, backup_names(context), install_audit_rows(context), standards_snapshot(context)
 
 
+def standards_pdfs(context) -> list[Path]:
+    """活目录（``paths.standards``）下的真实 PDF 文件，排序。"""
+    return sorted(
+        path for path in context.paths.standards.rglob("*.pdf") if path.is_file()
+    )
+
+
+def legacy_cleanup_rows(context) -> list:
+    """清理闸门的成功审计行（§五 的唯一成功凭证）。"""
+    return [
+        entry
+        for entry in context.audit.list_recent(500)
+        if entry.action == AUDIT_LEGACY_SOURCES_REMOVED
+    ]
+
+
 def evaluation_rows(context, evaluation_id: str) -> int:
     with context.database.engine.connect() as connection:
         return int(
@@ -123,14 +180,39 @@ def evaluation_rows(context, evaluation_id: str) -> int:
 
 
 def developer_private_key() -> Ed25519PrivateKey:
-    if not DEVELOPMENT_KEY.is_file():
-        pytest.skip("缺少开发签名私钥：work/signing/development-private-key.pem")
-    try:
-        key = serialization.load_pem_private_key(DEVELOPMENT_KEY.read_bytes(), password=None)
-    except Exception as exc:  # pragma: no cover - 私钥不可读时明确跳过而不是误判
-        pytest.skip(f"开发签名私钥无法加载：{type(exc).__name__}: {exc}")
-    assert isinstance(key, Ed25519PrivateKey)
-    return key
+    """临时（ephemeral）Ed25519 私钥：由测试现场生成，绝不读取仓库内私钥。
+
+    键名保留是为了不改动调用点；语义已从「开发私钥」变为「本用例的临时签名密钥」。
+    """
+    return Ed25519PrivateKey.generate()
+
+
+def synthetic_bundled_package(
+    directory: Path,
+    private_key: Ed25519PrivateKey,
+    *,
+    package_id: str,
+    data_version: str,
+    level_1: str = "10",
+    issue_day: int = 23,
+    standard_id: str | None = None,
+    standard_number: str | None = None,
+    rule_revision: int = 1,
+) -> Path:
+    """生成一个**名字匹配内置包 glob** 的合成包，可当内置包直接对账安装。"""
+    directory.mkdir(parents=True, exist_ok=True)
+    return build_test_package(
+        directory,
+        private_key,
+        package_id=package_id,
+        data_version=data_version,
+        level_1=level_1,
+        issue_day=issue_day,
+        file_name=f"initial-standard-package-{package_id}.uebench",
+        standard_id=standard_id,
+        standard_number=standard_number,
+        rule_revision=rule_revision,
+    )
 
 
 def build_test_package(
@@ -141,9 +223,14 @@ def build_test_package(
     data_version: str,
     level_1: str = "10",
     issue_day: int = 23,
+    file_name: str | None = None,
+    standard_id: str | None = None,
+    standard_number: str | None = None,
+    rule_revision: int = 1,
 ) -> Path:
     """用真实 ``StandardPackageBuilder`` 生成可验签的测试标准包。"""
-    definition = make_standard()
+    definition = make_standard(standard_id=standard_id, standard_number=standard_number)
+    definition.rule_revision = rule_revision
     definition.products[0].indicators[0].thresholds.level_1.value = level_1
     source = directory / definition.source_file
     source.write_bytes(b"placeholder-source-for-reconciliation")
@@ -154,7 +241,7 @@ def build_test_package(
             for reference in indicator.source_references:
                 reference.source_sha256 = digest
     return StandardPackageBuilder(private_key).build(
-        directory / f"{package_id}.uebench",
+        directory / (file_name or f"{package_id}.uebench"),
         [definition],
         {definition.source_file: source},
         package_id=package_id,
@@ -243,8 +330,27 @@ def mutate_pinned_definition(
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(scope="session")
+def ephemeral_keypair(tmp_path_factory: pytest.TempPathFactory) -> tuple[Ed25519PrivateKey, Path]:
+    """会话级临时密钥对：合成内置包用它的公钥装配组合根。
+
+    这样核心对账场景不再依赖 ``work/signing/development-private-key.pem``。
+    """
+    directory = tmp_path_factory.mktemp("ephemeral-key")
+    private_key = Ed25519PrivateKey.generate()
+    public_key_path = directory / "ephemeral-public-key.pem"
+    public_key_path.write_bytes(
+        private_key.public_key().public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+    )
+    return private_key, public_key_path
+
+
 @pytest.fixture
 def context(tmp_path: Path):
+    """真实组合根 + 真实产品公钥（安装仓库内固定正式包）。"""
     if not PUBLIC_KEY.is_file():
         pytest.skip(f"缺少内置更新公钥：{PUBLIC_KEY}")
     application_context = create_context(tmp_path / "data", public_key_path=PUBLIC_KEY)
@@ -255,6 +361,12 @@ def context(tmp_path: Path):
         # ``configure_logging`` 为每个数据目录挂一个滚动文件 handler；Windows 上
         # 必须先释放句柄，pytest 才能删除 tmp_path。
         close_logging()
+
+
+def synthetic_context(tmp_path: Path, ephemeral_keypair):
+    """真实组合根 + 会话级临时公钥（安装合成内置包，无需开发私钥）。"""
+    _private_key, ephemeral_public_key = ephemeral_keypair
+    return create_context(tmp_path / "synthetic-data", public_key_path=ephemeral_public_key)
 
 
 # ---------------------------------------------------------------------------
@@ -503,69 +615,98 @@ def test_second_reconciliation_is_noop_without_backup_or_audit_noise(context, tm
 # ---------------------------------------------------------------------------
 
 
-def test_older_installed_package_is_upgraded_to_bundled(context, tmp_path: Path) -> None:
-    require_pinned_packages()
-    old_manifest = manifest_of(OLD_PACKAGE)
-    current_manifest = manifest_of(CURRENT_PACKAGE)
-    service = reconciler(context)
+def test_older_installed_package_is_upgraded_to_bundled(
+    tmp_path: Path, ephemeral_keypair
+) -> None:
+    """合成内置包：旧版本 → 新版本 = UPGRADE（真实安装、真实备份、不覆盖旧备份）。"""
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        old_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-old",
+            data_version="2026.09-published.2",
+            rule_revision=1,
+        )
+        current_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-current",
+            data_version="2026.10-published.3",
+            level_1="11",
+            issue_day=24,
+            rule_revision=2,
+        )
+        old_manifest = manifest_of(old_package)
+        current_manifest = manifest_of(current_package)
+        service = reconciler(context)
 
-    old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
-    installed = service.reconcile(old_directory)
-    assert installed.action is ReconciliationAction.INSTALL
-    assert context.standards.get_published(GB29446).rule_revision == 1
+        old_directory = bundled_directory(tmp_path / "old", (old_package, old_package.name))
+        installed = service.reconcile(old_directory)
+        assert installed.action is ReconciliationAction.INSTALL
+        assert context.standards.get_published("gb-00000-2026").rule_revision == 1
 
-    # 备份名带亚秒精度并带碰撞保护，因此连续两次安装必须各自留下一个可独立
-    # 观察的备份——这里刻意不 sleep，正是要复现“同一秒内覆盖备份”的缺陷。
-    backups_before = backup_names(context)
-    assert backups_before, "首次安装必须留下 pre-package-*.uebackup 安全备份"
-    first_backup = next(iter(backups_before))
-    first_backup_bytes = (context.paths.backups / first_backup).read_bytes()
-    first_backup_sha256 = hashlib.sha256(first_backup_bytes).hexdigest()
+        # 备份名带亚秒精度并带碰撞保护，因此连续两次安装必须各自留下一个可独立
+        # 观察的备份——这里刻意不 sleep，正是要复现“同一秒内覆盖备份”的缺陷。
+        backups_before = backup_names(context)
+        assert backups_before, "首次安装必须留下 pre-package-*.uebackup 安全备份"
+        first_backup = next(iter(backups_before))
+        first_backup_bytes = (context.paths.backups / first_backup).read_bytes()
+        first_backup_sha256 = hashlib.sha256(first_backup_bytes).hexdigest()
 
-    current_directory = bundled_directory(tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name))
-    outcome = service.reconcile(current_directory)
+        current_directory = bundled_directory(
+            tmp_path / "current", (current_package, current_package.name)
+        )
+        outcome = service.reconcile(current_directory)
 
-    assert outcome.action is ReconciliationAction.UPGRADE
-    assert outcome.reason is ReconciliationReason.BUNDLED_NEWER
-    assert outcome.executed is True
-    assert outcome.installed_before is not None
-    assert outcome.installed_before.package_id == old_manifest["package_id"]
-    assert outcome.installed_after is not None
-    assert outcome.installed_after.package_id == current_manifest["package_id"]
+        assert outcome.action is ReconciliationAction.UPGRADE
+        assert outcome.reason is ReconciliationReason.BUNDLED_NEWER
+        assert outcome.executed is True
+        assert outcome.installed_before is not None
+        assert outcome.installed_before.package_id == old_manifest["package_id"]
+        assert outcome.installed_after is not None
+        assert outcome.installed_after.package_id == current_manifest["package_id"]
 
-    new_backups = backup_names(context) - backups_before
-    assert len(new_backups) == 1, "升级必须留下 pre-package-*.uebackup 安全备份"
-    # 回归：升级备份不得覆盖首次安装的备份，且首次备份字节/哈希逐字节不变。
-    assert (context.paths.backups / first_backup).is_file()
-    assert (context.paths.backups / first_backup).read_bytes() == first_backup_bytes
-    assert (
-        hashlib.sha256((context.paths.backups / first_backup).read_bytes()).hexdigest()
-        == first_backup_sha256
-    )
-    assert outcome.backup_path not in backups_before
-    # 新规则就位：r2 作为新修订加入，r1 仍然保留（历史评价必须可复算）。
-    assert context.application.get_published_standard(GB29446).rule_revision == 2
-    gb29446_revisions = sorted(
-        item.rule_revision
-        for item in context.application.list_all_standards()
-        if item.id == GB29446
-    )
-    assert gb29446_revisions == [1, 2], "升级必须新增 r2 而不是替换 r1"
-    assert len(context.application.list_all_standards()) == 49
-    history = context.application.list_package_history(5)
-    assert len(history) == 2
-    assert history[0].package_id == current_manifest["package_id"]
-    assert history[0].data_version == current_manifest["data_version"]
-    assert install_audit_rows(context) == 2
+        new_backups = backup_names(context) - backups_before
+        assert len(new_backups) == 1, "升级必须留下 pre-package-*.uebackup 安全备份"
+        # 回归：升级备份不得覆盖首次安装的备份，且首次备份字节/哈希逐字节不变。
+        assert (context.paths.backups / first_backup).is_file()
+        assert (context.paths.backups / first_backup).read_bytes() == first_backup_bytes
+        assert (
+            hashlib.sha256((context.paths.backups / first_backup).read_bytes()).hexdigest()
+            == first_backup_sha256
+        )
+        assert outcome.backup_path not in backups_before
+        # 新规则就位：r2 作为新修订加入，r1 仍然保留（历史评价必须可复算）。
+        assert context.application.get_published_standard("gb-00000-2026").rule_revision == 2
+        revisions = sorted(
+            item.rule_revision
+            for item in context.application.list_all_standards()
+            if item.id == "gb-00000-2026"
+        )
+        assert revisions == [1, 2], "升级必须新增 r2 而不是替换 r1"
+        assert len(context.application.list_all_standards()) == 2
+        history = context.application.list_package_history(5)
+        assert len(history) == 2
+        assert history[0].package_id == current_manifest["package_id"]
+        assert history[0].data_version == current_manifest["data_version"]
+        assert install_audit_rows(context) == 2
 
-    # 再跑一次：NOOP，且不得新增备份/审计。
-    second = service.reconcile(current_directory)
-    assert second.action is ReconciliationAction.NOOP
-    assert second.reason is ReconciliationReason.IDENTICAL_PACKAGE
-    assert second.executed is False
-    assert backup_names(context) - backups_before == new_backups, "NOOP 不得新增备份"
-    assert install_audit_rows(context) == 2
-    assert len(context.application.list_package_history(5)) == 2
+        # 再跑一次：NOOP，且不得新增备份/审计。
+        second = service.reconcile(current_directory)
+        assert second.action is ReconciliationAction.NOOP
+        assert second.reason is ReconciliationReason.IDENTICAL_PACKAGE
+        assert second.executed is False
+        assert backup_names(context) - backups_before == new_backups, "NOOP 不得新增备份"
+        assert install_audit_rows(context) == 2
+        assert len(context.application.list_package_history(5)) == 2
+    finally:
+        context.database.dispose()
+        # ``configure_logging`` 为每个数据目录挂滚动文件 handler；Windows 上必须先
+        # 释放句柄，pytest 才能删除 tmp_path。
+        close_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -573,27 +714,44 @@ def test_older_installed_package_is_upgraded_to_bundled(context, tmp_path: Path)
 # ---------------------------------------------------------------------------
 
 
-def test_newer_installed_package_refuses_downgrade(context, tmp_path: Path) -> None:
-    require_pinned_packages()
-    current_manifest = manifest_of(CURRENT_PACKAGE)
-    service = reconciler(context)
+def test_newer_installed_package_refuses_downgrade(tmp_path: Path, ephemeral_keypair) -> None:
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        current_package = synthetic_bundled_package(
+            work, private_key, package_id="recon-newer", data_version="2026.10-published.3"
+        )
+        old_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-older",
+            data_version="2026.09-published.2",
+            issue_day=22,
+        )
+        current_manifest = manifest_of(current_package)
+        service = reconciler(context)
 
-    current_directory = bundled_directory(tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name))
-    assert service.reconcile(current_directory).action is ReconciliationAction.INSTALL
-    before = policy_state(context)
+        current_directory = bundled_directory(
+            tmp_path / "current", (current_package, current_package.name)
+        )
+        assert service.reconcile(current_directory).action is ReconciliationAction.INSTALL
+        before = policy_state(context)
 
-    old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
-    outcome = service.reconcile(old_directory)
+        old_directory = bundled_directory(tmp_path / "old", (old_package, old_package.name))
+        outcome = service.reconcile(old_directory)
 
-    assert outcome.action is ReconciliationAction.NO_DOWNGRADE
-    assert outcome.reason is ReconciliationReason.INSTALLED_NEWER
-    assert outcome.executed is False
-    assert "降级" in outcome.message
-    # 内置包本身是有效的：拒绝降级来自版本比较，不是完整性失败。
-    assert outcome.bundled is not None and outcome.bundled.valid is True
-    assert policy_state(context) == before, "拒绝降级时不得改动任何已安装状态"
-    assert context.standards.get_published(GB29446).rule_revision == 2
-    assert context.application.list_package_history(5)[0].package_id == current_manifest["package_id"]
+        assert outcome.action is ReconciliationAction.NO_DOWNGRADE
+        assert outcome.reason is ReconciliationReason.INSTALLED_NEWER
+        assert outcome.executed is False
+        assert "降级" in outcome.message
+        # 内置包本身是有效的：拒绝降级来自版本比较，不是完整性失败。
+        assert outcome.bundled is not None and outcome.bundled.valid is True
+        assert policy_state(context) == before, "拒绝降级时不得改动任何已安装状态"
+        assert context.application.list_package_history(5)[0].package_id == current_manifest["package_id"]
+    finally:
+        context.database.dispose()
+        close_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -601,44 +759,51 @@ def test_newer_installed_package_refuses_downgrade(context, tmp_path: Path) -> N
 # ---------------------------------------------------------------------------
 
 
-def test_same_data_version_different_identity_conflicts_without_overwrite(context, tmp_path: Path) -> None:
+def test_same_data_version_different_identity_conflicts_without_overwrite(
+    tmp_path: Path, ephemeral_keypair
+) -> None:
     """内容一致、仅包身份不同：判 E（SAME_DATA_VERSION_DIFFERENT_IDENTITY）。"""
-    private_key = developer_private_key()
-    work = tmp_path / "build"
-    work.mkdir(parents=True)
-    first = build_test_package(work, private_key, package_id="recon-conflict-a", data_version="2026.05-published.1")
-    # 同一份定义内容（同一 level_1、同一原文），只有 manifest.package_id 不同。
-    second = build_test_package(work, private_key, package_id="recon-conflict-b", data_version="2026.05-published.1")
-    assert manifest_of(first)["package_id"] != manifest_of(second)["package_id"]
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        work.mkdir(parents=True)
+        first = build_test_package(work, private_key, package_id="recon-conflict-a", data_version="2026.05-published.1")
+        # 同一份定义内容（同一 level_1、同一原文），只有 manifest.package_id 不同。
+        second = build_test_package(work, private_key, package_id="recon-conflict-b", data_version="2026.05-published.1")
+        assert manifest_of(first)["package_id"] != manifest_of(second)["package_id"]
 
-    service = reconciler(context)
-    installed = service.reconcile(
-        bundled_directory(
-            tmp_path / "a", (first, "initial-standard-package-conflict-a.uebench")
+        service = reconciler(context)
+        installed = service.reconcile(
+            bundled_directory(
+                tmp_path / "a", (first, "initial-standard-package-conflict-a.uebench")
+            )
         )
-    )
-    assert installed.action is ReconciliationAction.INSTALL
-    before = policy_state(context)
+        assert installed.action is ReconciliationAction.INSTALL
+        before = policy_state(context)
 
-    bundled = bundled_directory(
-        tmp_path / "b", (second, "initial-standard-package-conflict-b.uebench")
-    )
-    identity = service.discover_bundled_package(bundled)
-    assert identity is not None and identity.valid is True
-    assert identity.install_blockers == [], "内容一致时 preview 只给 warning，不阻塞"
+        bundled = bundled_directory(
+            tmp_path / "b", (second, "initial-standard-package-conflict-b.uebench")
+        )
+        identity = service.discover_bundled_package(bundled)
+        assert identity is not None and identity.valid is True
+        assert identity.install_blockers == [], "内容一致时 preview 只给 warning，不阻塞"
 
-    outcome = service.reconcile(bundled)
+        outcome = service.reconcile(bundled)
 
-    assert outcome.action is ReconciliationAction.CONFLICT
-    assert outcome.reason is ReconciliationReason.SAME_DATA_VERSION_DIFFERENT_IDENTITY
-    assert outcome.executed is False
-    assert outcome.succeeded is False, "冲突必须显式上报，不能当作成功"
-    assert "recon-conflict-a" in outcome.message and "recon-conflict-b" in outcome.message
-    assert outcome.bundled is not None and outcome.bundled.valid is True
-    # 已安装内容逐字节未变，也没有新增备份/审计/包记录。
-    assert policy_state(context) == before
-    assert len(context.application.list_package_history(200)) == 1
-    assert context.application.list_package_history(5)[0].package_id == "recon-conflict-a"
+        assert outcome.action is ReconciliationAction.CONFLICT
+        assert outcome.reason is ReconciliationReason.SAME_DATA_VERSION_DIFFERENT_IDENTITY
+        assert outcome.executed is False
+        assert outcome.succeeded is False, "冲突必须显式上报，不能当作成功"
+        assert "recon-conflict-a" in outcome.message and "recon-conflict-b" in outcome.message
+        assert outcome.bundled is not None and outcome.bundled.valid is True
+        # 已安装内容逐字节未变，也没有新增备份/审计/包记录。
+        assert policy_state(context) == before
+        assert len(context.application.list_package_history(200)) == 1
+        assert context.application.list_package_history(5)[0].package_id == "recon-conflict-a"
+    finally:
+        context.database.dispose()
+        close_logging()
 
 
 def test_install_blockers_guard_never_calls_install() -> None:
@@ -707,89 +872,172 @@ def test_content_conflict_message_truncates_long_conflict_lists() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_invalid_bundled_package_installs_nothing_and_keeps_existing_data(context, tmp_path: Path) -> None:
-    require_pinned_packages()
-    service = reconciler(context)
-    old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
-    assert service.reconcile(old_directory).action is ReconciliationAction.INSTALL
-    before = policy_state(context)
+def test_invalid_bundled_package_installs_nothing_and_keeps_existing_data(
+    tmp_path: Path, ephemeral_keypair
+) -> None:
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        old_package = synthetic_bundled_package(
+            work, private_key, package_id="recon-invalid-old", data_version="2026.09-published.2"
+        )
+        good_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-invalid-good",
+            data_version="2026.10-published.3",
+            level_1="11",
+            issue_day=24,
+        )
+        service = reconciler(context)
+        old_directory = bundled_directory(tmp_path / "old", (old_package, old_package.name))
+        assert service.reconcile(old_directory).action is ReconciliationAction.INSTALL
+        before = policy_state(context)
 
-    work = tmp_path / "broken"
-    work.mkdir(parents=True)
-    tampered = tampered_copy(CURRENT_PACKAGE, work / "tampered.uebench")
-    truncated = work / "truncated.uebench"
-    truncated.write_bytes(CURRENT_PACKAGE.read_bytes()[: CURRENT_PACKAGE.stat().st_size // 2])
-    unsigned = unsigned_copy(CURRENT_PACKAGE, work / "unsigned.uebench")
+        broken = tmp_path / "broken"
+        broken.mkdir(parents=True)
+        tampered = tampered_copy(good_package, broken / "tampered.uebench")
+        truncated = broken / "truncated.uebench"
+        truncated.write_bytes(
+            good_package.read_bytes()[: good_package.stat().st_size // 2]
+        )
+        unsigned = unsigned_copy(good_package, broken / "unsigned.uebench")
 
-    for damaged in (tampered, truncated, unsigned):
-        directory = bundled_directory(work / damaged.stem, (damaged, CURRENT_PACKAGE.name))
-        outcome = service.reconcile(directory)
+        for damaged in (tampered, truncated, unsigned):
+            directory = bundled_directory(
+                broken / damaged.stem, (damaged, good_package.name)
+            )
+            outcome = service.reconcile(directory)
 
-        assert outcome.action is ReconciliationAction.INVALID, damaged.name
-        assert outcome.reason is ReconciliationReason.BUNDLED_INVALID
-        assert outcome.executed is False
-        assert outcome.succeeded is False, "校验失败绝不能上报为已更新"
-        assert outcome.errors, "必须给出校验失败原因"
-        assert policy_state(context) == before, f"{damaged.name} 之后存量数据/备份/审计必须不变"
+            assert outcome.action is ReconciliationAction.INVALID, damaged.name
+            assert outcome.reason is ReconciliationReason.BUNDLED_INVALID
+            assert outcome.executed is False
+            assert outcome.succeeded is False, "校验失败绝不能上报为已更新"
+            assert outcome.errors, "必须给出校验失败原因"
+            assert policy_state(context) == before, f"{damaged.name} 之后存量数据/备份/审计必须不变"
 
-    assert context.standards.get_published(GB29446).rule_revision == 1
-    assert context.application.list_package_history(5)[0].package_id == manifest_of(OLD_PACKAGE)["package_id"]
+        assert context.standards.get_published("gb-00000-2026").rule_revision == 1
+        assert (
+            context.application.list_package_history(5)[0].package_id
+            == manifest_of(old_package)["package_id"]
+        )
+    finally:
+        context.database.dispose()
+        close_logging()
 
 
-def test_content_conflict_with_installed_rules_is_conflict_not_invalid(context, tmp_path: Path) -> None:
+def mutate_package_definition(
+    source: Path,
+    target: Path,
+    private_key: Ed25519PrivateKey,
+    *,
+    package_id: str,
+    data_version: str,
+    issued_at: str,
+    level_1: str = "5.5",
+) -> Path:
+    """取一个合成包，改其定义的内容但保持 (id, version, rule_revision)，重新签名。
+
+    这是现场“用户库的规则来自其它渠道包、与内置包同 (标准, 版本, 规则版本) 但内容
+    不同”的最小复现：包本身签名/哈希全部有效，但装不进已有规则行。
+    """
+    with zipfile.ZipFile(source) as archive:
+        entries = {name: archive.read(name) for name in archive.namelist()}
+    manifest = json.loads(entries["manifest.json"])
+    member = next(item for item in manifest["files"] if item["kind"] == "definition")
+    definition = json.loads(entries[member["path"]])
+    definition["products"][0]["indicators"][0]["thresholds"]["level_1"]["value"] = level_1
+    payload = json.dumps(
+        definition, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    entries[member["path"]] = payload
+    member["sha256"] = hashlib.sha256(payload).hexdigest()
+    member["size"] = len(payload)
+    manifest["package_id"] = package_id
+    manifest["data_version"] = data_version
+    manifest["issued_at"] = issued_at
+    manifest_bytes = json.dumps(
+        manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    entries["manifest.json"] = manifest_bytes
+    entries["signature.ed25519"] = private_key.sign(manifest_bytes)
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, data in entries.items():
+            archive.writestr(name, data)
+    return target
+
+
+def test_content_conflict_with_installed_rules_is_conflict_not_invalid(
+    tmp_path: Path, ephemeral_keypair
+) -> None:
     """集成评审缺陷回归：同 (标准, 版本, 规则版本) 内容不同 → CONFLICT，不得抛异常。
 
     缺陷版本把 ``标准版本已存在：`` 当成安装闸门吞掉，于是 bundled.valid 仍为 True、
-    决策为 UPGRADE，随后 ``install()`` 以 44 条 ``StandardPackageError`` 抛出。
+    决策为 UPGRADE，随后 ``install()`` 以一批 ``StandardPackageError`` 抛出。
+    夹具为合成包 + 会话级临时密钥，因此不依赖归档区与开发私钥。
     """
-    require_pinned_packages()
-    private_key = developer_private_key()
-    service = reconciler(context)
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        current_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-content-conflict-base",
+            data_version="2026.10-published.3",
+        )
+        service = reconciler(context)
 
-    current_directory = bundled_directory(
-        tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name)
-    )
-    assert service.reconcile(current_directory).action is ReconciliationAction.INSTALL
-    before = policy_state(context)
-    assert len(context.application.list_package_history(200)) == 1
+        current_directory = bundled_directory(
+            tmp_path / "current", (current_package, current_package.name)
+        )
+        assert service.reconcile(current_directory).action is ReconciliationAction.INSTALL
+        before = policy_state(context)
+        assert len(context.application.list_package_history(200)) == 1
 
-    mutated = mutate_pinned_definition(
-        CURRENT_PACKAGE,
-        tmp_path / "mutated" / "mutated.uebench",
-        private_key,
-        package_id="recon-mutated-gb29446-content",
-        data_version="2026.11-published.4",  # 严格更新：不拦内容冲突就会走 UPGRADE
-        issued_at="2026-11-05T00:00:00Z",
-    )
-    mutated_manifest = manifest_of(mutated)
-    current_key = _data_version_key(manifest_of(CURRENT_PACKAGE)["data_version"])
-    mutated_key = _data_version_key(mutated_manifest["data_version"])
-    assert current_key is not None and mutated_key is not None and mutated_key > current_key
+        mutated = mutate_package_definition(
+            current_package,
+            tmp_path / "mutated" / "mutated.uebench",
+            private_key,
+            package_id="recon-mutated-content",
+            data_version="2026.11-published.4",  # 严格更新：不拦内容冲突就会走 UPGRADE
+            issued_at="2026-11-05T00:00:00Z",
+        )
+        mutated_manifest = manifest_of(mutated)
+        current_key = _data_version_key(manifest_of(current_package)["data_version"])
+        mutated_key = _data_version_key(mutated_manifest["data_version"])
+        assert current_key is not None and mutated_key is not None and mutated_key > current_key
 
-    directory = bundled_directory(
-        tmp_path / "mutated-bundled", (mutated, CURRENT_PACKAGE.name)
-    )
-    identity = service.discover_bundled_package(directory)
-    assert identity is not None
-    assert identity.valid is True, "内容冲突不是包损坏：不得判 INVALID"
-    assert identity.errors == []
-    assert any("标准版本已存在" in item for item in identity.install_blockers)
+        directory = bundled_directory(
+            tmp_path / "mutated-bundled", (mutated, current_package.name)
+        )
+        identity = service.discover_bundled_package(directory)
+        assert identity is not None
+        assert identity.valid is True, "内容冲突不是包损坏：不得判 INVALID"
+        assert identity.errors == []
+        assert any("标准版本已存在" in item for item in identity.install_blockers)
 
-    # 组合根入口不得抛异常（这是被评审的失败点），必须返回可上报的 CONFLICT。
-    outcome = reconcile_standard_package(context, directory)
+        # 组合根入口不得抛异常（这是被评审的失败点），必须返回可上报的 CONFLICT。
+        outcome = reconcile_standard_package(context, directory)
 
-    assert outcome.action is ReconciliationAction.CONFLICT
-    assert outcome.reason is ReconciliationReason.INSTALLED_CONTENT_CONFLICT
-    assert outcome.executed is False
-    assert outcome.succeeded is False
-    assert "GB 29446-2019 2019" in outcome.message
-    assert outcome.errors
+        assert outcome.action is ReconciliationAction.CONFLICT
+        assert outcome.reason is ReconciliationReason.INSTALLED_CONTENT_CONFLICT
+        assert outcome.executed is False
+        assert outcome.succeeded is False
+        assert "GB 00000-2026 2026" in outcome.message
+        assert outcome.errors
 
-    # 无新备份、无新 standard_packages 行、已安装标准行逐字节不变。
-    assert policy_state(context) == before
-    assert len(context.application.list_package_history(200)) == 1
-    assert context.application.get_published_standard(GB29446).rule_revision == 2
-    assert context.application.last_package_reconciliation() is outcome
+        # 无新备份、无新 standard_packages 行、已安装标准行逐字节不变。
+        assert policy_state(context) == before
+        assert len(context.application.list_package_history(200)) == 1
+        assert context.application.get_published_standard("gb-00000-2026").rule_revision == 1
+        assert context.application.last_package_reconciliation() is outcome
+    finally:
+        context.database.dispose()
+        close_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -797,50 +1045,84 @@ def test_content_conflict_with_installed_rules_is_conflict_not_invalid(context, 
 # ---------------------------------------------------------------------------
 
 
-def test_upgrade_preserves_saved_evaluation_snapshot(context, tmp_path: Path) -> None:
-    require_pinned_packages()
-    service = reconciler(context)
+def test_upgrade_preserves_saved_evaluation_snapshot(tmp_path: Path, ephemeral_keypair) -> None:
+    """升级后历史评价快照保持原样（不按新规则重算）。
 
-    old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
-    assert service.reconcile(old_directory).action is ReconciliationAction.INSTALL
-    assert context.standards.get_published(GB29446).rule_revision == 1
+    定义沿用真实 GB 29446-2019 的 id / 编号（唯一纳入正式评价范围的标准，因此
+    ``evaluate`` 会形成正式记录），但夹具本身是合成包 + 会话级临时密钥，所以本用例
+    不依赖外部归档区与开发私钥。
+    """
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        old_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-snapshot-old",
+            data_version="2026.09-published.2",
+            standard_id=GB29446,
+            standard_number="GB 29446-2019",
+            rule_revision=1,
+        )
+        current_package = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-snapshot-new",
+            data_version="2026.10-published.3",
+            level_1="11",
+            issue_day=24,
+            standard_id=GB29446,
+            standard_number="GB 29446-2019",
+            rule_revision=2,
+        )
+        service = reconciler(context)
 
-    # r1（合并前的 GB29446）使用 direct_input_key = actual.coking-coal。
-    request = EvaluationRequest(
-        evaluation_date=date(2026, 9, 26),
-        standard_id=GB29446,
-        product_id=GB29446_COKING_PRODUCT,
-        input_mode=InputMode.DIRECT,
-        inputs={"actual.coking-coal": InputValue(value="5.0", unit="kW·h/t")},
-        organization_name="对账测试企业",
-    )
-    result = context.application.evaluate(request)
-    assert result.rule_revision == 1
-    assert evaluation_rows(context, result.evaluation_id) == 1
+        old_directory = bundled_directory(tmp_path / "old", (old_package, old_package.name))
+        assert service.reconcile(old_directory).action is ReconciliationAction.INSTALL
+        assert context.standards.get_published(GB29446).rule_revision == 1
 
-    loaded_before = context.application.get_evaluation(result.evaluation_id)
-    assert loaded_before is not None
-    revision_before = loaded_before[1].rule_revision
-    snapshot_before = loaded_before[1].rule_snapshot_sha256
-    rows_before = context.application.count_evaluations()
+        # r1 定义使用 direct_input_key = actual（合成夹具的指标输入键）。
+        request = EvaluationRequest(
+            evaluation_date=date(2026, 9, 26),
+            standard_id=GB29446,
+            product_id="product",
+            input_mode=InputMode.DIRECT,
+            inputs={"actual": InputValue(value="5", unit="kgce/t")},
+            organization_name="对账测试企业",
+        )
+        result = context.application.evaluate(request)
+        assert result.rule_revision == 1
+        assert evaluation_rows(context, result.evaluation_id) == 1
 
-    current_directory = bundled_directory(tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name))
-    outcome = service.reconcile(current_directory)
-    assert outcome.action is ReconciliationAction.UPGRADE
+        loaded_before = context.application.get_evaluation(result.evaluation_id)
+        assert loaded_before is not None
+        revision_before = loaded_before[1].rule_revision
+        snapshot_before = loaded_before[1].rule_snapshot_sha256
+        rows_before = context.application.count_evaluations()
 
-    # 新规则就位……
-    assert context.standards.get_published(GB29446).rule_revision == 2
-    # ……但历史记录仍然存在，而且仍是当时的 r1 规则快照（不被重算）。
-    assert evaluation_rows(context, result.evaluation_id) == 1
-    assert context.application.count_evaluations() == rows_before == 1
-    loaded_after = context.application.get_evaluation(result.evaluation_id)
-    assert loaded_after is not None
-    assert loaded_after[0] == loaded_before[0]
-    assert loaded_after[1].rule_revision == revision_before == 1
-    assert loaded_after[1].rule_snapshot_sha256 == snapshot_before
-    assert loaded_after[2].rule_revision == 1, "历史规则快照必须仍是升级前的 r1"
-    summaries = context.application.list_recent_evaluations()
-    assert [item.evaluation_id for item in summaries] == [result.evaluation_id]
+        current_directory = bundled_directory(
+            tmp_path / "current", (current_package, current_package.name)
+        )
+        outcome = service.reconcile(current_directory)
+        assert outcome.action is ReconciliationAction.UPGRADE
+
+        # 新规则就位……
+        assert context.standards.get_published(GB29446).rule_revision == 2
+        # ……但历史记录仍然存在，而且仍是当时的 r1 规则快照（不被重算）。
+        assert evaluation_rows(context, result.evaluation_id) == 1
+        assert context.application.count_evaluations() == rows_before == 1
+        loaded_after = context.application.get_evaluation(result.evaluation_id)
+        assert loaded_after is not None
+        assert loaded_after[0] == loaded_before[0]
+        assert loaded_after[1].rule_revision == revision_before == 1
+        assert loaded_after[1].rule_snapshot_sha256 == snapshot_before
+        assert loaded_after[2].rule_revision == 1, "历史规则快照必须仍是升级前的 r1"
+        summaries = context.application.list_recent_evaluations()
+        assert [item.evaluation_id for item in summaries] == [result.evaluation_id]
+    finally:
+        context.database.dispose()
+        close_logging()
 
 
 # ---------------------------------------------------------------------------
@@ -849,34 +1131,97 @@ def test_upgrade_preserves_saved_evaluation_snapshot(context, tmp_path: Path) ->
 
 
 def test_bundled_discovery_prefers_highest_data_version_not_last_filename(
-    context, tmp_path: Path
+    tmp_path: Path, ephemeral_keypair
 ) -> None:
+    private_key, _public_key = ephemeral_keypair
+    context = synthetic_context(tmp_path, ephemeral_keypair)
+    try:
+        work = tmp_path / "build"
+        newer = synthetic_bundled_package(
+            work, private_key, package_id="recon-discover-newer", data_version="2026.10-published.3"
+        )
+        older = synthetic_bundled_package(
+            work,
+            private_key,
+            package_id="recon-discover-older",
+            data_version="2026.09-published.2",
+            issue_day=22,
+        )
+        current_manifest = manifest_of(newer)
+        directory = bundled_directory(
+            tmp_path,
+            # 文件名故意让“旧包”排在字典序最后：旧实现取 sorted()[-1] 会选错。
+            (older, "initial-standard-package-z-older.uebench"),
+            (newer, "initial-standard-package-a-newer.uebench"),
+        )
+        names = sorted(path.name for path in directory.glob(BUNDLED_PACKAGE_GLOB))
+        assert names == [
+            "initial-standard-package-a-newer.uebench",
+            "initial-standard-package-z-older.uebench",
+        ], "用例前提：字典序最后的是旧包"
+
+        service = reconciler(context)
+        identity = service.discover_bundled_package(directory)
+        assert identity is not None
+        assert identity.package_id == current_manifest["package_id"]
+        assert identity.data_version == current_manifest["data_version"]
+        assert identity.path.endswith("initial-standard-package-a-newer.uebench")
+
+        outcome = service.reconcile(directory)
+        assert outcome.action is ReconciliationAction.INSTALL
+        assert outcome.installed is not None
+        assert outcome.installed.package_id == current_manifest["package_id"]
+        assert context.standards.get_published("gb-00000-2026").rule_revision == 1
+        assert len(context.application.list_package_history(5)) == 1
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_archived_legacy_package_upgrades_to_pinned_package(context, tmp_path: Path) -> None:
+    """【历史归档证据用例 / EVIDENCE-ONLY，不计入核心兼容覆盖】
+
+    验证真实归档旧包（``G:\\ECQuota-Archive`` 的 ``2026.09-published.2``）到当前固定
+    包的 r1 → r2 取代关系。归档件按运维决定已移出仓库，本仓库无法再生成它的替代物
+    （合成夹具可以覆盖同一契约，但覆盖不了「真实归档件本身的字节」），因此：
+
+    * 归档可用时：跑完整断言；
+    * 归档不可用（CI / 其它机器）时：以 ``require_archived_old_package`` 显式跳过，
+      跳过原因明确写出这是历史归档证据、不计入核心覆盖。
+
+    **核心对账契约**（安装 / 升级 / no-op / 冲突 / 损坏包 / 历史快照保全 / 内置包
+    发现确定性）全部由本模块的合成夹具覆盖，不依赖这条用例。
+    """
     require_pinned_packages()
+    require_archived_old_package()
+    old_manifest = manifest_of(OLD_PACKAGE)
     current_manifest = manifest_of(CURRENT_PACKAGE)
-    directory = bundled_directory(
-        tmp_path,
-        # 文件名故意让“旧包”排在字典序最后：旧实现取 sorted()[-1] 会选错。
-        (OLD_PACKAGE, "initial-standard-package-z-older.uebench"),
-        (CURRENT_PACKAGE, "initial-standard-package-a-newer.uebench"),
-    )
-    names = sorted(path.name for path in directory.glob(BUNDLED_PACKAGE_GLOB))
-    assert names == [
-        "initial-standard-package-a-newer.uebench",
-        "initial-standard-package-z-older.uebench",
-    ], "用例前提：字典序最后的是旧包"
-
     service = reconciler(context)
-    identity = service.discover_bundled_package(directory)
-    assert identity is not None
-    assert identity.package_id == current_manifest["package_id"]
-    assert identity.data_version == current_manifest["data_version"]
-    assert identity.path.endswith("initial-standard-package-a-newer.uebench")
 
-    outcome = service.reconcile(directory)
-    assert outcome.action is ReconciliationAction.INSTALL
-    assert outcome.installed is not None
-    assert outcome.installed.package_id == current_manifest["package_id"]
+    old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
+    assert service.reconcile(old_directory).action is ReconciliationAction.INSTALL
+    assert context.standards.get_published(GB29446).rule_revision == 1
+
+    current_directory = bundled_directory(
+        tmp_path / "current", (CURRENT_PACKAGE, CURRENT_PACKAGE.name)
+    )
+    outcome = service.reconcile(current_directory)
+
+    assert outcome.action is ReconciliationAction.UPGRADE
+    assert outcome.installed_before is not None
+    assert outcome.installed_before.package_id == old_manifest["package_id"]
+    assert outcome.installed_after is not None
+    assert outcome.installed_after.package_id == current_manifest["package_id"]
+    # r2 作为新修订加入，r1 仍然保留（历史评价必须可复算）。
     assert context.standards.get_published(GB29446).rule_revision == 2
+    revisions = sorted(
+        item.rule_revision
+        for item in context.application.list_all_standards()
+        if item.id == GB29446
+    )
+    assert revisions == [1, 2], "升级必须新增 r2 而不是替换 r1"
+    assert len(context.application.list_all_standards()) == 49
+    assert len(context.application.list_package_history(5)) == 2
 
 
 def test_reconciliation_without_package_service_is_unavailable(tmp_path: Path) -> None:
@@ -893,3 +1238,294 @@ def test_reconciliation_without_package_service_is_unavailable(tmp_path: Path) -
     finally:
         context.database.dispose()
         close_logging()
+
+
+# ---------------------------------------------------------------------------
+# 10. §五 —— 老备份恢复后，正常启动/对账必须再次经过同一个 cleanup Gate
+#
+# 缺口（本节的用例就是它的回归护栏）：``install`` 只在 INSTALL/UPGRADE 时被调用，
+# 而 cleanup Gate 原先只存在于 ``install`` 内部。于是
+#     BackupService.restore() 把老 ``sources/*`` PDF 放回活目录
+#   → 内置包与恢复回来的已安装包完全相同
+#   → 决策 NOOP
+#   → 清理永不执行，旧 PDF 留在用户数据目录。
+# 现在 ``PackageReconciliationService.reconcile()`` 在决策表**之前**无条件调用
+# 端口方法 ``StandardPackagePort.cleanup_legacy_sources()``（应用层不导入
+# infrastructure），因此 NOOP 也必须经过同一闸门。
+#
+# 夹具全部是合成的（临时 Ed25519 密钥 + dummy PDF 字节），因此不依赖
+# ``G:\ECQuota-Archive`` 与 ``work/signing``，也不会因二者缺失而 skip。
+# ---------------------------------------------------------------------------
+
+
+def synthetic_bundled_ready_context(tmp_path: Path, *, root: str = "appdata", work: str = "work"):
+    """装好合成包的真实组合根 + 与已安装包**逐字节相同**的内置包目录。
+
+    返回 ``(library, context, directory)``：``directory`` 里的内置包与已安装包
+    同 ``package_id``、同 ``package_sha256``，所以对账决策是真 NOOP。
+    """
+    library = synthetic_legacy_library(tmp_path / work)
+    context = create_context(tmp_path / root, public_key_path=library.public_key_path)
+    context.package_service.install(library.package)
+    # 文件名必须匹配内置包 glob ``initial-standard-package-*.uebench``；
+    # 复制的是**逐字节相同**的文件，所以 package_id / package_sha256 都不变。
+    directory = bundled_directory(
+        tmp_path / "bundled",
+        (library.package, f"initial-standard-package-{library.package.name}"),
+    )
+    assert manifest_of(directory / f"initial-standard-package-{library.package.name}")[
+        "package_id"
+    ] == library.package_id
+    return library, context, directory
+
+
+def assert_cleanup_audit_matches(
+    context, *, directories: int, files: int, flat: int, index: int = 0
+) -> dict:
+    """清理成功审计行必须是**验证后**的真实计数（并且只有一行）。"""
+    rows = legacy_cleanup_rows(context)
+    assert len(rows) == 1, [row.action for row in context.audit.list_recent(200)]
+    details = json.loads(rows[index].details_json)
+    assert details["directories_removed"] == directories
+    assert details["files_removed"] == files
+    assert details["flat_files_removed"] == flat
+    assert details["verified"] is True
+    assert details["scope"] == str(context.paths.standards.resolve())
+    assert rows[index].entity_type == "standard_package"
+    return details
+
+
+def test_restore_then_noop_still_passes_the_cleanup_gate(tmp_path: Path) -> None:
+    """核心缺口回归：从老备份恢复 → 决策 NOOP → 活目录仍然被清理干净。
+
+    历史 ``.uebackup`` 里带着老 ``sources/*`` 与平铺 PDF（那是历史事实，不得改写），
+    ``BackupService.restore()`` 会把它们原样放回活目录。随后正常启动路径
+    （``reconcile_standard_package`` → ``PackageReconciliationService.reconcile``）
+    必须**先过 cleanup Gate 再做决策**：即使决策是 NOOP 也要把活目录清干净。
+    """
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        package_directory = context.paths.standards / library.package_id
+        materialize_legacy_layout(package_directory, LEGACY_LAYOUT_BOTH, pdf_count=2)
+
+        # 用例前提：老布局真的在活目录里，而且是**两种**布局同时存在。
+        assert len(standards_pdfs(context)) == 4
+        assert (package_directory / "sources").is_dir()
+        assert len(list(package_directory.glob("*.pdf"))) == 2
+
+        # 老版本/本次升级产生的历史安全备份：恢复后它必须逐字节不变。
+        backup = context.application.create_backup(
+            context.paths.backups / "pre-package-20260101-000000-000000.uebackup"
+        )
+        backup_bytes = backup.read_bytes()
+        backup_sha256 = hashlib.sha256(backup_bytes).hexdigest()
+        with zipfile.ZipFile(backup) as archive:
+            assert [
+                name for name in archive.namelist() if name.lower().endswith(".pdf")
+            ], "用例前提：历史备份里确实带着老 PDF"
+
+        context.application.restore_backup(backup)
+
+        # ``restore`` 把老 PDF 放回活目录——这正是缺口现场。
+        assert len(standards_pdfs(context)) == 4, "用例前提：恢复把老布局放回了活目录"
+        assert not legacy_cleanup_rows(context)
+
+        outcome = reconcile_standard_package(context, directory)
+
+        # 1) 决策仍然是 NOOP：清理不得把 no-op 变成 install。
+        assert outcome.action is ReconciliationAction.NOOP
+        assert outcome.reason is ReconciliationReason.IDENTICAL_PACKAGE
+        assert outcome.executed is False
+        assert outcome.backup_path is None, "NOOP 不得顺手创建备份"
+        assert context.application.last_package_reconciliation() is outcome
+
+        # 2) 活目录里 0 个旧版 PDF，两种布局都被清掉，非原文产物保留。
+        assert standards_pdfs(context) == []
+        assert not (package_directory / "sources").exists()
+        assert list(context.paths.standards.rglob("sources")) == []
+        assert (package_directory / "corrections.json").is_file()
+
+        # 3) 成功审计行存在，并且是**真实**计数（1 个目录 / 2 个文件 / 2 个平铺）。
+        assert_cleanup_audit_matches(context, directories=1, files=2, flat=2)
+
+        # 4) 没有新安装：包历史仍然只有那一条，也没有第二次安装审计。
+        assert len(context.application.list_package_history(5)) == 1
+        assert install_audit_rows(context) == 1
+
+        # 5) 历史备份逐字节不变，而且它仍然携带老 PDF（不得为了“合规”回改历史）。
+        assert backup.read_bytes() == backup_bytes
+        assert hashlib.sha256(backup.read_bytes()).hexdigest() == backup_sha256
+        with zipfile.ZipFile(backup) as archive:
+            assert [
+                name for name in archive.namelist() if name.lower().endswith(".pdf")
+            ], "历史备份的内容属于历史事实，不得被改写"
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_cleanup_gate_is_idempotent_across_repeated_startups(tmp_path: Path) -> None:
+    """幂等：第二次及以后的对账不再新增审计行，也没有旧版 PDF 可清。"""
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        package_directory = context.paths.standards / library.package_id
+        materialize_legacy_layout(package_directory, LEGACY_LAYOUT_FLAT, pdf_count=3)
+
+        first = reconcile_standard_package(context, directory)
+        assert first.action is ReconciliationAction.NOOP
+        assert standards_pdfs(context) == []
+        assert_cleanup_audit_matches(context, directories=0, files=0, flat=3)
+
+        second = reconcile_standard_package(context, directory)
+        assert second.action is ReconciliationAction.NOOP
+        assert second.executed is False
+        assert standards_pdfs(context) == []
+        # 第二次没有东西可清：审计行数不变（不新增第二条）。
+        assert len(legacy_cleanup_rows(context)) == 1
+
+        # 直接经端口重复调用同样返回全零（真实计数的“没有东西可清”）。
+        assert context.package_service.cleanup_legacy_sources() == (0, 0, 0)
+
+        third = reconcile_standard_package(context, directory)
+        assert third.action is ReconciliationAction.NOOP
+        assert len(legacy_cleanup_rows(context)) == 1
+        assert standards_pdfs(context) == []
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_locked_legacy_pdf_aborts_reconciliation_fail_closed(tmp_path: Path) -> None:
+    """Windows 真实占用句柄：对账在决策前中止，且没有任何“成功”痕迹。
+
+    ``open(path, "rb")`` 保持打开会让删除在 Windows 上真实地以
+    ``PermissionError``(winerror 32) 失败（与 install 路径的占用用例同款做法）。
+    这里验证的是**对账路径**的 fail-closed：即使决策本会是 NOOP，闸门失败也必须
+    中止，而不是“反正不装包，跳过清理”。
+    """
+    if sys.platform != "win32":
+        pytest.skip("真实文件占用只能在 Windows 上复现（其他平台允许删除已打开的文件）")
+
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        package_directory = context.paths.standards / library.package_id
+        materialize_legacy_layout(package_directory, LEGACY_LAYOUT_BOTH, pdf_count=2)
+        sources_pdf = sorted((package_directory / "sources").glob("*.pdf"))[0]
+        flat_pdf = sorted(package_directory.glob("*.pdf"))[0]
+        locked_bytes = sources_pdf.read_bytes()
+        backups_before = backup_names(context)
+        history_before = [entry.package_id for entry in context.application.list_package_history(5)]
+
+        with open(sources_pdf, "rb") as handle:
+            assert handle.read(8).startswith(b"%PDF")
+            with pytest.raises(StandardPackageError) as failure:
+                reconcile_standard_package(context, directory)
+
+        message = str(failure.value)
+        # 与 install 路径**同一**中文错误与处置建议（同一份实现、同一套语义）。
+        assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
+        assert "安装已中止" in message
+        assert "PermissionError" in message or "另一个程序正在使用此文件" in message
+        assert "重试" in message
+        assert str(sources_pdf.parent) in message
+
+        # 1) 没有成功审计（这正是“不得记录成功”的断言）。
+        assert legacy_cleanup_rows(context) == []
+        # 2) 没有新备份，也没有新安装。
+        assert backup_names(context) == backups_before
+        assert [
+            entry.package_id for entry in context.application.list_package_history(5)
+        ] == history_before
+        assert install_audit_rows(context) == 1
+        # 3) 被占用的原文仍在原位、逐字节未变，其所在目录也未被删掉
+        #    （删除失败的目标就是 ``sources`` 目录本身，rmtree 非 ignore_errors）。
+        assert sources_pdf.is_file() and sources_pdf.read_bytes() == locked_bytes
+        assert (package_directory / "sources").is_dir()
+        #    失败并非「什么都没尝试」：未被占用的平铺 PDF 确实已被删除。
+        assert not flat_pdf.exists()
+        # 4) 数据库与业务状态可用：仍能正常读取已安装标准与包历史。
+        assert context.standards.get_published(library.definition.id) is not None
+        assert context.application.list_package_history(5)[0].package_id == library.package_id
+
+        # 句柄释放后同一路径恢复正常：下一次启动即完成清理。
+        # （本次失败尝试里未被占用的平铺 PDF 已在第一次尝试时删除，因此重试成功
+        #   之后剩下的只有那个目录与其中 2 个文件——审计计数是**实测**结果。）
+        outcome = reconcile_standard_package(context, directory)
+        assert outcome.action is ReconciliationAction.NOOP
+        assert standards_pdfs(context) == []
+        assert_cleanup_audit_matches(context, directories=1, files=2, flat=0)
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_historical_backup_is_byte_identical_after_the_cleanup_gate(tmp_path: Path) -> None:
+    """§五：清理只动活目录，现存 ``.uebackup`` 逐字节（内容 + SHA256）不变。"""
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        package_directory = context.paths.standards / library.package_id
+        materialize_legacy_layout(package_directory, LEGACY_LAYOUT_BOTH, pdf_count=2)
+
+        historical = context.application.create_backup(
+            context.paths.backups / "pre-package-20200101-000000-000000.uebackup"
+        )
+        before_bytes = historical.read_bytes()
+        before_sha = hashlib.sha256(before_bytes).hexdigest()
+        backups_before = backup_names(context)
+
+        outcome = reconcile_standard_package(context, directory)
+
+        assert outcome.action is ReconciliationAction.NOOP
+        assert standards_pdfs(context) == []
+        assert historical.is_file()
+        assert historical.read_bytes() == before_bytes
+        assert hashlib.sha256(historical.read_bytes()).hexdigest() == before_sha
+        # 清理本身不创建备份：备份集合逐项不变（历史备份原样，也没有新增）。
+        assert backup_names(context) == backups_before
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_reconcile_always_calls_the_cleanup_gate_even_for_a_noop_decision(
+    tmp_path: Path,
+) -> None:
+    """运行时契约：``reconcile()`` 在决策表之前**无条件**过闸门（NOOP 也算）。
+
+    这是能抓住原缺口的断言：无论方法是否存在、无论决策是什么，只要活目录里有旧版
+    原文，一次对账就必须把它清掉并留下真实计数。这里直接驱动
+    ``PackageReconciliationService.reconcile``（而不是 ``reconcile_standard_package``），
+    并断言决策确实是 NOOP——即清理不是靠 INSTALL/UPGRADE 顺带发生的。
+    """
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        service = PackageReconciliationService(
+            context.package_service, data_version_key=_data_version_key
+        )
+        # 先做一次真实对账确认它是 NOOP（同 id、同 sha256）。
+        identity = service.discover_bundled_package(directory)
+        assert identity is not None
+        installed = service.installed_identity()
+        assert installed is not None
+        assert installed.package_id == identity.package_id
+        assert installed.package_sha256 == identity.package_sha256
+        assert service.reconcile(directory).action is ReconciliationAction.NOOP
+        assert legacy_cleanup_rows(context) == []
+
+        # 现在把旧版布局放回活目录：下一次对账仍然是 NOOP，但必须先清理。
+        package_directory = context.paths.standards / library.package_id
+        materialize_legacy_layout(package_directory, LEGACY_LAYOUT_BOTH, pdf_count=1)
+        assert len(standards_pdfs(context)) == 2
+
+        outcome = service.reconcile(directory)
+
+        assert outcome.action is ReconciliationAction.NOOP, "清理不得把 no-op 变成 install"
+        assert outcome.executed is False
+        assert standards_pdfs(context) == []
+        assert_cleanup_audit_matches(context, directories=1, files=1, flat=1)
+        # 端口方法本身也必须能独立复现同一个 Gate（应用层访问基础设施的唯一入口）。
+        assert context.package_service.cleanup_legacy_sources() == (0, 0, 0)
+    finally:
+        context.database.dispose()
+        close_logging()
+

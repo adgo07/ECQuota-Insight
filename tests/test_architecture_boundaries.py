@@ -415,3 +415,29 @@ def test_gb29446_shared_mapping_is_ui_and_excel_free() -> None:
         or name.startswith(("uebench.infrastructure", "uebench.ui"))
     )
     assert not frameworks, f"application/gb29446.py must not depend on these: {frameworks}"
+
+
+def test_package_reconciliation_reaches_cleanup_only_through_the_port() -> None:
+    """``package_reconciliation`` must reach the cleanup gate through the port.
+
+    The module calls ``StandardPackagePort.cleanup_legacy_sources()`` on every
+    startup reconciliation, before the decision table.  The obvious shortcut
+    would be to import ``uebench.infrastructure.packages`` — even deferred
+    inside the method — to call the service directly, which the layer rule
+    forbids.  The repository-wide application rule already covers this file;
+    this guard makes the intent explicit and names the eviction, so the reason
+    the port exists (no application→infrastructure import) cannot be
+    refactored away silently.  Both runtime and ``TYPE_CHECKING`` imports are
+    checked, so a type-only alias cannot smuggle the adapter in either.
+    """
+    module = SRC / "application" / "package_reconciliation.py"
+    assert module.exists()
+    collector = _collect(module)
+    imports = collector.runtime | collector.type_only
+    assert not [name for name in imports if name.startswith("uebench.infrastructure")], (
+        "application/package_reconciliation.py must not import the package adapter: "
+        "call cleanup_legacy_sources through the port declared in application/ports.py"
+    )
+    assert "uebench.application.ports" in imports or "ports" in {
+        name.split(".")[-1] for name in imports
+    }, "the cleanup gate must come from the application-layer port module"

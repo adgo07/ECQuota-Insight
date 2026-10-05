@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import html
 import logging
+import re
 from collections import Counter
 from datetime import date
 from decimal import Decimal
@@ -116,6 +118,26 @@ def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
     if align_right:
         item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return item
+
+
+#: 普通界面里的 ``E_d`` / ``e_d`` 必须以**真下标**呈现。内部变量键、JSON 与领域字段名
+#: 保持不变，只在展示层把它们渲染成 Qt 富文本；绝不能把字面量 “<sub>” 直接塞进纯文本。
+_SUBSCRIPT_D = re.compile(r"([Ee])_d")
+
+
+def _rich_text(value) -> str:
+    """把普通文本转成 Qt 富文本：先转义，再把 ``E_d`` / ``e_d`` 变成真下标。"""
+
+    escaped = html.escape("" if value is None else str(value), quote=False)
+    return _SUBSCRIPT_D.sub(r"\1<sub>d</sub>", escaped).replace("\n", "<br>")
+
+
+def _rich_label(value) -> QLabel:
+    """构造一个真正按富文本渲染的标签：只有显式声明富文本，``<sub>`` 才会显示为下标。"""
+
+    label = QLabel(_rich_text(value))
+    label.setTextFormat(Qt.TextFormat.RichText)
+    return label
 
 
 # Rule JSON keeps stable machine-readable note codes.  The desktop UI must
@@ -295,29 +317,30 @@ def gb29446_rule_is_compatible(definition) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# 标准库「评价范围」（ECQ-RS05 §六）
+# 标准「适用范围」（ECQ-RS05 §六 收尾）
 # ---------------------------------------------------------------------------
 #
-# 「评价范围」只能来自**已确认的既有标准元数据**，UI 不得自行编写范围文字：
+# 所有标准共用同一个「适用范围」字段与同一个位置。文字只能来自**已确认的标准元数据**：
 #
-# * GB 29446—2019 已经完成梳理，因此可以如实展示范围：覆盖煤种取自定义自身的
-#   ``selection_schema`` / ``selection_values["coal_type"]``；统计边界取自定义中
-#   ``electricity_consumption`` 输入的说明（“统计边界按标准第5.1条”）；单次评价
-#   只支持单一煤种、单一工艺取自定义中 ``single_coal_single_process`` 输入的说明。
+# * GB 29446—2019 的适用范围已由 Owner 逐字确认，登记在
+#   :data:`STANDARD_SCOPE_TEXTS`，界面只做展示，不改一个字；
 # * 其余标准尚未重新梳理，没有可靠范围，只能如实显示
-#   :data:`EVALUATION_SCOPE_PENDING_LABEL`，不得由 UI 或实现者代写范围。
-EVALUATION_SCOPE_PENDING_LABEL = "评价范围尚待梳理"
+#   :data:`STANDARD_SCOPE_PENDING_LABEL`。不得由界面或实现者根据旧规则、旧 Excel 或
+#   推测代写范围文字。
+STANDARD_SCOPE_PENDING_LABEL = "适用范围尚待整理"
 
-#: GB 29446 统计范围已确认文本（标准第5.1条）。此前只内联在「新建评价」的
-#: 「统计范围说明」里；现在「统计范围说明」与标准库「评价范围」共用同一份已确认
-#: 内容，避免两处各自漂移。
+#: Owner 已确认的「适用范围」原文（逐字登记，未登记的标准一律显示待整理）。
+STANDARD_SCOPE_TEXTS: dict[str, str] = {
+    GB29446_STANDARD_ID: (
+        "适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，以及新建和改扩建企业的电力单耗控制。"
+    ),
+}
+
+#: GB 29446 统计范围已确认文本（标准第5.1条），只用于「新建评价」的「统计范围说明」。
 GB29446_STATISTICS_SCOPE_LINES = (
     "原煤输送至选煤厂 → 选煤产品运输出选煤厂",
     "统计内容包括：选煤机械、照明、化验室、相关线路电损失、相关变压器电损失。",
 )
-
-#: 标准库表格用的边界短文本；与定义中 ``electricity_consumption`` 的说明一致。
-GB29446_STATISTICS_BOUNDARY_REFERENCE = "统计边界按标准第5.1条"
 
 
 def _gb29446_statistics_scope_text() -> str:
@@ -326,57 +349,24 @@ def _gb29446_statistics_scope_text() -> str:
     return "\n".join(GB29446_STATISTICS_SCOPE_LINES)
 
 
-def _gb29446_scope_metadata(definition) -> tuple[list[str], str, bool]:
-    """从已安装的 GB 29446 定义中读出已确认的范围元数据。
+def standard_scope_text(standard_id: str | None) -> str:
+    """标准「适用范围」：只有已确认登记的标准才有文字，其余如实显示待整理。"""
 
-    返回 ``(覆盖煤种, 统计边界依据, 是否限制单一煤种单一工艺)``。读不到的部分留空，
-    由调用方如实省略，不在这里补写任何业务文字。
+    if not standard_id:
+        return STANDARD_SCOPE_PENDING_LABEL
+    return STANDARD_SCOPE_TEXTS.get(standard_id, STANDARD_SCOPE_PENDING_LABEL)
+
+
+def standard_scope_line(standard_id: str | None) -> str:
+    """标准库详情里唯一的一行「适用范围」。
+
+    已确认的标准显示 ``适用范围：<scope>``；未确认的标准只显示
+    :data:`STANDARD_SCOPE_PENDING_LABEL`（该文字本身已经点名「适用范围」，不再重复字段名）。
     """
 
-    coal_types: list[str] = []
-    boundary = ""
-    single_coal_single_process = False
-    for product in definition.products:
-        value = str(product.selection_values.get(GB29446_COAL_TYPE_KEY) or "").strip()
-        if value and value not in coal_types:
-            coal_types.append(value)
-        for item in product.input_definitions:
-            if item.key == "single_coal_single_process":
-                single_coal_single_process = True
-        for indicator in product.indicators:
-            for item in indicator.input_definitions:
-                if item.key == "electricity_consumption" and item.description and not boundary:
-                    boundary = item.description.split("；", 1)[0].strip()
-    return coal_types, boundary, single_coal_single_process
+    text = standard_scope_text(standard_id)
+    return text if text == STANDARD_SCOPE_PENDING_LABEL else f"适用范围：{text}"
 
-
-def evaluation_scope_summary(definition) -> str:
-    """标准库表格用的「评价范围」短文本；没有可靠范围时返回如实状态。"""
-
-    if definition is None or definition.id != GB29446_STANDARD_ID:
-        return EVALUATION_SCOPE_PENDING_LABEL
-    coal_types, boundary, _single = _gb29446_scope_metadata(definition)
-    parts: list[str] = []
-    if coal_types:
-        parts.append("覆盖煤种：" + "、".join(coal_types))
-    parts.append(boundary or GB29446_STATISTICS_BOUNDARY_REFERENCE)
-    return "；".join(parts)
-
-
-def evaluation_scope_text(definition) -> str:
-    """标准库详情用的完整「评价范围」；内容全部来自已确认的标准元数据。"""
-
-    if definition is None or definition.id != GB29446_STANDARD_ID:
-        return EVALUATION_SCOPE_PENDING_LABEL
-    coal_types, boundary, single_coal_single_process = _gb29446_scope_metadata(definition)
-    parts: list[str] = []
-    if coal_types:
-        parts.append("覆盖煤种：" + "、".join(coal_types))
-    boundary_text = "；".join(line.rstrip("。") for line in GB29446_STATISTICS_SCOPE_LINES)
-    parts.append(f"{boundary}：{boundary_text}" if boundary else boundary_text)
-    if single_coal_single_process:
-        parts.append("单次评价仅支持单一煤种、单一工艺")
-    return "；".join(parts)
 
 
 class MainWindow(QMainWindow):
@@ -514,19 +504,17 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.standard_official_button)
         controls.addWidget(self.standard_official_status)
         layout.addLayout(controls)
-        # 普通页面只保留业务信息：标准编号/名称/状态/版本/实施日期，以及软件评价支持
-        # 状态、评价范围和官方来源。原文 SHA-256、页码、条款/表号、产品/工序数属于
-        # 内部可追溯信息，不再占用普通页面。
-        self.standard_table = QTableWidget(0, 8)
+        # 普通页面只保留业务信息：标准编号/名称/状态/实施日期，以及软件评价支持状态
+        # 和官方来源。规则版本、评价范围列、原文 SHA-256、页码、条款/表号、产品/工序数
+        # 都不再占用普通页面；「适用范围」只作为选中标准后的一行说明出现。
+        self.standard_table = QTableWidget(0, 6)
         self.standard_table.setHorizontalHeaderLabels(
             [
                 "标准编号",
                 "标准名称",
                 "标准状态",
-                "版本",
                 "实施日期",
                 "软件评价支持状态",
-                "评价范围",
                 "官方来源",
             ]
         )
@@ -537,12 +525,13 @@ class MainWindow(QMainWindow):
             f"双击标准行打开{OFFICIAL_SOURCE_PLATFORM_NAME}上已登记的官方来源；未登记地址的标准不可用。"
         )
         layout.addWidget(self.standard_table, 1)
-        self.standard_detail_label = QLabel("选择标准后查看指标、限额和评价范围")
+        # 选中标准后只显示一行「适用范围：<scope>」；未确认的标准如实显示待整理。
+        self.standard_detail_label = QLabel("选择标准后查看适用范围")
         self.standard_detail_label.setWordWrap(True)
         layout.addWidget(self.standard_detail_label)
-        self.standard_indicator_table = QTableWidget(0, 7)
+        self.standard_indicator_table = QTableWidget(0, 6)
         self.standard_indicator_table.setHorizontalHeaderLabels(
-            ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额", "适用条件/说明"]
+            ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额"]
         )
         self._configure_table(self.standard_indicator_table)
         layout.addWidget(self.standard_indicator_table, 2)
@@ -624,13 +613,14 @@ class MainWindow(QMainWindow):
         self.eval_organization = QLineEdit()
         self.eval_project = QLineEdit()
         self.eval_project.setVisible(False)
+        # 「备注」不再出现在普通界面上；控件保留为**不进入任何布局**的内部承载，
+        # 历史记录的 notes 才能继续原样载入与保存（见 _load_request_into_form）。
         self.eval_notes = QLineEdit()
         self.generic_form_container = QWidget()
         generic_form = QFormLayout(self.generic_form_container)
         generic_form.setContentsMargins(0, 0, 0, 0)
         generic_form.addRow("产品/工序", self.selection_container)
         generic_form.addRow("单位名称", self.eval_organization)
-        generic_form.addRow("评价备注", self.eval_notes)
 
         self.gb29446_form_container = QWidget()
         gb_form = QFormLayout(self.gb29446_form_container)
@@ -677,10 +667,15 @@ class MainWindow(QMainWindow):
         gb_form.addRow("核算周期", period_row)
         gb_form.addRow("煤种", self.gb29446_coal_type)
         gb_form.addRow("选煤工艺", self.gb29446_process)
-        gb_form.addRow("统计期选煤电力消耗量 E_d（kW·h）", self.gb29446_electricity)
+        gb_form.addRow(_rich_label("统计期选煤电力消耗量 E_d（kW·h）"), self.gb29446_electricity)
         gb_form.addRow("统计期入选原煤量 m（t）", self.gb29446_raw_coal)
         gb_form.addRow("折算系数 k（自动匹配，只读）", self.gb29446_factor)
-        gb_form.addRow("备注", self.gb29446_notes)
+        # 「备注」不再出现在普通界面上；控件保留为不进入任何布局的内部承载，
+        # 历史记录的 notes（核算周期 + 备注）才能继续原样载入与保存。
+        self.eval_notes.setParent(self.generic_form_container)
+        self.eval_notes.setVisible(False)
+        self.gb29446_notes.setParent(self.gb29446_form_container)
+        self.gb29446_notes.setVisible(False)
 
         standard_row = QHBoxLayout()
         standard_row.addWidget(QLabel("标准"))
@@ -782,7 +777,7 @@ class MainWindow(QMainWindow):
         gb29446_layout.addWidget(gb_result_heading)
         metrics = QHBoxLayout()
         ed_card, ed_layout = self._card()
-        ed_layout.addWidget(QLabel("选煤电力单耗 e_d"))
+        ed_layout.addWidget(_rich_label("选煤电力单耗 e_d"))
         self.gb29446_result_ed = QLabel("— kW·h/t")
         self.gb29446_result_ed.setProperty("class", "metric")
         ed_layout.addWidget(self.gb29446_result_ed)
@@ -796,14 +791,17 @@ class MainWindow(QMainWindow):
         gb29446_layout.addLayout(metrics)
         self.gb29446_result_message = QLabel("尚未计算")
         self.gb29446_result_message.setWordWrap(True)
+        self.gb29446_result_message.setTextFormat(Qt.TextFormat.RichText)
         gb29446_layout.addWidget(self.gb29446_result_message)
         gb_result_section_layout.addWidget(self.gb29446_result_card)
         layout.addWidget(self.gb29446_result_section)
 
         self.gb29446_explanation_section, explanation_layout = self._card()
         explanation_layout.addWidget(QLabel("三、计算与判定说明"))
-        self.gb29446_explanation = QLabel("完成计算后显示本次代入计算和判定阈值。")
+        self.gb29446_explanation = QLabel("完成计算后显示本次计算与判定说明。")
         self.gb29446_explanation.setWordWrap(True)
+        # 说明里含 E_d / e_d 真下标（富文本）；只有显式声明富文本才会渲染为下标。
+        self.gb29446_explanation.setTextFormat(Qt.TextFormat.RichText)
         self.gb29446_explanation.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         explanation_layout.addWidget(self.gb29446_explanation)
         layout.addWidget(self.gb29446_explanation_section)
@@ -813,9 +811,8 @@ class MainWindow(QMainWindow):
         self.gb29446_basis = QLabel("完成计算后显示本次评价的标准依据。")
         self.gb29446_basis.setWordWrap(True)
         basis_layout.addWidget(self.gb29446_basis)
-        self.gb29446_basis_open = QPushButton("查看标准原文")
-        self.gb29446_basis_open.clicked.connect(self.open_selected_standard_for_evaluation)
-        basis_layout.addWidget(self.gb29446_basis_open, 0, Qt.AlignmentFlag.AlignLeft)
+        # 页面顶部已有统一的「查看标准原文」入口；这里不再重复一个同样的按钮，
+        # 只保留本页特有的「统计范围说明」。
         self.gb29446_scope_toggle = QPushButton("统计范围说明 ▸")
         self.gb29446_scope_toggle.setCheckable(True)
         self.gb29446_scope_details = QLabel(_gb29446_statistics_scope_text())
@@ -843,15 +840,12 @@ class MainWindow(QMainWindow):
         view.clicked.connect(self.view_selected_record)
         recalculate = QPushButton("基于此记录重新评价")
         recalculate.clicked.connect(self.recalculate_selected_record)
-        export = QPushButton("导出Excel")
-        export.clicked.connect(self.export_selected_record)
         delete = QPushButton("删除记录")
         delete.clicked.connect(self.delete_selected_record)
         controls.addWidget(refresh)
         controls.addWidget(view)
         controls.addWidget(recalculate)
         controls.addStretch()
-        controls.addWidget(export)
         controls.addWidget(delete)
         layout.addLayout(controls)
         self.record_table = QTableWidget(0, 6)
@@ -889,6 +883,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.import_status)
         self.import_summary = QLabel("")
         self.import_summary.setWordWrap(True)
+        self.import_summary.setTextFormat(Qt.TextFormat.RichText)
         self.import_summary.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.import_summary.setVisible(False)
         layout.addWidget(self.import_summary)
@@ -1048,18 +1043,14 @@ class MainWindow(QMainWindow):
                 standard.number,
                 standard.title,
                 status,
-                standard.version,
                 format_local_date(standard.effective_date),
                 evaluation_support_label(standard),
-                evaluation_scope_summary(standard),
                 OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL,
             ]
             for column, value in enumerate(values):
                 item = _item(value)
                 item.setData(Qt.ItemDataRole.UserRole, standard.id)
-                if column == 6:
-                    item.setToolTip(evaluation_scope_text(standard))
-                elif column == 7:
+                if column == 5:
                     item.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
                 self.standard_table.setItem(row, column, item)
         self.refresh_standard_detail()
@@ -1080,25 +1071,20 @@ class MainWindow(QMainWindow):
         )
 
     def refresh_standard_detail(self) -> None:
-        """Show the selected standard's products, limits, scope and official source."""
+        """Show the selected standard's 适用范围 line, then its limits."""
         if not hasattr(self, "standard_indicator_table"):
             return
         self.standard_indicator_table.setRowCount(0)
         standard_id = self._selected_library_standard_id()
         standard = self._library_standard(standard_id)
         if standard is None:
-            self.standard_detail_label.setText("选择标准后查看指标、限额和评价范围")
+            self.standard_detail_label.setText("选择标准后查看适用范围")
             self.standard_evaluate_button.setEnabled(False)
             self.standard_official_button.setEnabled(False)
             self.standard_official_status.setText("请先选择标准")
             return
-        # 「软件评价支持状态」只来自正式评价范围注册表；「标准状态」只描述文档效力。
-        status = "已发布" if standard.publication_status is PublicationStatus.PUBLISHED else "待确认"
-        self.standard_detail_label.setText(
-            f"{standard.number} {standard.title}；标准状态：{status}；"
-            f"软件评价支持状态：{evaluation_support_label(standard)}；"
-            f"评价范围：{evaluation_scope_text(standard)}"
-        )
+        # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
+        self.standard_detail_label.setText(standard_scope_line(standard.id))
         official_url = official_source_url(standard.id)
         self.standard_official_button.setEnabled(official_url is not None)
         self.standard_official_button.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
@@ -1122,16 +1108,7 @@ class MainWindow(QMainWindow):
         for product in standard.products:
             for indicator in product.indicators:
                 base = indicator.base_thresholds or indicator.thresholds
-                notes = "；".join(
-                    translated
-                    for translated in (_translate_note(note) for note in indicator.notes)
-                    if translated
-                )
-                if indicator.applicability.op != "always":
-                    condition_text = _condition_description(indicator.applicability)
-                    notes = (notes + "；" if notes else "") + (
-                        f"适用条件：{condition_text}" if condition_text else "适用条件：按标准规定确认"
-                    )
+                # 「适用条件/说明」不再出现在普通标准库里：条件与内部备注代码都不再展示。
                 values = [
                     product.name,
                     indicator.name,
@@ -1139,7 +1116,6 @@ class MainWindow(QMainWindow):
                     limit_value(base.level_1),
                     limit_value(base.level_2),
                     limit_value(base.level_3),
-                    notes,
                 ]
                 detail_row = self.standard_indicator_table.rowCount()
                 self.standard_indicator_table.insertRow(detail_row)
@@ -1514,7 +1490,7 @@ class MainWindow(QMainWindow):
         self.gb29446_result_ed.setText("— kW·h/t")
         self.gb29446_result_grade.setText("—")
         self.gb29446_result_message.setText("尚未计算")
-        self.gb29446_explanation.setText("完成计算后显示本次代入计算和判定阈值。")
+        self.gb29446_explanation.setText("完成计算后显示本次计算与判定说明。")
         self.gb29446_basis.setText("完成计算后显示本次评价的标准依据。")
 
     def _gb29446_inputs_changed(self, *_args) -> None:
@@ -1537,8 +1513,9 @@ class MainWindow(QMainWindow):
                 self.eval_product.addItem(display_name, product.id)
             self.eval_date.setDate(QDate.currentDate())
             warning = self.current_standard.selection_warning(date.today())
-            # 标准编号与名称已经在下拉框里显示，这里只显示状态，避免同一句话重复两遍。
-            self.eval_standard_status.setText(warning if warning else "当前有效")
+            # 版本下拉框已经说明选择方式（“当前有效标准（自动）”），这里不再重复一句
+            # 「当前有效」；只有确实需要提示（尚未实施 / 历史标准）时才显示警告文字。
+            self.eval_standard_status.setText(warning or "")
         else:
             self.eval_standard_status.setText("当前选择方式下没有可正式评价的标准")
         self.eval_product.blockSignals(False)
@@ -2008,8 +1985,12 @@ class MainWindow(QMainWindow):
             self.gb29446_result_ed.setText("— kW·h/t")
             self.gb29446_result_grade.setText("—")
             self.gb29446_result_message.setText(
-                "无法计算："
-                + "；".join(self._gb29446_warning_for_display(request, warning) for warning in item.warnings)
+                _rich_text(
+                    "无法计算："
+                    + "；".join(
+                        self._gb29446_warning_for_display(request, warning) for warning in item.warnings
+                    )
+                )
             )
             self.gb29446_explanation.setText("请根据提示补全或修正评价数据后重新计算。")
             return
@@ -2020,18 +2001,55 @@ class MainWindow(QMainWindow):
         self.gb29446_result_grade.setText(grade_label)
         self.gb29446_result_message.setText("")
 
-        self.gb29446_explanation.setText(self._gb29446_saved_explanation(request, result, item))
+        self.gb29446_explanation.setText(_rich_text(self._gb29446_saved_explanation(request, result, item)))
+
+    @staticmethod
+    def _gb29446_basis_lines(item: IndicatorResult) -> list[str]:
+        return [line for line in MainWindow._gb29446_basis_for_display(item).splitlines() if line]
+
+    @staticmethod
+    def _gb29446_display_value_could_mislead(item: IndicatorResult, actual: Decimal) -> bool:
+        """两位小数的界面显示值会不会被判成另一个等级。
+
+        完整计算值与界面显示值落在等级限值两侧时，显示值会误导用户，需要额外说明；
+        普通情形保持三行。
+        """
+
+        thresholds = item.corrected_thresholds
+
+        def grade_of(value: Decimal) -> Grade | None:
+            for key, grade in (
+                ("LEVEL_1", Grade.LEVEL_1),
+                ("LEVEL_2", Grade.LEVEL_2),
+                ("LEVEL_3", Grade.LEVEL_3),
+            ):
+                limit = thresholds.get(key)
+                if limit is not None and value <= limit:
+                    return grade
+            return Grade.NOT_QUALIFIED if thresholds.get("LEVEL_3") is not None else None
+
+        try:
+            rounded = Decimal(f"{actual:.2f}")
+        except Exception:  # noqa: BLE001 - 展示层判断，任何异常都只意味着“无需提示”
+            return False
+        return grade_of(rounded) != grade_of(actual)
 
     @staticmethod
     def _gb29446_saved_explanation(
         request: EvaluationRequest, result: EvaluationResult, item: IndicatorResult,
     ) -> str:
-        """用普通用户语言说明本次代入的数据、公式、阈值和判定结果。
+        """用普通用户语言说明本次代入的数据、公式、判定结果与必要标准依据。
 
-        只展示保存下来的输入与结果：不重新执行公式，也不重新判级。计算依据（E_d、m、
-        选煤工艺与 k、``e_d = E_d × k / m``、分级阈值、判定结果、标准条款）全部保留，
-        但不再堆叠内部追踪术语（rule_id / numeric_behavior 之类不出现在这里）。
+        只展示保存下来的输入与结果：不重新执行公式，也不重新判级。普通情形只有三行：
+
+        1. 选煤工艺与折算系数；
+        2. 代入计算（``e_d = E_d × k ÷ m``）与本次计算值；
+        3. 判定等级与必要标准依据（等级依据 / 计算依据 / 折算系数依据）。
+
+        不堆叠 rule_id / numeric_behavior / CalculationStep / field_id /
+        calculator_version 等内部追踪术语。
         """
+
         actual = item.actual_value
         grade_label = MainWindow._gb29446_grade_label(item.grade)
         supplied_electricity = request.inputs.get("electricity_consumption")
@@ -2046,89 +2064,39 @@ class MainWindow(QMainWindow):
             if supplied_raw_coal is not None
             else None
         )
-        e0 = item.display_values.get("unadjusted_power_consumption")
         factor = item.display_values.get("process_factor")
         process = request.inputs.get("washing_process")
         process_name = str(process.value) if process is not None else "—"
-        coal_type = "炼焦煤" if "coking" in item.indicator_id else "动力煤"
 
-        lines: list[str] = []
-        if request.input_mode is InputMode.DETAIL:
-            electricity_text = (
-                f"{MainWindow._format_explanation_number(electricity)} kW·h"
-                if electricity is not None
-                else "未填写"
-            )
-            raw_coal_text = (
-                f"{MainWindow._format_explanation_number(raw_coal)} t"
-                if raw_coal is not None
-                else "未填写"
-            )
-            lines.append(
-                f"本次评价输入：煤种 {coal_type}；选煤工艺 {process_name}；"
-                f"统计期选煤电力消耗量 E_d = {electricity_text}；"
-                f"统计期入选原煤量 m = {raw_coal_text}。"
-            )
-            if e0 is not None:
-                lines.append(
-                    f"未折算单位电耗 E_d/m：{MainWindow._format_result_number(e0)} kW·h/t"
-                )
-        else:
-            # 直接录入口径：没有 E_d / m 明细，但公式依据照样说明。
-            lines.append("本次评价输入：直接录入选煤电力单耗 e_d（已按 e_d = E_d × k / m 折算）。")
-        lines.append(
-            f"折算系数 k：{MainWindow._format_result_number(factor)}"
-            f"（煤种 {coal_type}，选煤工艺 {process_name}；按标准附录A表A.1自动匹配）"
-        )
+        lines = [
+            f"选煤工艺：{process_name}，折算系数 k = {MainWindow._format_result_number(factor)}"
+        ]
         if electricity is not None and raw_coal is not None and factor is not None:
             lines.append(
-                f"本次代入：e_d = {MainWindow._format_explanation_number(electricity)} × "
-                f"{MainWindow._format_explanation_number(factor)} / "
+                f"计算：e_d = E_d × k ÷ m = "
+                f"{MainWindow._format_explanation_number(electricity)} × "
+                f"{MainWindow._format_explanation_number(factor)} ÷ "
                 f"{MainWindow._format_explanation_number(raw_coal)} = "
                 f"{MainWindow._format_explanation_number(actual)} kW·h/t"
             )
         else:
-            lines.append("计算公式：e_d = E_d × k / m")
-        lines.append(
-            f"本次电耗 e_d = {MainWindow._format_result_number(actual)} kW·h/t；判级结果：{grade_label}。"
-        )
-
-        thresholds = item.corrected_thresholds
-        threshold_names = (("LEVEL_1", "1级"), ("LEVEL_2", "2级"), ("LEVEL_3", "3级"))
-        threshold_text = "；".join(
-            f"{name} ≤ {MainWindow._format_result_number(thresholds.get(key))} kW·h/t"
-            for key, name in threshold_names
-            if thresholds.get(key) is not None
-        )
-        level3 = thresholds.get("LEVEL_3")
-        if level3 is not None:
-            threshold_text += f"；超出3级：> {MainWindow._format_result_number(level3)} kW·h/t"
-        raw_value_line = f"原始计算值（未修约）：{MainWindow._format_explanation_number(actual)} kW·h/t"
-        threshold_key = "LEVEL_3" if item.grade is Grade.NOT_QUALIFIED else item.grade.value
-        threshold = thresholds.get(threshold_key)
-        if threshold is not None:
-            operator = ">" if item.grade is Grade.NOT_QUALIFIED else "≤"
-            comparison_line = (
-                f"判级比较：{MainWindow._format_explanation_number(actual)} {operator} "
-                f"{MainWindow._format_explanation_number(threshold)}；结果：{grade_label}"
+            # 直接录入口径：没有 E_d / m 明细，公式依据与本次结果照样说明。
+            lines.append(
+                f"计算：e_d = E_d × k ÷ m = "
+                f"{MainWindow._format_explanation_number(actual)} kW·h/t（直接录入选煤电力单耗）"
             )
-        else:
-            comparison_line = f"正式结果：{grade_label}"
-        current_grade_line = (
-            f"{raw_value_line}\n{comparison_line}\n"
-            "判级采用原始计算值与等级限值直接比较；页面显示的小数位仅用于展示，不影响判级。"
-        )
+        notes: list[str] = []
         if result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1":
             # 未声明当前 Profile 的旧记录只展示当时结论，不替它补写当前比较语义。
-            current_grade_line = (
-                f"{raw_value_line}\n当时保存的结果：{grade_label}。"
-                "正式比较语义见原记录技术详情。"
-            )
-        lines.extend((f"{coal_type}分级阈值：{threshold_text}", current_grade_line))
-        # 标准依据属于本次说明的一部分，必须保留；与「四、标准依据」卡片同源。
-        basis = MainWindow._gb29446_basis_for_display(item)
-        if basis:
-            lines.append("标准依据：" + "；".join(basis.splitlines()))
+            notes.append("当时保存的结果")
+        notes.extend(MainWindow._gb29446_basis_lines(item))
+        lines.append(f"判定：{grade_label}" + (f"（{'；'.join(notes)}）" if notes else ""))
+        if (
+            result.numeric_profile_id == "ECQUOTA_DECIMAL_FULL_VALUE_V1"
+            and MainWindow._gb29446_display_value_could_mislead(item, actual)
+        ):
+            # 完整计算值与两位小数显示值落在阈值两侧时，必须说明展示口径。
+            lines.append("判级使用完整计算值，界面显示值仅作简化展示。")
         return "\n".join(lines)
 
     def refresh_records(self) -> None:
@@ -2224,31 +2192,9 @@ class MainWindow(QMainWindow):
                 f"{ref.standard_number}，第{ref.page}页，{ref.clause or ''} {ref.table or ''} {ref.note or ''}"
                 for ref in item.source_references
             )
-        content.setPlainText("\n".join(lines))
+        # 展示层富文本：E_d / e_d 以真下标呈现（保存的数据本身保持原样）。
+        content.setHtml(_rich_text("\n".join(lines)))
         layout.addWidget(content, 1)
-        toggle = QPushButton("技术详情")
-        toggle.setCheckable(True)
-        technical = QTextEdit()
-        technical.setObjectName("record_detail_technical")
-        technical.setReadOnly(True)
-        technical.setPlainText("\n".join([
-            f"evaluation_id: {result.evaluation_id}",
-            f"standard version: {snapshot.version}",
-            f"rule_revision: {snapshot.rule_revision}",
-            f"numeric_contract_version: {result.numeric_contract_version}",
-            f"numeric_profile_id: {result.numeric_profile_id}",
-            f"calculator_version: {result.calculator_version}",
-            f"numeric_behavior_version: {result.numeric_behavior_version}",
-            f"rule_snapshot_sha256: {result.rule_snapshot_sha256}",
-            f"source_sha256: {snapshot.source_sha256}",
-            "原 Request：" + request.model_dump_json(),
-            "原 Result：" + result.model_dump_json(),
-            "原 Rule Snapshot：" + snapshot.model_dump_json(),
-        ]))
-        technical.setVisible(False)
-        toggle.toggled.connect(technical.setVisible)
-        layout.addWidget(toggle)
-        layout.addWidget(technical)
         buttons = QHBoxLayout()
         # 普通界面不再打开本机 PDF，只打开已登记的官方来源页面。
         official = official_source_url(result.standard_id)
@@ -2432,6 +2378,12 @@ class MainWindow(QMainWindow):
             self.navigation.setCurrentRow(2)
 
     def export_selected_record(self) -> None:
+        """导出所选记录的 Excel 能力（保留）。
+
+        本轮只按 Owner 要求移除了「评价记录」页上的普通界面按钮；导出本身仍由
+        :meth:`ApplicationFacade.export_evaluation` 提供，程序化入口保持不变。
+        """
+
         evaluation_id = self._selected_record_id()
         if not evaluation_id:
             QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
@@ -2564,7 +2516,7 @@ class MainWindow(QMainWindow):
                 f"评价日期：{format_local_date(request.evaluation_date)}",
                 f"产品/工序：{request.product_id}",
             ]
-        self.import_summary.setText("\n".join(lines))
+        self.import_summary.setText(_rich_text("\n".join(lines)))
         self.import_summary.setVisible(True)
 
     def evaluate_import(self) -> None:

@@ -12,9 +12,15 @@ import pytest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtWidgets import QApplication, QLabel, QMessageBox
+from PySide6.QtWidgets import QApplication, QLabel, QMessageBox, QPushButton
 
-from uebench.application.official_sources import NO_OFFICIAL_SOURCE_LABEL, official_source_url
+from uebench.application.evaluation_support import FORMAL_EVALUATION_SUPPORTED_LABEL
+from uebench.application.official_sources import (
+    NO_OFFICIAL_SOURCE_LABEL,
+    OFFICIAL_SOURCE_PLATFORM_NAME,
+    VIEW_OFFICIAL_SOURCE_BUTTON_TEXT,
+    official_source_url,
+)
 from uebench.bootstrap import create_context
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import Grade, InputMode, InputValue, StandardDefinition, parse_decimal
@@ -122,18 +128,37 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert window.last_result_id is not None
     assert window.gb29446_result_ed.text() == "6.27 kW·h/t"
     assert window.gb29446_result_grade.text() == "2级"
-    assert "未折算单位电耗 E_d/m：5.60 kW·h/t" in window.gb29446_explanation.text()
-    assert "e_d = 560 × 1.12 / 100 = 6.272 kW·h/t" in window.gb29446_explanation.text()
-    assert "1级 ≤ 5.00 kW·h/t" in window.gb29446_explanation.text()
-    assert "原始计算值（未修约）：6.272 kW·h/t" in window.gb29446_explanation.text()
-    assert "判级比较：6.272 ≤ 7；结果：2级" in window.gb29446_explanation.text()
-    assert "结果：2级" in window.gb29446_explanation.text()
-    assert "页面显示的小数位仅用于展示，不影响判级" in window.gb29446_explanation.text()
+    # A5：普通情形只有三行 —— 选煤工艺与折算系数 / 代入计算 / 判定与必要标准依据。
+    explanation = window.gb29446_explanation.text()
+    lines = explanation.split("<br>")
+    assert len(lines) == 3, explanation
+    assert lines[0] == "选煤工艺：重介，折算系数 k = 1.12"
+    assert lines[1] == (
+        "计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = 560 × 1.12 ÷ 100 = 6.272 kW·h/t"
+    )
+    assert lines[2].startswith("判定：2级（")
+    for basis in ("等级依据：第3.1条", "计算依据：第5.2条", "折算系数依据：附录A表A.1"):
+        assert basis in lines[2]
+    # A4：说明里的 E_d / e_d 是真下标（富文本），不是字面量 “<sub>”，也不是纯 ASCII 写法。
+    assert window.gb29446_explanation.textFormat() is Qt.TextFormat.RichText
+    assert "e_d" not in explanation and "E_d" not in explanation
+    # 四、标准依据 卡片仍与说明同源，且不泄露本机 PDF 页码。
     assert "PDF第" not in window.gb29446_basis.text()
     assert "第3.1条" in window.gb29446_basis.text()
     assert "第5.2条" in window.gb29446_basis.text()
     assert "附录A表A.1" in window.gb29446_basis.text()
-    assert window.gb29446_basis_open.text() == "查看标准原文"
+    # A1：「四、标准依据」里重复的「查看标准原文」已删除；页面顶部统一入口仍走官方来源登记表。
+    assert not hasattr(window, "gb29446_basis_open")
+    assert VIEW_OFFICIAL_SOURCE_BUTTON_TEXT not in [
+        button.text() for button in window.gb29446_basis_section.findChildren(QPushButton)
+    ]
+    opened: list[str] = []
+    monkeypatch.setattr(
+        "uebench.ui.main_window.QDesktopServices.openUrl",
+        lambda url: opened.append(url.toString()) or True,
+    )
+    window.eval_standard_open.click()
+    assert opened == [official_source_url(standard.id)]
     assert window.eval_results.rowCount() == 0
     assert window.eval_summary.text() == ""
 
@@ -321,10 +346,13 @@ def test_gb29446_error_card_uses_chinese_labels_and_no_grade(
     window.calculate_evaluation()
 
     assert window.gb29446_result_grade.text() == "—"
-    assert expected_message in window.gb29446_result_message.text()
-    assert internal_key not in window.gb29446_result_message.text()
-    assert "electricity_consumption" not in window.gb29446_result_message.text()
-    assert "raw_coal_input" not in window.gb29446_result_message.text()
+    # A4：提示卡里的 E_d 以真下标（富文本）渲染，且仍然完整说明是哪一个输入项。
+    rendered_message = window.gb29446_result_message.text()
+    assert window.gb29446_result_message.textFormat() is Qt.TextFormat.RichText
+    assert expected_message.replace("E_d", "E<sub>d</sub>") in rendered_message
+    assert internal_key not in rendered_message
+    assert "electricity_consumption" not in rendered_message
+    assert "raw_coal_input" not in rendered_message
     assert warnings == ["输入数据未通过校验，未生成电耗等级。请查看评价结果中的提示并修正。"]
 
     if window.last_result_id is not None:
@@ -348,11 +376,16 @@ def test_gb29446_full_value_boundary_explanation_matches_formal_grade(tmp_path: 
     window.calculate_evaluation()
 
     assert window.gb29446_result_grade.text() == "2级"
+    # Numeric v1：判级使用**完整计算值**。5.0000004 已超过 1 级限值（5.00），
+    # 两位小数的界面显示值看起来仍是 1 级 —— 必须如实说明展示口径。
+    assert window.gb29446_result_ed.text() == "5.00 kW·h/t"
     explanation = window.gb29446_explanation.text()
-    assert "原始计算值（未修约）：5.0000004 kW·h/t" in explanation
-    assert "判级比较：5.0000004 ≤ 7；结果：2级" in explanation
-    assert "判级采用原始计算值与等级限值直接比较" in explanation
-    assert "页面显示的小数位仅用于展示，不影响判级" in explanation
+    lines = explanation.split("<br>")
+    assert len(lines) == 4, explanation
+    assert "5.0000004" in lines[1], explanation
+    assert lines[1].startswith("计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = ")
+    assert lines[2].startswith("判定：2级（")
+    assert lines[3] == "判级使用完整计算值，界面显示值仅作简化展示。"
     assert "ROUND(" not in explanation
     assert "numeric_behavior=" not in explanation
 
@@ -404,11 +437,35 @@ def test_gb29446_discovery_to_new_evaluation(reference_window):
     window.navigation.setCurrentRow(1)
     window.standard_search.setText("29446")
     assert window.standard_table.rowCount() == 1
-    assert [window.standard_table.item(0, column).text() for column in range(5)] == [
-        standard.number, "选煤电力消耗限额", "当前有效", "2019", "2020-07-01"
+    # C1：普通标准库列 = 编号 / 名称 / 标准状态 / 实施日期 / 软件评价支持状态 / 官方来源；
+    # 「版本」与「评价范围」列已删除。
+    headers = [
+        window.standard_table.horizontalHeaderItem(column).text()
+        for column in range(window.standard_table.columnCount())
+    ]
+    assert headers == [
+        "标准编号",
+        "标准名称",
+        "标准状态",
+        "实施日期",
+        "软件评价支持状态",
+        "官方来源",
+    ]
+    assert "版本" not in headers and "评价范围" not in headers
+    assert [window.standard_table.item(0, column).text() for column in range(6)] == [
+        standard.number,
+        "选煤电力消耗限额",
+        "当前有效",
+        "2020-07-01",
+        FORMAL_EVALUATION_SUPPORTED_LABEL,
+        OFFICIAL_SOURCE_PLATFORM_NAME,
     ]
     window.standard_table.selectRow(0)
-    assert "已发布" in window.standard_detail_label.text()
+    # C2：选中标准后只有一行「适用范围：<scope>」，GB 29446 用 Owner 逐字确认的原文。
+    assert window.standard_detail_label.text() == (
+        "适用范围：适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，"
+        "以及新建和改扩建企业的电力单耗控制。"
+    )
     assert window.standard_indicator_table.rowCount() == 2
     assert window.standard_indicator_table.item(0, 2).text() == "kW·h/t"
     window.navigation.setCurrentRow(2)
@@ -674,7 +731,14 @@ def test_gb29446_typed_result_grade_and_coal_basis_ignore_internal_trace(referen
     assert "第4." not in basis
     assert window.gb29446_result_grade.text() == MainWindow._gb29446_grade_label(expected_grade)
     text = window.gb29446_explanation.text()
-    assert (" > " if expected_grade is Grade.NOT_QUALIFIED else " ≤ ") in text
+    # A5：判定行给出等级与必要标准依据；数字比较已按 Owner 确认口径移出普通说明
+    # （完整值语义由 test_gb29446_full_value_boundary_explanation_matches_formal_grade 覆盖）。
+    lines = text.split("<br>")
+    judgement = next(line for line in lines if line.startswith("判定："))
+    assert judgement.startswith(
+        f"判定：{MainWindow._gb29446_grade_label(expected_grade)}（"
+    )
+    assert "等级依据：" in judgement and "计算依据：" in judgement
     for internal in ["Decimal", "numeric_behavior=", "malformed", "calculator", "rule_id", item.indicator_id]:
         assert internal not in text
 
@@ -696,4 +760,10 @@ def test_gb29446_explanation_preserves_exact_small_boundary_difference(reference
     window.calculate_evaluation()
     assert window.gb29446_result_ed.text() == "5.00 kW·h/t"
     assert window.gb29446_result_grade.text() == "2级"
-    assert "判级比较：5.0000000000000001 ≤ 7；结果：2级" in window.gb29446_explanation.text()
+    # Numeric v1：完整计算值 5.0000000000000001 仍判为 2 级（不是显示值 5.00 的 1 级），
+    # 计算行保留完整值，并如实说明界面显示值只作简化展示。
+    explanation = window.gb29446_explanation.text()
+    lines = explanation.split("<br>")
+    assert "5.0000000000000001" in lines[1], explanation
+    assert next(line for line in lines if line.startswith("判定：")).startswith("判定：2级")
+    assert lines[-1] == "判级使用完整计算值，界面显示值仅作简化展示。"

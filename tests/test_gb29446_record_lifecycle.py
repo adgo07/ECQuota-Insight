@@ -108,8 +108,31 @@ def detail_text(window):
     return window.record_detail_dialog.findChild(QTextEdit, "record_detail_content").toPlainText()
 
 
-def technical_text(window):
-    return window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical").toPlainText()
+def record_trace(window, evaluation_id):
+    """同一条记录在仓储里的原始 trace / rule snapshot / 审计数据。
+
+    B1 之后普通界面不再有「技术详情」入口，但这些数据本身必须原样保留。因此断言直接
+    落在仓储 / 应用层读回的原始数据上，而不是落在一个已经删除的控件上。
+    """
+
+    loaded = window.context.application.get_evaluation(evaluation_id)
+    assert loaded is not None, "记录必须存在"
+    request, result, snapshot = loaded
+    return {
+        "evaluation_id": result.evaluation_id,
+        "standard_version": snapshot.version,
+        "rule_revision": snapshot.rule_revision,
+        "numeric_contract_version": result.numeric_contract_version,
+        "numeric_profile_id": result.numeric_profile_id,
+        "calculator_version": result.calculator_version,
+        "numeric_behavior_version": result.numeric_behavior_version,
+        "rule_snapshot_sha256": result.rule_snapshot_sha256,
+        "source_sha256": snapshot.source_sha256,
+        "request_json": request.model_dump_json(),
+        "result_json": result.model_dump_json(),
+        "snapshot_json": snapshot.model_dump_json(),
+        "audit_count": len(window.context.application.list_audit(500)),
+    }
 
 
 def install_r3(context, standard):
@@ -181,16 +204,41 @@ def test_view_is_readonly_no_engine_no_current_metadata(lifecycle, monkeypatch):
     assert raw_state(context, result.evaluation_id) == before
     assert workspace == (window.last_result_id, window.gb29446_electricity.text())
     ordinary = detail_text(window)
-    for expected in ["宁夏测试企业", "2026年6月", "炼焦煤", "重介", "E_d：560", "m：100", "折算系数 k：1.12", "6.272", "2级", "e_d = 560 × 1.12 / 100", "第3.1条", "第5.2条", "附录A"]:
+    for expected in [
+        "宁夏测试企业",
+        "2026年6月",
+        "炼焦煤",
+        "重介",
+        "560",
+        "100",
+        "折算系数 k = 1.12",
+        "6.272",
+        "2级",
+        "第3.1条",
+        "第5.2条",
+        "附录A",
+    ]:
         assert expected in ordinary
+    # A4：记录视图里的 E_d / e_d 以真下标渲染；“Ed：560”是下标文本的纯文本投影。
+    assert "Ed：560" in ordinary and "m：100" in ordinary
+    content = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+    assert content is not None and "vertical-align:sub" in content.toHtml()
     assert result.evaluation_id not in ordinary
     assert "numeric_profile_id" not in ordinary
-    technical = window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical")
-    assert technical.isHidden()
-    for expected in [result.evaluation_id, "rule_revision: 2", result.rule_snapshot_sha256, result.numeric_profile_id, request.model_dump_json(), result.model_dump_json(), standard.model_dump_json()]:
-        assert expected in technical.toPlainText()
-    next(button for button in window.record_detail_dialog.findChildren(QPushButton) if button.text() == "技术详情").click()
-    assert not technical.isHidden()
+    # B1：「技术详情」按钮已从普通界面移除，但底层 trace / rule snapshot / 审计数据必须原样保留。
+    assert "技术详情" not in [
+        button.text() for button in window.record_detail_dialog.findChildren(QPushButton)
+    ]
+    assert window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical") is None
+    trace = record_trace(window, result.evaluation_id)
+    assert trace["evaluation_id"] == result.evaluation_id
+    assert trace["rule_revision"] == 2
+    assert trace["rule_snapshot_sha256"] == result.rule_snapshot_sha256
+    assert trace["numeric_profile_id"] == result.numeric_profile_id
+    assert trace["request_json"] == request.model_dump_json()
+    assert trace["result_json"] == result.model_dump_json()
+    assert trace["snapshot_json"] == standard.model_dump_json()
+    assert trace["audit_count"] >= 1, "审计能力不得因移除按钮而消失"
 
 
 def test_legacy_record_without_numeric_metadata_keeps_saved_conclusion(lifecycle, monkeypatch):
@@ -207,10 +255,12 @@ def test_legacy_record_without_numeric_metadata_keeps_saved_conclusion(lifecycle
     before = raw_state(context, legacy.evaluation_id)
     monkeypatch.setattr(EvaluationEngine, "evaluate", forbidden)
     window.view_selected_record()
-    assert "当时保存的结果：1级" in detail_text(window)
-    assert "5.0000004" in detail_text(window)
-    assert "5.0000004 ≤ 5" not in detail_text(window)
-    assert "判级采用原始计算值" not in detail_text(window)
+    ordinary = detail_text(window)
+    # A5：旧 Profile 的记录只展示当时保存的结论，不替它补写当前比较语义。
+    assert "判定：1级（当时保存的结果" in ordinary
+    assert "5.0000004" in ordinary
+    assert "5.0000004 ≤ 5" not in ordinary
+    assert "判级使用完整计算值" not in ordinary
     assert raw_state(context, legacy.evaluation_id) == before
 
 
@@ -228,8 +278,13 @@ def test_rule_drift_preserves_all_original_json_and_display(lifecycle, monkeypat
     assert normalized(context.application.get_evaluation(result.evaluation_id)) == original
     assert "测试新版" not in detail_text(window)
     assert "仅供测试的新版依据" not in detail_text(window)
-    assert "1级 ≤ 5.00" in detail_text(window)
-    assert "rule_revision: 2" in technical_text(window)
+    # A5：原记录按保存下来的等级与依据展示（阈值不再出现在普通说明里，r3 的 6.5 也没有渗入）。
+    assert "判定：2级（等级依据：第3.1条" in detail_text(window)
+    assert "6.272" in detail_text(window)
+    # B1：「技术详情」按钮已移除；原 Rule Snapshot 仍原样保存在记录里。
+    trace = record_trace(window, result.evaluation_id)
+    assert trace["rule_revision"] == 2
+    assert trace["snapshot_json"] == standard.model_dump_json()
     summary = context.application.list_recent_evaluations()[0]
     assert summary.standard_title == standard.title
     assert summary.product_name == result.product_name
@@ -547,7 +602,9 @@ install_r3(context,loaded[2])
 select_record(window,a["id"])
 before=raw_state(context,a["id"])
 window.view_selected_record()
-assert "rule_revision: 2" in technical_text(window)
+trace=record_trace(window,a["id"])
+assert trace["rule_revision"]==2 and trace["snapshot_json"]==loaded[2].model_dump_json()
+assert "技术详情" not in [b.text() for b in window.record_detail_dialog.findChildren(QPushButton)]
 assert "测试新版" not in detail_text(window)
 assert raw_state(context,a["id"])==before
 window.record_detail_dialog.close()

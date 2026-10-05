@@ -6,14 +6,22 @@
 ``paths.standards/<package_id>/``，于是「安装产品自带的标准包」就会在用户数据目录
 留下全套标准 PDF；旧版本已经写下的那些目录还会被安全备份一起带上。
 
-新契约：
+新契约（fail-closed）：
 
 * 任何包（含仍携带 ``sources/*`` 的旧包）安装时都**不再**把原文写入用户数据目录；
-* 安装前先删除旧版本在产品数据目录下创建的 ``sources`` 目录，范围严格限定为
-  ``paths.standards/<package_id>/sources``（不跟随符号链接、不越出 ``standards/``）；
+* 安装前先检测并删除旧版本在产品数据目录下创建的原文，范围严格限定为
+  ``paths.standards/<package_id>/sources`` **以及** 同一层的历史平铺
+  ``paths.standards/<package_id>/*.pdf``（不跟随符号链接 / junction、不越出
+  ``standards/``）；
+* 删除之后必须**重新扫描确认目标确实消失**，只有确认后才写成功审计；
+* 确认失败（占用 / 权限 / 删除失败 / 目标仍在）时**中止安装**：不写成功审计、
+  不产生携带旧 PDF 的新备份、不改数据库、不留半安装目录，并抛出中文错误；
 * 清理发生在**迁移前安全备份之前**，所以该次安装留下的
   ``pre-package-*.uebackup`` 里同样没有 PDF；
 * 清理既写日志（``logging.getLogger(__name__)``）又写审计行。
+
+旧版两种历史布局（平铺 / ``sources/`` / 两者同时）的完整矩阵、fail-closed 的
+Windows 真实占用用例、以及合成夹具见 ``test_package_legacy_layouts.py``。
 
 阻塞项 #3（安全备份不得被静默覆盖）
 ----------------------------------
@@ -24,6 +32,8 @@
 ``pre-package-*.uebackup`` 前缀以便既有代码/测试继续 glob。
 
 本模块只做真实（非 mock）测试：真实 Ed25519 签名包、真实 SQLite、真实安装流程。
+本模块不依赖 ``G:\\ECQuota-Archive``，也不依赖 ``work/signing/development-private-key.pem``：
+包一律用测试时生成的临时密钥签名，公钥按路径交给服务。
 """
 
 from __future__ import annotations
@@ -31,6 +41,8 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
+import shutil
 import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -54,6 +66,7 @@ from uebench.infrastructure.packages import (
     BACKUP_NAME_PREFIX,
     PackageInstallResult,
     StandardPackageBuilder,
+    StandardPackageError,
     StandardPackageService,
     _backup_path,
 )
@@ -63,21 +76,30 @@ from uebench.infrastructure.repositories import AuditRepository, SqlStandardRepo
 from .test_engine import make_standard
 
 try:  # 测试目录既可能是普通目录，也可能被当作包
-    from _legacy_assets import session_legacy_package
+    from _legacy_assets import (
+        LEGACY_LAYOUT_BOTH,
+        LEGACY_LAYOUT_FLAT,
+        LEGACY_LAYOUT_SOURCES_DIR,
+        materialize_legacy_layout,
+        synthetic_legacy_library,
+    )
 except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模式
-    from tests._legacy_assets import session_legacy_package
+    from tests._legacy_assets import (
+        LEGACY_LAYOUT_BOTH,
+        LEGACY_LAYOUT_FLAT,
+        LEGACY_LAYOUT_SOURCES_DIR,
+        materialize_legacy_layout,
+        synthetic_legacy_library,
+    )
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
-#: 开发签名私钥（绝不复制进仓库，只按路径引用）。
-DEVELOPMENT_KEY = ROOT / "work" / "signing" / "development-private-key.pem"
+BUNDLED_PACKAGE = (
+    ROOT / "release" / "standard-packages" / "initial-standard-package-published.uebench"
+)
 GLOB = f"{BACKUP_NAME_PREFIX}*.uebackup"
 
-#: 真实归档的 r1（2026.09-published.2）旧包副本；归档不可用时是「不存在的路径」。
-LEGACY_PACKAGE = session_legacy_package()
-#: 旧包安装在真实环境里写入的原文文件名。
-LEGACY_SOURCE_NAME = "28.GB 29446-2019选煤电力消耗限额.pdf"
-#: 真实 GB 29446（r1 旧包）里用于正式评价的取值。
+#: 真实 GB 29446-2019（唯一纳入正式评价范围的标准）的 id / 取值。
 GB29446_ID = "gb-29446-2019"
 GB29446_PRODUCT = "gb_29446-2019-coking-coal"
 GB29446_DIRECT_INPUT_KEY = "actual.coking-coal"
@@ -90,9 +112,9 @@ ISSUED_AT = datetime(2026, 10, 5, tzinfo=timezone.utc)
 # ---------------------------------------------------------------------------
 
 
-def require_legacy_package() -> None:
-    if not LEGACY_PACKAGE.is_file():
-        pytest.skip(f"缺少归档旧标准包：{LEGACY_PACKAGE}")
+def require_bundled_package() -> None:
+    """固定正式标准包是仓库内固定件，CI 可用；缺失即硬失败，不 skip。"""
+    assert BUNDLED_PACKAGE.is_file(), f"缺少固定正式标准包：{BUNDLED_PACKAGE}"
 
 
 def make_service(tmp_path: Path, private_key: Ed25519PrivateKey):
@@ -109,8 +131,24 @@ def make_service(tmp_path: Path, private_key: Ed25519PrivateKey):
     return paths, database, standards, audit, service
 
 
+def make_service_with_public_key(tmp_path: Path, public_key_path: Path, *, root: str = "appdata"):
+    """用夹具自带公钥装配真实服务（与真实产品公钥无关，可离线运行）。"""
+    from cryptography.hazmat.primitives import serialization
+
+    paths = AppPaths.from_root(tmp_path / root)
+    paths.ensure()
+    database = DatabaseManager(paths.database)
+    database.initialize()
+    audit = AuditRepository(database)
+    backup = BackupService(paths, database, audit)
+    standards = SqlStandardRepository(database, audit)
+    public_key = serialization.load_pem_public_key(public_key_path.read_bytes())
+    service = StandardPackageService(paths, database, public_key, backup, standards, audit)
+    return paths, database, standards, audit, service
+
+
 def real_key_paths(tmp_path: Path):
-    """数据目录 + 真实产品公钥（校验归档/固定正式包时必须用它，不能用临时密钥）。"""
+    """数据目录 + 真实产品公钥（校验仓库内固定正式包时必须用它）。"""
     from cryptography.hazmat.primitives import serialization
 
     assert PUBLIC_KEY.is_file(), f"缺少内置更新公钥：{PUBLIC_KEY}"
@@ -124,20 +162,6 @@ def real_key_paths(tmp_path: Path):
     public_key = serialization.load_pem_public_key(PUBLIC_KEY.read_bytes())
     service = StandardPackageService(paths, database, public_key, backup, standards, audit)
     return paths, database, standards, audit, service
-
-
-def developer_private_key() -> Ed25519PrivateKey:
-    """开发签名私钥（绝不复制进仓库，只按路径引用）。
-
-    用真实产品公钥校验的数据目录，只能安装用这把私钥签名的包。
-    """
-    from cryptography.hazmat.primitives import serialization
-
-    if not DEVELOPMENT_KEY.is_file():
-        pytest.skip(f"缺少开发签名私钥：{DEVELOPMENT_KEY}")
-    key = serialization.load_pem_private_key(DEVELOPMENT_KEY.read_bytes(), password=None)
-    assert isinstance(key, Ed25519PrivateKey)
-    return key
 
 
 def definition_with_source(tmp_path: Path, *, rule_revision: int = 1):
@@ -187,8 +211,11 @@ def build_provenance_only_package(
     *,
     package_id: str,
     data_version: str,
+    definition: StandardDefinition | None = None,
 ):
-    definition, _source = definition_with_source(tmp_path)
+    """构造一个 provenance-only 的后继包（默认新造定义，也可复用已安装定义）。"""
+    if definition is None:
+        definition, _source = definition_with_source(tmp_path)
     return StandardPackageBuilder(private_key).build(
         tmp_path / f"{package_id}.uebench",
         [definition],
@@ -299,18 +326,23 @@ def test_source_bearing_package_installs_zero_source_files(tmp_path: Path) -> No
 def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """真实归档 r1 旧包 → 安装新版：活目录与本次安装备份都必须 0 个 PDF。"""
-    require_legacy_package()
-    private_key = developer_private_key()
-    paths, _database, _standards, audit, service = real_key_paths(tmp_path)
+    """旧版落盘原文（``sources/`` 布局）→ 安装新版：活目录与本次备份都必须 0 个 PDF。
 
-    # 第一步：旧版本行为 —— 安装真实归档 r1 包。
-    first = service.install(LEGACY_PACKAGE)
+    夹具为合成旧包 + 临时密钥（不依赖归档区与开发私钥）。
+    """
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, _database, _standards, audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+
+    # 第一步：旧版本行为 —— 安装一个仍携带 sources/* 的旧包。
+    first = service.install(library.package)
     legacy_directory = paths.standards / first.package_id
     assert first.removed_source_directory_count == 0
+    assert first.removed_flat_source_file_count == 0
 
-    # 第二步：构造「上一版本已落盘原文」的数据目录。真实归档包里确有原文，
-    # 若因环境差异没有，则按同样的布局自行写入，用例仍成立。
+    # 第二步：复现「上一版本已落盘原文」的数据目录（sources/ 布局）。
     legacy_sources = legacy_directory / "sources"
     legacy_sources.mkdir(parents=True, exist_ok=True)
     for index in range(3):
@@ -323,11 +355,13 @@ def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     assert len(pdf_files(paths.standards)) == 3
 
     # 第三步：安装新版（provenance-only），清理必须先于安全备份发生。
+    # 复用旧包里的同一份定义（同一 id/版本/规则版本、内容一致），只提高数据版本。
     successor = build_provenance_only_package(
         tmp_path,
-        private_key,
+        library.private_key,
         package_id="safety-successor",
         data_version="2026.11-published.1",
+        definition=library.definition,
     )
     with caplog.at_level(logging.WARNING):
         result = service.install(successor)
@@ -338,6 +372,7 @@ def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     assert pdf_files(paths.standards) == [], "升级后用户数据目录必须 0 个 PDF"
     assert result.removed_source_directory_count == 1
     assert result.removed_source_file_count == expected_files
+    assert result.removed_flat_source_file_count == 0
     assert pdf_files(legacy_directory) == []
 
     # 日志证据：同一数据目录、同一进程内可观察到清理记录。
@@ -359,6 +394,8 @@ def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     details = json.loads(rows[0].details_json)
     assert details["directories_removed"] == 1
     assert details["files_removed"] == expected_files
+    assert details["flat_files_removed"] == 0
+    assert details["verified"] is True
     assert rows[0].entity_type == "standard_package"
 
     # 备份证据：本次安装新增的 pre-package 备份里同样 0 个 PDF。
@@ -385,15 +422,64 @@ def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     ), backup_members
 
 
+def test_upgrade_removes_flat_legacy_pdfs_too(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """真实旧版布局：PDF 平铺在 ``standards/<package>/*.pdf`` 也必须被清理。"""
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, _database, _standards, audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+    first = service.install(library.package)
+    legacy_directory = paths.standards / first.package_id
+    materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_FLAT, pdf_count=3)
+    keep = legacy_directory / "corrections.json"
+    assert keep.is_file()
+    backups_before = backup_names(paths)
+    assert len(pdf_files(paths.standards)) == 3
+
+    successor = build_provenance_only_package(
+        tmp_path,
+        library.private_key,
+        package_id="safety-flat-successor",
+        data_version="2026.11-published.1",
+        definition=library.definition,
+    )
+    with caplog.at_level(logging.WARNING):
+        result = service.install(successor)
+
+    assert result.removed_source_directory_count == 0
+    assert result.removed_source_file_count == 0
+    assert result.removed_flat_source_file_count == 3
+    assert pdf_files(paths.standards) == []
+    assert list(legacy_directory.glob("*.pdf")) == []
+    # 非原文产物原样保留。
+    assert keep.is_file()
+    details = json.loads(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)[0].details_json)
+    assert details["flat_files_removed"] == 3
+    assert details["directories_removed"] == 0
+    # 备份在清理之后：打开备份，里面没有 PDF。
+    new_backups = backup_names(paths) - backups_before
+    assert len(new_backups) == 1
+    members = archive_names(paths.backups / next(iter(new_backups)))
+    assert [name for name in members if name.lower().endswith(".pdf")] == [], members
+    assert any(name.endswith("corrections.json") for name in members), members
+
+
 def test_cleanup_scope_never_touches_user_documents(tmp_path: Path) -> None:
-    """清理范围严格限定为 ``standards/<package_id>/sources`` 直接子目录。"""
-    require_legacy_package()
-    private_key = developer_private_key()
-    paths, _database, _standards, audit, service = real_key_paths(tmp_path)
-    first = service.install(LEGACY_PACKAGE)
+    """清理范围严格限定为包目录直接子级：``sources/`` 与平铺 ``*.pdf``。"""
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, _database, _standards, audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+    first = service.install(library.package)
     legacy_sources = paths.standards / first.package_id / "sources"
     legacy_sources.mkdir(parents=True, exist_ok=True)
     (legacy_sources / "product-installed.pdf").write_bytes(b"%PDF-1.4 product")
+    flat_pdf = paths.standards / first.package_id / "loose-legacy.pdf"
+    flat_pdf.write_bytes(b"%PDF-1.4 flat legacy")
 
     # 同一契约下会被清理的第二个目录：另一个包目录的直接子级 ``sources``。
     second_package = paths.standards / "second-installed-package"
@@ -418,23 +504,27 @@ def test_cleanup_scope_never_touches_user_documents(tmp_path: Path) -> None:
 
     successor = build_provenance_only_package(
         tmp_path,
-        private_key,
+        library.private_key,
         package_id="safety-scope-successor",
         data_version="2026.11-published.3",
+        definition=library.definition,
     )
     result = service.install(successor)
 
-    # 只删了「包目录/sources」这两个目录，各 1 个文件。
+    # 删了「包目录/sources」两个目录（各 1 个文件）与 1 个平铺 PDF。
     assert result.removed_source_directory_count == 2
     assert result.removed_source_file_count == 2
+    assert result.removed_flat_source_file_count == 1
     assert not legacy_sources.exists()
     assert not second_sources.exists()
+    assert not flat_pdf.exists()
     assert loose_pdf.read_bytes() == b"%PDF-1.4 loose user file"
     assert user_pdf.read_bytes() == b"%PDF-1.4 user document"
     assert nested_pdf.read_bytes() == b"%PDF-1.4 nested"
     details = json.loads(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)[0].details_json)
     assert details["directories_removed"] == 2
     assert details["files_removed"] == 2
+    assert details["flat_files_removed"] == 1
 
 
 def test_second_install_after_cleanup_is_a_noop_for_source_state(tmp_path: Path) -> None:
@@ -458,73 +548,174 @@ def test_second_install_after_cleanup_is_a_noop_for_source_state(tmp_path: Path)
     assert pdf_files(paths.standards) == []
 
 
+def test_cleanup_legacy_sources_port_method_reports_real_counts_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
+    """§五 端口方法：与 ``install`` 用同一个 Gate，返回真实计数且幂等。
+
+    ``StandardPackagePort.cleanup_legacy_sources()`` 是启动/对账路径唯一允许调用
+    的入口（application 层不得导入 infrastructure）。它必须是**同一份**实现：
+    计数、审计、失败语义都与 ``install`` 内部那一次完全一致。
+    """
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, _database, _standards, audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+    first = service.install(library.package)
+    legacy_directory = paths.standards / first.package_id
+    created = materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_BOTH, pdf_count=2)
+    assert created["sources"].is_dir()
+    assert len(pdf_files(paths.standards)) == 4
+
+    # 真实计数：(1 个 sources 目录, 目录内 2 个文件, 2 个平铺 PDF)。
+    assert service.cleanup_legacy_sources() == (1, 2, 2)
+    assert pdf_files(paths.standards) == []
+    assert not (legacy_directory / "sources").exists()
+    # 非原文产物原样保留。
+    assert (legacy_directory / "corrections.json").is_file()
+    details = json.loads(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)[0].details_json)
+    assert details["directories_removed"] == 1
+    assert details["files_removed"] == 2
+    assert details["flat_files_removed"] == 2
+    assert details["verified"] is True
+
+    # 幂等：没有旧原文时全零且不新增审计行。
+    assert service.cleanup_legacy_sources() == (0, 0, 0)
+    assert len(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)) == 1
+
+
+def test_cleanup_legacy_sources_port_method_is_fail_closed_when_it_cannot_delete(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """§五 端口方法的 fail-closed：删不掉就中止，绝不写成功审计。
+
+    与 ``test_cleanup_keeps_retrying_then_aborts_when_target_never_disappears``
+    同一套做法（在删除动作这一层注入永久失败，因此跨平台可复现），但驱动的是
+    **端口方法本身**——也就是启动/对账路径真正调用的那一个入口。
+    """
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, database, _standards, audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+    first = service.install(library.package)
+    legacy_directory = paths.standards / first.package_id
+    materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_SOURCES_DIR, pdf_count=1)
+    sources = legacy_directory / "sources"
+    target = next(sources.glob("*.pdf"))
+    payload = target.read_bytes()
+
+    attempts: list[int] = []
+    real_rmtree = shutil.rmtree
+    real_remove = os.remove
+
+    def never_deletes(directories, flat_files):
+        for directory in directories:
+            if directory.exists():
+                real_rmtree(directory)
+        for path in flat_files:
+            if path.exists():
+                real_remove(path)
+        attempts.append(1)
+        sources.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+        return [(sources, f"PermissionError: 模拟永久占用：{target}")]
+
+    monkeypatch.setattr(StandardPackageService, "_delete_legacy_targets", staticmethod(never_deletes))
+    monkeypatch.setattr(StandardPackageService, "LEGACY_CLEANUP_RETRY_DELAY", 0.0)
+
+    with pytest.raises(StandardPackageError) as failure:
+        service.cleanup_legacy_sources()
+
+    assert len(attempts) == StandardPackageService.LEGACY_CLEANUP_ATTEMPTS, attempts
+    message = str(failure.value)
+    assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
+    assert "安装已中止" in message and "PermissionError" in message
+    assert "模拟永久占用" in message
+    # 无成功审计、数据库完好、目标仍在（而不是"装作删掉了"）。
+    assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+    assert database.path.exists()
+    assert [entry.package_id for entry in service.list_history(50)] == [first.package_id]
+    assert target.is_file() and target.read_bytes() == payload
+
+
 # ---------------------------------------------------------------------------
 # 3. 业务数据在升级（含清理）后原样保留
 # ---------------------------------------------------------------------------
 
 
 def test_business_data_survives_the_upgrade_and_cleanup(tmp_path: Path) -> None:
-    """升级并清理原文目录不得影响已保存评价及其规则快照、定义与包历史。
+    """真实 GB 29446 端到端：安装正式包时清理旧版原文，业务数据与快照不受影响。
 
-    评价走真实 GB 29446-2019（正式评价范围内），因此这条用例同时证明清理不会
-    破坏「历史记录 + 规则快照 + 已安装定义 + 包历史」。
+    评价走真实 GB 29446-2019（唯一纳入正式评价范围的标准），定义来自仓库内固定的
+    正式标准包，用**真实产品公钥**装配真实组合根。旧版落盘原文在安装之前就已存在
+    （这正是历史布局在真实环境里的样子），因此走的是一条完整的 ``install`` 路径：
+    检测 → 删除 → 重新扫描验证 → 审计 → 安全备份 → 落盘定义。本用例不依赖外部
+    归档区，也不依赖 ``work/signing/development-private-key.pem``。
     """
-    require_legacy_package()
-    private_key = developer_private_key()
-    paths, database, standards, _audit, service = real_key_paths(tmp_path)
-    first = service.install(LEGACY_PACKAGE)
-
     from uebench.bootstrap import create_context
-    from uebench.application.services import EvaluationService
-    from uebench.infrastructure.repositories import SqlEvaluationRepository
 
-    evaluations = SqlEvaluationRepository(database, AuditRepository(database))
-    request = EvaluationRequest(
-        evaluation_date=date(2026, 9, 26),
-        standard_id=GB29446_ID,
-        product_id=GB29446_PRODUCT,
-        selection_mode=StandardSelectionMode.CURRENT,
-        input_mode=InputMode.DIRECT,
-        inputs={GB29446_DIRECT_INPUT_KEY: InputValue(value="5.0", unit="kW·h/t")},
-        organization_name="升级清理回归企业",
-    )
-    result_before = EvaluationService(standards, evaluations).evaluate(request)
-    loaded_before = evaluations.get(result_before.evaluation_id)
-    assert loaded_before is not None
-    snapshot_sha_before = loaded_before[1].rule_snapshot_sha256
-    assert loaded_before[1].rule_revision == 1
-    assert database.path.exists()
-
-    # 旧版本留下的原文目录（清理对象）。
-    legacy_sources = paths.standards / first.package_id / "sources"
-    legacy_sources.mkdir(parents=True, exist_ok=True)
-    (legacy_sources / "legacy.pdf").write_bytes(b"%PDF-1.4 legacy")
-
-    # 真实组合根路径（bootstrap + facade）跑一次升级，避免只测「手工装配」。
-    context = create_context(paths.root, public_key_path=PUBLIC_KEY)
+    require_bundled_package()
+    # 真实组合根路径（bootstrap + facade），真实产品公钥。
+    context = create_context(tmp_path / "appdata", public_key_path=PUBLIC_KEY)
     try:
-        upgrade = context.package_service.install(
-            build_provenance_only_package(
-                tmp_path,
-                private_key,
-                package_id="safety-business-successor",
-                data_version="2026.11-published.2",
-            )
-        )
-        assert upgrade.removed_source_directory_count == 1
+        # 安装前：旧版本留下的两种历史布局同时存在。
+        legacy_directory = context.paths.standards / "legacy-package-from-old-version"
+        materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_BOTH, pdf_count=1)
+        keep_note = legacy_directory / "user-notes.txt"
+        keep_note.write_text("用户自己的说明", encoding="utf-8")
+        assert len(pdf_files(context.paths.standards)) == 2
+
+        backups_before = backup_names(context.paths)
+        first = context.package_service.install(BUNDLED_PACKAGE)
+
+        # 清理发生在同一条 install 路径内，并且是真实、可复核的结果。
+        assert first.removed_source_directory_count == 1
+        assert first.removed_source_file_count == 1
+        assert first.removed_flat_source_file_count == 1
         assert pdf_files(context.paths.standards) == []
-        assert context.application.count_evaluations() >= 1
-        reloaded = context.application.get_evaluation(result_before.evaluation_id)
-        assert reloaded is not None, "升级后历史评价必须仍可读取"
-        assert reloaded[1].rule_snapshot_sha256 == snapshot_sha_before
-        assert reloaded[1].rule_revision == 1
-        assert reloaded[2].rule_revision == 1, "规则快照必须仍是升级前的 r1"
-        assert reloaded[0] == loaded_before[0]
-        # 其它包历史与已安装定义都还在。
-        history = context.application.list_package_history(50)
-        assert {entry.package_id for entry in history} >= {first.package_id, upgrade.package_id}
-        published = context.application.get_published_standard(GB29446_ID)
-        assert published is not None and published.rule_revision == 1
+        assert not (legacy_directory / "sources").exists()
+        # 非原文内容原样保留。
+        assert keep_note.read_text(encoding="utf-8") == "用户自己的说明"
+        # 本次安装的安全备份在清理之后：里面没有 PDF。
+        new_backups = backup_names(context.paths) - backups_before
+        assert len(new_backups) == 1
+        members = archive_names(context.paths.backups / next(iter(new_backups)))
+        assert [name for name in members if name.lower().endswith(".pdf")] == [], members
+        # 安装目录只落非原文产物。
+        destination = context.paths.standards / first.package_id
+        assert sorted(path.name for path in destination.iterdir()) == ["corrections.json"]
+
+        revisions = sorted(
+            item.rule_revision
+            for item in context.application.list_all_standards()
+            if item.id == GB29446_ID
+        )
+        assert revisions, "正式包必须提供 GB 29446 定义"
+        current_revision = max(revisions)
+
+        request = EvaluationRequest(
+            evaluation_date=date(2026, 9, 26),
+            standard_id=GB29446_ID,
+            product_id=GB29446_PRODUCT,
+            selection_mode=StandardSelectionMode.CURRENT,
+            input_mode=InputMode.DIRECT,
+            inputs={GB29446_DIRECT_INPUT_KEY: InputValue(value="5.0", unit="kW·h/t")},
+            organization_name="升级清理回归企业",
+        )
+        evaluation = context.application.evaluate(request)
+        loaded = context.application.get_evaluation(evaluation.evaluation_id)
+        assert loaded is not None
+        assert loaded[1].rule_revision == current_revision
+        assert context.application.count_evaluations() == 1
+        # 标准目录与数据库都没有半升级状态。
+        assert pdf_files(context.paths.standards) == []
+        assert context.database.path.exists()
+        assert context.application.get_published_standard(GB29446_ID) is not None
+        assert [entry.package_id for entry in context.application.list_package_history(5)] == [
+            first.package_id
+        ]
     finally:
         context.database.dispose()
         close_logging()
@@ -650,21 +841,28 @@ def test_package_install_result_reports_removed_source_counts(tmp_path: Path) ->
 
 
 def test_real_legacy_package_ships_sources_but_never_lands_them(tmp_path: Path) -> None:
-    """真实归档 r1 包：包内含原文，安装后用户数据目录 0 个 PDF（端到端）。"""
-    require_legacy_package()
-    private_key = Ed25519PrivateKey.generate()
-    paths, _database, _standards, _audit, service = real_key_paths(tmp_path)
+    """真实携带原文的旧包：安装后用户数据目录 0 个 PDF（端到端，可离线）。
 
-    with zipfile.ZipFile(LEGACY_PACKAGE) as archive:
+    夹具用合成旧包（临时密钥、真实签名），包里确实含 ``sources/*``，安装后一个
+    PDF 都不落盘。
+    """
+    work = tmp_path / "work"
+    library = synthetic_legacy_library(work)
+    paths, _database, _standards, _audit, service = make_service_with_public_key(
+        tmp_path, library.public_key_path
+    )
+
+    with zipfile.ZipFile(library.package) as archive:
         source_members = [name for name in archive.namelist() if name.startswith("sources/")]
-    assert source_members, "用例前提：归档旧包确实携带 sources/*"
+    assert source_members, "用例前提：旧包确实携带 sources/*"
 
-    report = service.preview(LEGACY_PACKAGE)
+    report = service.preview(library.package)
     assert report.valid, report.errors
-    result = service.install(LEGACY_PACKAGE)
+    assert report.manifest is not None and report.manifest.source_policy == "embedded"
+    result = service.install(library.package)
 
     assert pdf_files(paths.standards) == [], "用户数据目录不得出现标准原文"
     assert list(paths.standards.rglob("sources")) == []
     destination = paths.standards / result.package_id
     assert sorted(path.name for path in destination.iterdir()) == ["corrections.json"]
-    assert not (destination / LEGACY_SOURCE_NAME).exists()
+    assert not (destination / library.source_file_name).exists()

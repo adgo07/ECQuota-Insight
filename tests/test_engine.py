@@ -38,7 +38,23 @@ def constant(value: str) -> Expression:
     return Expression(op="constant", value=value)
 
 
-def make_standard(*, comparison: ComparisonDirection = ComparisonDirection.LTE) -> StandardDefinition:
+def make_standard(
+    *,
+    comparison: ComparisonDirection = ComparisonDirection.LTE,
+    standard_id: str | None = None,
+    standard_number: str | None = None,
+) -> StandardDefinition:
+    """一个最小可用标准定义。
+
+    ``standard_id`` / ``standard_number`` 默认沿用测试占位标准（``gb-00000-2026``）。
+    需要落在正式评价范围内的场景（例如 ``gb-29446-2019``）可以显式覆盖：此时
+    id、number 与原文文件名三者保持一致，定义内部引用仍然自洽。
+    """
+    number = standard_number or SOURCE.standard_number
+    identifier = standard_id or "gb-00000-2026"
+    # 标准版本年份必须与标准编号末段一致（``StandardDefinition`` 自身会校验）。
+    version = number.rsplit("-", 1)[-1]
+    source = SOURCE.model_copy(update={"standard_number": number})
     indicator = IndicatorDefinition(
         id="energy",
         name="单位产品能耗",
@@ -53,7 +69,7 @@ def make_standard(*, comparison: ComparisonDirection = ComparisonDirection.LTE) 
             args=[Expression(op="input", input_key="total"), Expression(op="input", input_key="production")],
         ),
         thresholds=ThresholdSet(level_1=constant("10"), level_2=constant("20"), level_3=constant("30")),
-        source_references=[SOURCE.model_copy(deep=True)],
+        source_references=[source],
     )
     product = ProductDefinition(
         id="product",
@@ -71,14 +87,14 @@ def make_standard(*, comparison: ComparisonDirection = ComparisonDirection.LTE) 
         indicators=[indicator],
     )
     return StandardDefinition(
-        id="gb-00000-2026",
-        number="GB 00000-2026",
+        id=identifier,
+        number=number,
         title="测试标准",
-        version="2026",
+        version=version,
         publication_status=PublicationStatus.PUBLISHED,
         publication_date=date(2026, 1, 1),
         effective_date=date(2026, 2, 1),
-        source_file=SOURCE.source_file,
+        source_file=source.source_file,
         source_sha256=SOURCE.source_sha256,
         products=[product],
     )
