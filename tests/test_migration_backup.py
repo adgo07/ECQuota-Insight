@@ -4,10 +4,16 @@ Verifies that ``DatabaseManager.initialize`` writes a transactionally
 consistent ``backups/pre-migration-*.uebackup`` snapshot exactly when a schema
 change is pending — never on a fresh database, never without managed tables,
 and never on a repeated launch that is already at the migration head.
+
+Phase 7 adds the backup *scope* contract: a migration (safety) backup is
+responsible for the non-rebuildable user business data only — the database.
+``standards/``, ``imports/`` and ``logs/`` are rebuildable application data and
+must not ride along into a migration safety backup.
 """
 
 from __future__ import annotations
 
+import json
 import shutil
 import sqlite3
 import zipfile
@@ -183,6 +189,45 @@ def test_pending_upgrade_backs_up_pre_upgrade_database(tmp_path: Path) -> None:
         assert revision_of(snapshot) == "0001"
         assert "standard_family_id" not in standard_columns(snapshot)
         assert standard_numbers(snapshot) == ["GB 11111-2019"]
+    finally:
+        context.database.dispose()
+
+
+def test_pre_migration_backup_is_user_data_only(tmp_path: Path) -> None:
+    """迁移前安全备份只含用户业务数据：可重建的应用数据（含标准原文）一律不进备份。
+
+    这是 Phase 7 §二 的核心契约：迁移发生在**包对账之前**，所以旧 ``standards/``
+    树里的标准 PDF 曾经会被整棵复制进 ``pre-migration-*.uebackup``。数据目录里确实
+    放上这些文件之后，本用例证明新备份里一个都没有。
+    """
+    context = create_context(tmp_path / "appdata")
+    try:
+        database_at_0001(context)
+        insert_standard(context, "GB 66666-2019")
+        # 活目录里的可重建应用数据（旧版遗留的落盘原文正是这样被打包进备份的）。
+        legacy = context.paths.standards / "legacy-package-from-old-version"
+        legacy.mkdir(parents=True, exist_ok=True)
+        (legacy / "legacy.pdf").write_bytes(b"%PDF-1.4 legacy")
+        (context.paths.imports / "input.xlsx").write_bytes(b"import-placeholder")
+        (context.paths.logs / "old.log").write_bytes(b"log-placeholder")
+
+        created = context.database.initialize()
+        assert created is not None
+        with zipfile.ZipFile(created) as archive:
+            assert set(archive.namelist()) == {"uebench.sqlite3", "manifest.json"}
+            manifest = json.loads(archive.read("manifest.json"))
+        assert manifest["scope"] == "user-data"
+        assert set(manifest["files"]) == {"uebench.sqlite3"}
+
+        # 备份仍然是升级前的真实数据库快照（范围收窄没有削弱迁移保护）。
+        snapshot = extract_backup_database(created, tmp_path / "scope.sqlite3")
+        assert revision_of(snapshot) == "0001"
+        assert "standard_family_id" not in standard_columns(snapshot)
+        assert standard_numbers(snapshot) == ["GB 66666-2019"]
+        assert revision_of(context.paths.database) == HEAD
+        assert standard_numbers(context.paths.database) == ["GB 66666-2019"]
+        # 活目录里的应用数据一个字节都没被动过。
+        assert (legacy / "legacy.pdf").read_bytes() == b"%PDF-1.4 legacy"
     finally:
         context.database.dispose()
 

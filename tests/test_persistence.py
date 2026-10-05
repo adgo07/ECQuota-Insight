@@ -120,19 +120,34 @@ def test_soft_delete_hides_evaluation(tmp_path: Path, monkeypatch) -> None:
     assert evaluations.get(result.evaluation_id) is None
 
 
-def test_backup_and_restore(tmp_path: Path) -> None:
+def test_safety_backup_carries_only_user_business_data(tmp_path: Path) -> None:
+    """安全备份（``create`` 默认范围）只含用户业务数据：数据库，别的一律不带。
+
+    这是 Phase 7 的备份语义契约：迁移前 / 安装前 / 恢复前的安全备份只负责不可重建的
+    用户业务数据；标准包、标准原文 PDF、bundled 资源、缓存和日志都是可重建的应用数据，
+    不再因为「整棵 ``standards/`` 被复制」而进入安全备份。
+    """
     paths, database, audit = setup_database(tmp_path)
     standards = SqlStandardRepository(database, audit)
     standard = make_standard()
     standards.install(standard)
+    # 活目录里确实存在可重建的应用数据（旧版遗留 PDF 就是这样被打包进备份的）。
     (paths.standards / "source.pdf").write_bytes(b"pdf-placeholder")
     (paths.imports / "input.xlsx").write_bytes(b"import-placeholder")
     (paths.logs / "old.log").write_bytes(b"log-placeholder")
 
     service = BackupService(paths, database, audit)
-    backup = service.create(tmp_path / "snapshot.uebackup")
-    assert service.validate(backup)["schema_version"] == "1.0"
+    backup = service.create(tmp_path / "safety.uebackup")
 
+    with zipfile.ZipFile(backup) as archive:
+        members = set(archive.namelist())
+    assert members == {"uebench.sqlite3", "manifest.json"}, members
+    manifest = service.validate(backup)
+    assert manifest["scope"] == "user-data"
+    assert manifest["schema_version"] == "1.0"
+    assert set(manifest["files"]) == {"uebench.sqlite3"}
+
+    # 恢复：用户业务记录回来，而安全备份不拥有的活目录内容不被删除。
     with database.session() as session:
         from uebench.infrastructure.database import StandardRow
 
@@ -144,6 +159,141 @@ def test_backup_and_restore(tmp_path: Path) -> None:
     assert (paths.standards / "source.pdf").read_bytes() == b"pdf-placeholder"
     assert (paths.imports / "input.xlsx").read_bytes() == b"import-placeholder"
     assert (paths.logs / "old.log").read_bytes() == b"log-placeholder"
+    # 恢复前的安全备份同样只含数据库：恢复本身也不会把 PDF 带进任何安全备份。
+    pre_restore = sorted(paths.backups.glob("pre-restore-*.uebackup"))
+    assert len(pre_restore) == 1, [path.name for path in pre_restore]
+    with zipfile.ZipFile(pre_restore[0]) as archive:
+        assert set(archive.namelist()) == {"uebench.sqlite3", "manifest.json"}
+
+
+def test_full_environment_backup_keeps_and_restores_application_data(tmp_path: Path) -> None:
+    """用户主动的全环境备份（``create_full_environment``）仍然是一份自包含归档。"""
+    paths, database, audit = setup_database(tmp_path)
+    standards = SqlStandardRepository(database, audit)
+    standard = make_standard()
+    standards.install(standard)
+    (paths.standards / "source.pdf").write_bytes(b"pdf-placeholder")
+    (paths.imports / "input.xlsx").write_bytes(b"import-placeholder")
+    (paths.logs / "old.log").write_bytes(b"log-placeholder")
+
+    service = BackupService(paths, database, audit)
+    backup = service.create_full_environment(tmp_path / "full.uebackup")
+
+    manifest = service.validate(backup)
+    assert manifest["scope"] == "full-environment"
+    assert {"standards/source.pdf", "imports/input.xlsx", "logs/old.log"} <= set(
+        manifest["files"]
+    )
+
+    # 破坏恢复目标：数据库行与活目录里的应用数据全部删掉。
+    with database.session() as session:
+        from uebench.infrastructure.database import StandardRow
+
+        session.query(StandardRow).delete()
+    (paths.standards / "source.pdf").unlink()
+    (paths.imports / "input.xlsx").unlink()
+    (paths.logs / "old.log").unlink()
+
+    service.restore(backup)
+    assert standards.get_published(standard.id) is not None
+    assert (paths.standards / "source.pdf").read_bytes() == b"pdf-placeholder"
+    assert (paths.imports / "input.xlsx").read_bytes() == b"import-placeholder"
+    assert (paths.logs / "old.log").read_bytes() == b"log-placeholder"
+
+
+def test_restore_never_deletes_live_application_data_it_does_not_own(tmp_path: Path) -> None:
+    """全环境备份恢复是「就地合并」：归档之后新产生的可重建数据不被删除。"""
+    paths, database, audit = setup_database(tmp_path)
+    standards = SqlStandardRepository(database, audit)
+    standards.install(make_standard())
+    (paths.standards / "source.pdf").write_bytes(b"pdf-placeholder")
+
+    service = BackupService(paths, database, audit)
+    backup = service.create_full_environment(tmp_path / "full.uebackup")
+    later = paths.standards / "installed-after-the-backup" / "corrections.json"
+    later.parent.mkdir(parents=True)
+    later.write_bytes(b'{"corrections":[]}')
+
+    service.restore(backup)
+
+    assert later.read_bytes() == b'{"corrections":[]}'
+    assert (paths.standards / "source.pdf").read_bytes() == b"pdf-placeholder"
+
+
+def test_validate_rejects_a_safety_backup_that_carries_application_data(tmp_path: Path) -> None:
+    """自述为安全备份（user-data）却带应用数据 → 拒绝；旧归档按全环境读。"""
+    _paths, database, audit = setup_database(tmp_path)
+    service = BackupService(AppPaths.from_root(tmp_path / "appdata"), database, audit)
+
+    payload = b"%PDF-1.4 legacy"
+    inconsistent = tmp_path / "inconsistent.uebackup"
+    manifest = {
+        "schema_version": "1.0",
+        "backup_id": "inconsistent",
+        "scope": "user-data",
+        "files": {"uebench.sqlite3": "0" * 64, "standards/legacy.pdf": "1" * 64},
+    }
+    with zipfile.ZipFile(inconsistent, "w") as archive:
+        archive.writestr("manifest.json", json.dumps(manifest))
+        archive.writestr("uebench.sqlite3", b"db")
+        archive.writestr("standards/legacy.pdf", payload)
+    with pytest.raises(BackupValidationError, match="不得包含可重建的应用数据"):
+        service.validate(inconsistent)
+
+    # 拆分之前写下的归档没有 scope 字段：它们确实带整棵 standards/，按全环境读。
+    historical = tmp_path / "historical.uebackup"
+    historical_manifest = {
+        "schema_version": "1.0",
+        "backup_id": "historical",
+        "files": {"uebench.sqlite3": "0" * 64},
+    }
+    with zipfile.ZipFile(historical, "w") as archive:
+        archive.writestr("manifest.json", json.dumps(historical_manifest))
+        archive.writestr("uebench.sqlite3", b"db")
+    # 哈希不匹配才是这里的失败原因，范围本身被接受（不再是「不支持的备份范围」）。
+    with pytest.raises(BackupValidationError, match="哈希错误|备份缺少文件"):
+        service.validate(historical)
+
+
+def test_restore_still_reads_a_pre_split_full_archive(tmp_path: Path) -> None:
+    """拆分之前写下的归档（无 ``scope`` 字段）仍按全环境读取并真实恢复。"""
+    paths, database, audit = setup_database(tmp_path)
+    standards = SqlStandardRepository(database, audit)
+    standard = make_standard()
+    standards.install(standard)
+    (paths.standards / "legacy-source.pdf").write_bytes(b"%PDF-1.4 legacy")
+
+    service = BackupService(paths, database, audit)
+    modern = service.create_full_environment(tmp_path / "modern.uebackup")
+    historical = tmp_path / "historical.uebackup"
+    with zipfile.ZipFile(modern) as source, zipfile.ZipFile(historical, "w") as target:
+        for name in source.namelist():
+            payload = source.read(name)
+            if name == "manifest.json":
+                document = json.loads(payload)
+                document.pop("scope", None)
+                payload = json.dumps(
+                    document, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
+            target.writestr(name, payload)
+    stored = json.loads(zipfile.ZipFile(historical).read("manifest.json"))
+    assert "scope" not in stored, "用例前提：模拟拆分之前写下的归档"
+
+    # 范围由校验层归一化为 full-environment（缺字段不得读成安全备份）。
+    assert service.validate(historical)["scope"] == "full-environment"
+
+    with database.session() as session:
+        from uebench.infrastructure.database import StandardRow
+
+        session.query(StandardRow).delete()
+    (paths.standards / "legacy-source.pdf").unlink()
+
+    service.restore(historical)
+    assert standards.get_published(standard.id) is not None
+    assert (paths.standards / "legacy-source.pdf").read_bytes() == b"%PDF-1.4 legacy"
+    # 恢复行为与归档范围一致地记入审计。
+    restore_rows = [entry for entry in audit.list_recent(50) if entry.action == "BACKUP_RESTORE"]
+    assert restore_rows and json.loads(restore_rows[0].details_json)["scope"] == "full-environment"
 
 
 def test_backup_rejects_windows_path_traversal(tmp_path: Path) -> None:

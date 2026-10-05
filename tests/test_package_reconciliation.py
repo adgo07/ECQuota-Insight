@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import shutil
 import sys
 import zipfile
@@ -126,6 +127,20 @@ def bundled_directory(tmp_path: Path, *entries: tuple[Path, str]) -> Path:
 
 def reconciler(context) -> PackageReconciliationService:
     return PackageReconciliationService(context.package_service, data_version_key=_data_version_key)
+
+
+def reconcile_without_fail_closed_abort(context, directory: Path):
+    """对账并明确断言**不再**抛 ``StandardPackageError``（fail-closed 已废除）。
+
+    warn-only 契约下，旧版原文删不掉只应体现为 WARNING + 无成功审计，绝不应变成
+    对账/启动异常。
+    """
+    try:
+        return reconcile_standard_package(context, directory)
+    except StandardPackageError as exc:  # pragma: no cover - 新契约下不应发生
+        raise AssertionError(
+            f"warn-only 契约下对账仍抛出 StandardPackageError：{exc}"
+        ) from exc
 
 
 def backup_names(context) -> set[str]:
@@ -1395,13 +1410,16 @@ def test_cleanup_gate_is_idempotent_across_repeated_startups(tmp_path: Path) -> 
         close_logging()
 
 
-def test_locked_legacy_pdf_aborts_reconciliation_fail_closed(tmp_path: Path) -> None:
-    """Windows 真实占用句柄：对账在决策前中止，且没有任何“成功”痕迹。
+def test_locked_legacy_pdf_does_not_block_reconciliation_warn_only(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Windows 真实占用句柄：对账照常完成，清理失败只记 WARNING、不写成功审计。
 
     ``open(path, "rb")`` 保持打开会让删除在 Windows 上真实地以
     ``PermissionError``(winerror 32) 失败（与 install 路径的占用用例同款做法）。
-    这里验证的是**对账路径**的 fail-closed：即使决策本会是 NOOP，闸门失败也必须
-    中止，而不是“反正不装包，跳过清理”。
+    这里验证的是**对账路径**的 warn-only：即使决策本会是 NOOP，闸门也照样真的尝试
+    清理，但它的失败绝不会阻止启动/决策/评价/保存 —— 只留下 WARNING、被占用的文件
+    逐字节不动，下一次启动自动重试。
     """
     if sys.platform != "win32":
         pytest.skip("真实文件占用只能在 Windows 上复现（其他平台允许删除已打开的文件）")
@@ -1418,32 +1436,40 @@ def test_locked_legacy_pdf_aborts_reconciliation_fail_closed(tmp_path: Path) -> 
 
         with open(sources_pdf, "rb") as handle:
             assert handle.read(8).startswith(b"%PDF")
-            with pytest.raises(StandardPackageError) as failure:
-                reconcile_standard_package(context, directory)
+            with caplog.at_level(
+                logging.WARNING, logger="uebench.infrastructure.packages"
+            ):
+                outcome = reconcile_without_fail_closed_abort(context, directory)
 
-        message = str(failure.value)
-        # 与 install 路径**同一**中文错误与处置建议（同一份实现、同一套语义）。
-        assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
-        assert "安装已中止" in message
-        assert "PermissionError" in message or "另一个程序正在使用此文件" in message
-        assert "重试" in message
-        assert str(sources_pdf.parent) in message
-
-        # 1) 没有成功审计（这正是“不得记录成功”的断言）。
+        # 1) 对账照常完成：决策仍然是 NOOP（与 install 路径同一份 warn-only 实现）。
+        assert outcome.action is ReconciliationAction.NOOP
+        assert outcome.executed is False
+        warnings = [
+            record.getMessage()
+            for record in caplog.records
+            if record.name == "uebench.infrastructure.packages"
+            and record.levelno == logging.WARNING
+            and "无法删除旧版本遗留在用户数据目录中的标准原文" in record.getMessage()
+        ]
+        assert warnings, [record.getMessage() for record in caplog.records]
+        assert "仅记录警告" in warnings[0]
+        assert "下次启动会自动重试" in warnings[0]
+        assert str(sources_pdf.parent) in warnings[0]
+        # 2) 没有成功审计（这正是“不得记录成功”的断言）。
         assert legacy_cleanup_rows(context) == []
-        # 2) 没有新备份，也没有新安装。
+        # 3) 没有新备份，也没有新安装。
         assert backup_names(context) == backups_before
         assert [
             entry.package_id for entry in context.application.list_package_history(5)
         ] == history_before
         assert install_audit_rows(context) == 1
-        # 3) 被占用的原文仍在原位、逐字节未变，其所在目录也未被删掉
+        # 4) 被占用的原文仍在原位、逐字节未变，其所在目录也未被删掉
         #    （删除失败的目标就是 ``sources`` 目录本身，rmtree 非 ignore_errors）。
         assert sources_pdf.is_file() and sources_pdf.read_bytes() == locked_bytes
         assert (package_directory / "sources").is_dir()
         #    失败并非「什么都没尝试」：未被占用的平铺 PDF 确实已被删除。
         assert not flat_pdf.exists()
-        # 4) 数据库与业务状态可用：仍能正常读取已安装标准与包历史。
+        # 5) 数据库与业务状态可用：仍能正常读取已安装标准与包历史。
         assert context.standards.get_published(library.definition.id) is not None
         assert context.application.list_package_history(5)[0].package_id == library.package_id
 
@@ -1454,6 +1480,40 @@ def test_locked_legacy_pdf_aborts_reconciliation_fail_closed(tmp_path: Path) -> 
         assert outcome.action is ReconciliationAction.NOOP
         assert standards_pdfs(context) == []
         assert_cleanup_audit_matches(context, directories=1, files=2, flat=0)
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_reconciliation_survives_an_unexpected_cleanup_gate_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """兜底护栏：清理闸门意外抛异常时也只记 WARNING，绝不阻断启动对账。
+
+    真实实现是 warn-only（删不掉就返回实测计数），但诊断性清理永远不该成为启动的
+    单点故障：应用层在这里再兜一层。
+    """
+    library, context, directory = synthetic_bundled_ready_context(tmp_path)
+    try:
+        def exploding_cleanup(self):
+            raise RuntimeError("模拟清理闸门内部故障")
+
+        monkeypatch.setattr(
+            type(context.package_service), "cleanup_legacy_sources", exploding_cleanup
+        )
+
+        with caplog.at_level(logging.WARNING, logger="uebench.application.package_reconciliation"):
+            outcome = reconcile_standard_package(context, directory)
+
+        assert outcome.action is ReconciliationAction.NOOP
+        assert outcome.executed is False
+        assert any(
+            record.levelno == logging.WARNING and "旧版本标准原文清理未能执行" in record.getMessage()
+            for record in caplog.records
+        ), [record.getMessage() for record in caplog.records]
+        # 业务状态照常可用。
+        assert context.standards.get_published(library.definition.id) is not None
+        assert len(context.application.list_package_history(5)) == 1
     finally:
         context.database.dispose()
         close_logging()

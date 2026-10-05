@@ -6,7 +6,7 @@
 ``paths.standards/<package_id>/``，于是「安装产品自带的标准包」就会在用户数据目录
 留下全套标准 PDF；旧版本已经写下的那些目录还会被安全备份一起带上。
 
-新契约（fail-closed）：
+新契约（warn-only + 用户数据范围的安全备份）：
 
 * 任何包（含仍携带 ``sources/*`` 的旧包）安装时都**不再**把原文写入用户数据目录；
 * 安装前先检测并删除旧版本在产品数据目录下创建的原文，范围严格限定为
@@ -14,13 +14,14 @@
   ``paths.standards/<package_id>/*.pdf``（不跟随符号链接 / junction、不越出
   ``standards/``）；
 * 删除之后必须**重新扫描确认目标确实消失**，只有确认后才写成功审计；
-* 确认失败（占用 / 权限 / 删除失败 / 目标仍在）时**中止安装**：不写成功审计、
-  不产生携带旧 PDF 的新备份、不改数据库、不留半安装目录，并抛出中文错误；
-* 清理发生在**迁移前安全备份之前**，所以该次安装留下的
-  ``pre-package-*.uebackup`` 里同样没有 PDF；
+* 确认失败（占用 / 权限 / 删除失败 / 目标仍在）时**只记 WARNING 并继续**：不写成功
+  审计、不抛异常、不中断安装；被占用的文件逐字节留在原位，数据库与业务数据完好，
+  下一次启动自动重试；
+* 安装的安全备份是 **user-data 范围**（只含数据库）——因此即便清理没能删掉某个被
+  占用的 PDF，``pre-package-*.uebackup`` 也不可能携带任何标准原文或应用数据；
 * 清理既写日志（``logging.getLogger(__name__)``）又写审计行。
 
-旧版两种历史布局（平铺 / ``sources/`` / 两者同时）的完整矩阵、fail-closed 的
+旧版两种历史布局（平铺 / ``sources/`` / 两者同时）的完整矩阵、warn-only 的
 Windows 真实占用用例、以及合成夹具见 ``test_package_legacy_layouts.py``。
 
 阻塞项 #3（安全备份不得被静默覆盖）
@@ -398,28 +399,27 @@ def test_upgrade_of_legacy_data_directory_removes_installed_pdfs(
     assert details["verified"] is True
     assert rows[0].entity_type == "standard_package"
 
-    # 备份证据：本次安装新增的 pre-package 备份里同样 0 个 PDF。
+    # 备份证据：本次安装新增的安全备份只含用户业务数据（数据库），因此既没有
+    # PDF，也没有任何可重建的应用数据（旧的 ``standards/`` 整棵树不再进备份）。
     new_backups = backup_names(paths) - backups_before
     assert len(new_backups) == 1
     assert Path(result.backup_path).name in new_backups
     backup = paths.backups / next(iter(new_backups))
     backup_members = archive_names(backup)
-    assert backup_members, backup_members
+    assert sorted(backup_members) == ["manifest.json", "uebench.sqlite3"], backup_members
+    with zipfile.ZipFile(backup) as archive:
+        assert json.loads(archive.read("manifest.json"))["scope"] == "user-data"
     assert [name for name in backup_members if name.lower().endswith(".pdf")] == [], (
         f"本次安装的安全备份仍包含 PDF：{backup_members}"
     )
-    # 备份里连旧包的 versions/sources 目录都不应存在。
+    # 备份里连旧包的 versions/sources 目录、非原文残留与安装目录都不应存在。
     assert not [name for name in backup_members if name.endswith("/sources/")]
     assert not [
         name
         for name in backup_members
         if Path(name).name == "note.txt" or name.endswith(".legacy.pdf")
     ], f"本次安装的安全备份仍包含旧版原文目录内容：{backup_members}"
-    # 备份里必须有该包安装目录（只是里面不再有 sources/）。
-    assert any(
-        name.endswith("corrections.json") and first.package_id in name
-        for name in backup_members
-    ), backup_members
+    assert not [name for name in backup_members if name.startswith("standards/")], backup_members
 
 
 def test_upgrade_removes_flat_legacy_pdfs_too(
@@ -459,12 +459,13 @@ def test_upgrade_removes_flat_legacy_pdfs_too(
     details = json.loads(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)[0].details_json)
     assert details["flat_files_removed"] == 3
     assert details["directories_removed"] == 0
-    # 备份在清理之后：打开备份，里面没有 PDF。
+    # 备份只含用户业务数据：没有 PDF，也没有任何 standards/ 成员。
     new_backups = backup_names(paths) - backups_before
     assert len(new_backups) == 1
     members = archive_names(paths.backups / next(iter(new_backups)))
     assert [name for name in members if name.lower().endswith(".pdf")] == [], members
-    assert any(name.endswith("corrections.json") for name in members), members
+    assert [name for name in members if name.startswith("standards/")] == [], members
+    assert sorted(members) == ["manifest.json", "uebench.sqlite3"], members
 
 
 def test_cleanup_scope_never_touches_user_documents(tmp_path: Path) -> None:
@@ -585,12 +586,12 @@ def test_cleanup_legacy_sources_port_method_reports_real_counts_and_is_idempoten
     assert len(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)) == 1
 
 
-def test_cleanup_legacy_sources_port_method_is_fail_closed_when_it_cannot_delete(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+def test_cleanup_legacy_sources_port_method_is_warn_only_when_it_cannot_delete(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """§五 端口方法的 fail-closed：删不掉就中止，绝不写成功审计。
+    """§五 端口方法的 warn-only：删不掉只记 WARNING，绝不写成功审计、绝不抛异常。
 
-    与 ``test_cleanup_keeps_retrying_then_aborts_when_target_never_disappears``
+    与 ``test_cleanup_keeps_retrying_and_warns_when_target_never_disappears``
     同一套做法（在删除动作这一层注入永久失败，因此跨平台可复现），但驱动的是
     **端口方法本身**——也就是启动/对账路径真正调用的那一个入口。
     """
@@ -625,19 +626,74 @@ def test_cleanup_legacy_sources_port_method_is_fail_closed_when_it_cannot_delete
     monkeypatch.setattr(StandardPackageService, "_delete_legacy_targets", staticmethod(never_deletes))
     monkeypatch.setattr(StandardPackageService, "LEGACY_CLEANUP_RETRY_DELAY", 0.0)
 
-    with pytest.raises(StandardPackageError) as failure:
-        service.cleanup_legacy_sources()
+    with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+        removed = service.cleanup_legacy_sources()
 
+    # 重试到上限后放弃清理 —— 但只警告，不抛异常，也不假装删掉了。
     assert len(attempts) == StandardPackageService.LEGACY_CLEANUP_ATTEMPTS, attempts
-    message = str(failure.value)
-    assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
-    assert "安装已中止" in message and "PermissionError" in message
-    assert "模拟永久占用" in message
+    assert removed == (0, 0, 0), removed
+    warnings = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "uebench.infrastructure.packages"
+        and record.levelno == logging.WARNING
+        and "无法删除旧版本遗留在用户数据目录中的标准原文" in record.getMessage()
+    ]
+    assert warnings, [record.getMessage() for record in caplog.records]
+    assert "仅记录警告" in warnings[0] and "下次启动会自动重试" in warnings[0]
+    assert "PermissionError" in warnings[0] and "模拟永久占用" in warnings[0]
+    assert str(paths.standards.resolve()) in warnings[0]
     # 无成功审计、数据库完好、目标仍在（而不是"装作删掉了"）。
     assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
     assert database.path.exists()
     assert [entry.package_id for entry in service.list_history(50)] == [first.package_id]
     assert target.is_file() and target.read_bytes() == payload
+
+    # 下一次启动（同一入口）会重试：仍然失败，仍然只警告、仍然不写成功审计。
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+        assert service.cleanup_legacy_sources() == (0, 0, 0)
+    assert len(attempts) == 2 * StandardPackageService.LEGACY_CLEANUP_ATTEMPTS, attempts
+    assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+    assert target.is_file() and target.read_bytes() == payload
+
+
+def test_cleanup_scan_failure_is_warn_only_and_does_not_block_install(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """兜底：连**扫描**都失败（权限 / 过滤驱动）时同样只警告，安装照常完成。"""
+    private_key = Ed25519PrivateKey.generate()
+    paths, database, _standards, audit, service = make_service(tmp_path, private_key)
+
+    def exploding_scan(self):
+        raise PermissionError(13, "模拟扫描被拒绝", str(paths.standards))
+
+    monkeypatch.setattr(
+        StandardPackageService, "_scan_legacy_targets", exploding_scan
+    )
+
+    with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+        assert service.cleanup_legacy_sources() == (0, 0, 0)
+    assert any(
+        record.levelno == logging.WARNING and "旧版本标准原文清理无法执行" in record.getMessage()
+        for record in caplog.records
+    ), [record.getMessage() for record in caplog.records]
+
+    caplog.clear()
+    package = build_provenance_only_package(
+        tmp_path,
+        private_key,
+        package_id="scan-failure-proceeds",
+        data_version="2026.10-published.16",
+    )
+    with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+        result = service.install(package)
+
+    assert result.package_id == "scan-failure-proceeds"
+    assert result.removed_source_directory_count == 0
+    assert (paths.standards / "scan-failure-proceeds" / "corrections.json").is_file()
+    assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+    assert database.path.exists()
 
 
 # ---------------------------------------------------------------------------
@@ -678,11 +734,11 @@ def test_business_data_survives_the_upgrade_and_cleanup(tmp_path: Path) -> None:
         assert not (legacy_directory / "sources").exists()
         # 非原文内容原样保留。
         assert keep_note.read_text(encoding="utf-8") == "用户自己的说明"
-        # 本次安装的安全备份在清理之后：里面没有 PDF。
+        # 本次安装的安全备份只含用户业务数据（数据库）：没有 PDF，也没有应用数据。
         new_backups = backup_names(context.paths) - backups_before
         assert len(new_backups) == 1
         members = archive_names(context.paths.backups / next(iter(new_backups)))
-        assert [name for name in members if name.lower().endswith(".pdf")] == [], members
+        assert sorted(members) == ["manifest.json", "uebench.sqlite3"], members
         # 安装目录只落非原文产物。
         destination = context.paths.standards / first.package_id
         assert sorted(path.name for path in destination.iterdir()) == ["corrections.json"]
@@ -716,6 +772,134 @@ def test_business_data_survives_the_upgrade_and_cleanup(tmp_path: Path) -> None:
         assert [entry.package_id for entry in context.application.list_package_history(5)] == [
             first.package_id
         ]
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
+def test_undeletable_legacy_pdf_never_blocks_install_startup_or_evaluation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """warn-only 端到端：旧版原文永远删不掉时，安装 / 启动 / 评价 / 保存照常。
+
+    真实 GB 29446-2019 + 仓库内固定正式包 + 真实产品公钥。删除动作被注入为
+    「永久失败且目标一直复活」（跨平台可复现，等价于 Windows 上被 PDF 阅读器 /
+    同步盘 / 杀毒软件长期占用的文件）：
+
+    * 安装照常完成，正式规则照常落库；
+    * 正式评价与保存照常可用；
+    * 下一次启动的对账照常，不被清理失败阻断（并且会再次重试清理）；
+    * 但**绝不写成功审计**，被占用的 PDF 逐字节留在原位；
+    * 本次安装的安全备份只含数据库 —— 删不掉的 PDF 不可能进入备份。
+    """
+    from uebench.application.package_reconciliation import (
+        PackageReconciliationService,
+        ReconciliationAction,
+    )
+    from uebench.bootstrap import create_context
+    from uebench.infrastructure.packages import _data_version_key
+
+    require_bundled_package()
+    context = create_context(tmp_path / "appdata", public_key_path=PUBLIC_KEY)
+    try:
+        legacy_directory = context.paths.standards / "legacy-package-from-old-version"
+        materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_BOTH, pdf_count=1)
+        sources = legacy_directory / "sources"
+        locked_pdf = sorted(sources.glob("*.pdf"))[0]
+        locked_bytes = locked_pdf.read_bytes()
+        audit = AuditRepository(context.database)
+
+        attempts: list[int] = []
+        real_rmtree = shutil.rmtree
+        real_remove = os.remove
+
+        def never_deletes(directories, flat_files):
+            for directory in directories:
+                if directory.exists():
+                    real_rmtree(directory)
+            for path in flat_files:
+                if path.exists():
+                    real_remove(path)
+            attempts.append(1)
+            sources.mkdir(parents=True, exist_ok=True)
+            locked_pdf.write_bytes(locked_bytes)
+            return [(sources, f"PermissionError: 模拟永久占用：{locked_pdf}")]
+
+        monkeypatch.setattr(
+            StandardPackageService, "_delete_legacy_targets", staticmethod(never_deletes)
+        )
+        monkeypatch.setattr(StandardPackageService, "LEGACY_CLEANUP_RETRY_DELAY", 0.0)
+
+        backups_before = backup_names(context.paths)
+        with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+            first = context.package_service.install(BUNDLED_PACKAGE)
+
+        # 1) 安装照常完成：正式规则落库、包历史写入。
+        assert first.standards_installed > 0
+        assert context.application.get_published_standard(GB29446_ID) is not None
+        assert [entry.package_id for entry in context.application.list_package_history(5)] == [
+            first.package_id
+        ]
+        # 2) 清理被真的尝试过（重试到上限），但只警告：没有成功审计。
+        assert len(attempts) == StandardPackageService.LEGACY_CLEANUP_ATTEMPTS, attempts
+        assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+        warnings = [
+            record.getMessage()
+            for record in caplog.records
+            if record.name == "uebench.infrastructure.packages"
+            and record.levelno == logging.WARNING
+            and "无法删除旧版本遗留在用户数据目录中的标准原文" in record.getMessage()
+        ]
+        assert warnings, [record.getMessage() for record in caplog.records]
+        assert "仅记录警告" in warnings[0]
+        # 3) 被占用的 PDF 逐字节留在原位。
+        assert locked_pdf.is_file() and locked_pdf.read_bytes() == locked_bytes
+        # 4) 本次安装的安全备份只含数据库：删不掉的 PDF 不可能进入备份。
+        new_backups = backup_names(context.paths) - backups_before
+        assert len(new_backups) == 1
+        members = archive_names(context.paths.backups / next(iter(new_backups)))
+        assert sorted(members) == ["manifest.json", "uebench.sqlite3"], members
+        # 5) 正式评价与保存照常（清理失败不得阻断业务）。
+        request = EvaluationRequest(
+            evaluation_date=date(2026, 9, 26),
+            standard_id=GB29446_ID,
+            product_id=GB29446_PRODUCT,
+            selection_mode=StandardSelectionMode.CURRENT,
+            input_mode=InputMode.DIRECT,
+            inputs={GB29446_DIRECT_INPUT_KEY: InputValue(value="5.0", unit="kW·h/t")},
+            organization_name="清理失败回归企业",
+        )
+        evaluation = context.application.evaluate(request)
+        loaded = context.application.get_evaluation(evaluation.evaluation_id)
+        assert loaded is not None
+        assert context.application.count_evaluations() == 1
+        # 6) 下一次启动/对账同样不被阻断：决策照常（内置包已安装 → NOOP），清理再次重试。
+        attempts_before_reconcile = len(attempts)
+        outcome = PackageReconciliationService(
+            context.package_service, data_version_key=_data_version_key
+        ).reconcile(BUNDLED_PACKAGE.parent)
+        assert outcome.action is ReconciliationAction.NOOP
+        assert len(attempts) == attempts_before_reconcile + (
+            StandardPackageService.LEGACY_CLEANUP_ATTEMPTS
+        ), attempts
+        assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+        assert locked_pdf.is_file() and locked_pdf.read_bytes() == locked_bytes
+        # 业务数据在整条路径上都没有被改动。
+        assert context.application.count_evaluations() == 1
+        assert context.application.get_evaluation(evaluation.evaluation_id) is not None
+
+        # 7) 占用一旦消失，下一次启动就真的清理成功并写入真实计数的审计。
+        monkeypatch.undo()
+        removed = context.package_service.cleanup_legacy_sources()
+        assert removed[0] == 1, removed
+        assert pdf_files(context.paths.standards) == []
+        details = json.loads(audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED)[0].details_json)
+        assert details["directories_removed"] == removed[0]
+        assert details["files_removed"] == removed[1]
+        assert details["flat_files_removed"] == removed[2]
+        assert details["verified"] is True
     finally:
         context.database.dispose()
         close_logging()

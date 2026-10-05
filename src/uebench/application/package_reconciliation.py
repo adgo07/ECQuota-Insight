@@ -43,9 +43,11 @@ revision 2）。
   所在：``install`` 只在 INSTALL/UPGRADE 时被调用，所以「从老备份恢复 → 恢复回来的
   ``sources/*`` PDF → 内置包与已安装包完全相同 → NOOP」会让清理永远不执行。
   闸门与 ``install`` 内部调用的是**同一份**检测/删除/复验代码（应用层只经端口访问，
-  不导入 infrastructure），因此清理失败时的语义完全一致：抛出中文
-  ``StandardPackageError``、不写成功审计、不新增备份、数据库与业务状态可用且未半升级；
-  没有旧版原文时不写审计、返回全零，因此可重复调用。
+  不导入 infrastructure），而且语义是 **warn-only**：清理成功时写日志 + 真实计数的
+  成功审计；删不掉（占用 / 权限 / 任何残留）时只记 WARNING 并继续，不写成功审计、
+  不阻断启动、对账、安装、正式评价或保存，下次启动自动重试。对账端还额外兜底：
+  即使端口方法意外抛异常，也只记 WARNING，绝不阻断启动。没有旧版原文时不写审计、
+  返回全零，因此可重复调用。
 
 分层与依赖注入（重要）::
 
@@ -501,13 +503,18 @@ class PackageReconciliationService:
         NOOP and the cleanup would otherwise never happen.  Running it first
         makes every normal startup pass the gate regardless of the decision.
 
-        Ordering is fail-closed:
+        Ordering and failure semantics:
 
-        * the gate is the first thing this method does; a cleanup that cannot be
-          verified raises the Chinese ``StandardPackageError`` out of
-          ``reconcile`` **before** any discovery/decision/install work and before
-          ``_last_outcome`` is touched, so no success audit is written and the
-          database/business state stays usable and not half-upgraded;
+        * the gate is the first thing this method does;
+        * the gate is **warn-only** (owner decision): a legacy PDF that cannot be
+          deleted — Windows lock, permission, residue — logs a WARNING and
+          returns the counts the re-scan proved removed.  It never raises, so it
+          can never block startup, the decision below, an install, a formal
+          evaluation or a save, and the next startup simply retries;
+        * this method adds one more safety net: should the port call fail for
+          any *other* reason (an adapter raising), the exception is logged as a
+          WARNING and reconciliation continues — a diagnostic cleanup must never
+          keep the product from starting;
         * the gate is idempotent (nothing to clean → no audit row, ``(0, 0, 0)``),
           so by the time a decision of INSTALL/UPGRADE reaches ``install`` its own
           cleanup is a no-op and the install path records no second audit row;
@@ -530,7 +537,17 @@ class PackageReconciliationService:
             )
         else:
             # §五 cleanup gate: every startup/reconciliation, whatever the decision.
-            self._packages.cleanup_legacy_sources()
+            # Warn-only: it never raises for a deletion failure, and any other
+            # adapter failure is caught here so the product still starts.
+            try:
+                self._packages.cleanup_legacy_sources()
+            except Exception as exc:  # noqa: BLE001 - a cleanup failure must never block startup
+                logger.warning(
+                    "旧版本标准原文清理未能执行（%s: %s），本次仅记录警告并继续对账；"
+                    "现有数据库与业务数据不受影响，下次启动会重试。",
+                    type(exc).__name__,
+                    exc,
+                )
             bundled = self.discover_bundled_package(Path(directory))
             installed = self.installed_identity()
             outcome = decide(installed, bundled, data_version_key=self._data_version_key)

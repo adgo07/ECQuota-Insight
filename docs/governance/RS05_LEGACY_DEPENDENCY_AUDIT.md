@@ -437,3 +437,96 @@ G:\ECQuota-Archive\ECQ-RS05-LEGACY-REFERENCE-ONLY\
 - `G:\ECQuota-Archive` 只被读取（`LEGACY-ARCHIVE.json` 与文件列表），未被写入或改变；
 - 归档模拟在 `G:\tmp\ecq-legacy-audit\` 下的独立副本中进行，副本与 `--basetemp` 均在审计结束后删除；
 - 未执行 `git add` / `git commit` / `git push`。
+
+## 10. 执行记录（Executed Removals，Phase 7 收口轮）
+
+> 本节由 Phase 7「移除历史负担」执行轮**追加**。第 1–9 节的审计结论未被改写。
+> 执行基线：`feat/ecq-rs05-windows-v1-release` head `b4dee1340efabff5a85b9ec583828b13863eb3e0`。
+> 未改写 Git 历史；`G:\ECQuota-Archive` 保持只读未被改动；未提交、未推送。
+
+### 10.1 已删除（每项附「当前实现已覆盖同一职责」的证据）
+
+| 审计项 | 删除对象 | 覆盖证据（实测） |
+|---|---|---|
+| LEG-014 | `tools/build_initial_package.py`（110 行） | `git grep -I "build_initial_package"` 去除审计文本后**零命中**（仅 `tests/test_release_version_consistency.py:20` 的一句 docstring 曾引用，本次已同步改为只列现存工具）。包构建职责由 `src/uebench/infrastructure/packages.py::StandardPackageBuilder` + `tools/build_gb29446_package_revision.py` 承担，由 `tests/test_standard_package_revision.py:151-210` 与 `tests/test_release_source.py:311-360` 覆盖。 |
+| LEG-043 | `tools/build_release_workbooks.mjs`（332 行） | 除自身外零引用（`git grep` 实测）。它 import 的 `@oai/artifact-tool` **不在本仓依赖内**，默认输出 `dist/release`；0.2.0 只交付 GB29446 导入模板，由 `tools/build_release_templates.py` 经真实 `WorkbookTemplateService` 生成（`scripts/build_candidate.ps1:266-271`、`packaging/installer.iss:76-79`）。 |
+| （同类） | `tools/build_unified_merge_report.mjs`（15 行） | 零引用；同样 import 不可用的 `@oai/artifact-tool`，并写 `work/workbooks-after-29141`（未跟踪草稿目录）。 |
+| LEG-049 | `tests/conftest.py:10-32` 的 xfail-strict 收集钩子 + `tests/test_gb29446.py` 中**唯一**被它标记的 2 个用例（2 个函数共 6 个 parametrize 实例，其中 4 个实例为 xfail） | 见 10.2 专项说明。 |
+| LEG-015 | `tools/capture_ui.py:28` 的 `dist/standard-packages/` 回退默认值 | 改为指向唯一正式标准包 `release/standard-packages/initial-standard-package-published.uebench`（`tests/test_release_source.py:271-308` 钉住其哈希）。原默认目录为空且已废弃。 |
+
+### 10.2 LEG-049 专项：为什么这 6 例可以删
+
+- 实测（head `b4dee13`）：`pytest tests/test_gb29446.py -rxX` → **53 passed, 4 xfailed**；4 个 xfail 实例全部落在 `test_gb29446_grade_threshold_comparisons_round_both_values_to_six_places[5.0000004|8.5000004]` 与 `test_detail_formula_grade_trace_shows_six_place_comparison[...]`，即 `tests/conftest.py` 钩子是其**唯一**作用点；被删的两个函数共含 **6 个 parametrize 实例**，其中另外 2 个（`5.0000005` / `8.5000005`）与「六位修约」无关、本来**通过**，属于同一函数的正常边界参数，随函数一并移除（边界本身仍被 `THRESHOLDS` 参数化用例 `test_each_coal_grade_boundaries_include_threshold_and_values_on_both_sides` 覆盖）。`git grep "5.0000004\|8.5000004"` 确认再无其它用例被该钩子选中。
+- 这两个函数断言的是「比较前做六位 ROUND」这一**已被 Numeric v1 废除**的契约，`xfail(strict=True)` 证明它们不可能变绿——它们从不执行任何产品行为，只贡献 4 行 `x`。
+- 同一职责的现行覆盖（全部实测通过，84 passed）：
+  1. `tests/pilots/numeric/qzc_n01_a_vectors.json` 的 `boundary_vectors` 含 `coking-l1-plus=5.0000004`（legacy `LEVEL_1` → new `LEVEL_2`）与 `coking-l3-plus=8.5000004`（legacy `LEVEL_3` → new `NOT_QUALIFIED`），由 `tests/pilots/numeric/test_qzc_n01_a.py:65-83` 真实执行，并**额外**断言 `all("ROUND(" not in step.expression)` 与 `GB29446_NUMERIC_BEHAVIOR_VERSION in step.expression`——比被删用例更强。
+  2. `tests/pilots/numeric/test_qzc_n01_a.py:148-175`（e2e 向量 `coking-detail-just-above-l1`）以 `electricity=50.000004 / raw_coal=10` 覆盖 DETAIL 公式路径，断言 `"5.0000004 <= 5"` / `"5.0000004 <= 7"` 与 `ROUND(` 不存在——替代被删用例中 `5.000000 <= 5.000000` 的陈旧期望。
+  3. `tests/conformance/numeric/test_ecquota_numeric_v1.py:167-193` 冻结向量 `ecq-public-grade-round6-break` / `ecq-gb29446-break-*`。
+  4. GB29446 Product Golden `full-value trap`（`tests/golden/gb29446_product_golden_v1.json:368-387`，`test_gb29446_product_golden.py:558`）。
+- **先在 `G:\tmp` 的一次性 git worktree（detached `b4dee13`，用完已删除/已 prune）里做了离线实验**：删除 conftest 钩子 + 两个用例后 `tests/test_gb29446.py` 51 passed / 0 failed / 0 error，再合并到工作树。
+- 删除后 `tests/test_gb29446.py` 由 53 passed + 4 xfailed 变为 **51 passed / 0 skipped / 0 xfail**；`Decimal` / `pytest` / `InputMode` 等被删用例用到的符号仍被该文件其余用例使用，无残留未用 import，`compileall` 通过。**结果是全量套件里的长期 xfail 归零，而不是隐藏失败。**
+
+### 10.3 参数化（未删除，按审计风险 6 修复）
+
+`tools/windows_runtime_evidence.py` 保留（「Windows 验收证据不完整」仍 OPEN），完成两项修复：
+
+1. **路径参数化**：`ROOT` 不再硬编码 `G:\Python Project\能耗限额`，改为按脚本自身位置推导（`Path(__file__).resolve().parents[1]`），并可用 `--root` / `UEBENCH_EVIDENCE_ROOT` 覆盖；`EXE` 可用 `--exe` / `UEBENCH_EVIDENCE_EXE`，包可用 `UEBENCH_EVIDENCE_PACKAGE`，工作目录可用 `UEBENCH_EVIDENCE_WORK`。`git grep "G:\\\\Python Project" -- tools tests` 现为**零命中**。
+2. **归档惰性化**：模块导入时不再复制归档包（原 `:46 LEGACY_PACKAGE = _legacy_package_copy()` 已移除）。归档只在 `run_part_b()` 内按需读取；新增 `--part {a,b,both}`，`--part a` 可在**完全没有归档**的机器上跑完。另加 `ECQ_LEGACY_ARCHIVE` 覆盖归档根。
+   实测：把 `ECQ_LEGACY_ARCHIVE` 指向不存在路径后，模块**导入成功**，`legacy_package_copy()` 仍按预期 `SystemExit`（且**只在 Part B 请求时**抛出，错误信息提示 `--part a` 可用）。
+
+### 10.4 LEG-057 处置与 `scope-65` 决定
+
+- `tests/test_evaluation_support.py:27` 的 `DEFINITIONS` 已由 `standards/development/scope-65/definitions` 改为 **`data/definitions`**。
+  依据：`standards/development/manifest.json` 明示 `"formal_runtime_source": "data"`、`"canonical_scope": "scope-63"`、`"legacy_scopes": ["scope-65"]`；`data/definitions` 48 项**全部 `published`**，与 `README.md`「正式软件仍只读取项目根目录 `data` 中已发布的规则」一致，也正是「已安装标准库」的真实内容。顺带把 `len(definitions) > 1` 收紧为 `== 48`，防止该 Gate 在数据源退化时静默通过。
+- **`scope-65` 本轮保留为 `REFERENCE_ONLY`，不删除。** 理由（与审计第 5 节风险 5 的差异，需明确）：
+  1. 审计对 LEG-057/058/061 的分类是 `REFERENCE_ONLY`，定义是「历史证据，应留在活动仓库之外的只读归档区」——这属于**移出**动作，而本轮任务明确「不要在本轮删除被跟踪的标准快照」；
+  2. `scope-65` 仍被 8 处**活**引用，其中 5 处是**正向不变量/对照断言**，删掉它们会直接丢覆盖：`tests/test_next_scope_65.py:12`（65 项范围与发布/草案计数 46+19）、`tests/test_snapshot_merge.py:12,23-37`（canonical/legacy 根路径与「scope-63 内不得出现 scope-65.json 别名」）、`tests/test_version_identity.py:38`（`legacy_only ⊆ 替代关系 keys`）、`tools/compare_development_snapshots.py:173`（`--legacy` 默认值）、`tools/build_development_manifest.py:138`（`comparison_snapshots`）、`tools/normalize_standard_identity.py:21`、`tools/verify_scope.py:94`；
+  3. 因此本轮的正确动作是**消除「用历史快照当现行数据」这处语义错位**（已做），而不是删除快照本身。
+- 若后续确实要清掉这 71 个被跟踪文件，建议顺序是：先把 `snapshot-comparison.json` 已固化的对照结论与 4 项旧版标准的替代关系抽成**仓内最小夹具**，再改上述 5 处正向断言，最后才移出归档——否则会重演「删快照 → 连带删断言 → 覆盖静默丢失」。
+
+### 10.5 本轮明确**未**处置（留待归属方，避免跨工作流冲突）
+
+| 审计项 | 原因 |
+|---|---|
+| LEG-006 `tests/_legacy_assets.py::session_user_library()` | 该文件归属兄弟工作流（本轮任务显式列为「不修改」）。已独立复核「零调用者」成立：`git grep "session_user_library"` 仅命中定义处与该文件 docstring、`LEGACY-REFERENCE.json` 的指针条目。删除前需确认兄弟工作流不再扩写该模块。 |
+| LEG-050 `tests/test_standard_package_revision.py:151-156` | 同属兄弟工作流文件。审计判断成立（Source Gate `tests/test_release_source.py:300-308` 断言同一 `size`/`sha256`）；但该文件的 `:117-143` 卫生不变量与 `:167-210`（无 sources/PDF、GB29446 r2 + `coal_type`、真实 Ed25519 验签）**必须保留**，删除时只能摘掉 `:151-156` 中重复的 size/hash 两行及 `PINNED_SHA256` 常量，不得动其余断言。 |
+| LEG-046 `tests/test_package_reconciliation.py:44` 陈旧注释（`2026.10-published.3`，实际 `.4`） | 同属兄弟工作流文件，本轮不得编辑。当前固定包版本由 `release/standard-packages/PIN.json`（`data_version=2026.10-published.4`）与 `tests/test_standard_package_revision.py:158-164` 钉住，注释不承载机器语义。 |
+| LEG-016/033 `tools/publish_confirmed_rules.py:78` 默认输出 `dist/standard-packages/...` | 该工具是 `ACTIVE` legacy publication gate（`tests/test_confirmation_tools.py:11` 直接 import 它的 `validate_confirmation`）。本轮的 `capture_ui.py` 改动只涉及**读取**回退，失败即降级为「不安装包」，安全；而本项是**写入**路径，且 `--apply` 会重签包，改默认值是行为变更，超出「移除历史负担」的最小必要范围。建议单独立项：把默认值改为 `release/standard-packages/initial-standard-package-published.uebench`，并同步 `tests/test_confirmation_tools.py` 的期望。 |
+
+### 10.6 本轮未新增未注册 marker
+
+`pyproject.toml` 为 `addopts = "-q --strict-markers"`，且**没有**注册任何自定义 marker。因此本轮**没有**引入 `@pytest.mark.evidence` 之类的新 marker（否则会因 `--strict-markers` 直接收集失败）；也未对任何用例添加 `skip` / `xfail` / `deselect` 来掩盖真实失败。
+
+### 10.7 验证记录（本轮实测）
+
+```text
+pytest tests/test_development_tool_defaults.py tests/test_document_hygiene.py \
+       tests/test_evaluation_support.py tests/test_release_source.py \
+       tests/test_release_artifacts.py tests/test_architecture_boundaries.py \
+       -ra --junit-xml G:\tmp\w2.xml --basetemp G:\tmp\w2bt
+-> 56 passed, 65 skipped, 0 failed, 0 error (exit 0)
+   （65 skip = test_release_artifacts.py 因未设置 UEBENCH_ARTIFACT_DIR，设计如此）
+
+pytest tests/test_gb29446.py tests/pilots/numeric/test_qzc_n01_a.py \
+       tests/conformance/numeric/test_ecquota_numeric_v1.py \
+       tests/test_gb29446_product_golden.py
+-> 135 passed, 0 failed（删除前该组为 139 collected / 53+4xfail + 84 passed）
+
+pytest tests/test_release_version_consistency.py tests/test_source_zip.py \
+       tests/test_confirmation_tools.py tests/test_next_scope_65.py \
+       tests/test_development_library.py tests/test_document_hygiene.py
+-> 88 passed
+pytest tests/test_release_tools_console.py -> 11 passed
+python -m compileall -q tools src tests -> exit 0
+```
+
+`scripts/` 与 `.github/` 本轮**未**修改，也**不需要**修改：`git grep` 确认被删的 3 个工具在 `.github/`、`scripts/`、`packaging/`、`pyproject.toml`、`uebench.spec` 中**零引用**；`tests/test_release_tools_console.py` 与 `tests/test_release_version_consistency.py` 都是**动态**扫描 `tools/**/*.py`，不维护硬编码文件清单。
+
+## §11 与「fail-closed」相关的建议已被 Owner 决策取代
+
+本审计 §3/§4 中关于「legacy PDF 删除失败必须中止对账（fail-closed）」的建议**已作废**：
+Owner 在最终收尾轮明确 legacy PDF 删除失败属**「提醒但不阻塞」**，现行实现为 **warn-only**
+（只记 WARNING、不写成功审计、下次启动重试，且不阻塞启动/对账/安装/正式评价/保存）。
+同样，「安全备份包含整个 standards 目录」也已被取代：安全备份现为 **user-data only**
+（仅数据库快照），完整环境备份改为**显式**的用户操作。
+详见 `RS05_EXECUTION_REPORT.md` 的「Phase 7 Final Simplification」一节。

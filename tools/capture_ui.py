@@ -25,7 +25,9 @@ def main() -> None:
     package = Path(
         os.environ.get(
             "UEBENCH_CAPTURE_PACKAGE",
-            "dist/standard-packages/initial-standard-package-published.uebench",
+            # The single formal standard package; the retired
+            # ``dist/standard-packages/`` staging directory is no longer used.
+            "release/standard-packages/initial-standard-package-published.uebench",
         )
     ).resolve()
     if not context.standards.list_all() and context.package_service is not None and package.exists():

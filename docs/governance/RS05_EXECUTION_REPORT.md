@@ -994,3 +994,44 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
 `Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
 `ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。
+
+## Phase 7 Final Simplification（本轮）—— 语义收敛与简化
+
+> 追加记录。**本节取代上文关于 fail-closed 清理与"整目录备份"的描述**；独立验收对象仍为 Base `fb91ccc6…` → 本轮 final Head。
+
+### §二 Backup 语义收敛：安全备份只负责用户业务数据
+
+新增 `BackupScope`：
+
+- `USER_DATA`（默认，`BackupService.create`）→ **只写数据库快照**；预迁移（`database.py`）、预安装（`packages.py`）、预恢复（`restore`）**全部使用该默认值** —— **未做任何启动顺序调整**（迁移仍在 package reconciliation 之前）。
+- `FULL_ENVIRONMENT`（`create_full_environment`）→ 额外打包 `APPLICATION_DATA_ROOTS = ("standards","imports","logs")`。
+- **实测**（真实内置包 + 3 份 legacy PDF + imports + logs 的活目录）：安全备份 = **2 个成员 `{manifest.json, uebackup.sqlite3}`**（112,662 B、`scope=user-data`、**0 PDF、0 `standards/` 成员**）；同一目录走完整环境备份 = 8 成员 / 115,088 B（即旧单一机制每次都复制进备份的内容）。
+- 清单自描述 `scope` 且 `validate()` **拒绝**"自称 user-data 却列有应用数据成员"的归档；`restore` 只合并归档真正拥有的内容（**取消了破坏性的 `rmtree(standards)`**），因此安全备份**永不删除活的**可重建数据；历史 `.uebackup` 逐字节不变。
+- **面向用户的"完整备份"仍然存在**（UI「创建备份」→ `ApplicationFacade.create_backup` → `create_full_environment`），与内部安全备份是**两套语义**。
+
+### §三 Legacy PDF 清理改为 **warn-only**（**反转**上一轮的 fail-closed）
+
+- 成功：仍记日志 + 成功审计 `STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED`，计数为**重扫验证后**的真实结果。
+- 失败（占用/权限/任何异常）：**只记一条中文 WARNING 并继续** —— **不阻塞启动、对账、安装、正式评价与保存**，**不写成功审计**，返回计数只包含**已验证删除**的部分，下次启动自动重试。
+- `reconcile()` 额外包裹端口调用，任何异常都只 WARNING 后继续决策表。
+- Windows 真实占用实测：安装完成、规则落盘、GB29446 正式评价与保存正常、随后对账 NOOP 不抛异常、无成功审计、被锁 PDF 逐字节不变、未被锁的平铺 PDF **确实被删**；释放句柄后下次清理成功且审计计数 == 返回计数。
+
+### §五 发现并修复一个真实缺陷（此前会写入垃圾记录）
+
+审查确认：**标准明确要求的必填量缺失时不阻塞** —— `E_d` / `m` **留空**或**为 0 / 负数**时，引擎报 `MissingInputError` / `EvaluationValidationError`，结果 `INCOMPLETE`，**但记录仍然被保存**（`m=0` 即分母为 0）。现改为在**构造 `EvaluationRequest` 之前**于 UI 采集层拒绝：空值「…不能为空。」、非数字/非有限（复用领域 `parse_decimal`）、`<= 0`「…必须大于 0。」→ 提示 + 页面结果卡 + **不保存任何记录**；其他有限小数**原样透传**（Numeric 全值语义不变）。**未新增任何字段或复选框**（用 `findChildren(QCheckBox) == []` 断言）。新增 `tests/test_gb29446_ui_validation.py`（20 项）。
+
+### §七 历史包袱清理（执行记录见 `RS05_LEGACY_DEPENDENCY_AUDIT.md` §10）
+
+- **删除**：`tools/build_initial_package.py`、`tools/build_release_workbooks.mjs`、`tools/build_unified_merge_report.mjs`（均零引用，后两者 `import` 一个本仓不存在的模块、任何机器都跑不起来）。
+- **删除** `tests/conftest.py` 的 xfail-strict 钩子及其唯一标记的 2 个用例（6 个参数实例）—— 它们断言的是**已废止**的比较前 ROUND6 契约，同一职责由 `pilots/numeric` 边界向量、`conformance/numeric` 与 GB29446 Golden 的 full-value trap **更强**地承担；**全量套件的 xfail 计数由 4 降为 0**。
+- **改造**：`tools/windows_runtime_evidence.py` 去掉硬编码 `G:\`（改 `--root`/`UEBENCH_EVIDENCE_ROOT`）并**惰性化归档访问**（新增 `--part {a,b,both}`，Part A 可无归档运行）；`tests/test_evaluation_support.py` 改指运行期真值源 `data/definitions` 并把断言收紧为 `== 48`。
+- **保留**：`standards/development/scope-65` 仍为 REFERENCE_ONLY（8 处活引用、其中 5 处是正向不变量断言；先移出会静默删覆盖），移除顺序已记入审计 §10。
+
+### 仍未执行 / 待裁定
+
+- 其余 8 个 `tools/build_gb*_review.mjs` 仍 `import @oai/artifact-tool`（本仓无该依赖），**任何机器都无法运行**；建议删除或改指受支持生成器。
+- 自定义核算周期留空仍阻塞；`E_d = 0` 在 UI 阻塞（与领域守卫一致）。
+
+状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
+`Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
+`ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。

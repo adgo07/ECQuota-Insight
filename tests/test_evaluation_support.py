@@ -5,6 +5,14 @@ conflated with "the software formally supports evaluating it", which made 43 of
 48 installed standards look evaluable.  These tests pin the 0.2.0 owner decision
 (GB 29446-2019 only) and prove the decision is independent of
 ``StandardDefinition.publication_status``.
+
+The definitions are read from ``data/definitions`` — the formal runtime source
+(``standards/development/manifest.json``: ``"formal_runtime_source": "data"``),
+i.e. exactly what ships.  They deliberately do **not** come from
+``standards/development/scope-65``: that directory is a superseded historical
+comparison snapshot (``"legacy_scopes": ["scope-65"]``) kept only for traceability,
+so loading it here would have asserted the 0.2.0 capability decision against
+stale data.
 """
 
 from __future__ import annotations
@@ -24,7 +32,8 @@ from uebench.application.evaluation_support import (
 from uebench.domain.models import PublicationStatus, StandardDefinition
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFINITIONS = ROOT / "standards" / "development" / "scope-65" / "definitions"
+#: Formal runtime truth source: the published definitions that ship with the product.
+DEFINITIONS = ROOT / "data" / "definitions"
 MODULE = ROOT / "src" / "uebench" / "application" / "evaluation_support.py"
 
 SUPPORTED_ID = "gb-29446-2019"
@@ -36,7 +45,7 @@ _CHINESE = re.compile(r"[\u4e00-\u9fff]")
 
 
 def _definition(standard_id: str) -> StandardDefinition:
-    """Load a real installed definition from the development library."""
+    """Load a real installed definition from the formal runtime source."""
     path = DEFINITIONS / f"{standard_id}.json"
     assert path.is_file(), f"{standard_id} must be a real installed standard"
     return StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
@@ -78,9 +87,14 @@ def test_other_installed_standards_are_not_formally_evaluable() -> None:
 
 
 def test_installed_library_has_exactly_one_formally_evaluable_standard() -> None:
-    """The whole library, not just a sample: one evaluable standard, not 43."""
+    """The whole published runtime library: one evaluable standard, not 43.
+
+    ``data/definitions`` is the set that actually ships (48 published standards),
+    so "43 of 48 looked evaluable" is asserted against the real product data
+    rather than against a superseded development snapshot.
+    """
     definitions = _installed_definitions()
-    assert len(definitions) > 1, "the installed library must still contain many standards"
+    assert len(definitions) == 48, "正式运行库必须仍是 48 项已发布标准"
     evaluable = filter_formally_evaluable(definitions)
     assert [definition.id for definition in evaluable] == [SUPPORTED_ID]
 

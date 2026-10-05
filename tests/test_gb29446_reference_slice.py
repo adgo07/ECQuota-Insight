@@ -317,15 +317,24 @@ def test_gb29446_month_period_is_saved_and_restored(tmp_path: Path, monkeypatch)
 
 
 @pytest.mark.parametrize(
-    ("electricity", "raw_coal", "expected_message", "internal_key"),
+    ("electricity", "raw_coal", "expected_message", "expected_warning", "internal_key"),
     [
-        ("", "100", "统计期选煤电力消耗量 E_d", "electricity_consumption"),
-        ("100", "", "统计期入选原煤量 m", "raw_coal_input"),
-        ("0", "100", "必须大于 0", "electricity_consumption"),
+        (
+            "", "100", "统计期选煤电力消耗量 E_d",
+            "统计期选煤电力消耗量 E_d 不能为空。", "electricity_consumption",
+        ),
+        (
+            "100", "", "统计期入选原煤量 m",
+            "统计期入选原煤量 m 不能为空。", "raw_coal_input",
+        ),
+        (
+            "0", "100", "必须大于 0",
+            "统计期选煤电力消耗量 E_d 必须大于 0。", "electricity_consumption",
+        ),
     ],
 )
 def test_gb29446_error_card_uses_chinese_labels_and_no_grade(
-    tmp_path: Path, monkeypatch, electricity, raw_coal, expected_message, internal_key
+    tmp_path: Path, monkeypatch, electricity, raw_coal, expected_message, expected_warning, internal_key
 ) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
@@ -353,12 +362,10 @@ def test_gb29446_error_card_uses_chinese_labels_and_no_grade(
     assert internal_key not in rendered_message
     assert "electricity_consumption" not in rendered_message
     assert "raw_coal_input" not in rendered_message
-    assert warnings == ["输入数据未通过校验，未生成电耗等级。请查看评价结果中的提示并修正。"]
-
-    if window.last_result_id is not None:
-        saved = context.application.get_evaluation(window.last_result_id)
-        assert saved is not None
-        assert saved[1].results[0].grade.value == "INCOMPLETE"
+    # §五 MUST BLOCK：空值 / 零 / 非数字在生成评价请求之前就被拒绝，提示为纯文本的业务原因。
+    assert warnings == [expected_warning]
+    assert window.last_result_id is None, "被阻止的输入不得产生评价记录"
+    assert context.application.list_recent_evaluations() == []
     window.close()
     context.database.dispose()
 
@@ -636,8 +643,10 @@ def test_gb29446_bad_input_clears_previous_grade_without_internal_error(referenc
     message = window.gb29446_result_message.text() + " ".join(warnings)
     for internal in ["decimal.InvalidOperation", "ValidationError", "CalculationStep", "value.decimal", "numeric_behavior", "electricity_consumption", "raw_coal_input"]:
         assert internal not in message
-    if window.last_result_id:
-        assert context.application.get_evaluation(window.last_result_id)[1].results[0].grade is Grade.INCOMPLETE
+    # §五 MUST BLOCK：坏输入（空值 / 0 / 负数 / 非数字 / 非有限值）在生成评价请求之前
+    # 就被拒绝，既没有结果也没有新记录（旧行为会保存一条“不完整”记录）。
+    assert window.last_result_id is None
+    assert context.application.count_evaluations() == 1, "只应保留本用例开始时那条成功记录"
 
 
 @pytest.mark.parametrize("failure", ["request", "domain", "unexpected"])

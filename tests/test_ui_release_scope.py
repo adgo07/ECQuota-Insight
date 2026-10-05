@@ -37,7 +37,15 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QPushButton, QTextEdit
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QTabWidget,
+    QTextEdit,
+)
 
 from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_SUPPORTED_LABEL,
@@ -350,6 +358,40 @@ def test_library_no_longer_shows_internal_traceability_noise(window) -> None:
     assert "条款/表号" not in indicator_headers
     assert "原文SHA-256" not in headers
     assert "产品/工序数" not in headers
+
+
+def test_library_page_has_no_applicability_area_not_just_a_removed_column(window) -> None:
+    """§六：「适用条件/说明」不只是一个被删掉的列——标准库页面上根本没有这个区。
+
+    上一轮只删掉了下方指标表的「适用条件/说明」**列**。Owner 两次写到「删除适用条件/说明区」，
+    因此这里穷举标准库页面上的每一个标签/按钮/表头/单元格文字，证明页面上不存在任何叫
+    「适用条件/说明」的区域；同时证明下方指标表本身仍在（产品/工序、指标、单位、1/2/3级限额
+    是核心数据，不得与列一起删掉）。
+    """
+
+    library_page = window.pages.widget(1)
+    assert library_page is not None
+    texts = [label.text() for label in library_page.findChildren(QLabel)]
+    texts += [button.text() for button in library_page.findChildren(QPushButton)]
+    # 唯一带「适用条件/修正参数」页签的输入表属于「新建评价」页，标准库页面没有任何页签容器。
+    assert library_page.findChildren(QTabWidget) == []
+    for table in (window.standard_table, window.standard_indicator_table):
+        texts += [table.horizontalHeaderItem(column).text() for column in range(table.columnCount())]
+        for row in range(table.rowCount()):
+            for column in range(table.columnCount()):
+                item = table.item(row, column)
+                if item is not None:
+                    texts.append(item.text())
+    assert not [text for text in texts if "适用条件" in text], texts
+
+    # 下方指标表本身保留：6 列核心数据，GB29446 的限额行照旧显示。
+    window.standard_table.selectRow(_library_row(window, GB29446_ID))
+    assert [
+        window.standard_indicator_table.horizontalHeaderItem(column).text()
+        for column in range(window.standard_indicator_table.columnCount())
+    ] == ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额"]
+    assert window.standard_indicator_table.rowCount() == 2
+    assert window.standard_indicator_table.item(0, 2).text() == "kW·h/t"
 
 
 def test_library_can_jump_into_new_evaluation_with_the_supported_standard(window) -> None:

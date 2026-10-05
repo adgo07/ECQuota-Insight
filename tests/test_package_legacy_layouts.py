@@ -16,17 +16,20 @@ public_key_path=...)`` 交给组合根。因此本模块不依赖 ``G:\\ECQuota-
 1. layout A（平铺）清理；
 2. layout B（``sources/``）清理；
 3. layout C（两者同时）清理；
-4. 顺序：清理先于安全备份，因此**本次**新备份里没有 PDF（打开备份列成员验证）；
+4. 顺序：清理先于安全备份；而且安全备份是 **user-data 范围**（只含数据库），
+   所以它里面既没有 PDF、也没有任何 ``standards/`` 成员；
 5. 历史评价 / 规则快照存活，数据库不半升级；
 6. 对账（reconciliation）与 no-op 路径仍可用；
-7. **删除失败时 fail-closed**：Windows 上真实占用句柄 → 中止 + 无成功审计 +
-   无新备份 + 中文错误 + 数据库完好；另有跨平台的注入失败用例验证同一语义。
+7. **删除失败时 warn-only**：Windows 上真实占用句柄 → 只记 WARNING、继续安装/启动、
+   不写成功审计、被占用的文件逐字节留在原位、数据库完好，下一次启动自动重试；
+   另有跨平台的注入失败用例验证同一语义。
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import shutil
 import sqlite3
@@ -153,6 +156,19 @@ def install_synthetic_legacy(root: Path, work: Path, *, layout: str, pdf_count: 
     legacy_directory = paths.standards / result.package_id
     created = materialize_legacy_layout(legacy_directory, layout, pdf_count=pdf_count)
     return paths, database, standards, audit, service, library, legacy_directory, created
+
+
+def install_without_fail_closed_abort(service: StandardPackageService, package: Path):
+    """安装并明确断言**不再**抛 ``StandardPackageError``（fail-closed 已废除）。
+
+    warn-only 契约下，旧版原文删不掉只应产生日志/审计差异，绝不应变成安装异常。
+    """
+    try:
+        return service.install(package)
+    except StandardPackageError as exc:  # pragma: no cover - 新契约下不应发生
+        raise AssertionError(
+            f"warn-only 契约下安装仍抛出 StandardPackageError：{exc}"
+        ) from exc
 
 
 def backup_package_row_count(backup: Path) -> int:
@@ -318,15 +334,15 @@ def test_cleanup_never_touches_non_legacy_content(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# 4. 顺序：清理先于安全备份（打开备份列成员验证）
+# 4. 顺序：清理先于安全备份；安全备份是 user-data 范围（打开备份列成员验证）
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("layout", ALL_LAYOUTS)
-def test_new_backup_is_taken_after_cleanup_and_contains_no_pdf(
+def test_new_backup_is_taken_after_cleanup_and_contains_only_user_data(
     tmp_path: Path, layout: str
 ) -> None:
-    """本次安装的新备份里不得有 PDF：必须打开备份、列成员、逐条断言。"""
+    """本次安装的安全备份只含数据库：必须打开备份、列成员、逐条断言。"""
     work = tmp_path / "work"
     (
         paths,
@@ -356,7 +372,10 @@ def test_new_backup_is_taken_after_cleanup_and_contains_no_pdf(
     assert backup.name == Path(result.backup_path).name
 
     members = archive_names(backup)
-    assert members, "备份包不能为空"
+    # 安全备份 = 用户业务数据：只有数据库 + 清单。
+    assert sorted(members) == ["manifest.json", "uebench.sqlite3"], members
+    with zipfile.ZipFile(backup) as archive:
+        assert json.loads(archive.read("manifest.json"))["scope"] == "user-data"
     assert [name for name in members if name.lower().endswith(".pdf")] == [], (
         f"本次安装的安全备份仍包含 PDF：{members}"
     )
@@ -366,11 +385,9 @@ def test_new_backup_is_taken_after_cleanup_and_contains_no_pdf(
     assert not [
         name for name in members if "legacy-flat" in name or "legacy-sources" in name
     ], members
-    # 备份仍然覆盖本次安装前的*活目录状态*：前一个包的安装目录在备份里。
-    assert any(
-        name.endswith(f"standards/{library.package_id}/corrections.json") for name in members
-    ), members
-    # 备份是安装前时点：里面只有第一个包。
+    # 可重建的应用数据（前一个包的安装目录）不再进安全备份。
+    assert not [name for name in members if name.startswith("standards/")], members
+    # 备份是安装前时点：内嵌数据库里只有第一个包。
     assert backup_package_row_count(backup) == 1
     # 活目录同样 0 个 PDF。
     assert all_pdfs(paths.standards) == []
@@ -700,7 +717,7 @@ def test_reconciliation_and_upgrade_without_any_legacy_layout_still_work(tmp_pat
 
 
 # ---------------------------------------------------------------------------
-# 7. fail-closed：删除失败必须中止
+# 7. warn-only：删除失败只记 WARNING，绝不中止安装/启动
 # ---------------------------------------------------------------------------
 
 
@@ -709,12 +726,17 @@ def _require_windows() -> None:
         pytest.skip("真实文件占用只能在 Windows 上复现（其他平台允许删除已打开的文件）")
 
 
-def test_locked_legacy_pdf_aborts_install_fail_closed(tmp_path: Path) -> None:
-    """Windows 真实占用句柄：删除真的失败 → 中止安装、无成功审计、无新备份。
+def test_locked_legacy_pdf_does_not_block_install_warn_only(tmp_path: Path) -> None:
+    """Windows 真实占用句柄：删除真的失败 → 只记 WARNING，安装照常完成。
 
     这是本模块最重要的一条：``open(path, "rb")`` 保持打开会让 ``os.remove`` 真实地
     以 ``PermissionError``(winerror 32) 失败——本机已实测。因此它验证的不是注入的
-    假失败，而是 Windows 上真实会发生的占用。
+    假失败，而是 Windows 上真实会发生的占用，以及 owner 决定的 warn-only 语义：
+
+    * 安装**不**被中断，新包照常落库；
+    * 不写成功审计（成功审计以复验通过为前提），被占用的 PDF 逐字节留在原位；
+    * 本次安全备份只含数据库，因此不可能携带那个删不掉的 PDF；
+    * 句柄释放后，下一次启动的同一个闸门就真的清理成功并写入真实计数。
     """
     _require_windows()
     work = tmp_path / "work"
@@ -754,40 +776,47 @@ def test_locked_legacy_pdf_aborts_install_fail_closed(tmp_path: Path) -> None:
 
     with open(locked_pdf, "rb") as handle:
         assert handle.read(8).startswith(b"%PDF")
-        with pytest.raises(StandardPackageError) as failure:
-            service.install(successor)
+        result = install_without_fail_closed_abort(service, successor)
 
-    message = str(failure.value)
-    # 中文错误 + 精确原因 + 处置建议。
-    assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
-    assert "安装已中止" in message
-    assert "PermissionError" in message or "另一个程序正在使用此文件" in message
-    # 错误里点名了删不掉的目标（被占用的 PDF 所在目录）。
-    assert str(locked_pdf.parent) in message
-    assert "重试" in message
-
-    # 1) 新包没有安装。
-    assert not (paths.standards / "synthetic-locked-successor").exists()
-    # 2) 没有成功审计。
+    # 1) 新包已经装好：warn-only 不阻断安装。
+    assert result.package_id == "synthetic-locked-successor"
+    assert (paths.standards / "synthetic-locked-successor").is_dir()
+    assert installed_package_ids(service) == ["synthetic-locked-successor", library.package_id]
+    assert service.latest_manifest().package_id == "synthetic-locked-successor"
+    # 上报的是实测结果：``sources`` 目录没能删掉（0），平铺 PDF 真的删掉了（全部）。
+    assert result.removed_source_directory_count == 0
+    assert result.removed_flat_source_file_count == len(loose_pdfs)
+    # 2) 没有成功审计（复验没过就不能记成功）。
     assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == audits_before
-    # 3) 没有新的 pre-package 备份（否则它会继续带着旧 PDF）。
-    assert backup_names(paths) == backups_before
-    # 4) 数据库完好：包历史没有新增，规则行没有新增。
-    assert installed_package_ids(service) == history_before
-    assert service.latest_manifest().package_id == library.package_id
-    revisions = sorted(
-        item.rule_revision
-        for item in service.standards.list_all()
-        if item.id == library.definition.id
-    )
-    assert revisions == [1]
-    # 5) 被占用的原文仍在（句柄释放后依然在原位），且逐字节未变。
+    # 3) 被占用的原文仍在（句柄释放后依然在原位），且逐字节未变。
     assert locked_pdf.is_file()
     assert locked_pdf.read_bytes() == locked_bytes
-    # 6) 未被占用的其余目标（另一类布局的平铺 PDF）确实已经删掉：
+    # 4) 未被占用的其余目标（另一类布局的平铺 PDF）确实已经删掉：
     #    失败并非「什么都没尝试」。被占用 PDF 的同级文件是否已删取决于
     #    ``rmtree`` 的遍历顺序，不作断言。
     assert not flat_pdf.exists()
+    # 5) 本次安装的安全备份只含数据库：删不掉的 PDF 不可能进入备份。
+    new_backups = backup_names(paths) - backups_before
+    assert len(new_backups) == 1, sorted(new_backups)
+    members = archive_names(paths.backups / next(iter(new_backups)))
+    assert sorted(members) == ["manifest.json", "uebench.sqlite3"], members
+    # 6) 数据库完好：规则行新增了后继修订，业务状态可用。
+    assert sorted(
+        item.rule_revision
+        for item in service.standards.list_all()
+        if item.id == library.definition.id
+    ) == [1, 2]
+
+    # 7) 句柄释放后，下一次启动（同一入口）就真的清理成功：审计写的是实测计数。
+    removed = service.cleanup_legacy_sources()
+    assert removed[0] == 1, removed
+    assert all_pdfs(paths.standards) == []
+    details = audit_details(audit, AUDIT_LEGACY_SOURCES_REMOVED)
+    assert len(details) == 1, details
+    assert details[0]["directories_removed"] == removed[0]
+    assert details[0]["files_removed"] == removed[1]
+    assert details[0]["flat_files_removed"] == removed[2]
+    assert details[0]["verified"] is True
 
 
 def test_cleanup_retries_transient_failure_and_only_then_records_success(
@@ -847,15 +876,15 @@ def test_cleanup_retries_transient_failure_and_only_then_records_success(
     assert (paths.standards / "synthetic-retry-successor" / "corrections.json").is_file()
 
 
-def test_cleanup_keeps_retrying_then_aborts_when_target_never_disappears(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+def test_cleanup_keeps_retrying_and_warns_when_target_never_disappears(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """跨平台：重试到上限后目标依然存在 → 中止，且不产生任何成功痕迹。
+    """跨平台：重试到上限后目标依然存在 → 只记 WARNING，安装照常继续。
 
     永久占用不可能在 POSIX 上靠文件句柄复现（打开的文件照样能删），所以这里在
     **删除动作这一层**注入永久失败：每一次尝试都删掉后立刻复原并抛
-    ``PermissionError``。这样验证的是重试计数与「验证不过就不许成功」的判定，
-    与 Windows 上的真实占用用例互补。
+    ``PermissionError``。这样验证的是重试计数、warn-only 判定、以及
+    「验证不过就绝不记成功」的不变量，与 Windows 上的真实占用用例互补。
     """
     work = tmp_path / "work"
     library = synthetic_legacy_library(work)
@@ -894,38 +923,61 @@ def test_cleanup_keeps_retrying_then_aborts_when_target_never_disappears(
         data_version="2026.11-published.1",
     )
     backups_before = backup_names(paths)
-    with pytest.raises(StandardPackageError) as failure:
-        service.install(successor)
+    with caplog.at_level(logging.WARNING, logger="uebench.infrastructure.packages"):
+        result = install_without_fail_closed_abort(service, successor)
 
+    # 重试到上限（warn-only：不再中止安装）。
     assert len(attempts) == StandardPackageService.LEGACY_CLEANUP_ATTEMPTS, attempts
-    message = str(failure.value)
-    assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
-    assert "安装已中止" in message and "PermissionError" in message
-    assert "模拟永久占用" in message
-    # 无安装、无成功审计、无新备份、数据库可用。
-    assert not (paths.standards / "synthetic-refused-successor").exists()
+    warnings = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "uebench.infrastructure.packages"
+        and record.levelno == logging.WARNING
+        and "无法删除旧版本遗留在用户数据目录中的标准原文" in record.getMessage()
+    ]
+    assert warnings, [record.getMessage() for record in caplog.records]
+    assert "仅记录警告" in warnings[0] and "PermissionError" in warnings[0]
+    assert "模拟永久占用" in warnings[0]
+    # 安装完成、且如实上报「实测没删掉任何东西」（0/0/0，不是假成功计数）。
+    assert result.removed_source_directory_count == 0
+    assert result.removed_source_file_count == 0
+    assert result.removed_flat_source_file_count == 0
+    assert (paths.standards / "synthetic-refused-successor").is_dir()
+    # 无成功审计（复验没过就不能记成功）。
     assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
-    assert backup_names(paths) == backups_before
-    assert installed_package_ids(service) == [library.package_id]
+    assert set(installed_package_ids(service)) == {
+        library.package_id,
+        "synthetic-refused-successor",
+    }
     assert database.path.exists()
-    assert target.is_file()
+    # 被占用的目标逐字节留在原位。
+    assert target.is_file() and target.read_bytes() == payload
+    # 本次安全备份只含数据库：删不掉的 PDF 不可能进入备份。
+    new_backups = backup_names(paths) - backups_before
+    assert len(new_backups) == 1, sorted(new_backups)
+    assert sorted(archive_names(paths.backups / next(iter(new_backups)))) == [
+        "manifest.json",
+        "uebench.sqlite3",
+    ]
 
 
-def test_fail_closed_cleanup_never_creates_a_backup_containing_old_pdfs(
+def test_warn_only_cleanup_still_produces_a_pdf_free_backup(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """删除失败后，现存备份里都不允许出现旧版 PDF，也没有新备份产生。"""
+    """删除失败时安装照常，而且现存备份里都不允许出现旧版 PDF，新备份只含数据库。"""
     import uebench.infrastructure.packages as packages_module
 
     work = tmp_path / "work"
     library = synthetic_legacy_library(work)
-    paths, _database, _standards, _audit, service = make_service(
+    paths, _database, _standards, audit, service = make_service(
         tmp_path / "appdata", library.public_key_path
     )
     service.install(library.package)
     legacy_directory = paths.standards / library.package_id
-    materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_BOTH, pdf_count=1)
+    created = materialize_legacy_layout(legacy_directory, LEGACY_LAYOUT_BOTH, pdf_count=1)
     backups_before = backup_names(paths)
+    kept_pdfs = all_pdfs(paths.standards)
+    kept_bytes = {path: path.read_bytes() for path in kept_pdfs}
 
     real_rmtree = shutil.rmtree
 
@@ -947,15 +999,28 @@ def test_fail_closed_cleanup_never_creates_a_backup_containing_old_pdfs(
         package_id="synthetic-refused-backup-successor",
         data_version="2026.11-published.1",
     )
-    with pytest.raises(StandardPackageError):
-        service.install(successor)
+    result = service.install(successor)
 
-    assert backup_names(paths) == backups_before
+    # warn-only：安装完成，但绝不写成功审计（`sources` 与 1 个平铺 PDF 都还活着）。
+    assert (paths.standards / "synthetic-refused-backup-successor").is_dir()
+    assert audit_rows(audit, AUDIT_LEGACY_SOURCES_REMOVED) == []
+    assert result.removed_source_directory_count == 0
+    assert result.removed_flat_source_file_count == 0
+    assert all_pdfs(paths.standards) == kept_pdfs
+    for path, payload in kept_bytes.items():
+        assert path.read_bytes() == payload
+
+    new_backups = backup_names(paths) - backups_before
+    assert len(new_backups) == 1, sorted(new_backups)
     for name in backup_names(paths):
         members = archive_names(paths.backups / name)
         assert [item for item in members if item.lower().endswith(".pdf")] == [], (
             f"备份 {name} 携带了旧版 PDF：{members}"
         )
+    assert sorted(archive_names(paths.backups / next(iter(new_backups)))) == [
+        "manifest.json",
+        "uebench.sqlite3",
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -1268,14 +1333,15 @@ def test_startup_reconciliation_passes_the_gate_before_the_decision_table(
         close_logging()
 
 
-def test_startup_reconciliation_aborts_fail_closed_on_a_locked_legacy_pdf(
-    tmp_path: Path,
+def test_startup_reconciliation_warns_but_does_not_block_on_a_locked_legacy_pdf(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """对账路径的 fail-closed：被占用的旧 PDF 让对账在决策前中止。
+    """对账路径的 warn-only：被占用的旧 PDF 只产生 WARNING，对账照常完成。
 
     与 install 路径的占用用例同款做法（``open(path, "rb")`` 保持打开，Windows 上
     删除真实失败），但这里驱动的是**正常启动/对账**路径，且决策本会是 NOOP ——
-    这证明闸门不会因为"反正不装包"而被跳过。
+    这证明：闸门不会因为"反正不装包"而被跳过（仍然真的尝试删除），但它的失败也
+    绝不会阻止软件启动、决策、评价或保存；下一次启动会自动重试。
     """
     if sys.platform != "win32":
         pytest.skip("真实文件占用只能在 Windows 上复现（其他平台允许删除已打开的文件）")
@@ -1299,6 +1365,7 @@ def test_startup_reconciliation_aborts_fail_closed_on_a_locked_legacy_pdf(
         package_directory = context.paths.standards / library.package_id
         created = materialize_legacy_layout(package_directory, LEGACY_LAYOUT_BOTH, pdf_count=2)
         locked_pdf = sorted(created["sources"].glob("*.pdf"))[0]
+        flat_pdf = sorted(package_directory.glob("*.pdf"))[0]
         locked_bytes = locked_pdf.read_bytes()
         backups_before = backup_names(context.paths)
         history_before = installed_package_ids(context.package_service)
@@ -1306,23 +1373,44 @@ def test_startup_reconciliation_aborts_fail_closed_on_a_locked_legacy_pdf(
 
         with open(locked_pdf, "rb") as handle:
             assert handle.read(8).startswith(b"%PDF")
-            with pytest.raises(StandardPackageError) as failure:
-                service.reconcile(directory)
+            with caplog.at_level(
+                logging.WARNING, logger="uebench.infrastructure.packages"
+            ):
+                outcome = service.reconcile(directory)
 
-        message = str(failure.value)
-        assert "无法删除旧版本遗留在用户数据目录中的标准原文" in message
-        assert "安装已中止" in message
-        assert "PermissionError" in message or "另一个程序正在使用此文件" in message
-        assert "重试" in message
-        assert str(locked_pdf.parent) in message
+        # 对账照常完成：决策仍然是 NOOP，没有被清理失败打断。
+        assert outcome.action is ReconciliationAction.NOOP
+        assert outcome.executed is False
+        warnings = [
+            record.getMessage()
+            for record in caplog.records
+            if record.name == "uebench.infrastructure.packages"
+            and record.levelno == logging.WARNING
+            and "无法删除旧版本遗留在用户数据目录中的标准原文" in record.getMessage()
+        ]
+        assert warnings, [record.getMessage() for record in caplog.records]
+        assert "仅记录警告" in warnings[0] and "下次启动会自动重试" in warnings[0]
+        assert str(locked_pdf.parent) in warnings[0]
 
-        # 中止语义：无成功审计、无新备份、无半安装、数据库完好。
+        # warn-only 语义：无成功审计、无新备份、无新安装、数据库完好。
         assert cleanup_audit_rows(context.audit) == audits_before
         assert backup_names(context.paths) == backups_before
         assert installed_package_ids(context.package_service) == history_before
-        assert not (context.paths.standards / "synthetic-gate-locked").exists()
         assert locked_pdf.is_file() and locked_pdf.read_bytes() == locked_bytes
         assert context.database.path.exists()
+        # 失败并非「什么都没尝试」：未被占用的平铺 PDF 已经删掉了。
+        assert not flat_pdf.exists()
+
+        # 句柄释放后，下一次启动的同一个闸门就真的清理成功并写入实测计数。
+        removed = context.package_service.cleanup_legacy_sources()
+        assert removed[0] == 1, removed
+        assert all_pdfs(context.paths.standards) == []
+        details = audit_details(context.audit, AUDIT_LEGACY_SOURCES_REMOVED)
+        assert len(details) == 1, details
+        assert details[0]["directories_removed"] == removed[0]
+        assert details[0]["files_removed"] == removed[1]
+        assert details[0]["flat_files_removed"] == removed[2]
+        assert details[0]["verified"] is True
     finally:
         context.database.dispose()
         close_logging()

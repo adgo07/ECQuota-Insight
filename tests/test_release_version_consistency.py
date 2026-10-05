@@ -17,7 +17,7 @@ Notes on what is intentionally **not** flagged:
   and ``GB29446_EXCEL_TEMPLATE_VERSION`` are *separate version domains* — they
   version a contract or a template, not the product.
 * ``minimum_app_version="0.1.0"`` in
-  ``src/uebench/infrastructure/packages.py`` / ``tools/build_initial_package.py``
+  ``src/uebench/infrastructure/packages.py``
   / ``tools/publish_confirmed_rules.py`` is the *minimum application version a
   standard package requires*.  That is a different concept and is correctly
   still ``0.1.0``.

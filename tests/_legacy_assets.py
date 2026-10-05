@@ -10,8 +10,8 @@ in two different shapes:
 ``sources-dir``     ``standards/<package_id>/sources/*.pdf``  (later layout)
 ``both``            both of the above at once
 
-The regression tests for「清理旧版本原文」and its fail-closed abort must be able to
-reproduce those shapes **anywhere**, including CI, without ``G:\\ECQuota-Archive``,
+The regression tests for「清理旧版本原文」and its warn-only failure semantics must be
+able to reproduce those shapes **anywhere**, including CI, without ``G:\\ECQuota-Archive``,
 without a real standard PDF and without the gitignored development signing key.
 So this module can build them from scratch:
 

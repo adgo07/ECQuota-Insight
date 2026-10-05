@@ -280,9 +280,17 @@ class ApplicationFacade:
         return self._package.install(path)
 
     def create_backup(self, path: Path) -> Path:
+        """User-initiated full environment backup (数据库 + 可重建应用数据).
+
+        Safety backups (migration / package install / pre-restore) are taken by
+        the infrastructure services on their own and carry the user's business
+        data only; this user-facing entry point keeps the historical "one
+        self-contained archive" semantics by asking for the full environment
+        explicitly.
+        """
         if self._backup is None:
             raise RuntimeError("备份服务未配置")
-        return self._backup.create(path)
+        return self._backup.create_full_environment(path)
 
     def restore_backup(self, path: Path) -> None:
         if self._backup is None:

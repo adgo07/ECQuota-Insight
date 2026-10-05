@@ -92,6 +92,7 @@ from uebench.domain.models import (
     ProductionLine,
     StandardDefinition,
     StorageCorruptionError,
+    parse_decimal,
 )
 from uebench.ui.presentation import format_local_date, format_local_datetime
 
@@ -1733,6 +1734,47 @@ class MainWindow(QMainWindow):
         # in the application-layer codec.
         return decode_period_notes(notes)
 
+    def _gb29446_quantity_input(self, product, key: str, field: QLineEdit) -> InputValue:
+        """校验并包装 GB 29446 标准公式必须的一个数量输入（MUST BLOCK / WARN ONLY）。
+
+        标签与单位都取自规则定义本身，界面不写死业务文字。必须**当场阻止**、且不生成
+        任何评价记录的三类情况（对应 §五 的分类）：
+
+        * 空值——标准公式 ``e_d = E_d × k ÷ m`` 需要该数据，``m`` 还是分母；
+        * 非数字或非有限值——公式根本无法代入；
+        * 小于或等于 0——``m`` 为 0 即除零；``E_d`` 的领域守卫同样要求大于 0
+          （``EvaluationEngine._validate_inputs``），界面只做前置拦截，不重算任何东西。
+
+        其余一律放行：例如 ``1e999`` 这类极大但有限的值标准并未禁止，界面不发明任何上限，
+        只由结果与等级如实呈现。
+        """
+
+        definition = next((item for item in product.input_definitions if item.key == key), None)
+        if definition is None:
+            # 这两个数量由**指标**声明（产品只声明煤种/工艺等选择项），查找方式与引擎一致。
+            definition = next(
+                (
+                    item
+                    for indicator in product.indicators
+                    for item in indicator.input_definitions
+                    if item.key == key
+                ),
+                None,
+            )
+        label = definition.label if definition is not None else key
+        raw = field.text().strip()
+        if not raw:
+            raise ValueError(f"{label} 不能为空。")
+        try:
+            value = parse_decimal(raw, field_name=label)
+        except ValueError as exc:
+            # 领域解析器的中文提示直接复用，避免界面出现第二套数值口径。
+            raise ValueError(f"{exc}。") from exc
+        if value <= 0:
+            raise ValueError(f"{label} 必须大于 0。")
+        # 保留用户录入的原始十进制字面量：Numeric full-value 语义不得被界面改写。
+        return InputValue(value=raw, unit=definition.unit if definition is not None else None)
+
     def _collect_gb29446_request(self) -> EvaluationRequest:
         assert self.current_standard is not None
         period = str(self.gb29446_period.currentData() or "全年")
@@ -1752,12 +1794,13 @@ class MainWindow(QMainWindow):
         if not process:
             raise ValueError("请选择选煤工艺。")
         inputs = {"washing_process": InputValue(value=str(process))}
-        electricity = self.gb29446_electricity.text().strip()
-        raw_coal = self.gb29446_raw_coal.text().strip()
-        if electricity:
-            inputs["electricity_consumption"] = InputValue(value=electricity, unit="kW·h")
-        if raw_coal:
-            inputs["raw_coal_input"] = InputValue(value=raw_coal, unit="t")
+        # 标准公式 e_d = E_d × k ÷ m 的两个必填量：空值 / 非数字 / 不大于 0 必须在这里
+        # 就被拒绝（MUST BLOCK），不能先生成一条“不完整”记录再让用户去结果页里找原因。
+        for key, field in (
+            ("electricity_consumption", self.gb29446_electricity),
+            ("raw_coal_input", self.gb29446_raw_coal),
+        ):
+            inputs[key] = self._gb29446_quantity_input(product, key, field)
         notes = self._encode_gb29446_notes(period, custom_period, self.gb29446_notes.text())
         return EvaluationRequest(
             evaluation_date=date.today(),
@@ -1817,8 +1860,10 @@ class MainWindow(QMainWindow):
                     request = self._collect_request()
                 except ValueError as exc:
                     message = str(exc) if type(exc) is ValueError else "评价信息未通过校验，请检查核算周期、煤种、选煤工艺及输入数据。"
-                    self.gb29446_result_message.setText(message)
-                    QMessageBox.warning(self, "信息未填写", message)
+                    # 结果卡是富文本：E_d / e_d 必须按真下标呈现（提示文字本身保持纯文本）。
+                    self.gb29446_result_message.setText(_rich_text(message))
+                    self.gb29446_explanation.setText("请根据提示修正评价数据后重新计算。")
+                    QMessageBox.warning(self, "评价信息未通过校验", message)
                     return
             request = request or self._collect_request()
             is_preview = request.selection_mode is StandardSelectionMode.FUTURE
@@ -1826,7 +1871,7 @@ class MainWindow(QMainWindow):
         except Exception as exc:
             if is_gb29446:
                 if type(exc) is ValueError:
-                    self.gb29446_result_message.setText(f"无法计算：{exc}")
+                    self.gb29446_result_message.setText(_rich_text(f"无法计算：{exc}"))
                     self.gb29446_explanation.setText("请根据提示修正评价数据后重新计算。")
                     QMessageBox.warning(self, "无法计算", str(exc))
                 else:
