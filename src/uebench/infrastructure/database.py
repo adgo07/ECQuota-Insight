@@ -249,12 +249,20 @@ class DatabaseManager:
         if current is not None and current == head:
             logger.info("数据库已在迁移目标版本 %s，无需迁移前备份", current)
             return None
-        backup_path = self._pre_migration_backup_path()
+        from .backup import BackupService
+        from .backup_paths import PRE_MIGRATION_PREFIX, reserve_unique_backup_path
+
         # Reuse the sqlite online backup API through BackupService so the
         # snapshot is transactionally consistent: copying the live
         # ``.sqlite3``/``-wal``/``-shm`` files directly can lose committed
         # data or capture a torn database.
-        from .backup import BackupService
+        #
+        # One shared namer for every automatic safety backup: microsecond stamp
+        # plus a short uuid, and the name is exclusively reserved before it is
+        # written.  Two migrations in the same second therefore produce two
+        # backups instead of the second silently overwriting the first.
+        backups_dir = self.paths.backups if self.paths is not None else self.path.parent / "backups"
+        backup_path = reserve_unique_backup_path(backups_dir, PRE_MIGRATION_PREFIX)
 
         logger.info(
             "检测到数据库迁移（当前版本 %s → 目标版本 %s），创建迁移前备份：%s",
@@ -262,17 +270,7 @@ class DatabaseManager:
             head if head is not None else "未知",
             backup_path,
         )
-        return BackupService(self.paths, self).create(backup_path)
-
-    def _pre_migration_backup_path(self) -> Path:
-        """Resolve ``backups/pre-migration-{YYYYmmdd-HHMMSS}.uebackup``."""
-
-        if self.paths is not None:
-            backups_dir = self.paths.backups
-        else:
-            backups_dir = self.path.parent / "backups"
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        return backups_dir / f"pre-migration-{stamp}.uebackup"
+        return BackupService(self.paths, self).create(backup_path, reserve=True)
 
     @contextmanager
     def session(self) -> Iterator[Session]:

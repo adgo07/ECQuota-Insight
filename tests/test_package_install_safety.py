@@ -59,7 +59,9 @@ from uebench.domain.models import (
     StandardDefinition,
     StandardSelectionMode,
 )
+from uebench.infrastructure import backup_paths as backup_paths_module
 from uebench.infrastructure.backup import BackupService
+from uebench.infrastructure.backup_paths import RESERVATION_MARKER_PREFIX, BackupPathError
 from uebench.infrastructure.database import DatabaseManager
 from uebench.infrastructure.logging import close_logging
 from uebench.infrastructure.packages import (
@@ -968,26 +970,37 @@ def test_two_back_to_back_installs_never_overwrite_a_backup(tmp_path: Path) -> N
 
 
 def test_backup_path_is_unique_within_the_same_second(tmp_path: Path) -> None:
-    """同一时刻（同一秒内）连续取 200 个名字必须互不相同且都不存在。"""
+    """同一秒内连续取 200 个名字：互不相同、带微秒精度，且各自独占占用。
+
+    修复后 ``_backup_path`` 走共享命名器（``reserve_unique_backup_path``）：
+    ``<prefix>YYYYMMDD-HHMMSS-ffffff-<短uuid>.uebackup``，名字在返回时就以
+    ``O_CREAT | O_EXCL`` 独占创建，因此同一秒、甚至同一微秒也不可能重名。
+    """
     directory = tmp_path / "backups"
     directory.mkdir(parents=True)
     names = [_backup_path(directory) for _ in range(200)]
 
     assert len(set(names)) == len(names), "备份路径出现重名：可能覆盖已有安全备份"
-    assert all(not name.exists() for name in names)
     assert all(name.name.startswith(BACKUP_NAME_PREFIX) for name in names)
-    # 名字必须带亚秒精度：``YYYYmmdd-HHMMSS-ffffff``，第三段是 6 位微秒。
+    assert all(name.suffix == ".uebackup" for name in names)
+    # 名字必须带亚秒精度与唯一后缀：``YYYYmmdd-HHMMSS-ffffff-<8位十六进制>``。
     for name in names:
         core = name.name[len(BACKUP_NAME_PREFIX) : -len(".uebackup")]
         parts = core.split("-")
-        assert len(parts) >= 3, core
+        assert len(parts) == 4, core
         assert len(parts[0]) == 8 and parts[0].isdigit(), core
         assert len(parts[1]) == 6 and parts[1].isdigit(), core
         assert len(parts[2]) == 6 and parts[2].isdigit(), f"缺少微秒精度：{core}"
+        assert len(parts[3]) == 8, core
+        int(parts[3], 16)
+    # 每个名字在返回时都已经被独占预订（带本进程专属令牌的占位文件，随后由安装路径
+    # 校验令牌后原子接管）：这正是「选择与占用是同一步」的落盘证据。
+    assert all(name.is_file() for name in names)
+    assert all(name.read_bytes().startswith(RESERVATION_MARKER_PREFIX) for name in names)
 
 
 def test_backup_path_never_returns_an_existing_path(tmp_path: Path) -> None:
-    """显式碰撞保护：目标已存在时必须换一个不同的名字（-1 后缀），绝不覆盖。"""
+    """显式碰撞保护：目标已存在时（含名称被抢占）必须换一个不同的名字，绝不覆盖。"""
     directory = tmp_path / "backups"
     directory.mkdir(parents=True)
 
@@ -998,9 +1011,32 @@ def test_backup_path_never_returns_an_existing_path(tmp_path: Path) -> None:
     fresh = _backup_path(directory)
 
     assert fresh != taken
-    assert not fresh.exists()
     assert fresh.name.startswith(BACKUP_NAME_PREFIX)
     assert taken.exists() and taken.read_bytes() == taken_bytes, "已有安全备份不得被触碰"
+
+    # 名称在返回前就被独占占用：把时钟与 uuid 都冻结后，同一个候选名的独占创建必然
+    # 失败，重试用尽即显式失败 —— 绝不退化为覆盖已有备份。
+    frozen = datetime(2026, 10, 5, 22, 50, 0)
+
+    class FrozenClock:
+        @classmethod
+        def now(cls) -> datetime:
+            return frozen
+
+    original_clock = backup_paths_module.datetime
+    original_token = backup_paths_module._token
+    backup_paths_module.datetime = FrozenClock
+    backup_paths_module._token = lambda: "deadbeef"
+    try:
+        assert _backup_path(directory).name == (
+            f"{BACKUP_NAME_PREFIX}20261005-225000-000000-deadbeef.uebackup"
+        )
+        with pytest.raises(BackupPathError):
+            _backup_path(directory)
+    finally:
+        backup_paths_module.datetime = original_clock
+        backup_paths_module._token = original_token
+    assert taken.read_bytes() == taken_bytes
 
 
 def test_package_install_result_reports_removed_source_counts(tmp_path: Path) -> None:

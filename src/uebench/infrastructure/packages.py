@@ -26,6 +26,7 @@ from uebench import RULE_ENGINE_VERSION, __version__
 from uebench.domain.models import PackageHistoryEntry, PublicationStatus, StandardDefinition
 
 from .backup import BackupService
+from .backup_paths import PRE_PACKAGE_PREFIX, reserve_unique_backup_path
 from .database import DatabaseManager, PackageRow, StandardRow
 from .paths import AppPaths
 from .repositories import AuditRepository, SqlStandardRepository
@@ -39,8 +40,10 @@ logger = logging.getLogger(__name__)
 AUDIT_LEGACY_SOURCES_REMOVED = "STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED"
 
 #: Glob-compatible prefix of the pre-install safety backup.  Existing callers
-#: and tools glob ``pre-package-*.uebackup``.
-BACKUP_NAME_PREFIX = "pre-package-"
+#: and tools glob ``pre-package-*.uebackup``.  The value now comes from the one
+#: shared namer (``backup_paths.PRE_PACKAGE_PREFIX``) so no call site can drift
+#: from the common naming rule.
+BACKUP_NAME_PREFIX = PRE_PACKAGE_PREFIX
 
 
 class StandardPackageError(ValueError):
@@ -151,28 +154,16 @@ class PackageInstallResult(BaseModel):
 
 
 def _backup_path(directory: Path) -> Path:
-    """Return a **new** pre-install safety backup path that does not yet exist.
+    """预订一个全新的 ``pre-package-`` 安全备份路径。
 
-    The name is unique to the microsecond *and* guarded against collision: if
-    the computed path already exists (same microsecond, restored directory, or
-    a clock that does not advance) a ``-1``/``-2``/… suffix is appended until a
-    free name is found.  A safety backup is never silently replaced.
-
-    ``BackupService.create`` writes to the path it is given, so choosing the
-    name here is what keeps two back-to-back installs from destroying the first
-    backup — the previous implementation was precise only to the second.
+    安装/升级前的安全备份名走与迁移前、恢复前完全相同的**唯一命名器**
+    （``reserve_unique_backup_path``）：微秒时间戳 + 短 uuid，并且在此处**独占创建**
+    占位，安装路径随即以 ``reserve=True`` 原子接管，因此同一秒内的连续安装既不会重名，
+    也不可能覆盖任何既有备份。前缀 ``pre-package-`` 保持不变，既有代码与工具继续
+    glob ``pre-package-*.uebackup``。
     """
-    directory = Path(directory)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    candidate = directory / f"{BACKUP_NAME_PREFIX}{stamp}.uebackup"
-    if not candidate.exists():
-        return candidate
-    sequence = 1
-    while True:
-        distinct = directory / f"{BACKUP_NAME_PREFIX}{stamp}-{sequence}.uebackup"
-        if not distinct.exists():
-            return distinct
-        sequence += 1
+
+    return reserve_unique_backup_path(directory, BACKUP_NAME_PREFIX)
 
 
 def _canonical_json(value: dict) -> bytes:
@@ -1099,7 +1090,7 @@ class StandardPackageService:
             self._remove_legacy_source_directories()
         )
         backup_path = _backup_path(self.paths.backups)
-        self.backup.create(backup_path)
+        self.backup.create(backup_path, reserve=True)
         destination = (self.paths.standards / manifest.package_id).resolve()
         if destination.parent != self.paths.standards.resolve():
             raise StandardPackageError("标准包目标目录不安全")

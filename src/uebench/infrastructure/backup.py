@@ -13,9 +13,31 @@ from enum import Enum
 from pathlib import Path, PurePosixPath
 from uuid import uuid4
 
+from .backup_paths import (
+    PRE_MIGRATION_PREFIX,
+    PRE_PACKAGE_PREFIX,
+    PRE_RESTORE_PREFIX,
+    BackupPathError,
+    claim_reserved_backup_path,
+    reserve_unique_backup_path,
+)
 from .database import DatabaseManager
 from .paths import AppPaths
 from .repositories import AuditRepository
+
+__all__ = [
+    "APPLICATION_DATA_ROOTS",
+    "BackupPathError",
+    "BackupScope",
+    "BackupService",
+    "BackupValidationError",
+    "PRE_MIGRATION_PREFIX",
+    "PRE_PACKAGE_PREFIX",
+    "PRE_RESTORE_PREFIX",
+    "claim_reserved_backup_path",
+    "create_sqlite_snapshot",
+    "reserve_unique_backup_path",
+]
 
 
 class BackupValidationError(ValueError):
@@ -116,7 +138,13 @@ class BackupService:
         self.database = database
         self.audit = audit or AuditRepository(database)
 
-    def create(self, path: Path, *, scope: BackupScope = BackupScope.USER_DATA) -> Path:
+    def create(
+        self,
+        path: Path,
+        *,
+        scope: BackupScope = BackupScope.USER_DATA,
+        reserve: bool = False,
+    ) -> Path:
         """Write a backup archive and return its path.
 
         ``scope=BackupScope.USER_DATA`` (the default, and what every *safety*
@@ -132,10 +160,26 @@ class BackupService:
         application data subtrees.  It is the explicit user-initiated "full
         environment backup" and is only reachable through
         :meth:`create_full_environment`.
+
+        ``reserve=True`` is the *safety* write path and only accepts a path
+        returned by
+        :func:`~uebench.infrastructure.backup_paths.reserve_unique_backup_path`
+        (the file that helper exclusively created and stamped with its
+        reservation token).  :func:`~uebench.infrastructure.backup_paths.claim_reserved_backup_path`
+        proves that ownership, so an existing ``.uebackup`` archive can never be
+        taken over as if it were a reservation.  The archive itself is built in
+        a sibling temporary file and moved onto the reserved name with
+        :func:`os.replace`.  A process killed before that rename leaves the
+        reservation behind — a name that fails ``validate`` — never a
+        half-written, corrupt ``.uebackup``.
         """
         scope = BackupScope(scope)
-        path = path.resolve()
-        path.parent.mkdir(parents=True, exist_ok=True)
+        path = Path(path)
+        if reserve:
+            path = claim_reserved_backup_path(path)
+        else:
+            path = path.resolve()
+            path.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="uebench-backup-") as temporary:
             temporary_path = Path(temporary)
             database_copy = temporary_path / "uebench.sqlite3"
@@ -165,14 +209,32 @@ class BackupService:
                 "scope": scope.value,
                 "files": files,
             }
-            with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-                archive.write(database_copy, "uebench.sqlite3")
-                for archive_name, item in source_files:
-                    archive.write(item, archive_name)
-                archive.writestr(
-                    "manifest.json",
-                    json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+            destination = path
+            if reserve:
+                # Build the archive beside the reservation, then let ``os.replace``
+                # take the reserved name over in one step.  A crash between the
+                # two leaves the reservation placeholder behind (which
+                # ``validate`` rejects), never a truncated archive.
+                handle, staged = tempfile.mkstemp(
+                    prefix=f".{path.name}.", suffix=".partial", dir=path.parent
                 )
+                os.close(handle)
+                destination = Path(staged)
+            try:
+                with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                    archive.write(database_copy, "uebench.sqlite3")
+                    for archive_name, item in source_files:
+                        archive.write(item, archive_name)
+                    archive.writestr(
+                        "manifest.json",
+                        json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+                    )
+                if reserve:
+                    os.replace(destination, path)
+            except BaseException:
+                if reserve:
+                    destination.unlink(missing_ok=True)
+                raise
         self.audit.append(
             "BACKUP_CREATE",
             "backup",
@@ -275,8 +337,13 @@ class BackupService:
         database.
         """
         manifest = self.validate(path)
-        pre_restore = self.paths.backups / f"pre-restore-{datetime.now():%Y%m%d-%H%M%S}.uebackup"
-        self.create(pre_restore)
+        # The pre-restore safety backup is a *safety* backup: its name comes from
+        # the one shared namer (microsecond stamp + short uuid) and the name is
+        # exclusively reserved before it is written, so two restores in the same
+        # second — or two at the same microsecond — can never target the same
+        # file and destroy the earlier safety backup.
+        pre_restore = reserve_unique_backup_path(self.paths.backups, PRE_RESTORE_PREFIX)
+        self.create(pre_restore, reserve=True)
         with tempfile.TemporaryDirectory(prefix="uebench-restore-") as temporary:
             temporary_path = Path(temporary)
             with zipfile.ZipFile(path, "r") as archive:
