@@ -950,3 +950,47 @@ Numeric v1 + N01-A + Generic Excel + legacy upgrade、**exact-head CI**、本机
 状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
 `Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
 `ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。
+
+## 三项 blocker 修复完成（本轮）
+
+> 追加记录，取代上文"待完成"。**独立验收对象仍为 Base `fb91ccc6f85791bcaf9751c5681cc00c5a0ed213` → 本 head。**
+
+- final Head：`c380e15215b19a77ed5c3d4f052034df3ea55a70`（本轮 1 个提交，Phase 7 整体 16 个提交）
+
+| # | blocker | 修复 | 验证 |
+|---|---|---|---|
+| 1 | 正式评价范围只在 UI 收口 | `EvaluationService.evaluate()` 在**解析/计算/保存之前**用 `request.standard_id` 判范围（换 `selection_mode` 绕不过），范围外抛 `ValueError` 且**不写任何记录**；`preview()` 显式保留为对所有标准开放并写入 docstring | 独立复现：`gb-16780-2021` 拒绝、记录 `0→0`、DB `rows=0`、`preview()` 仍算出 LEVEL_1 且不落记录、GB29446 仍落记录；新增门禁测试 11 项（含不导入 Qt/无 MainWindow 直调、`ast` 守卫、子进程从未加载 PySide6、穷举 >40 个范围外标准） |
+| 2 | 安装仍把标准原文写入用户数据目录 | 暂存循环改为**仅 `correction`**（`sources/*` 只留在压缩包内，`preview()` 逐文件哈希校验不变）；并在**取升级前备份之前**清理旧版遗留的 `standards/<pkg>/sources`（严格限定、junction/符号链接防护、不动用户文档），记 WARNING + 审计行 `STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED` + 计数上报 | 独立复现：装含 sources 旧包后用户目录 PDF **0**；人为注入 3 份遗留 PDF → 再装后 **0**（`removed_dirs=1 removed_files=3`）；**两个 `.uebackup` 逐成员清点 `pdf=0`**；真实 Candidate EXE 自检后用户数据目录 PDF **0** |
+| 3 | 安全备份可被静默覆盖 | `_backup_path()` 改 `%Y%m%d-%H%M%S-%f`（微秒）+ 显式碰撞守卫 `-1/-2…`，**绝不覆盖**；前缀与备份机制（sqlite3 在线备份）不变；测试中 `time.sleep(1.05)` 规避已移除 | 独立复现：连续两次安装（无 sleep）备份路径不同、两个都在、**第一个未被覆盖**（sha256 不变）；新增 `tests/test_package_install_safety.py` 10 项（含碰撞回归、同秒 200 个名字唯一、守卫绝不返回已存在路径） |
+
+**同时消除"失败断言退化为无限挂起"这一类风险**（此前多次全量跑不出失败清单的真因：门禁上线后某 UI 测试触发**真模态 `QMessageBox.critical`**）：`test_ui.py` 增加 autouse 对话框中和 fixture（函数体内重新 patch 仍生效），门禁测试子进程改为写普通文件 + `timeout=600`。
+
+### 回归结果（pytest 口径）
+
+```text
+literal full suite: 939 passed / 65 skipped / 4 xfailed，exit 0
+  junit G:\tmp\p7-full.xml: tests=1008 fail=0 err=0 skipped=69（65 真实 skip + 4 xfail）
+  65 个 skip 全部为既有"未声明已构建 Candidate（UEBENCH_ARTIFACT_DIR 未设）"一类
+Artifact Gate（真实 rc-c380e15）: 66 passed, exit 0
+audit_release: valid=True, errors=[]；no_standard_pdf 各计数全 0
+冻结 EXE --self-check: exit 0（6/6，含 GB29446 Golden 回放 / 记录往返 / Excel 链路）
+exact-head CI（c380e15）: Windows Release Candidate / Numeric v1 / N01-A 全 success
+```
+未删除、未 skip、未 xfail、未 deselect 任何测试；未放宽任何断言；GB29446 数学/阈值/Numeric/Golden 未改动。
+
+### 产物（rc-c380e15）
+
+| 文件 | size |
+|---|---|
+| `UEBench-0.2.0-rc-c380e15-win-x64.zip` | 157,065,836 |
+| `UEBench-Setup-0.2.0-rc-c380e15-x64.exe` | 104,807,403 |
+| `UEBench-source-0.2.0-rc-c380e15.zip` | 1,595,271 |
+| `initial-standard-package-published.uebench` | 132,837（0 sources / 0 PDF / provenance-only / 2026.10-published.4） |
+
+### 仍未进行（按本轮要求）
+
+Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工核对，留待最终人工发布验收。**未 merge、未发布。**
+
+状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
+`Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
+`ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。
