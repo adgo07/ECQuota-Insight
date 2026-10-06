@@ -151,8 +151,15 @@ if (-not [string]::IsNullOrWhiteSpace($SelfCheckExe) -and (Test-Path -LiteralPat
     }
     New-Item -ItemType Directory -Path $DataDir -Force | Out-Null
     $reportPath = Join-Path $OutputDir "self-check.json"
-    & $SelfCheckExe --self-check --output $reportPath --data-dir $DataDir
-    $code = $LASTEXITCODE
+    # Candidate EXEs use the windowed subsystem; wait for the real process.
+    $selfCheckProcess = Start-Process -FilePath $SelfCheckExe -ArgumentList @("--self-check", "--output", ('"{0}"' -f $reportPath), "--data-dir", ('"{0}"' -f $DataDir)) -Wait -PassThru -WindowStyle Hidden
+    $code = if ($selfCheckProcess.ExitCode -ne 0) {
+        $selfCheckProcess.ExitCode
+    } elseif (Test-Path -LiteralPath $reportPath -PathType Leaf) {
+        0
+    } else {
+        1
+    }
     Add-Finding -Check "打包后可执行自检" -Status $(if ($code -eq 0) { "PASS" } else { "FAIL" }) `
         -Detail "exit=$code report=$reportPath"
 }

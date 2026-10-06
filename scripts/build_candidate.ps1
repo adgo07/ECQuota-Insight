@@ -210,8 +210,21 @@ try {
     if (-not (Test-Path -LiteralPath $SelfCheckExe -PathType Leaf)) {
         throw "Candidate payload 缺少 UEBench.exe：$SelfCheckExe"
     }
-    & $SelfCheckExe --self-check --data-dir $SelfCheckData --output $SelfCheckReport
-    if ($LASTEXITCODE -ne 0) { throw "打包 EXE 自检失败，退出码：$LASTEXITCODE" }
+    # UEBench.exe is a windowed (console=False) executable. PowerShell's direct
+    # call operator returns before GUI-subsystem processes finish, which can
+    # make the report check race the self-check. Start-Process -Wait gives us
+    # the actual process exit code after the report has been written.
+    $SelfCheckArguments = @(
+        "--self-check",
+        "--data-dir",
+        ('"{0}"' -f $SelfCheckData),
+        "--output",
+        ('"{0}"' -f $SelfCheckReport)
+    )
+    $SelfCheckProcess = Start-Process -FilePath $SelfCheckExe -ArgumentList $SelfCheckArguments -Wait -PassThru -WindowStyle Hidden
+    if ($SelfCheckProcess.ExitCode -ne 0) {
+        throw "打包 EXE 自检失败，退出码：$($SelfCheckProcess.ExitCode)"
+    }
     if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) {
         throw "打包 EXE 自检未生成报告：$SelfCheckReport"
     }
