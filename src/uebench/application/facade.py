@@ -29,7 +29,17 @@ from .ports import (
     WorkbookImportPort,
 )
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
+from .package_reconciliation import ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
+
+
+def _library_sort_key(definition: StandardDefinition) -> tuple[date, int, str]:
+    """Order installed revisions of one standard so the newest one wins.
+
+    Mirrors the repository's own ``desc(effective_date), desc(rule_revision)``
+    intent, but states it explicitly instead of depending on row order.
+    """
+    return (definition.effective_date, definition.rule_revision, definition.version)
 
 
 class ApplicationFacade:
@@ -64,6 +74,7 @@ class ApplicationFacade:
         self._catalogue_dir = catalogue_dir.resolve() if catalogue_dir is not None else None
         self._catalogue_cache: list[StandardDefinition] | None = None
         self._catalog = StandardCatalogService(standards)
+        self._package_reconciliation: ReconciliationOutcome | None = None
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.evaluate(request)
@@ -84,9 +95,21 @@ class ApplicationFacade:
         never returned by the evaluation-selection methods.  This allows a
         newly added, pending-confirmation standard to be discoverable in the
         library without weakening the ``published`` calculation gate.
+
+        One entry per standard id is returned, and it must be the **newest rule
+        revision** of that standard.  A standard can legitimately have several
+        revisions installed at once (RS01 keeps superseded revisions so historic
+        evaluations stay reproducible), so collapsing them with a bare
+        ``{item.id: item}`` would silently keep whichever row the repository
+        happened to yield last -- the repository orders by ``desc(rule_revision)``,
+        so that was the *oldest* revision.  The library page and the diagnostics
+        view then reported the superseded rule as if it were the current one.
         """
-        installed = self._standards.list_all()
-        by_id = {item.id: item for item in installed}
+        by_id: dict[str, StandardDefinition] = {}
+        for item in self._standards.list_all():
+            current = by_id.get(item.id)
+            if current is None or _library_sort_key(item) > _library_sort_key(current):
+                by_id[item.id] = item
         for item in self._load_catalogue_standards():
             by_id.setdefault(item.id, item)
         return sorted(by_id.values(), key=lambda item: (item.number, item.effective_date, item.rule_revision))
@@ -216,6 +239,18 @@ class ApplicationFacade:
     def has_package_service(self) -> bool:
         return self._package is not None
 
+    def record_package_reconciliation(self, outcome: ReconciliationOutcome) -> None:
+        """记录最近一次启动标准包对账结果（由组合根在启动时调用）。"""
+        self._package_reconciliation = outcome
+
+    def last_package_reconciliation(self) -> ReconciliationOutcome | None:
+        """返回最近一次启动标准包对账结果；尚未对账时返回 ``None``。
+
+        只读访问器：界面/自检据此说明“本次启动是否安装或升级了内置标准包”，
+        不需要（也不允许）自己重新比较版本。
+        """
+        return self._package_reconciliation
+
     def list_audit(self, limit: int = 200) -> list[AuditEntry]:
         if self._audit is None:
             return []
@@ -245,9 +280,17 @@ class ApplicationFacade:
         return self._package.install(path)
 
     def create_backup(self, path: Path) -> Path:
+        """User-initiated full environment backup (数据库 + 可重建应用数据).
+
+        Safety backups (migration / package install / pre-restore) are taken by
+        the infrastructure services on their own and carry the user's business
+        data only; this user-facing entry point keeps the historical "one
+        self-contained archive" semantics by asking for the full environment
+        explicitly.
+        """
         if self._backup is None:
             raise RuntimeError("备份服务未配置")
-        return self._backup.create(path)
+        return self._backup.create_full_environment(path)
 
     def restore_backup(self, path: Path) -> None:
         if self._backup is None:

@@ -1,32 +1,26 @@
 # -*- mode: python ; coding: utf-8 -*-
 from pathlib import Path
-import sys
 
 
 project_root = Path(SPECPATH)
-site_packages = Path(sys.prefix) / "Lib" / "site-packages"
-binaries = [
-    # PySide6's extension modules live under PySide6/, while the shiboken
-    # runtime DLL is collected under shiboken6/.  A flat copy makes the
-    # dependency resolvable by the Windows loader before package init runs.
-    (str(site_packages / "shiboken6" / "shiboken6.abi3.dll"), "."),
-]
-binaries.extend(
-    (str(path), ".")
-    for path in (site_packages / "PySide6").glob("*.dll")
-    # The application opens PDF files with the Windows default viewer and
-    # does not import QtWebEngine/QtWebView.  Do not ship these multi-hundred
-    # megabyte browser runtimes in the offline desktop package.
-    if path.name not in {"shiboken6.abi3.dll"}
-    and not path.name.lower().startswith(("qt6webengine", "qt6webview"))
+# Qt 与 shiboken 正本由 PyInstaller hook 按包目录收集；现有运行时
+# hook 提供 DLL 搜索路径。不再手工生成根目录下的四个重复 DLL 副本。
+# 保留自动 hook 收集的全部插件、翻译与其他运行库。
+binaries = []
+# ECQ-RS05: the standard package is bundled from a PINNED, tracked release
+# input rather than from dist/.  A clean checkout has no dist/ directory, so
+# reading it from there made a reproducible build impossible.  The pinned copy
+# is byte-identical to the published asset and its hash is locked by
+# release/standard-packages/PIN.json.  Keep the relative path as one canonical
+# string so the Source Gate can audit it.
+STANDARD_PACKAGE_RELATIVE_PATH = (
+    "release/standard-packages/initial-standard-package-published.uebench"
 )
+
 datas = [
     (str(project_root / "migrations"), "migrations"),
     (str(project_root / "src" / "uebench" / "resources"), "uebench/resources"),
-    (
-        str(project_root / "dist" / "standard-packages" / "initial-standard-package-published.uebench"),
-        "uebench/resources",
-    ),
+    (str(project_root / STANDARD_PACKAGE_RELATIVE_PATH), "uebench/resources"),
 ]
 
 a = Analysis(
@@ -51,6 +45,7 @@ a.binaries = [
     entry
     for entry in a.binaries
     if Path(entry[0]).name.lower() not in {"icuuc.dll", "icudt78.dll"}
+    and not Path(entry[0]).name.lower().startswith(("qt6webengine", "qt6webview"))
 ]
 pyz = PYZ(a.pure)
 

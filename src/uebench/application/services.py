@@ -13,6 +13,8 @@ from uebench.domain.models import (
     StandardSelectionMode,
 )
 
+from .evaluation_support import evaluation_support_label, supports_formal_evaluation
+
 
 class StandardRepository(Protocol):
     def get_published(self, standard_id: str) -> StandardDefinition | None: ...
@@ -119,11 +121,32 @@ class EvaluationService:
         return result
 
     def preview(self, request: EvaluationRequest) -> EvaluationResult:
-        """Calculate a result without creating a formal evaluation record."""
+        """Calculate a result without creating a formal evaluation record.
+
+        Deliberately **open to every installed standard**, including the ones the
+        software does not formally support: preview writes nothing, so an
+        out-of-scope standard can still be inspected without claiming a verified
+        formal evaluation capability.  Only :meth:`evaluate` is gated by the
+        formal-scope registry.
+        """
         standard = self._resolve_standard(request)
         return self._calculate(request, standard)
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
+        """Formal evaluation: the only path that writes an evaluation record.
+
+        It is gated by the application-layer formal-scope registry
+        (:mod:`uebench.application.evaluation_support`) *before* the standard is
+        resolved, calculated or saved, so no adapter -- UI, Excel or a future one
+        -- can produce a formal record for a standard outside the scope.  The
+        check reads ``request.standard_id`` directly rather than the resolved
+        definition, so changing ``selection_mode`` cannot slip an out-of-scope
+        standard past it.
+        """
+        if not supports_formal_evaluation(request.standard_id):
+            raise ValueError(
+                f"{evaluation_support_label(request.standard_id)}：该标准不能形成正式评价记录，仅可预览。"
+            )
         if request.selection_mode is StandardSelectionMode.FUTURE:
             raise ValueError("尚未实施标准只能预览，不能形成正式判定或保存评价记录。")
         standard = self._resolve_standard(request)

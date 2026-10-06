@@ -14,29 +14,44 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-**`ECQ-RS04` — `DONE`**（GB29446 Product Golden Gate）
+**`ECQ-RS05` — `IN PROGRESS / RELEASE CANDIDATE`**（Windows V1 Release Candidate）
 
 - `ECQ-GOV01 = DONE`（验收载体 PR #8）；
 - `ECQ-RS01 = DONE`（验收载体 PR #9）；
 - `ECQ-RS02 = DONE`（验收载体 PR #10）；
 - `ECQ-RS03 = DONE`（验收载体 PR #11）；
 - `ECQ-RS04 = DONE`（验收载体 PR #12）；
-- `GB29446 Business Capability = COMPLETE`；
-- `GB29446 Product Lifecycle = COMPLETE`；
-- `GB29446 Excel Adapter = COMPLETE`；
-- **`GB29446 Product Golden = ADOPTED (v1)`**；
-- **`Reference Standard 产品证据 = READY FOR RS05 WINDOWS ACCEPTANCE`**；
-- `Reference Standard Product Closure = PARTIAL`（尚欠 RS05）；
-- Golden v1 由标准原文（表1 / 表2 / 式(1) / 附录A 表A.1）+ 已发布 Definition + Numeric Contract v1
-  **独立推导**，**未**使用软件输出反向生成；
-- 产物：`tests/golden/gb29446_product_golden_v1.json`、
-  `tests/test_gb29446_product_golden.py`、`docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`；
-- 四类 Gate：A 业务 Golden（13 个正常案例 + 2 个安全案例）、B 产品生命周期（真实独立进程重启）、
-  C Excel Golden（GUI Request == Excel Request，两条路径投影 == Golden）、D Regression；
-- 覆盖：12 个附录A 系数、两煤种、1/2/3级与超出3级、6 个 exact threshold、
-  1 个 full-value trap（`5.0000004 → 2级`）；
-- 下一阶段 `RS05` = `NOT STARTED`；本任务未实施 RS05–RS06。
+- **`ECQ-RS05 = IN PROGRESS / RELEASE CANDIDATE`**（验收载体 PR #13）——
+  **不得**在本阶段写成 `DONE` 或 `UEBench 0.2.0 = RELEASED`；
+  只有独立验收 + merge + final release cut 之后才能写 `DONE`；
+- 目标版本：**`UEBench 0.2.0`**；唯一版本源为 `pyproject.toml` `[project] version`，
+  其余正式发布链文件由 `tools/release_version.py` 生成或读取；
+- `GB29446 Business Capability = COMPLETE`；`GB29446 Product Lifecycle = COMPLETE`；
+  `GB29446 Excel Adapter = COMPLETE`；**`GB29446 Product Golden = ADOPTED (v1)`**；
+- `Reference Standard 产品证据 = READY FOR RS05 WINDOWS ACCEPTANCE`；
+- `Reference Standard Product Closure = PARTIAL`（尚欠 RS05 完成）；
+- 本质检视结论：**Reference Standard Product Closure 保持 `PARTIAL`**，
+  `D-ECQ-006` 仍 **OPEN**。
 
+### RS05 Blocker 状态
+
+**已关闭 Blocker 1（固定标准包内 GB29446 定义落后）** —— 项目负责人批准方案 B 后执行：
+以已签名 `2026.09-published.2`（SHA256 `4f025b8a…1727`）为父基线，**只**把 GB29446 定义
+由 `rule_revision=1` 替换为当前 `rule_revision=2`，其余 46 项标准内容逐字节保持不变，
+重新签名生成新的完整正式标准包 `2026.10-published.3`（SHA256 `14db53be…32b0`）。
+全程未使用 `统一标准规则确认表.xlsx`。RS04 Product Golden 回放 15/15 通过，
+冻结 EXE 自检由 `exit 1` 变为 `exit 0`。详见 `release/standard-packages/PIN.json` 与
+`docs/governance/RS05_EXECUTION_REPORT.md` §5.2A/§7.4。
+
+**未关闭 Blocker 2（Windows 验收证据不完整，如实记录）**
+2. **Windows 验收证据不完整（如实记录，不伪造 PASS）**
+   - 本机仅有 **Windows 10 Build 19045**，**无 Windows 11 环境** → `BLOCKED`；
+   - 本机仅 **1 个显示器**，无法实测“不同 DPI 显示器之间拖动窗口” → `BLOCKED`；
+   - **DPI 100/125/150/175/200 五档实机实测** → `BLOCKED`；
+   - 标准（非管理员）账户、Windows 10 实机 → `PASS`；
+   - 离线运行 → 本次为 `OBSERVED-ONLINE`，需在断网验收机复测。
+
+- RS05 的两个未关闭 blocker 见本文件“当前任务”一节；
 > `READY FOR RS05 WINDOWS ACCEPTANCE` **不等于“可发布”**；Windows 正式交付证据尚未建立。
 >
 > 本文件只记录稳定状态。PR head SHA、审查进度与合并状态一律以对应 PR 为准，不写入本文件。
@@ -77,7 +92,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Windows V1 最终验收与发布                     NOT STARTED  ← 下一阶段
+→ RS05 Windows V1 最终验收与发布                     IN PROGRESS / RELEASE CANDIDATE  ← 当前阶段
 → RS06 第二标准架构验证                              NOT STARTED
 ```
 
@@ -95,13 +110,15 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 | GB29446 Product Golden | `ADOPTED (v1)` |
 | Reference Standard 产品证据 | `READY FOR RS05 WINDOWS ACCEPTANCE` |
 | Reference Standard Product Closure | `PARTIAL`（尚欠 RS05） |
-| Windows V1 最终验收与发布 | `NOT STARTED`（RS05 处理） |
+| Windows V1 最终验收与发布 | `IN PROGRESS / RELEASE CANDIDATE`（RS05 进行中，未 DONE） |
 | 第二标准架构验证 | `NOT STARTED`（RS06 处理） |
 
 ## 发布物状态
 
 - **上一正式发布物 / Previous Release**：`UEBench 0.1.0`、standard package `2026.09-published.2`。历史已发布版本，**不代表当前 main 源码**。
-- **当前开发源码 / Current Development Source**：以执行时实际 `main` SHA 为准；正在开发下一正式版；RS05 完成前不把旧 EXE 当作当前源码正式 Candidate。
+- **当前 Candidate / Current Release Candidate**：`UEBench 0.2.0`（RS05 产出；**未正式发布**，待独立验收与 final release cut）。
+  便携包 / 安装程序 / 源码包的文件名与 SHA256 以交付目录中的 `SHA256SUMS.txt` 与 `release-build-info.json` 为准，不在本文件内固定。
+- **当前开发源码 / Current Development Source**：以执行时实际 `main` SHA 为准。
 
 ## 当前 OPEN
 
@@ -119,13 +136,11 @@ ECQ-GOV01 治理清理与路线收口                        DONE
   RS04 **未关闭**该问题，也**未**写成官方解释；Golden 的 full-value trap 案例只把当前软件口径
   冻结为可回归的产品证据。
 
-**RS05 Release Gate（RS04 登记，未修复）**：
+**RS05 已修复（RS04 登记的 Release Gate）**：
 
-- `corrupted historical result_json` 爆炸半径：`SqlEvaluationRepository.list_recent()` 逐行
-  `EvaluationResult.model_validate_json(row.result_json)` 且**无异常隔离**
-  （`src/uebench/infrastructure/repositories.py:293`），单条损坏会使整个“评价记录”页与首页
-  最近记录加载失败。分类 `LOCAL DEFECT`，**不是** RS04 Golden Adoption 的 blocker，
-  须在 RS05 Windows 正式交付前处理。详见 `docs/golden/GB29446_PRODUCT_GOLDEN_V1.md` §11.2。
+- `corrupted historical result_json` 爆炸半径：RS05 已在 infrastructure 层按行隔离反序列化，
+  单条损坏记录降级显示并记录 WARNING，不再中断“评价记录”页、首页或应用启动；
+  detail 明确提示“记录损坏”，不伪装成“已删除 / 不存在”。详见 RS05 执行报告。
 
 其他 Deferred（仅登记）：
 
@@ -135,11 +150,79 @@ ECQ-GOV01 治理清理与路线收口                        DONE
   **只登记，不修改任何标准数据**，应在后续独立任务中收口；
 - 历史列表 `result-json` 性能优化（RS02 deferred）仍未处理。
 
+## RS05 本轮补充：运行时标准包对账 与 Candidate 身份闭环
+
+- **已实现启动期标准包对账**（替代原“只要库里有标准就跳过”的一次性初始化）：
+  空库安装 / 已同包 NO-OP（不重复备份、不重复安装）/ 旧包安全升级 /
+  已装更新包不降级 / 同版本或内容冲突不覆盖并提示 / 内置包验签失败不安装。
+  版本排序复用既有 `_data_version_key`，未另造第二套版本算法。
+- **升级数据安全**：升级前用现有安全备份能力（`pre-package-<时间>.uebackup`），
+  安装单事务、失败回滚、不留半升级状态；历史评价及其规则快照不被新规则重算。
+- **GB29446 fail-fast**：当前定义缺少正式 r2 结构（煤种维度 / 工艺系数）时明确提示
+  「标准规则数据不完整或版本不兼容」、禁止正式计算，不再用产品名冒充煤种。
+- **Candidate 身份**：RC 阶段资产名与 CI artifact 名携带 `-rc-<short7>`；
+  `release-build-info.json` 记录 `product_version` / `candidate_id` / `source_commit`(40位) /
+  `source_dirty` / 标准包身份 / `payload_tree_sha256` / `build_time_utc`；
+  正式 Candidate 要求 `source_dirty=false`；CI 校验 `source_commit` 与 exact head 一致。
+- **应用内诊断**：菜单「帮助 → 关于 / 诊断信息…」可查看并复制产品版本、Candidate 身份、
+  源码提交、内置/已安装标准包 id 与数据版本、标准包 SHA256、GB29446 `rule_revision`、
+  DB schema、数据目录与最近一次对账结果。
+- **单一 ACTIVE Candidate**：旧的 `dist/candidate` 已归档为
+  `dist/archive/SUPERSEDED-candidate-2026-10-04-before-identity`（含 SHA256 证据）；
+  构建脚本在组装前清空输出目录并写入 `ACTIVE-CANDIDATE.json`。
+- 状态仍为 **`RS05 = IN PROGRESS / RELEASE CANDIDATE`**；`D-ECQ-006` 继续 OPEN；
+  `Reference Standard Product Closure = PARTIAL`。
+
 ## 下一步
 
 - `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；
-- 下一阶段 = **`RS05` — Windows V1 最终验收与发布**（`NOT STARTED`）；RS06 未开始；
+- 当前阶段 = **`RS05` — Windows V1 最终验收与发布**（`IN PROGRESS / RELEASE CANDIDATE`）；RS06 未开始；
 - `READY FOR RS05 WINDOWS ACCEPTANCE` 不等于“可发布”；Windows 正式交付证据尚未建立；
 - 历史便携 ZIP 缺失仍是已知发布资产问题；具体执行证据见对应 PR，不据此宣布 Windows 最终交付完成。
 
-本任务停在 RS04，未开始 RS05。
+本任务停在 RS05 候选阶段，未开始 RS06。
+
+## Phase 7 收口进度（进行中，未验收）
+
+> 本节为**追加**记录，不改写上文历史。上文关于 `2026.10-published.3` 的叙述是其时事实；
+> 自本轮起，**当前正式标准包已变更为不含标准 PDF 的 `2026.10-published.4`**。
+
+### 新正式标准包（去 PDF，provenance-only）
+
+| 项目 | 值 |
+|---|---|
+| `package_id` | `gb29446-r2-provenance-only-from-2026.10-published.3` |
+| `data_version` | `2026.10-published.4`（排序晚于 `.3`） |
+| `minimum_app_version` | `0.2.0` |
+| size / SHA256 | 132,837 B / `023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff` |
+| 标准 / 规则 | 48 / 765（业务内容不变） |
+| 成员 | 48 × `definitions/*.json` + `corrections.json` + manifest + signature；**0** 个 `sources/*`、**0** 个 PDF |
+
+- 去 PDF 方式：manifest 新增自描述字段 `source_policy ∈ {"embedded","provenance-only"}`，
+  **默认 `embedded`** —— 因此所有历史/归档包仍按原语义校验，legacy 读取兼容未被破坏。
+- 定义 provenance（`source_file` / `source_sha256` / `source_references`）**保留**，
+  仅不再分发原文文件；`install()` 因而不再把 PDF 写入用户数据目录。
+- 逐字节证据（对归档基线以 `--verify-only` 复核）：
+  `removed_source_count=48, added=[], changed=[], unchanged_member_count=49` ——
+  48 个定义与 `corrections.json` 逐字节一致，仅 `manifest.json` / `signature.ed25519` 变化。
+- 旧 `2026.10-published.3` 已按既有规则归档为 SUPERSEDED / REFERENCE ONLY。
+- 新增 Gate：`tools/audit_release.py` 的 `no_standard_pdf` 一节 + Artifact Gate 四项
+  （发布目录 / 标准包 / 便携 ZIP / payload 清单均不得出现标准 PDF 或 `sources/*`）。
+
+### 支持范围 / 官方来源 / 时间显示（基础模块已完成）
+
+- `application/evaluation_support.py`：单一软件评价支持范围 = `{"gb-29446-2019"}`，
+  **不读 `publication_status`**（有 AST 守卫测试）。
+- `application/official_sources.py`：仅固定常量，**一个已核实**官方地址
+  `https://std.samr.gov.cn/gb/search/gbDetailed?id=9A0A4FA998CDD4A5E05397BE0A0AD02D`
+  （两次独立抓取 HTTP 200、内容与本仓标准快照逐项吻合）；其余标准一律未登记。
+- `ui/presentation.py`：`naive → UTC → 系统本地时区`，显示 `YYYY-MM-DD HH:MM:SS`、无微秒。
+
+### 尚未完成（因此本轮不构成完成报告）
+
+UI 收口（标准库信息结构 / 新建评价页 / 时间显示接入 / 声明原文入口）、
+release 文档中"当前包为 .3 / 48 项标准"表述的统一更新、重建 Candidate、
+Source/Artifact Gate + RS04 Golden + self-check + Numeric v1 + N01-A + Generic Excel +
+legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实产品链人工验证。
+**注意**：`dist/release` 仍是用旧包构建的 Candidate，新增"无 PDF"断言对它必然失败，
+必须重建后才转绿（不得以删断言或 skip 掩盖）。

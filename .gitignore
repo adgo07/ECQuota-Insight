@@ -29,3 +29,14 @@
 *.private.pem
 **/private_key.pem
 **/signing-key.pem
+
+# 本地草稿与临时排查目录：绝不入库，也不应让工作树被判定为 dirty。
+# ECQ-RS05 起，正式 Candidate 构建要求 source_dirty = false，因此这些
+# 只存在于开发机的路径必须在此显式忽略，而不是靠“记得别提交”。
+# 注意：标准原文 PDF 只在本机留存，不入库、不随产品分发。
+/标准原文/
+/.acl-recovery/
+/.rs02-check/
+/PR_BODY_DRAFT.md
+*_DRAFT.md
+*.draft.md

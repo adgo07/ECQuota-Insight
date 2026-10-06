@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 
 from uebench.application.facade import ApplicationFacade
@@ -13,6 +14,8 @@ from uebench.infrastructure.packages import StandardPackageService
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.sources import StandardSourceService
 from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRepository, SqlStandardRepository
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -35,8 +38,13 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
     paths = AppPaths.from_root(root) if root is not None else AppPaths.default()
     paths.ensure()
     configure_logging(paths.logs)
-    database = DatabaseManager(paths.database)
-    database.initialize()
+    database = DatabaseManager(paths.database, paths=paths)
+    # ``initialize`` writes a WAL-safe ``backups/pre-migration-*.uebackup``
+    # snapshot whenever the schema is about to change, and returns ``None``
+    # when the database is fresh or already at the migration head.
+    pre_migration_backup = database.initialize()
+    if pre_migration_backup is not None:
+        logger.info("迁移前数据库备份已创建：%s", pre_migration_backup)
     audit = AuditRepository(database)
     standards = SqlStandardRepository(database, audit)
     evaluations = SqlEvaluationRepository(database, audit)

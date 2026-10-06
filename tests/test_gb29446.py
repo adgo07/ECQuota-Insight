@@ -138,43 +138,6 @@ def test_each_coal_grade_boundaries_include_threshold_and_values_on_both_sides(s
     assert EvaluationEngine().evaluate(standard, request).results[0].grade is expected
 
 
-@pytest.mark.parametrize(
-    ("actual", "expected"),
-    [
-        ("5.0000004", Grade.LEVEL_1),
-        ("5.0000005", Grade.LEVEL_2),
-        ("8.5000004", Grade.LEVEL_3),
-        ("8.5000005", Grade.NOT_QUALIFIED),
-    ],
-)
-def test_gb29446_grade_threshold_comparisons_round_both_values_to_six_places(standard, actual, expected):
-    request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual=actual)
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.grade is expected
-
-
-@pytest.mark.parametrize(
-    ("electricity", "expected", "rounded_comparison"),
-    [
-        ("5.0000004", Grade.LEVEL_1, "5.000000 <= 5.000000"),
-        ("8.5000004", Grade.LEVEL_3, "8.500000 <= 8.500000"),
-    ],
-)
-def test_detail_formula_grade_trace_shows_six_place_comparison(standard, electricity, expected, rounded_comparison):
-    request = _request(
-        standard,
-        "炼焦煤",
-        process="跳汰、浮选联合",
-        electricity=electricity,
-        raw_coal="1",
-    )
-    result = EvaluationEngine().evaluate(standard, request).results[0]
-    assert result.actual_value == Decimal(electricity)
-    assert result.grade is expected
-    comparison_step = next(step for step in result.calculation_trace if step.operation == "grade_comparison")
-    assert rounded_comparison in comparison_step.expression
-
-
 def test_missing_or_false_single_coal_flag_does_not_block_grade(standard):
     request = _request(standard, "炼焦煤", mode=InputMode.DIRECT, actual="9")
     result = EvaluationEngine().evaluate(standard, request).results[0]

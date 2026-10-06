@@ -14,9 +14,12 @@ import pytest
 from sqlalchemy import text
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QPushButton, QTextEdit
 
+from uebench.application import evaluation_support
+from uebench.application.evaluation_support import FORMAL_EVALUATION_UNSUPPORTED_LABEL
+from uebench.application.official_sources import official_source_url
 from uebench.bootstrap import create_context
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import EvaluationRequest, EvaluationResult, Grade, InputValue, StandardDefinition, StandardSelectionMode
@@ -52,6 +55,21 @@ def raw_state(context, evaluation_id):
 
 def forbidden(*args, **kwargs):
     raise AssertionError("历史只读操作不得运行 Engine / 当前标准查询")
+
+
+def seed_legacy_record(context, request):
+    """直接写入一条**历史**正式记录，模拟 RS05 §三 之前版本留下的范围外记录。
+
+    ``EvaluationService.evaluate`` 现在拒绝范围外标准，但真实用户的数据库里仍存有旧版本
+    （把 ``published`` 当可评价）写下的记录——这正是本修复要保护的存量数据。要覆盖“这类
+    记录不得经「基于此记录重新评价」回到正式评价”，记录就必须**绕过正式写入口**直接落到
+    仓储，而不是靠临时放宽注册表伪造一次正式评价——那恰恰是修复要禁止的行为。
+    """
+    standard = context.application.get_published_standard(request.standard_id)
+    assert standard is not None, f"夹具标准应已安装：{request.standard_id}"
+    result = context.application.preview_evaluation(request)
+    context.evaluations.save(request, result, standard)
+    return result
 
 
 @pytest.fixture(scope="module")
@@ -90,8 +108,31 @@ def detail_text(window):
     return window.record_detail_dialog.findChild(QTextEdit, "record_detail_content").toPlainText()
 
 
-def technical_text(window):
-    return window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical").toPlainText()
+def record_trace(window, evaluation_id):
+    """同一条记录在仓储里的原始 trace / rule snapshot / 审计数据。
+
+    B1 之后普通界面不再有「技术详情」入口，但这些数据本身必须原样保留。因此断言直接
+    落在仓储 / 应用层读回的原始数据上，而不是落在一个已经删除的控件上。
+    """
+
+    loaded = window.context.application.get_evaluation(evaluation_id)
+    assert loaded is not None, "记录必须存在"
+    request, result, snapshot = loaded
+    return {
+        "evaluation_id": result.evaluation_id,
+        "standard_version": snapshot.version,
+        "rule_revision": snapshot.rule_revision,
+        "numeric_contract_version": result.numeric_contract_version,
+        "numeric_profile_id": result.numeric_profile_id,
+        "calculator_version": result.calculator_version,
+        "numeric_behavior_version": result.numeric_behavior_version,
+        "rule_snapshot_sha256": result.rule_snapshot_sha256,
+        "source_sha256": snapshot.source_sha256,
+        "request_json": request.model_dump_json(),
+        "result_json": result.model_dump_json(),
+        "snapshot_json": snapshot.model_dump_json(),
+        "audit_count": len(window.context.application.list_audit(500)),
+    }
 
 
 def install_r3(context, standard):
@@ -113,6 +154,24 @@ def install_r3(context, standard):
 
 
 # A. 通用 Record Lifecycle
+
+
+@pytest.fixture(autouse=True)
+def _silence_message_boxes(monkeypatch):
+    """No modal box may ever block a headless run.
+
+    Phase 7 added rejection paths that call ``QMessageBox.warning`` (standard
+    outside the formal evaluation scope, no registered official source, source
+    hash mismatch, record cannot be re-evaluated).  A real modal box runs a
+    nested Qt event loop, which hangs pytest indefinitely.  Neutralise all three
+    statics here; a test that needs to assert a dialog re-patches the specific
+    static inside itself, so its expectation still holds.
+    """
+    for _name in ("warning", "information", "critical"):
+        monkeypatch.setattr(
+            QMessageBox, _name, staticmethod(lambda *a, **k: QMessageBox.Ok)
+        )
+    yield
 
 def test_frozen_r2_historical_json_remains_deserializable():
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -145,16 +204,41 @@ def test_view_is_readonly_no_engine_no_current_metadata(lifecycle, monkeypatch):
     assert raw_state(context, result.evaluation_id) == before
     assert workspace == (window.last_result_id, window.gb29446_electricity.text())
     ordinary = detail_text(window)
-    for expected in ["宁夏测试企业", "2026年6月", "炼焦煤", "重介", "E_d：560", "m：100", "折算系数 k：1.12", "6.272", "2级", "e_d = 560 × 1.12 / 100", "第3.1条", "第5.2条", "附录A"]:
+    for expected in [
+        "宁夏测试企业",
+        "2026年6月",
+        "炼焦煤",
+        "重介",
+        "560",
+        "100",
+        "折算系数 k = 1.12",
+        "6.272",
+        "2级",
+        "第3.1条",
+        "第5.2条",
+        "附录A",
+    ]:
         assert expected in ordinary
+    # A4：记录视图里的 E_d / e_d 以真下标渲染；“Ed：560”是下标文本的纯文本投影。
+    assert "Ed：560" in ordinary and "m：100" in ordinary
+    content = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+    assert content is not None and "vertical-align:sub" in content.toHtml()
     assert result.evaluation_id not in ordinary
     assert "numeric_profile_id" not in ordinary
-    technical = window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical")
-    assert technical.isHidden()
-    for expected in [result.evaluation_id, "rule_revision: 2", result.rule_snapshot_sha256, result.numeric_profile_id, request.model_dump_json(), result.model_dump_json(), standard.model_dump_json()]:
-        assert expected in technical.toPlainText()
-    next(button for button in window.record_detail_dialog.findChildren(QPushButton) if button.text() == "技术详情").click()
-    assert not technical.isHidden()
+    # B1：「技术详情」按钮已从普通界面移除，但底层 trace / rule snapshot / 审计数据必须原样保留。
+    assert "技术详情" not in [
+        button.text() for button in window.record_detail_dialog.findChildren(QPushButton)
+    ]
+    assert window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical") is None
+    trace = record_trace(window, result.evaluation_id)
+    assert trace["evaluation_id"] == result.evaluation_id
+    assert trace["rule_revision"] == 2
+    assert trace["rule_snapshot_sha256"] == result.rule_snapshot_sha256
+    assert trace["numeric_profile_id"] == result.numeric_profile_id
+    assert trace["request_json"] == request.model_dump_json()
+    assert trace["result_json"] == result.model_dump_json()
+    assert trace["snapshot_json"] == standard.model_dump_json()
+    assert trace["audit_count"] >= 1, "审计能力不得因移除按钮而消失"
 
 
 def test_legacy_record_without_numeric_metadata_keeps_saved_conclusion(lifecycle, monkeypatch):
@@ -171,10 +255,12 @@ def test_legacy_record_without_numeric_metadata_keeps_saved_conclusion(lifecycle
     before = raw_state(context, legacy.evaluation_id)
     monkeypatch.setattr(EvaluationEngine, "evaluate", forbidden)
     window.view_selected_record()
-    assert "当时保存的结果：1级" in detail_text(window)
-    assert "5.0000004" in detail_text(window)
-    assert "5.0000004 ≤ 5" not in detail_text(window)
-    assert "判级采用原始计算值" not in detail_text(window)
+    ordinary = detail_text(window)
+    # A5：旧 Profile 的记录只展示当时保存的结论，不替它补写当前比较语义。
+    assert "判定：1级（当时保存的结果" in ordinary
+    assert "5.0000004" in ordinary
+    assert "5.0000004 ≤ 5" not in ordinary
+    assert "判级使用完整计算值" not in ordinary
     assert raw_state(context, legacy.evaluation_id) == before
 
 
@@ -192,14 +278,27 @@ def test_rule_drift_preserves_all_original_json_and_display(lifecycle, monkeypat
     assert normalized(context.application.get_evaluation(result.evaluation_id)) == original
     assert "测试新版" not in detail_text(window)
     assert "仅供测试的新版依据" not in detail_text(window)
-    assert "1级 ≤ 5.00" in detail_text(window)
-    assert "rule_revision: 2" in technical_text(window)
+    # A5：原记录按保存下来的等级与依据展示（阈值不再出现在普通说明里，r3 的 6.5 也没有渗入）。
+    assert "判定：2级（等级依据：第3.1条" in detail_text(window)
+    assert "6.272" in detail_text(window)
+    # B1：「技术详情」按钮已移除；原 Rule Snapshot 仍原样保存在记录里。
+    trace = record_trace(window, result.evaluation_id)
+    assert trace["rule_revision"] == 2
+    assert trace["snapshot_json"] == standard.model_dump_json()
     summary = context.application.list_recent_evaluations()[0]
     assert summary.standard_title == standard.title
     assert summary.product_name == result.product_name
 
 
 def test_history_source_uses_snapshot_hash_never_current(lifecycle, monkeypatch):
+    """历史记录原文只按**快照** hash 解析，绝不退回当前标准（应用层不变量）。
+
+    RS05 §四 之后普通界面不再打开本机 PDF，但该不变量本身没有消失：应用层来源服务
+    （``find_evaluation_standard_source``）仍然只按原评价快照的
+    ``source_file`` + ``source_sha256`` 定位原文。因此本用例把这半部分断言移到应用层
+    端口上，并另外断言界面侧打开的是已登记的官方来源页面，既不是快照文件、也不是
+    当前标准的文件。
+    """
     context, window, request, result, standard = lifecycle
     # 小测试原文与真实测试 hash，不伪造正式 PDF。
     r2 = standard.model_copy(deep=True)
@@ -215,21 +314,49 @@ def test_history_source_uses_snapshot_hash_never_current(lifecycle, monkeypatch)
     context.standards.install(r2)
     record = context.application.evaluate(request)
     install_r3(context, r2)
+    new_pdf = context.paths.standards / "r3.pdf"
+    assert new_pdf.exists() and new_pdf.resolve() != old_pdf.resolve()
+
+    # 「当前标准」这一侧确实有另一份可用的本机原文：r3.pdf 存在且 hash 吻合。
+    current_standard = context.application.get_standard_for_evaluation(r2.id, date.today())
+    assert current_standard is not None and current_standard.source_file == new_pdf.name
+    assert context.application.find_standard_source(r2.id, evaluation_date=date.today()) == new_pdf.resolve()
+
     before = raw_state(context, record.evaluation_id)
+    # 历史只读路径不得查询当前标准：一旦退回当前定义，下面两次调用会直接失败。
     monkeypatch.setattr(context.application, "get_standard", forbidden)
     monkeypatch.setattr(context.application, "get_standard_for_evaluation", forbidden)
     monkeypatch.setattr(EvaluationEngine, "evaluate", forbidden)
-    opened, warnings = [], []
-    monkeypatch.setattr("uebench.ui.main_window.QDesktopServices.openUrl", lambda url: opened.append(Path(url.toLocalFile())) or True)
+    opened, warnings, informations, criticals = [], [], [], []
+    monkeypatch.setattr("uebench.ui.main_window.QDesktopServices.openUrl", lambda url: opened.append(url) or True)
     monkeypatch.setattr(QMessageBox, "warning", lambda _p, _t, message: warnings.append(message))
+    monkeypatch.setattr(QMessageBox, "information", lambda _p, _t, message: informations.append(message))
+    monkeypatch.setattr(QMessageBox, "critical", lambda _p, _t, message: criticals.append(message))
+
+    # 快照里存的是 r2 的 source_file/hash，与当前定义（r3.pdf）不同。
+    _saved_request, _saved_result, snapshot = context.application.get_evaluation(record.evaluation_id)
+    assert snapshot.source_file == old_pdf.name
+    assert snapshot.source_sha256 == r2.source_sha256
     assert context.application.find_evaluation_standard_source(record.evaluation_id) == old_pdf.resolve()
-    window.open_evaluation_standard_source(record.evaluation_id)
-    assert opened == [old_pdf.resolve()]
+
+    # 负向：快照原文消失后必须如实返回 None，绝不退回当前标准的 r3.pdf。
     old_pdf.unlink()
+    assert not old_pdf.exists() and new_pdf.exists()
     assert context.application.find_evaluation_standard_source(record.evaluation_id) is None
-    window.open_evaluation_standard_source(record.evaluation_id)
-    assert len(opened) == 1 and warnings == ["原评价标准原文当前不可用。"]
     assert context.application.find_evaluation_standard_source("missing") is None
+
+    # 界面侧（新契约）：历史记录的「查看标准原文」只打开已登记的官方来源页面，
+    # 既不打开快照 PDF，也不打开当前标准的 PDF。
+    official = official_source_url(record.standard_id)
+    assert official is not None and QUrl(official).host() == "std.samr.gov.cn"
+    window.open_evaluation_standard_source(record.evaluation_id)
+    assert [url.toString() for url in opened] == [official]
+    for url in opened:
+        assert url.scheme() == "https"
+        assert url.isLocalFile() is False
+        assert "file://" not in url.toString().lower()
+        assert ".pdf" not in url.toString().lower()
+    assert warnings == [] and informations == [] and criticals == []
     assert raw_state(context, record.evaluation_id) == before
 
 
@@ -363,19 +490,63 @@ def test_based_on_record_fills_only_then_creates_new_record(lifecycle, monkeypat
 
 
 def test_shared_based_on_record_entry_keeps_generic_standard(lifecycle, monkeypatch):
+    """通用（非 GB29446）标准的「基于此记录重新评价」入口。
+
+    RS05 §三 之后「基于此记录重新评价」属于正式评价入口：未纳入正式评价范围的通用
+    夹具标准不能被它绕过，必须给出**确切的**范围拒绝理由，且不产生新记录、不改动页面
+    状态。把该标准**有意**放进正式评价范围后（monkeypatch 的正是注册表本身，界面因此
+    仍完全由注册表驱动），继续覆盖原用例的不变量：通用标准能经此入口正确回填表单。
+
+    记录本身是**存量数据**：旧版本会为范围外标准写下正式记录，新版本必须保留它可查看但不
+    允许借它重新进入正式评价，因此这里直接把记录写进仓储（见 ``seed_legacy_record``）。
+    """
     context, window, _request_old, _result, _standard = lifecycle
     standard = make_standard()
     context.standards.install(standard)
     request = EvaluationRequest(evaluation_date=date.today(), standard_id=standard.id, product_id="product", input_mode="DIRECT", inputs={"actual": InputValue(value="15", unit="kgce/t")})
-    result = context.application.evaluate(request)
+    assert evaluation_support.supports_formal_evaluation(standard.id) is False
+    result = seed_legacy_record(context, request)
     select_record(window, result.evaluation_id)
     before = raw_state(context, result.evaluation_id)
+    count_before = context.application.count_evaluations()
+    form_before = (window.eval_product.currentData(), window.navigation.currentRow())
     monkeypatch.setattr(EvaluationEngine, "evaluate", forbidden)
+    refusals, notices = [], []
+    monkeypatch.setattr(QMessageBox, "warning", lambda _parent, title, message: refusals.append((title, message)))
+    monkeypatch.setattr(QMessageBox, "information", lambda _parent, title, message: notices.append((title, message)))
+
+    # 正式评价范围是应用层的固定注册表，与“标准库里有没有”无关。
+    assert evaluation_support.supports_formal_evaluation(standard.id) is False
     window.recalculate_selected_record()
+
+    # 确切的范围拒绝，而不是“随便返回了个假值”。
+    expected_refusal = (
+        FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+        f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能重新发起正式评价；原记录仍可查看。",
+    )
+    assert refusals == [expected_refusal]
+    assert notices == []
+    assert window.last_result_id is None
+    assert window.eval_product.currentData() != "product"
+    assert (window.eval_product.currentData(), window.navigation.currentRow()) == form_before
+    assert raw_state(context, result.evaluation_id) == before
+    assert context.application.count_evaluations() == count_before
+    assert context.application.get_evaluation(result.evaluation_id) is not None
+
+    # 有意放入正式评价范围：只改注册表，界面行为依旧全部来自注册表。
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | {standard.id}
+    monkeypatch.setattr(evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended))
+    assert evaluation_support.supports_formal_evaluation(standard.id) is True
+
+    window.recalculate_selected_record()
+    assert refusals == [expected_refusal], "范围内标准不得再触发范围拒绝"
+    assert notices == []
     assert window.eval_product.currentData() == "product"
     assert window.eval_inputs.item(0, 2).text() == "15"
     assert raw_state(context, result.evaluation_id) == before
+    # 只是回填表单以便重新发起正式评价，还没有生成任何新记录。
     assert window.last_result_id is None
+    assert context.application.count_evaluations() == count_before
 
 
 def test_backup_restore_preserves_old_r2_after_r3(lifecycle, tmp_path):
@@ -431,7 +602,9 @@ install_r3(context,loaded[2])
 select_record(window,a["id"])
 before=raw_state(context,a["id"])
 window.view_selected_record()
-assert "rule_revision: 2" in technical_text(window)
+trace=record_trace(window,a["id"])
+assert trace["rule_revision"]==2 and trace["snapshot_json"]==loaded[2].model_dump_json()
+assert "技术详情" not in [b.text() for b in window.record_detail_dialog.findChildren(QPushButton)]
 assert "测试新版" not in detail_text(window)
 assert raw_state(context,a["id"])==before
 window.record_detail_dialog.close()

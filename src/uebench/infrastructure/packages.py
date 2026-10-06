@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 import shutil
 import tempfile
+import time
 import zipfile
 from collections import Counter
 from datetime import datetime, timezone
@@ -24,9 +26,24 @@ from uebench import RULE_ENGINE_VERSION, __version__
 from uebench.domain.models import PackageHistoryEntry, PublicationStatus, StandardDefinition
 
 from .backup import BackupService
+from .backup_paths import PRE_PACKAGE_PREFIX, reserve_unique_backup_path
 from .database import DatabaseManager, PackageRow, StandardRow
 from .paths import AppPaths
 from .repositories import AuditRepository, SqlStandardRepository
+
+logger = logging.getLogger(__name__)
+
+#: Audit action recorded when install/startup removes ``sources`` directories
+#: that an earlier version of this product wrote under the user data directory.
+#: Written **only** after the post-deletion re-scan proved the targets gone; a
+#: deletion that does not actually succeed records nothing at all.
+AUDIT_LEGACY_SOURCES_REMOVED = "STANDARD_PACKAGE_LEGACY_SOURCES_REMOVED"
+
+#: Glob-compatible prefix of the pre-install safety backup.  Existing callers
+#: and tools glob ``pre-package-*.uebackup``.  The value now comes from the one
+#: shared namer (``backup_paths.PRE_PACKAGE_PREFIX``) so no call site can drift
+#: from the common naming rule.
+BACKUP_NAME_PREFIX = PRE_PACKAGE_PREFIX
 
 
 class StandardPackageError(ValueError):
@@ -65,6 +82,20 @@ class PackageFile(BaseModel):
         return self
 
 
+#: How a package relates to the standard source documents its definitions cite.
+#:
+#: ``embedded``
+#:     The package ships ``sources/*`` members next to the definitions.  This is
+#:     the historical behaviour and remains the default, so every already
+#:     published/archived package keeps loading and installing unchanged.
+#: ``provenance-only``
+#:     The package ships **no** ``sources/*`` member.  Every definition still
+#:     carries its ``source_file`` / ``source_sha256`` provenance, but the
+#:     standard原文 itself is never distributed, stored or opened by the product
+#:     (owner decision, 0.2.0: full standard PDFs must not be distributed).
+SourcePolicy = Literal["embedded", "provenance-only"]
+
+
 class PackageManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -76,6 +107,10 @@ class PackageManifest(BaseModel):
     package_mode: Literal["full", "incremental"] = "full"
     rule_engine_version: str = RULE_ENGINE_VERSION
     parent_package_id: str | None = None
+    #: Self-describing distribution mode of the standard原文 (see SourcePolicy).
+    #: Defaults to the legacy value: a manifest without this field is an
+    #: ``embedded`` package and is verified exactly as before.
+    source_policy: SourcePolicy = "embedded"
     standard_count: int = Field(ge=0)
     rule_count: int = Field(ge=0)
     files: list[PackageFile]
@@ -103,6 +138,32 @@ class PackageInstallResult(BaseModel):
     data_version: str
     standards_installed: int
     backup_path: str
+    #: Number of legacy product-installed ``sources`` directories this attempt
+    #: really removed from the user data directory before the safety backup was
+    #: taken.  ``0`` for a data directory that never held them, and ``0`` for a
+    #: target the re-scan still found afterwards (a legacy cleanup that fails is
+    #: warn-only and never blocks the install).  The count is always measured by
+    #: the post-deletion re-scan, never assumed.
+    removed_source_directory_count: int = 0
+    #: Number of files that lived inside those directories and are verified gone.
+    removed_source_file_count: int = 0
+    #: Number of legacy standard原文 PDFs that older versions left **flat** in
+    #: ``standards/<package_id>/`` (no ``sources`` sub-directory).  Also measured
+    #: by the re-scan.
+    removed_flat_source_file_count: int = 0
+
+
+def _backup_path(directory: Path) -> Path:
+    """预订一个全新的 ``pre-package-`` 安全备份路径。
+
+    安装/升级前的安全备份名走与迁移前、恢复前完全相同的**唯一命名器**
+    （``reserve_unique_backup_path``）：微秒时间戳 + 短 uuid，并且在此处**独占创建**
+    占位，安装路径随即以 ``reserve=True`` 原子接管，因此同一秒内的连续安装既不会重名，
+    也不可能覆盖任何既有备份。前缀 ``pre-package-`` 保持不变，既有代码与工具继续
+    glob ``pre-package-*.uebackup``。
+    """
+
+    return reserve_unique_backup_path(directory, BACKUP_NAME_PREFIX)
 
 
 def _canonical_json(value: dict) -> bytes:
@@ -211,7 +272,7 @@ class StandardPackageBuilder:
         self,
         output: Path,
         definitions: list[StandardDefinition],
-        source_files: dict[str, Path],
+        source_files: dict[str, Path] | None = None,
         *,
         parent_package: Path,
         data_version: str,
@@ -220,6 +281,7 @@ class StandardPackageBuilder:
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
+        distribute_sources: bool = True,
     ) -> Path:
         """Build a signed package containing only definitions changed from parent.
 
@@ -227,6 +289,10 @@ class StandardPackageBuilder:
         or replaced complete catalogue must use the full build method.
         The parent package id is copied from the inspected manifest so callers
         cannot accidentally attach the diff to another lineage.
+
+        ``distribute_sources=False`` builds a **provenance-only** incremental
+        package: no ``sources/*`` member is written, and ``source_files`` may be
+        omitted entirely.
         """
         parent_manifest, parent_definitions, parent_corrections_data = _load_parent_package(parent_package)
         parent_by_key = {
@@ -278,12 +344,13 @@ class StandardPackageBuilder:
             corrections=corrections,
             package_id=package_id,
             issued_at=issued_at,
+            distribute_sources=distribute_sources,
         )
     def build(
         self,
         output: Path,
         definitions: list[StandardDefinition],
-        source_files: dict[str, Path],
+        source_files: dict[str, Path] | None = None,
         *,
         data_version: str,
         minimum_app_version: str = "0.1.0",
@@ -293,11 +360,35 @@ class StandardPackageBuilder:
         corrections: list[dict] | None = None,
         package_id: str | None = None,
         issued_at: datetime | None = None,
+        distribute_sources: bool = True,
     ) -> Path:
+        """Build a signed standard package.
+
+        Two distribution modes exist and are both recorded in the manifest as
+        ``source_policy`` (self-describing, so a consumer can tell them apart
+        without guessing):
+
+        * ``distribute_sources=True`` (default) — ``embedded``: every definition
+          must have its standard原文 provided in ``source_files`` and it is
+          written to a ``sources/*`` member.  This is the historical behaviour
+          and is unchanged.
+        * ``distribute_sources=False`` — ``provenance-only``: definitions keep
+          their ``source_file`` / ``source_sha256`` provenance, but **no**
+          ``sources/*`` member is written and no standard原文 is required.  The
+          owner decision for 0.2.0 is that a formal package must not distribute,
+          store or open full standard PDFs.
+
+        A definition is never silently dropped: an ``embedded`` package still
+        hard-fails on a missing or hash-mismatching原文.
+        """
         output = output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
         package_id = package_id or str(uuid4())
         issued_at = issued_at or datetime.now(timezone.utc)
+        if not distribute_sources and source_files:
+            raise StandardPackageError(
+                "provenance-only 标准包不写入 sources/*，不得提供标准原文文件"
+            )
         entries: dict[str, bytes] = {}
         rule_count = 0
         definition_keys: set[tuple[str, str, int]] = set()
@@ -313,7 +404,10 @@ class StandardPackageBuilder:
             data = _canonical_json(definition.model_dump(mode="json"))
             entries[path] = data
             rule_count += sum(len(product.indicators) for product in definition.products)
-            source = source_files.get(definition.source_file)
+            if not distribute_sources:
+                # Provenance stays on the definition; only the file is not shipped.
+                continue
+            source = (source_files or {}).get(definition.source_file)
             if source is None:
                 raise StandardPackageError(f"缺少标准原文：{definition.source_file}")
             source_data = source.read_bytes()
@@ -346,6 +440,7 @@ class StandardPackageBuilder:
             package_mode=package_mode,
             rule_engine_version=rule_engine_version,
             parent_package_id=parent_package_id,
+            source_policy="embedded" if distribute_sources else "provenance-only",
             standard_count=len(definitions),
             rule_count=rule_count,
             files=package_files,
@@ -496,6 +591,14 @@ class StandardPackageService:
                     errors.append(f"标准包包含未登记文件：{', '.join(sorted(extras))}")
                 if missing:
                     errors.append(f"标准包缺少文件：{', '.join(sorted(missing))}")
+                listed_source_paths = sorted(
+                    item.path for item in manifest.files if item.kind == "source"
+                )
+                if manifest.source_policy == "provenance-only" and listed_source_paths:
+                    errors.append(
+                        "标准包自述不随包分发标准原文（source_policy=provenance-only），"
+                        f"但清单仍登记原文：{', '.join(listed_source_paths)}"
+                    )
                 for item in manifest.files:
                     data = archive.read(item.path)
                     if len(data) != item.size or _sha256_bytes(data) != item.sha256:
@@ -574,6 +677,16 @@ class StandardPackageService:
                             warnings.append(f"标准 {definition.number} 声明替代 {superseded} 不在本包中；请确认是否另包提供")
                 for definition in definitions:
                     source = source_entries.get(definition.source_file)
+                    if manifest.source_policy == "provenance-only":
+                        # No standard原文 is distributed with this package.  The
+                        # definition's provenance (source_file/source_sha256 and
+                        # per-indicator source_references) is still verified above
+                        # and below; only the file's presence/hash is not demanded.
+                        if source is not None and source.sha256 != definition.source_sha256.lower():
+                            errors.append(
+                                f"标准原文哈希与定义不一致：{definition.source_file}"
+                            )
+                        continue
                     if source is None:
                         errors.append(f"标准定义缺少原文：{definition.source_file}")
                     elif source.sha256 != definition.source_sha256.lower():
@@ -644,13 +757,340 @@ class StandardPackageService:
             package_sha256=package_sha256,
         )
 
+    #: How many times a failed legacy原文 deletion is retried.  Windows transient
+    #: locks (indexer, anti-virus scanner, a shell thumbnail handler) routinely
+    #: release within milliseconds, so a few short retries turn a spurious
+    #: failure into a clean cleanup.  A *permanent* lock is never retried into
+    #: success: the retry only makes the cleanup more robust, it never records a
+    #: success the filesystem denies (and a failure no longer blocks anything —
+    #: see ``_remove_legacy_source_directories``).
+    LEGACY_CLEANUP_ATTEMPTS = 3
+    #: Seconds between the deletion attempts above.
+    LEGACY_CLEANUP_RETRY_DELAY = 0.2
+
+    def _scan_legacy_targets(self) -> tuple[list[Path], list[Path], int]:
+        """Detect legacy product-installed standard原文 under ``paths.standards``.
+
+        Two historical layouts really shipped, and both are still found in the
+        field (an old install may even hold both at once, for example when the
+        package changed its layout between two upgrades):
+
+        ``standards/<package_id>/*.pdf``
+            the **flat** layout an early version wrote;
+        ``standards/<package_id>/sources/**``
+            the later layout, where the whole原文 directory was copied.
+
+        Scope is deliberately narrow.  Only directories that are **direct**
+        children of ``paths.standards`` are considered a package directory, and
+        inside one only (a) a direct ``sources`` directory and (b) direct
+        ``*.pdf`` children are legacy products of this software.  Nothing else
+        is a target: not a PDF at the standards root, not one inside a user
+        sub-directory, not a deeper ``sources`` directory.
+
+        Symlinks and junctions are never followed out of the standards tree:
+        a package directory whose resolved path leaves ``paths.standards`` is
+        skipped entirely, ``sources`` is never entered or deleted through a
+        link, and link members are neither counted nor dereferenced (the
+        ``rglob`` walk does not descend into them).
+
+        This function only **reads** the filesystem; it is used both as the
+        pre-deletion detector and as the post-deletion verifier, so that "what
+        must be gone" and "what is still there" are measured by the same rule
+        and no target can escape verification by being described differently.
+
+        Returns ``(sources_directories, flat_pdf_files, files_inside_directories)``.
+        """
+        standards = Path(self.paths.standards)
+        if not standards.is_dir():
+            return [], [], 0
+        resolved_standards = standards.resolve()
+        sources_directories: list[Path] = []
+        flat_pdfs: list[Path] = []
+        files_inside = 0
+        for package_directory in sorted(standards.iterdir()):
+            if not package_directory.is_dir() or package_directory.is_symlink():
+                continue
+            resolved_package = package_directory.resolve()
+            # Never follow a package directory out of ``paths.standards`` (on
+            # Windows a junction is not reported by ``is_symlink``).
+            if not resolved_package.is_relative_to(resolved_standards):
+                continue
+            candidate = package_directory / "sources"
+            if candidate.is_dir() and not candidate.is_symlink():
+                # A package directory is a direct child of ``paths.standards``,
+                # so the candidate must stay strictly inside the standards root.
+                resolved_candidate = candidate.resolve()
+                if resolved_candidate.parent == resolved_package and resolved_candidate.is_relative_to(
+                    resolved_standards
+                ):
+                    sources_directories.append(candidate)
+                    files_inside += sum(
+                        1
+                        for item in candidate.rglob("*")
+                        # Symlinks are never followed and never counted: the
+                        # reported count must describe the files this cleanup
+                        # removes.
+                        if not item.is_symlink() and item.is_file()
+                    )
+            for sibling in sorted(package_directory.iterdir()):
+                if sibling.is_symlink():
+                    continue
+                if (
+                    sibling.is_file()
+                    and sibling.suffix.lower() == ".pdf"
+                    and sibling.resolve().is_relative_to(resolved_package)
+                ):
+                    flat_pdfs.append(sibling)
+        return sources_directories, flat_pdfs, files_inside
+
+    @staticmethod
+    def _delete_legacy_targets(
+        directories: list[Path], flat_files: list[Path]
+    ) -> list[tuple[Path, str]]:
+        """Attempt every removal; return ``(path, reason)`` for what would not go.
+
+        Deletion is best-effort per target and **never** silently ignored: each
+        failure is captured with the underlying OS error so the caller can
+        log a precise reason after its own verification.  ``rmtree`` is
+        called without ``ignore_errors``/``onerror``, so the first failure —
+        a locked PDF, a denied permission — raises ``PermissionError``/
+        ``OSError`` instead of leaving a directory that quietly survives.
+        """
+        failures: list[tuple[Path, str]] = []
+        for directory in directories:
+            if not directory.exists():
+                continue
+            # Last-line guard: never remove through a link that resolves out of
+            # its own package directory (the scanner already skips those).
+            if not directory.is_symlink() and not directory.resolve().parent == directory.parent.resolve():
+                failures.append((directory, "拒绝删除解析到包目录之外的目标"))
+                continue
+            try:
+                shutil.rmtree(directory)
+            except OSError as exc:
+                failures.append((directory, f"{type(exc).__name__}: {exc}"))
+        for path in flat_files:
+            if not path.exists():
+                continue
+            try:
+                os.remove(path)
+            except OSError as exc:
+                failures.append((path, f"{type(exc).__name__}: {exc}"))
+        return failures
+
+    @staticmethod
+    def _verified_removed_counts(
+        directories: list[Path],
+        flat_files: list[Path],
+        files_inside: int,
+        surviving_directories: list[Path],
+        surviving_flat_files: list[Path],
+        surviving_files_inside: int,
+    ) -> tuple[int, int, int]:
+        """Count only what the post-deletion re-scan proved gone.
+
+        Used on the warn-only failure path so the reported counts stay real: a
+        target the detector still finds is not counted as removed, and neither
+        are the files still sitting inside it.  Nothing here claims a success —
+        no audit row is written on this path.
+        """
+        surviving_directory_set = set(surviving_directories)
+        surviving_flat_set = set(surviving_flat_files)
+        removed_directories = [
+            directory for directory in directories if directory not in surviving_directory_set
+        ]
+        removed_flat_files = [path for path in flat_files if path not in surviving_flat_set]
+        removed_files_inside = max(0, files_inside - surviving_files_inside)
+        return len(removed_directories), removed_files_inside, len(removed_flat_files)
+
+    def _remove_legacy_source_directories(
+        self, *, attempts: int | None = None, retry_delay: float | None = None
+    ) -> tuple[int, int, int]:
+        """Warn-only wrapper: the legacy原文 cleanup can never block a caller.
+
+        Even a detector that cannot read the standards tree (denied permission,
+        an unreadable reparse point, an anti-virus filter driver) only produces a
+        WARNING and ``(0, 0, 0)`` — the same "warn only, keep going" rule the
+        deletion failures follow.  Both call sites (``install`` and
+        ``cleanup_legacy_sources`` used by startup reconciliation) go through
+        this method, so install and startup can never disagree.
+        """
+        try:
+            return self._cleanup_legacy_sources(attempts=attempts, retry_delay=retry_delay)
+        except Exception as exc:  # noqa: BLE001 - a diagnostic cleanup must never block anything
+            logger.warning(
+                "旧版本标准原文清理无法执行（%s: %s），本次仅记录警告并继续；"
+                "现有数据库与业务数据不受影响，下次启动会自动重试。标准数据目录：%s",
+                type(exc).__name__,
+                exc,
+                self.paths.standards,
+            )
+            return 0, 0, 0
+
+    def _cleanup_legacy_sources(
+        self, *, attempts: int | None = None, retry_delay: float | None = None
+    ) -> tuple[int, int, int]:
+        """Remove legacy standard原文 from the user data directory — **warn-only**.
+
+        The owner requirement is that the software must not keep full standard
+        PDFs in the user data directory.  ``install`` no longer copies
+        ``sources/*`` anywhere, but a data directory written by an earlier
+        version still holds them, in either historical layout (see
+        ``_scan_legacy_targets``).  Those are removed so the *live* directory —
+        and any safety backup taken from it — no longer carries standard原文.
+
+        The contract, in order, is:
+
+        1. detect every legacy target;
+        2. attempt deletion, retrying the whole set a few times to ride out
+           transient Windows locks;
+        3. re-scan with the **same** detector;
+        4. if every target is really gone: log the cleanup, record the success
+           audit row with the **real** counts and return them;
+        5. if anything is still present: log a **WARNING only** and continue.
+
+        Step 5 is the owner decision for this product: a locked file, a denied
+        permission or any other residue must **not** block software startup,
+        package install, formal evaluation or saving.  Nothing is fabricated
+        either — no success audit row is written when the re-scan still finds a
+        target, the surviving files are left exactly as they are, and the very
+        next startup simply retries the same gate.  The returned counts describe
+        only what the re-scan proved removed (``(0, 0, 0)`` when nothing was).
+
+        A no-op (no legacy target at all) records no audit, logs nothing and
+        returns zeros, so the cleanup stays idempotent.
+        """
+        resolved_standards = Path(self.paths.standards).resolve()
+        directories, flat_files, files_inside = self._scan_legacy_targets()
+        if not directories and not flat_files:
+            return 0, 0, 0
+        failures: list[tuple[Path, str]] = []
+        total_attempts = max(1, self.LEGACY_CLEANUP_ATTEMPTS if attempts is None else attempts)
+        delay = self.LEGACY_CLEANUP_RETRY_DELAY if retry_delay is None else retry_delay
+        # The loop below always runs at least once (``total_attempts >= 1``) and
+        # refreshes all three values from the detector; these initialisers only
+        # keep the post-loop read well-defined.
+        surviving_directories: list[Path] = []
+        surviving_flat_files: list[Path] = []
+        surviving_files_inside = 0
+        remaining = len(directories) + len(flat_files)
+        for attempt in range(total_attempts):
+            failures = self._delete_legacy_targets(directories, flat_files)
+            # Verify with the detector, not with an "if it did not raise" belief:
+            # the re-scan is what decides whether this cleanup succeeded.
+            (
+                surviving_directories,
+                surviving_flat_files,
+                surviving_files_inside,
+            ) = self._scan_legacy_targets()
+            remaining = len(surviving_directories) + len(surviving_flat_files)
+            if remaining == 0:
+                break
+            if attempt + 1 < total_attempts:
+                logger.warning(
+                    "旧版本标准原文删除后仍存在 %d 项，稍后重试（%d/%d）：%s",
+                    remaining,
+                    attempt + 1,
+                    total_attempts,
+                    "、".join(
+                        str(item) for item in surviving_directories + surviving_flat_files
+                    ),
+                )
+                time.sleep(delay)
+        if remaining:
+            # WARN ONLY — this must never block startup, install, evaluation or
+            # saving.  No success audit row is written: the success audit is
+            # conditional on the verified re-scan above, and it did not pass.
+            reasons = "；".join(f"{path}（{reason}）" for path, reason in failures) or "未知原因"
+            logger.warning(
+                "无法删除旧版本遗留在用户数据目录中的标准原文：尝试 %d 次后仍有 %d 项存在。"
+                "本次仅记录警告，不中断启动、安装或评价；下次启动会自动重试。"
+                "删除失败的原因：%s。现有数据库与业务数据保持可用、未做任何改动。"
+                "标准数据目录：%s。仍存在的目标：%s",
+                total_attempts,
+                remaining,
+                reasons,
+                resolved_standards,
+                "、".join(
+                    str(path) for path in surviving_directories + surviving_flat_files
+                ),
+            )
+            return self._verified_removed_counts(
+                directories,
+                flat_files,
+                files_inside,
+                surviving_directories,
+                surviving_flat_files,
+                surviving_files_inside,
+            )
+
+        # Reaching here means the re-scan proved the targets gone; the audit
+        # counts below are the measured pre-cleanup targets, not an estimate.
+        logger.warning(
+            "移除旧版本写入用户数据目录的标准原文：%d 个目录、%d 个文件（另有 %d 个平铺 PDF），"
+            "全部位于 %s 内；目录：%s；平铺文件：%s",
+            len(directories),
+            files_inside,
+            len(flat_files),
+            resolved_standards,
+            "、".join(str(directory) for directory in directories) or "无",
+            "、".join(str(path) for path in flat_files) or "无",
+        )
+        self.audit.append(
+            AUDIT_LEGACY_SOURCES_REMOVED,
+            "standard_package",
+            None,
+            {
+                "directories_removed": len(directories),
+                "files_removed": files_inside,
+                "flat_files_removed": len(flat_files),
+                "scope": str(resolved_standards),
+                "verified": True,
+            },
+        )
+        return len(directories), files_inside, len(flat_files)
+
+    def cleanup_legacy_sources(self) -> tuple[int, int, int]:
+        """Public face of the legacy原文 cleanup gate — the *same* implementation.
+
+        ``install`` runs this privately as its first step (before it takes the
+        pre-upgrade safety backup), which means a data directory that never needs
+        an install — the NOOP case, and in particular a data directory that a
+        ``BackupService.restore`` just filled with the old ``sources/*`` PDFs —
+        would never be cleaned.  The application-layer reconciliation therefore
+        calls this method on **every** startup, before its decision table, so
+        both call sites pass through one gate.
+
+        The delegate is deliberate: there is exactly one detector
+        (``_scan_legacy_targets``), one deletion/verification loop, one audit row
+        and one failure path, so the install path and the startup path can never
+        drift apart.  The failure semantics are **warn-only**: a target that
+        cannot be removed logs a WARNING, writes no success audit, leaves the
+        locked file and the database/business data untouched, and returns the
+        counts the re-scan proved removed — it never raises, so it can never
+        block startup, reconciliation, install, evaluation or saving.  A no-op
+        records nothing and returns ``(0, 0, 0)``.
+        """
+        return self._remove_legacy_source_directories()
+
     def install(self, path: Path) -> PackageInstallResult:
         report = self.preview(path)
         if not report.valid or report.manifest is None or report.package_sha256 is None:
             raise StandardPackageError("；".join(report.errors) or "标准包验证失败")
         manifest = report.manifest
-        backup_path = self.paths.backups / f"pre-package-{datetime.now():%Y%m%d-%H%M%S}.uebackup"
-        self.backup.create(backup_path)
+        # Order matters:
+        #   detect legacy原文 -> attempt deletion -> verify -> audit success
+        #   -> *then* the safety backup -> *then* install the new package.
+        # The cleanup runs before the backup so the backup does not carry the old
+        # PDFs.  The safety backup is a *user data* backup (database only), so
+        # even a cleanup that could not delete a locked file cannot leak a
+        # standard PDF into it; and the cleanup itself is warn-only, so a locked
+        # file never aborts the install.
+        removed_directories, removed_files, removed_flat_files = (
+            self._remove_legacy_source_directories()
+        )
+        backup_path = _backup_path(self.paths.backups)
+        self.backup.create(backup_path, reserve=True)
         destination = (self.paths.standards / manifest.package_id).resolve()
         if destination.parent != self.paths.standards.resolve():
             raise StandardPackageError("标准包目标目录不安全")
@@ -661,7 +1101,12 @@ class StandardPackageService:
                 temporary_path = Path(temporary)
                 with zipfile.ZipFile(path, "r") as archive:
                     for item in manifest.files:
-                        if item.kind in {"source", "correction"}:
+                        # Only non-original artefacts are materialised into the
+                        # user data directory.  ``sources/*`` members stay inside
+                        # the package archive: the product verifies them on
+                        # preview/install but must never store full standard
+                        # PDFs next to the user's data.
+                        if item.kind == "correction":
                             target = temporary_path / PurePosixPath(item.path).name
                             target.write_bytes(archive.read(item.path))
                 shutil.copytree(temporary_path, destination)
@@ -681,7 +1126,7 @@ class StandardPackageService:
                     "STANDARD_PACKAGE_INSTALL",
                     "standard_package",
                     manifest.package_id,
-                    {"data_version": manifest.data_version, "package_mode": manifest.package_mode, "rule_engine_version": manifest.rule_engine_version, "parent_package_id": manifest.parent_package_id, "standard_count": manifest.standard_count},
+                    {"data_version": manifest.data_version, "package_mode": manifest.package_mode, "rule_engine_version": manifest.rule_engine_version, "parent_package_id": manifest.parent_package_id, "standard_count": manifest.standard_count, "source_policy": manifest.source_policy},
                     session=session,
                 )
         except Exception:
@@ -692,4 +1137,7 @@ class StandardPackageService:
             data_version=manifest.data_version,
             standards_installed=len(report.definitions),
             backup_path=str(backup_path),
+            removed_source_directory_count=removed_directories,
+            removed_source_file_count=removed_files,
+            removed_flat_source_file_count=removed_flat_files,
         )

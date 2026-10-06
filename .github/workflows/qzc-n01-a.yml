@@ -61,33 +61,15 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-full
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-n01-a-full"
 
-      - name: Verify all tests except the pre-existing release asset failure
+      - name: Verify all tests
         shell: pwsh
         run: |
-          python -m pytest -q -ra -p no:cacheprovider --basetemp work/pytest-n01-a-clean `
-            --deselect tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu
-
-      - name: Prove the excluded release failure already exists on PR base
-        if: github.event_name == 'pull_request'
-        shell: pwsh
-        run: |
-          git worktree add ../n01-a-base ${{ github.event.pull_request.base.sha }}
-          Push-Location ../n01-a-base
-          python -m pytest tests/test_frozen_release.py::test_portable_release_does_not_bundle_incompatible_poppler_icu -q -p no:cacheprovider
-          $releaseExit = $LASTEXITCODE
-          if ($releaseExit -eq 0) {
-            throw "Base unexpectedly passes frozen-release artifact test; exclusion is no longer justified."
-          }
-          if ($releaseExit -ne 1) {
-            throw "Base frozen-release test exited with unexpected code $releaseExit."
-          }
-          Pop-Location
-          exit 0
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-n01-a-clean"
 
       - name: Summarize literal full-suite outcome
         shell: pwsh
         run: |
           Write-Host "Literal full-suite step outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "The known release failure was independently re-executed on the PR base and confirmed above."
+          Write-Host "Release-asset checks now live in the Source Gate (tests/test_release_source.py) and the Artifact Gate (tests/test_release_artifacts.py, enabled by UEBENCH_ARTIFACT_DIR); neither is deselected here."

@@ -5,6 +5,7 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
+from uebench.application import evaluation_support
 from uebench.application.services import EvaluationService
 from uebench.domain.models import EvaluationRequest, InputMode, InputValue
 from uebench.infrastructure.database import DatabaseManager
@@ -19,6 +20,19 @@ from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRepository, SqlStandardRepository
 
 from .test_engine import make_standard
+
+
+def _in_formal_scope(monkeypatch, *standard_ids: str) -> None:
+    """把 ``standard_ids`` 声明为正式可评价（与 ``test_ui.py::_in_formal_scope`` 同模式）。
+
+    正式评价范围是应用层的固定常量，**与“标准库里有没有这个标准”无关**（RS05 §三）。
+    本文件覆盖的是模板/导入/导出，不是范围本身，因此需要正式评价落库的用例必须显式扩展
+    真正的注册表；产品行为仍然完全由注册表驱动。
+    """
+    extended = set(evaluation_support.SUPPORTED_EVALUATION_STANDARD_IDS) | set(standard_ids)
+    monkeypatch.setattr(
+        evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset(extended)
+    )
 
 
 def setup_services(tmp_path: Path):
@@ -109,8 +123,10 @@ def test_import_reports_unknown_standard_and_product_at_info_cells(tmp_path: Pat
     assert any(issue.cell == "B4" and "未找到已发布标准" in issue.message for issue in report.issues)
 
 
-def test_export_matches_saved_result(tmp_path: Path) -> None:
+def test_export_matches_saved_result(tmp_path: Path, monkeypatch) -> None:
     _, audit, standards, evaluations = setup_services(tmp_path)
+    # 导出需要一条**正式**记录，因此把夹具标准显式放进注册表（RS05 §三）。
+    _in_formal_scope(monkeypatch, "gb-00000-2026")
     request = EvaluationRequest(
         evaluation_date=date(2026, 2, 2),
         standard_id="gb-00000-2026",
