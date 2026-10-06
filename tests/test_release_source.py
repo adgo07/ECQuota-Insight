@@ -250,6 +250,40 @@ def test_spec_version_resource_points_at_the_generated_file() -> None:
     assert "version=str(" in text
 
 
+def test_spec_does_not_flatten_qt_or_shiboken_libraries(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """核心与额外 Qt 模块均不得生成手工平铺重复副本。
+
+    执行真实 spec 的 Analysis 前输入装配，不启动 PyInstaller。此门禁只
+    约束手工副本；自动 Qt hook 的正本与插件收集仍由真实构建验证。
+    """
+    qt_dir = tmp_path / "Lib" / "site-packages" / "PySide6"
+    qt_dir.mkdir(parents=True)
+    required = {"Qt6Core.dll", "Qt6Gui.dll", "Qt6Widgets.dll"}
+    unused = {
+        "Qt6Designer.dll", "Qt6Quick.dll", "Qt6Qml.dll", "Qt6Pdf.dll",
+        "Qt6Multimedia.dll", "Qt63DRender.dll", "avcodec-61.dll",
+        "Qt6WebEngineCore.dll",
+    }
+    for name in required | unused:
+        (qt_dir / name).write_bytes(b"test-only DLL placeholder")
+    shiboken_dir = qt_dir.parent / "shiboken6"
+    shiboken_dir.mkdir()
+    (shiboken_dir / "shiboken6.abi3.dll").write_bytes(b"test-only DLL placeholder")
+    spec_text = SPEC.read_text(encoding="utf-8")
+    pre_analysis, separator, _ = spec_text.partition("\na = Analysis(")
+    assert separator, "无法定位真实 spec 的 Analysis 输入装配"
+    namespace: dict[str, Any] = {"SPECPATH": str(ROOT)}
+    with monkeypatch.context() as patch:
+        patch.setattr(sys, "prefix", str(tmp_path))
+        exec(compile(pre_analysis, str(SPEC), "exec"), namespace)
+    copied = {Path(source).name for source, _ in namespace["binaries"]}
+    assert not (required & copied), "核心 Qt DLL 被再次手工平铺进程序"
+    assert "shiboken6.abi3.dll" not in copied, "shiboken DLL 被再次手工平铺进程序"
+    assert not (unused & copied), "无关 Qt 模块被再次手工平铺进程序"
+
+
 # --------------------------------------------------------------------------
 # 4. Pinned standard package: existence, pin match, verified install
 # --------------------------------------------------------------------------
