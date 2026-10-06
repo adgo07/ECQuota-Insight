@@ -45,15 +45,17 @@ def configure_application_font(application: "QApplication") -> None:  # noqa: F8
 
 
 def bundled_package_directory() -> Path:
-    """内置标准包所在目录。
+    """返回当前软件携带的标准库目录。
 
-    PyInstaller 会把 ``release/standard-packages/initial-standard-package-published.uebench``
-    收集到 ``uebench/resources``（见 ``uebench.spec``）；打包运行时模块的
-    ``__file__`` 已位于 ``<_MEIPASS>/uebench/``，因此与源码运行使用同一相对位置。
+    PyInstaller 会把发布包收集到 uebench/resources。源码运行时则从仓库
+    release/standard-packages 读取，便于开发版与无头自检使用同一对账规则。
     """
+    from .application.self_check import locate_standard_package
+
+    package = locate_standard_package()
+    if package is not None:
+        return package.parent
     return Path(__file__).resolve().parent / "resources"
-
-
 def reconcile_standard_package(context, bundled_directory: Path | None = None):
     """ECQ-RS05 启动对账：每次正常启动都比对内置包与已安装包（原一次性初始化）。
 
@@ -64,16 +66,9 @@ def reconcile_standard_package(context, bundled_directory: Path | None = None):
     真正的 I/O / 校验异常会向上传播（``StandardPackageService.install`` 已保证
     失败回滚、不留半安装状态），由调用方决定如何提示。
     """
-    from .application.package_reconciliation import PackageReconciliationService
-    from .infrastructure.packages import _data_version_key
-
-    service = PackageReconciliationService(
-        context.package_service,
-        data_version_key=_data_version_key,
+    return context.application.reconcile_standard_library(
+        bundled_directory or bundled_package_directory()
     )
-    outcome = service.reconcile(bundled_directory or bundled_package_directory())
-    context.application.record_package_reconciliation(outcome)
-    return outcome
 
 
 # ---------------------------------------------------------------------------
@@ -86,7 +81,9 @@ def create_self_check_context(data_dir: Path):
     from .application.self_check import locate_public_key
     from .bootstrap import create_context
 
-    return create_context(data_dir, public_key_path=locate_public_key())
+    context = create_context(data_dir, public_key_path=locate_public_key())
+    reconcile_standard_package(context)
+    return context
 
 
 def write_workbook_rows(path: Path, sheet_name: str, rows: Mapping[int, object]) -> None:

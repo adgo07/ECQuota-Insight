@@ -174,6 +174,14 @@ INSTALL_ACTIONS: frozenset[ReconciliationAction] = frozenset(
     {ReconciliationAction.INSTALL, ReconciliationAction.UPGRADE}
 )
 
+FORMAL_EVALUATION_MISMATCH_MESSAGE = (
+    "当前标准库与软件版本不匹配，暂时不能新建评价。请安装完整的新版本。"
+    "历史记录和备份仍可继续使用。"
+)
+FORMAL_EVALUATION_INSTALLATION_MESSAGE = (
+    "当前安装文件不完整或已损坏，请重新安装完整版本。历史记录和备份仍可继续使用。"
+)
+
 
 class InstalledPackageIdentity(BaseModel):
     """当前已安装标准包（标准库）的身份。"""
@@ -492,6 +500,24 @@ class PackageReconciliationService:
 
     # -- 编排 -------------------------------------------------------------
 
+    def formal_evaluation_block_message(self) -> str | None:
+        """Return a user-facing explanation when the bundled library is not ready."""
+        outcome = self._last_outcome
+        if outcome is not None and outcome.succeeded:
+            return None
+        if outcome is None or outcome.action in {
+            ReconciliationAction.MISSING,
+            ReconciliationAction.UNAVAILABLE,
+            ReconciliationAction.INVALID,
+        }:
+            return FORMAL_EVALUATION_INSTALLATION_MESSAGE
+        return FORMAL_EVALUATION_MISMATCH_MESSAGE
+
+    def require_formal_evaluation_ready(self) -> None:
+        message = self.formal_evaluation_block_message()
+        if message is not None:
+            raise ValueError(message)
+
     def reconcile(self, directory: Path) -> ReconciliationOutcome:
         """对 ``directory`` 中的内置标准包执行一次对账。
 
@@ -529,6 +555,8 @@ class PackageReconciliationService:
         module keeps the architecture-gate rule that the application layer has
         no ``uebench.infrastructure`` dependency.
         """
+        # Never retain a previous success if this reconciliation later fails.
+        self._last_outcome = None
         if self._packages is None:
             outcome = _outcome(
                 ReconciliationAction.UNAVAILABLE,

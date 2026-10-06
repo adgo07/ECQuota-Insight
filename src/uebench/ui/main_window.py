@@ -13,7 +13,7 @@ from uuid import uuid4
 _LOGGER = logging.getLogger(__name__)
 
 from PySide6.QtCore import QDate, Qt, QUrl
-from PySide6.QtGui import QAction, QDesktopServices
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -95,6 +95,7 @@ from uebench.domain.models import (
     parse_decimal,
 )
 from uebench.ui.presentation import format_local_date, format_local_datetime
+from uebench.ui.settings_page import SettingsPage
 
 
 APP_STYLE = """
@@ -260,10 +261,6 @@ GB29446_PROCESS_FACTOR_KEY = "process_factor"
 #: 规则数据不完整/版本不兼容时的中文提示（必须说明“更新标准数据”）。
 GB29446_RULE_INCOMPATIBLE_MESSAGE = "标准规则数据不完整或版本不兼容，请更新标准数据后再评价。"
 
-#: 启动标准包对账未达到期望状态时的非阻断中文提示前缀（ECQ-RS05 §三 E/F）。
-PACKAGE_RECONCILIATION_NOTICE_PREFIX = "标准数据未更新或标准数据状态异常"
-
-
 def _gb29446_product_has_process_factor_rows(product) -> bool:
     """该煤种是否存在可用的“选煤工艺 → 折算系数 k”查表行。
 
@@ -376,8 +373,6 @@ class MainWindow(QMainWindow):
         self.context = context
         self.current_standard: StandardDefinition | None = None
         self.last_result_id: str | None = None
-        self.pending_import_id: str | None = None
-        self.pending_import_standard_id: str | None = None
         #: 当前加载的 GB 29446 规则是否满足正式 r2 结构；非 GB29446 标准恒为 True。
         self.gb29446_rule_compatible = True
         self.setWindowTitle("单位产品能耗对标软件")
@@ -404,27 +399,14 @@ class MainWindow(QMainWindow):
             ("标准库", self._build_standards),
             ("新建评价", self._build_evaluation),
             ("评价记录", self._build_records),
-            ("Excel导入", self._build_import),
-            ("系统维护", self._build_maintenance),
+            ("设置", self._build_settings),
         ]
         for title, builder in page_builders:
             self.navigation.addItem(QListWidgetItem(title))
             self.pages.addWidget(builder())
         self.navigation.currentRowChanged.connect(self._page_changed)
         self.navigation.setCurrentRow(0)
-        self._build_help_menu()
         self.refresh_all()
-
-    def _build_help_menu(self) -> None:
-        """Add the read-only 关于 / 诊断信息 entry without touching the page layout."""
-        help_menu = self.menuBar().addMenu("帮助")
-        diagnostics = QAction("关于 / 诊断信息…", self)
-        diagnostics.setObjectName("diagnostics_action")
-        diagnostics.triggered.connect(self.show_diagnostics)
-        help_menu.addAction(diagnostics)
-        # 保留 Python 引用：菜单属于窗口的辅助入口，不应依赖临时包装对象。
-        self.help_menu = help_menu
-        self.diagnostics_action = diagnostics
 
     def _page(self, title: str) -> tuple[QWidget, QVBoxLayout]:
         page = QWidget()
@@ -449,7 +431,7 @@ class MainWindow(QMainWindow):
         self.home_standard_count = QLabel("0")
         self.home_formal_scope_count = QLabel("0 项")
         self.home_evaluation_count = QLabel("0")
-        self.home_package_version = QLabel("未安装")
+        self.home_standard_library_version = QLabel("未安装")
         self.home_standard_count.setToolTip(
             "已发布且当前有效的标准数量（标准文档状态）；不等于可正式评价的标准数量，"
             "正式评价范围见「正式评价范围」。"
@@ -459,7 +441,7 @@ class MainWindow(QMainWindow):
             ("已发布标准", self.home_standard_count),
             ("正式评价范围", self.home_formal_scope_count),
             ("评价记录", self.home_evaluation_count),
-            ("标准包", self.home_package_version),
+            ("标准库版本", self.home_standard_library_version),
         ):
             card, card_layout = self._card()
             card_layout.addWidget(QLabel(title))
@@ -476,6 +458,12 @@ class MainWindow(QMainWindow):
         scope_row.addWidget(self.home_scope_label, 1)
         scope_row.addWidget(self.home_start_evaluation)
         layout.addLayout(scope_row)
+        self.home_compatibility_notice = QLabel("")
+        self.home_compatibility_notice.setObjectName("homeStandardLibraryReadinessNotice")
+        self.home_compatibility_notice.setWordWrap(True)
+        self.home_compatibility_notice.setStyleSheet("color: #b42318; font-weight: bold;")
+        self.home_compatibility_notice.setVisible(False)
+        layout.addWidget(self.home_compatibility_notice)
         card, card_layout = self._card()
         card_layout.addWidget(QLabel("最近评价"))
         self.home_recent = QTableWidget(0, 3)
@@ -555,6 +543,12 @@ class MainWindow(QMainWindow):
         header.addWidget(self.eval_official_status)
         header.addWidget(self.eval_standard_open)
         page_layout.addLayout(header)
+        self.evaluation_readiness_notice = QLabel("")
+        self.evaluation_readiness_notice.setObjectName("evaluationReadinessNotice")
+        self.evaluation_readiness_notice.setWordWrap(True)
+        self.evaluation_readiness_notice.setStyleSheet("color: #b42318; font-weight: bold;")
+        self.evaluation_readiness_notice.setVisible(False)
+        page_layout.addWidget(self.evaluation_readiness_notice)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -573,6 +567,7 @@ class MainWindow(QMainWindow):
         self.eval_selection_mode.addItem("历史标准（需提示确认）", StandardSelectionMode.HISTORICAL.value)
         self.eval_selection_mode.addItem("尚未实施标准（仅预览）", StandardSelectionMode.FUTURE.value)
         self.eval_selection_mode.currentIndexChanged.connect(self.refresh_standard_combo)
+        self.eval_selection_mode.currentIndexChanged.connect(self.refresh_formal_evaluation_readiness)
         self.eval_standard = QComboBox()
         self.eval_standard.setEditable(True)
         self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
@@ -855,82 +850,21 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.record_table, 1)
         return page
 
-    def _build_import(self) -> QWidget:
-        page, layout = self._page("Excel导入")
-        explanation = QLabel(
-            "Excel只作为录入适配器：软件按模板逐单元格校验，转换成与手工录入相同的评价请求，"
-            "再交给同一套计算引擎。Excel自身不计算折算系数、单位产品能耗或等级。"
+    def _build_settings(self) -> QWidget:
+        self.settings_page = SettingsPage(
+            software_version=__version__,
+            standard_library_version=self._standard_library_version_text(),
+            data_directory=str(self.context.paths.root),
+            parent=self,
         )
-        explanation.setWordWrap(True)
-        layout.addWidget(explanation)
-        controls = QHBoxLayout()
-        template = QPushButton("保存导入模板")
-        template.clicked.connect(self.save_import_template)
-        template_gb = QPushButton("保存 GB29446 专用模板")
-        template_gb.clicked.connect(self.save_gb29446_template)
-        validate = QPushButton("选择并校验Excel")
-        validate.clicked.connect(self.validate_import_workbook)
-        self.import_commit_button = QPushButton("确认导入并评价")
-        self.import_commit_button.setEnabled(False)
-        self.import_commit_button.clicked.connect(self.evaluate_import)
-        controls.addWidget(template)
-        controls.addWidget(template_gb)
-        controls.addWidget(validate)
-        controls.addStretch()
-        controls.addWidget(self.import_commit_button)
-        layout.addLayout(controls)
-        self.import_status = QLabel("尚未选择文件")
-        self.import_status.setWordWrap(True)
-        layout.addWidget(self.import_status)
-        self.import_summary = QLabel("")
-        self.import_summary.setWordWrap(True)
-        self.import_summary.setTextFormat(Qt.TextFormat.RichText)
-        self.import_summary.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.import_summary.setVisible(False)
-        layout.addWidget(self.import_summary)
-        self.import_issues = QTableWidget(0, 4)
-        self.import_issues.setHorizontalHeaderLabels(["级别", "工作表", "单元格", "问题"])
-        self._configure_table(self.import_issues)
-        layout.addWidget(self.import_issues, 1)
-        return page
-
-    def _build_maintenance(self) -> QWidget:
-        page, layout = self._page("系统维护")
-        controls = QHBoxLayout()
-        package = QPushButton("安装标准包")
-        package.clicked.connect(self.install_standard_package)
-        package.setEnabled(self.context.application.has_package_service())
-        scan_packages = QPushButton("扫描标准包目录")
-        scan_packages.clicked.connect(self.discover_standard_packages)
-        scan_packages.setEnabled(self.context.application.has_package_service())
-        backup = QPushButton("创建备份")
-        backup.clicked.connect(self.create_backup)
-        restore = QPushButton("恢复备份")
-        restore.clicked.connect(self.restore_backup)
-        open_data = QPushButton("打开数据目录")
-        open_data.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.context.paths.root))))
-        controls.addWidget(package)
-        controls.addWidget(scan_packages)
-        controls.addWidget(backup)
-        controls.addWidget(restore)
-        controls.addStretch()
-        controls.addWidget(open_data)
-        layout.addLayout(controls)
-        if not self.context.application.has_package_service():
-            layout.addWidget(QLabel("未配置标准包公钥，安装标准包功能已禁用。"))
-        layout.addWidget(QLabel("已安装标准包历史"))
-        self.package_history_table = QTableWidget(0, 8)
-        self.package_history_table.setHorizontalHeaderLabels(
-            ["安装时间", "数据版本", "包类型", "父包", "标准数", "规则数", "包ID", "SHA-256"]
+        self.settings_page.create_backup_requested.connect(self.create_backup)
+        self.settings_page.restore_backup_requested.connect(self.restore_backup)
+        self.settings_page.open_data_directory_requested.connect(
+            lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.context.paths.root)))
         )
-        self._configure_table(self.package_history_table)
-        layout.addWidget(self.package_history_table, 1)
-        layout.addWidget(QLabel("审计日志"))
-        self.audit_table = QTableWidget(0, 5)
-        self.audit_table.setHorizontalHeaderLabels(["时间", "操作", "对象类型", "对象ID", "详情"])
-        self._configure_table(self.audit_table)
-        layout.addWidget(self.audit_table, 1)
-        return page
+        self.settings_page.view_diagnostics_requested.connect(self.show_diagnostics)
+        self.settings_page.copy_diagnostics_requested.connect(self.copy_diagnostics)
+        return self.settings_page
 
     @staticmethod
     def _configure_table(table: QTableWidget, *, editable: bool = False) -> None:
@@ -959,19 +893,57 @@ class MainWindow(QMainWindow):
             self.refresh_standards()
         elif index == 3:
             self.refresh_records()
-        elif index == 5:
-            self.refresh_package_history()
-            self.refresh_audit()
+        elif index == 4:
+            self.refresh_settings()
+        self.refresh_formal_evaluation_readiness()
 
     def refresh_all(self) -> None:
         self.refresh_home()
         self.refresh_standards()
         self.refresh_standard_combo()
         self.refresh_records()
-        self.refresh_package_history()
-        self.refresh_audit()
-        # 启动/刷新后如实暴露标准包对账状态（非阻断，不弹模态框）。
-        self._show_package_reconciliation_notice()
+        self.refresh_settings()
+        self.refresh_formal_evaluation_readiness()
+
+    def _standard_library_version_text(self) -> str:
+        try:
+            version = self.context.application.standard_library_version()
+        except Exception:
+            version = None
+        return str(version) if version else "未安装"
+
+    def refresh_settings(self) -> None:
+        page = getattr(self, "settings_page", None)
+        if page is not None:
+            page.set_standard_library_version(self._standard_library_version_text())
+
+    def refresh_formal_evaluation_readiness(self) -> None:
+        try:
+            message = self.context.application.formal_evaluation_block_message()
+        except Exception:
+            message = "当前安装文件不完整或已损坏，请重新安装完整版本。历史记录和备份仍可继续使用。"
+        message = str(message).strip() if message else None
+        if hasattr(self, "home_compatibility_notice"):
+            self.home_compatibility_notice.setText(message or "")
+            self.home_compatibility_notice.setVisible(message is not None)
+            has_formal_scope = self.home_formal_scope_count.text() != "0 项"
+            self.home_start_evaluation.setEnabled(has_formal_scope and message is None)
+        if hasattr(self, "evaluation_readiness_notice"):
+            self.evaluation_readiness_notice.setText(message or "")
+            self.evaluation_readiness_notice.setVisible(message is not None)
+        if hasattr(self, "standard_evaluate_button"):
+            standard_id = self._selected_library_standard_id()
+            self.standard_evaluate_button.setEnabled(
+                message is None and supports_formal_evaluation(standard_id)
+            )
+        if hasattr(self, "calculate_button"):
+            preview = (
+                hasattr(self, "eval_selection_mode")
+                and self._selection_mode() is StandardSelectionMode.FUTURE
+            )
+            self.calculate_button.setEnabled(
+                self.gb29446_rule_compatible and (message is None or preview)
+            )
 
     def refresh_home(self) -> None:
         today = date.today()
@@ -993,10 +965,7 @@ class MainWindow(QMainWindow):
             self.home_scope_label.setText("本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。")
             self.home_start_evaluation.setEnabled(False)
         self.home_evaluation_count.setText(str(self.context.application.count_evaluations()))
-        package_manifest = self.context.application.latest_package_manifest()
-        self.home_package_version.setText(
-            package_manifest.get("data_version", "未知") if package_manifest else "未安装"
-        )
+        self.home_standard_library_version.setText(self._standard_library_version_text())
         self.home_recent.setRowCount(0)
         for record in records:
             row = self.home_recent.rowCount()
@@ -1083,6 +1052,7 @@ class MainWindow(QMainWindow):
             self.standard_evaluate_button.setEnabled(False)
             self.standard_official_button.setEnabled(False)
             self.standard_official_status.setText("请先选择标准")
+            self.refresh_formal_evaluation_readiness()
             return
         # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
         self.standard_detail_label.setText(standard_scope_line(standard.id))
@@ -1122,6 +1092,7 @@ class MainWindow(QMainWindow):
                 self.standard_indicator_table.insertRow(detail_row)
                 for column, value in enumerate(values):
                     self.standard_indicator_table.setItem(detail_row, column, _item(value))
+        self.refresh_formal_evaluation_readiness()
 
     def _selection_mode(self) -> StandardSelectionMode:
         value = self.eval_selection_mode.currentData() if hasattr(self, "eval_selection_mode") else StandardSelectionMode.CURRENT.value
@@ -1540,6 +1511,7 @@ class MainWindow(QMainWindow):
                 self.gb29446_result_message.setText(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         else:
             self._refresh_input_table()
+        self.refresh_formal_evaluation_readiness()
 
     def _product_changed(self) -> None:
         self._refresh_input_table()
@@ -2451,259 +2423,6 @@ class MainWindow(QMainWindow):
         self.context.application.delete_evaluation(evaluation_id)
         self.refresh_all()
 
-    def save_import_template(self) -> None:
-        path, _ = QFileDialog.getSaveFileName(self, "保存导入模板", "单位产品能耗对标导入模板.xlsx", "Excel (*.xlsx)")
-        if path:
-            self.context.application.create_template(Path(path))
-            QMessageBox.information(self, "模板已保存", path)
-
-    def save_gb29446_template(self) -> None:
-        path, _ = QFileDialog.getSaveFileName(
-            self, "保存 GB29446 专用模板", "GB29446-选煤电力消耗限额-评价数据.xlsx", "Excel (*.xlsx)"
-        )
-        if not path:
-            return
-        try:
-            self.context.application.create_template(Path(path), GB29446_STANDARD_ID)
-        except Exception as exc:
-            QMessageBox.critical(self, "模板保存失败", _friendly_error(exc, "保存GB29446模板"))
-            return
-        QMessageBox.information(self, "模板已保存", path)
-
-    def validate_import_workbook(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "选择Excel", "", "Excel (*.xlsx)")
-        if not path:
-            return
-        report = self.context.application.validate_workbook(Path(path))
-        self.pending_import_id = report.import_id if report.valid else None
-        self.pending_import_standard_id = getattr(getattr(report, "request", None), "standard_id", None)
-        self.import_commit_button.setEnabled(report.valid)
-        self.import_status.setText("校验通过，请确认下方识别摘要后点击“确认导入并评价”。" if report.valid else "校验失败，请修正后重新导入。")
-        self._show_import_summary(report)
-        self.import_issues.setRowCount(0)
-        for issue in report.issues:
-            row = self.import_issues.rowCount()
-            self.import_issues.insertRow(row)
-            for column, value in enumerate((issue.severity, issue.sheet, issue.cell, issue.message)):
-                self.import_issues.setItem(row, column, _item(value))
-        # FAIL-FAST（§三）：Excel 是正式评价入口之一，唯一能评价的范围同样由正式评价
-        # 范围注册表决定。未纳入范围的标准即使工作簿本身合法，也不能被当成正式评价。
-        if self.pending_import_id is not None and not supports_formal_evaluation(self.pending_import_standard_id):
-            self.pending_import_id = None
-            self.import_commit_button.setEnabled(False)
-            self.import_status.setText(self._excel_scope_rejection())
-            self.import_summary.setVisible(False)
-            self.import_summary.setText("")
-            QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
-            return
-        # FAIL-FAST：即使工作簿本身校验通过，只要当前 GB 29446 规则不完整/不兼容，
-        # 也不能通过 Excel 路径生成正式评价记录。
-        if self.pending_import_standard_id is not None:
-            reason = self._gb29446_rule_incompatibility(self.pending_import_standard_id)
-            if reason is not None:
-                self.pending_import_id = None
-                self.import_commit_button.setEnabled(False)
-                self.import_status.setText(reason)
-                self.import_summary.setVisible(False)
-                self.import_summary.setText("")
-                QMessageBox.warning(self, "标准规则不兼容", reason)
-
-    @staticmethod
-    def _excel_scope_rejection() -> str:
-        return (
-            f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，Excel 导入不能作为它的正式评价入口；"
-            "请在标准库中确认软件评价支持状态。"
-        )
-
-    def _show_import_summary(self, report) -> None:
-        """Show the recognisable business summary of a validated workbook.
-
-        Only user-facing fields are shown; internal keys, the numeric profile
-        and calculator identifiers stay in the technical detail layer.
-        """
-        request = getattr(report, "request", None)
-        if not report.valid or request is None:
-            self.import_summary.setVisible(False)
-            self.import_summary.setText("")
-            return
-        lines = []
-        support_line = f"软件评价支持状态：{evaluation_support_label(request.standard_id)}"
-        if request.standard_id == GB29446_STANDARD_ID:
-            period, custom_period, _note = self._decode_gb29446_notes(request.notes)
-            standard = self.context.application.get_standard(request.standard_id)
-            product = None
-            if standard is not None:
-                product = next((item for item in standard.products if item.id == request.product_id), None)
-            coal = ""
-            if product is not None:
-                # 只显示规则声明的煤种；缺少时留空，不用产品名冒充煤种。
-                coal = str(product.selection_values.get(GB29446_COAL_TYPE_KEY) or "").strip()
-            electricity = request.inputs.get("electricity_consumption")
-            raw_coal = request.inputs.get("raw_coal_input")
-            process = request.inputs.get("washing_process")
-            lines = [
-                f"标准：{standard.number if standard else 'GB 29446—2019'}",
-                support_line,
-                f"企业：{request.organization_name or '—'}",
-                f"评价日期：{format_local_date(request.evaluation_date)}",
-                f"核算周期：{custom_period if period == PERIOD_CUSTOM else period}",
-                f"煤种：{coal or '—'}",
-                f"选煤工艺：{process.value if process else '—'}",
-                f"统计期选煤电力消耗量 E_d：{electricity.value if electricity else '—'} kW·h",
-                f"统计期入选原煤量 m：{raw_coal.value if raw_coal else '—'} t",
-            ]
-        else:
-            standard = self.context.application.get_standard(request.standard_id)
-            lines = [
-                f"标准：{standard.number if standard else request.standard_id}",
-                support_line,
-                f"企业：{request.organization_name or '—'}",
-                f"评价日期：{format_local_date(request.evaluation_date)}",
-                f"产品/工序：{request.product_id}",
-            ]
-        self.import_summary.setText(_rich_text("\n".join(lines)))
-        self.import_summary.setVisible(True)
-
-    def evaluate_import(self) -> None:
-        """Formal Excel evaluation: same application use case as the GUI path."""
-        if not self.pending_import_id:
-            return
-        if not supports_formal_evaluation(self.pending_import_standard_id):
-            self.pending_import_id = None
-            self.import_commit_button.setEnabled(False)
-            self.import_status.setText(self._excel_scope_rejection())
-            QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
-            return
-        if self.pending_import_standard_id is not None:
-            reason = self._gb29446_rule_incompatibility(self.pending_import_standard_id)
-            if reason is not None:
-                self.pending_import_id = None
-                self.import_commit_button.setEnabled(False)
-                self.import_status.setText(reason)
-                QMessageBox.warning(self, "标准规则不兼容", reason)
-                return
-        try:
-            result = self.context.application.evaluate_workbook(self.pending_import_id)
-        except Exception as exc:
-            QMessageBox.critical(self, "导入评价失败", _friendly_error(exc, "导入Excel"))
-            return
-        self.pending_import_id = None
-        self.import_commit_button.setEnabled(False)
-        self.import_summary.setVisible(False)
-        self.import_summary.setText("")
-        self.import_status.setText("评价已完成并保存记录。")
-        self.refresh_all()
-        if result.standard_id == GB29446_STANDARD_ID:
-            try:
-                request = self.context.application.get_evaluation(result.evaluation_id)
-            except StorageCorruptionError:
-                # A record saved by this very process is corrupt on disk; the
-                # calculation result stays on screen and no detail is fabricated.
-                request = None
-            if request is not None:
-                self._show_gb29446_result(request[0], result)
-
-    def commit_import(self) -> None:
-        """Legacy generic submission path kept for the other standards."""
-        if not self.pending_import_id:
-            return
-        try:
-            draft = self.context.application.commit_workbook(self.pending_import_id)
-            # 与「确认导入并评价」同一门禁：正式评价范围之外的不得经 Excel 生成正式记录。
-            if not supports_formal_evaluation(getattr(draft.request, "standard_id", None)):
-                self.pending_import_id = None
-                self.import_commit_button.setEnabled(False)
-                self.import_status.setText(self._excel_scope_rejection())
-                QMessageBox.warning(self, FORMAL_EVALUATION_UNSUPPORTED_LABEL, self._excel_scope_rejection())
-                return
-            self.calculate_evaluation(draft.request)
-            self.pending_import_id = None
-            self.import_commit_button.setEnabled(False)
-        except Exception as exc:
-            QMessageBox.critical(self, "导入失败", _friendly_error(exc, "导入Excel"))
-
-    def refresh_package_history(self) -> None:
-        self.package_history_table.setRowCount(0)
-        mode_labels = {"full": "完整包", "incremental": "增量包"}
-        for entry in self.context.application.list_package_history(100):
-            row = self.package_history_table.rowCount()
-            self.package_history_table.insertRow(row)
-            values = (
-                format_local_datetime(entry.installed_at),
-                entry.data_version,
-                mode_labels.get(entry.package_mode, entry.package_mode),
-                entry.parent_package_id or "—",
-                entry.standard_count,
-                entry.rule_count,
-                entry.package_id,
-                entry.package_sha256,
-            )
-            for column, value in enumerate(values):
-                item = _item(value)
-                if column == 7:
-                    item.setToolTip(entry.package_sha256)
-                self.package_history_table.setItem(row, column, item)
-    def refresh_audit(self) -> None:
-        self.audit_table.setRowCount(0)
-        for entry in self.context.application.list_audit(500):
-            row = self.audit_table.rowCount()
-            self.audit_table.insertRow(row)
-            for column, value in enumerate(
-                (
-                    format_local_datetime(entry.created_at),
-                    entry.action,
-                    entry.entity_type,
-                    entry.entity_id,
-                    entry.details_json,
-                )
-            ):
-                self.audit_table.setItem(row, column, _item(value))
-
-    def discover_standard_packages(self) -> None:
-        """Scan a selected local/NAS directory through the application use case."""
-        if not self.context.application.has_package_service():
-            return
-        directory = QFileDialog.getExistingDirectory(self, "选择标准包目录")
-        if not directory:
-            return
-        try:
-            items = self.context.application.scan_package_directory(Path(directory), recursive=True)
-        except Exception as exc:
-            QMessageBox.critical(self, "扫描失败", _friendly_error(exc, "扫描标准包目录"))
-            return
-        if not items:
-            QMessageBox.information(self, "扫描结果", "目录中没有找到 .uebench 标准包。")
-            return
-        lines = [f"扫描到 {len(items)} 个候选包（仅扫描，未安装）："]
-        for item in items:
-            filename = Path(item.path).name
-            if item.valid:
-                detail = f"可安装；数据版本 {item.data_version}；{item.package_mode}；{item.standard_count} 项标准"
-                lines.append(f"{filename}：{detail}")
-                if item.warnings:
-                    lines.append("  提示：" + "；".join(item.warnings))
-            else:
-                lines.append(f"{filename}：拒绝；" + "；".join(item.errors))
-        QMessageBox.information(self, "标准包扫描结果", "\n".join(lines))
-    def install_standard_package(self) -> None:
-        if not self.context.application.has_package_service():
-            return
-        path, _ = QFileDialog.getOpenFileName(self, "选择标准包", "", "UEBench标准包 (*.uebench)")
-        if not path:
-            return
-        report = self.context.application.preview_package(Path(path))
-        if not report.valid:
-            QMessageBox.critical(self, "标准包无效", "\n".join(report.errors))
-            return
-        if QMessageBox.question(self, "确认安装", f"将安装 {len(report.definitions)} 项标准，是否继续？") != QMessageBox.StandardButton.Yes:
-            return
-        try:
-            result = self.context.application.install_package(Path(path))
-            self.refresh_all()
-            QMessageBox.information(self, "安装完成", f"已安装 {result.standards_installed} 项标准。")
-        except Exception as exc:
-            QMessageBox.critical(self, "安装失败", _friendly_error(exc, "安装标准包"))
-
     def create_backup(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "创建备份", f"uebench-{date.today():%Y%m%d}.uebackup", "UEBench备份 (*.uebackup)")
         if path:
@@ -2719,7 +2438,11 @@ class MainWindow(QMainWindow):
         try:
             self.context.application.restore_backup(Path(path))
             self.refresh_all()
-            QMessageBox.information(self, "恢复完成", "数据已恢复。")
+            readiness = self.context.application.formal_evaluation_block_message()
+            if readiness:
+                QMessageBox.warning(self, "数据已恢复", f"数据已恢复。{readiness}")
+            else:
+                QMessageBox.information(self, "恢复完成", "数据已恢复。")
         except Exception as exc:
             QMessageBox.critical(self, "恢复失败", _friendly_error(exc, "恢复备份"))
 
@@ -2741,7 +2464,7 @@ class MainWindow(QMainWindow):
         return str(standard.rule_revision)
 
     def _installed_package_text(self) -> tuple[str, str, str]:
-        """最近一次成功安装的标准包 (package_id, data_version, sha256)。"""
+        """返回仅供诊断信息使用的完整标准库身份。"""
         try:
             history = list(self.context.application.list_package_history(1))
         except Exception:
@@ -2753,7 +2476,7 @@ class MainWindow(QMainWindow):
             has_service = bool(self.context.application.has_package_service())
         except Exception:
             has_service = False
-        placeholder = "未安装标准包" if has_service else "未配置标准包服务"
+        placeholder = "未安装" if has_service else "服务不可用"
         return (placeholder, placeholder, placeholder)
 
     def _diagnostics_facts(self) -> DiagnosticsFacts:
@@ -2786,7 +2509,7 @@ class MainWindow(QMainWindow):
             reconciliation_facts(self._package_reconciliation_outcome()),
         )
 
-    # -- 最近一次标准包对账（只读展示 + 非阻断提示） -----------------------
+    # -- 最近一次启动/恢复后的标准库对账（仅供高级诊断） -------------------
 
     def _package_reconciliation_outcome(self):
         """最近一次启动标准包对账结果；组合根未记录或旧版门面不支持时返回 ``None``。"""
@@ -2799,57 +2522,14 @@ class MainWindow(QMainWindow):
         except Exception:
             return None
 
-    def package_reconciliation_notice(self) -> str | None:
-        """对账未达到期望状态时的中文非阻断提示；正常或未对账时返回 ``None``。
-
-        只有 ``succeeded``（install / noop / upgrade）才视为“标准数据可信”，
-        conflict / invalid / no-downgrade / missing / unavailable 都必须让用户看到
-        标准数据尚未更新的提示，而不是让他误以为已经是最新。
-        """
-
-        outcome = self._package_reconciliation_outcome()
-        if outcome is None:
-            return None
-        if bool(getattr(outcome, "succeeded", False)):
-            return None
-        message = str(getattr(outcome, "message", "") or "").strip()
-        notice = PACKAGE_RECONCILIATION_NOTICE_PREFIX
-        if message:
-            notice = f"{notice}：{message}"
-        return f"{notice}（详见“帮助 → 关于 / 诊断信息”）"
-
-    def _clear_package_reconciliation_notice(self) -> None:
-        for attribute in ("package_reconciliation_notice_label", "package_reconciliation_notice_dismiss"):
-            widget = getattr(self, attribute, None)
-            if widget is None:
-                continue
-            widget.setParent(None)
-            widget.deleteLater()
-            setattr(self, attribute, None)
-
-    def _show_package_reconciliation_notice(self) -> None:
-        """在状态栏显示可关闭的非阻断中文提示（不弹模态框、不改页面布局）。"""
-
-        self._clear_package_reconciliation_notice()
-        notice = self.package_reconciliation_notice()
-        if notice is None:
-            return
-        status = self.statusBar()
-        label = QLabel(notice)
-        label.setObjectName("packageReconciliationNotice")
-        label.setStyleSheet("color: #b42318; font-weight: bold;")
-        dismiss = QPushButton("关闭提示")
-        dismiss.setObjectName("packageReconciliationNoticeDismiss")
-        dismiss.clicked.connect(lambda: self._clear_package_reconciliation_notice())
-        status.addWidget(label, 1)
-        status.addPermanentWidget(dismiss)
-        self.package_reconciliation_notice_label = label
-        self.package_reconciliation_notice_dismiss = dismiss
-
     def _copy_diagnostics(self, text: str) -> None:
         clipboard = QApplication.clipboard()
         if clipboard is not None:
             clipboard.setText(text)
+
+    def copy_diagnostics(self) -> None:
+        self._copy_diagnostics(self.diagnostics_report())
+        QMessageBox.information(self, "诊断信息", "诊断信息已复制到剪贴板。")
 
     def show_diagnostics(self) -> None:
         """Open the read-only 关于 / 诊断信息 dialog."""

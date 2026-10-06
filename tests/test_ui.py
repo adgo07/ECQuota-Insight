@@ -6,7 +6,7 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QFormLayout, QLineEdit, QMessageBox, QPushButton
+from PySide6.QtWidgets import QApplication, QFormLayout, QLabel, QLineEdit, QMessageBox, QPushButton
 
 import pytest
 
@@ -107,7 +107,7 @@ def test_main_window_starts_with_empty_database(tmp_path: Path) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     window = MainWindow(context)
-    assert window.navigation.count() == 6
+    assert window.navigation.count() == 5
     assert window.home_standard_count.text() == "0/0"
     window.close()
     context.database.dispose()
@@ -284,32 +284,45 @@ def test_future_standard_calculation_is_preview_only(tmp_path: Path, monkeypatch
     window.close()
     context.database.dispose()
 
-def test_maintenance_page_shows_package_history_from_application_layer(tmp_path: Path) -> None:
+def test_settings_page_hides_package_management_details_by_default(tmp_path: Path) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     entry = PackageHistoryEntry(
         package_id="pkg-history",
-        data_version="2026.09-published.1",
-        package_mode="incremental",
+        data_version="2026.10-published.4",
+        package_mode="full",
         issued_at=datetime(2026, 9, 1, tzinfo=timezone.utc),
         installed_at=datetime(2026, 9, 2, 12, 34, 56, tzinfo=timezone.utc),
-        parent_package_id="pkg-parent",
-        standard_count=63,
+        parent_package_id=None,
+        standard_count=48,
         rule_count=900,
         package_sha256="a" * 64,
     )
     context.application.list_package_history = lambda limit=50: [entry]
     window = MainWindow(context)
-    window.navigation.setCurrentRow(5)
-    assert window.package_history_table.rowCount() == 1
-    assert window.package_history_table.item(0, 1).text() == "2026.09-published.1"
-    assert window.package_history_table.item(0, 2).text() == "增量包"
-    assert window.package_history_table.item(0, 3).text() == "pkg-parent"
-    assert window.package_history_table.item(0, 7).text() == "a" * 64
+    assert [window.navigation.item(i).text() for i in range(window.navigation.count())] == [
+        "首页", "标准库", "新建评价", "评价记录", "设置"
+    ]
+    assert window.home_standard_library_version.text() == "2026.10-published.4"
+    window.navigation.setCurrentRow(4)
+    page = window.settings_page
+    assert page.standard_library_version_value.text() == "2026.10-published.4"
+    assert page.advanced_content.isHidden()
+    assert page.advanced_toggle.text() == "高级"
+    assert [button.text() for button in page.advanced_content.findChildren(QPushButton)] == [
+        "打开数据目录", "查看诊断信息", "复制诊断信息"
+    ]
+    assert not hasattr(window, "package_history_table")
+    assert not hasattr(window, "audit_table")
+    all_text = "\n".join(widget.text() for widget in window.findChildren(QLabel))
+    assert "标准库随软件版本一起更新，无需单独安装。" in all_text
+    assert "恢复会替换当前数据，软件会先创建恢复前保护。" in all_text
+    assert "安装标准包" not in all_text
+    assert "扫描标准包" not in all_text
+    assert "package_id" not in all_text
+    assert "SHA-256" not in all_text
     window.close()
     context.database.dispose()
-
-
 def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")

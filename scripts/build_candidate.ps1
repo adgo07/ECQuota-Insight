@@ -193,6 +193,43 @@ if (-not (Test-Path -LiteralPath $PayloadDir -PathType Container)) {
     throw "PyInstaller 未产出 payload 目录：$PayloadDir"
 }
 
+# Run the packaged executable self-check before assembling the Candidate.
+# This validates the frozen EXE with its bundled key and standard library,
+# using an isolated database instead of the developer's user data.
+$SelfCheckRoot = Join-Path (Join-Path $ProjectRoot "work") ("candidate-self-check-" + [guid]::NewGuid().ToString("N"))
+$SelfCheckPrefix = [IO.Path]::GetFullPath((Join-Path $ProjectRoot "work")) + [IO.Path]::DirectorySeparatorChar
+$SelfCheckRoot = [IO.Path]::GetFullPath($SelfCheckRoot)
+if (-not $SelfCheckRoot.StartsWith($SelfCheckPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "自检目录不在项目 work 目录下：$SelfCheckRoot"
+}
+New-Item -ItemType Directory -Path $SelfCheckRoot -Force | Out-Null
+try {
+    $SelfCheckExe = Join-Path $PayloadDir "UEBench.exe"
+    $SelfCheckData = Join-Path $SelfCheckRoot "data"
+    $SelfCheckReport = Join-Path $SelfCheckRoot "report.json"
+    if (-not (Test-Path -LiteralPath $SelfCheckExe -PathType Leaf)) {
+        throw "Candidate payload 缺少 UEBench.exe：$SelfCheckExe"
+    }
+    & $SelfCheckExe --self-check --data-dir $SelfCheckData --output $SelfCheckReport
+    if ($LASTEXITCODE -ne 0) { throw "打包 EXE 自检失败，退出码：$LASTEXITCODE" }
+    if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) {
+        throw "打包 EXE 自检未生成报告：$SelfCheckReport"
+    }
+    $SelfCheck = Get-Content -LiteralPath $SelfCheckReport -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($SelfCheck.schema -ne "uebench.self-check-report" -or
+        $SelfCheck.overall_status -ne "passed" -or
+        $SelfCheck.frozen -ne $true -or
+        @($SelfCheck.failed_checks).Count -ne 0) {
+        throw "打包 EXE 自检报告未通过：$($SelfCheck.overall_status)，失败项：$($SelfCheck.failed_checks -join ',')"
+    }
+    Write-Host "打包 EXE 自检通过：$(@($SelfCheck.checks).Count) 项；隔离目录 $SelfCheckRoot"
+}
+finally {
+    if (Test-Path -LiteralPath $SelfCheckRoot) {
+        Remove-Item -LiteralPath $SelfCheckRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # ECQ-RS05 §11: the embedded build identity must exist in the payload BEFORE the
 # payload manifest is generated, so the manifest covers and hashes it.  One
 # build timestamp is shared with release-build-info.json and ACTIVE-CANDIDATE.json

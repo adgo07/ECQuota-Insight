@@ -207,42 +207,6 @@ def test_incompatible_definition_shows_chinese_message_and_refuses_evaluation(
         context.database.dispose()
 
 
-def test_excel_evaluation_path_is_refused_for_incompatible_rule(
-    tmp_path: Path, monkeypatch
-) -> None:
-    """The Excel import/evaluate path must not save a formal record either."""
-
-    application = _qt_app()
-    context = create_context(tmp_path / "appdata")
-    context.standards.install(pre_r2_definition())
-
-    window = MainWindow(context)
-    warnings: list[str] = []
-    monkeypatch.setattr(
-        QMessageBox, "warning", lambda *args, **kwargs: warnings.append(str(args[2]) if len(args) > 2 else "")
-    )
-
-    def _must_not_run(*_args, **_kwargs):  # pragma: no cover - asserted never called
-        raise AssertionError("规则不兼容时不得进入正式 Excel 评价用例")
-
-    monkeypatch.setattr(context.application, "evaluate_workbook", _must_not_run)
-    try:
-        # A workbook that validated before the incompatible rule was installed
-        # (or was validated against it) must still be refused here.
-        window.pending_import_id = "pending-import"
-        window.pending_import_standard_id = STANDARD_ID
-        window.import_commit_button.setEnabled(True)
-        window.evaluate_import()
-        assert window.pending_import_id is None
-        assert window.import_commit_button.isEnabled() is False
-        assert GB29446_RULE_INCOMPATIBLE_MESSAGE in window.import_status.text()
-        assert any(GB29446_RULE_INCOMPATIBLE_MESSAGE in item for item in warnings)
-        assert context.application.list_recent_evaluations() == []
-    finally:
-        window.close()
-        context.database.dispose()
-
-
 # ---------------------------------------------------------------------------
 # 4. The normal r2 path still works (mirrors a Golden case)
 # ---------------------------------------------------------------------------

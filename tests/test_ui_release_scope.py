@@ -1,28 +1,11 @@
-"""ECQ-RS05 §二(UI) / §三 / §四 / §六 / §七 — Windows V1 release-scope UI gates.
+"""UI release-scope and RS05 product simplification gates.
 
-These tests drive the **real widgets** offscreen against a real application context
-(the pattern established by ``tests/test_gb29446_evaluate_wiring.py``): no modal box
-may hang the run, and every assertion goes through Qt signals, table cells and
-buttons rather than through the private helpers alone.
-
-What is fenced here:
-
-* §二 时间显示 — every ordinary page renders stored-UTC timestamps in local time to
-  the second (:func:`uebench.ui.presentation.format_local_datetime`), never with
-  microseconds and never with a second offset added.
-* §三 正式评价范围 — the 「新建评价」 combo offers exactly the formally supported
-  standards, and an unsupported standard cannot reach a formal evaluation through
-  the combo, the library, the home page or the Excel entry.
-* §四 官方来源 — 「查看标准原文」 opens the pre-registered official page from
-  :mod:`uebench.application.official_sources`; the ordinary UI never opens a local
-  PDF, and an unregistered standard disables the control.
-* §六 标准库信息结构 — support status, the single 适用范围 line and the official source
-  are visible; internal traceability noise is gone; the scope of an un-surveyed standard
-  is reported as pending instead of invented.
-* §七 新建评价 — the combo is wide enough to read, the duplicated standard name and the
-  duplicated 「查看标准原文」 are gone, and the library can jump into the page with the
-  supported standard selected.
+These tests exercise the real offscreen Qt widgets against the application context.
+They cover timestamp presentation, formal evaluation scope, official source links,
+standard-library information, supported-standard navigation, settings, and the
+absence of user-facing package management or Excel import/evaluation workflows.
 """
+
 from __future__ import annotations
 
 import copy
@@ -283,22 +266,19 @@ def test_record_detail_renders_local_seconds_precision(window) -> None:
     assert date_lines and MICROSECONDS.search(date_lines[0]) is None
 
 
-def test_audit_and_package_history_render_local_seconds_precision(window) -> None:
+def test_settings_replaces_ordinary_package_management(window) -> None:
     _evaluate_gb29446(window)
-    window.navigation.setCurrentRow(5)
+    window.navigation.setCurrentRow(4)
 
-    assert window.audit_table.rowCount() >= 1
-    audit_entry = window.context.application.list_audit(500)[0]
-    audit_cell = window.audit_table.item(0, 0).text()
-    assert SECONDS_PRECISION.fullmatch(audit_cell), audit_cell
-    assert audit_cell == format_local_datetime(audit_entry.created_at)
-
-    history = window.context.application.list_package_history(100)
-    if not history:  # pragma: no cover - depends on the release package being present
-        pytest.skip("本机没有已安装标准包历史，跳过该列的时间显示检查")
-    installed_cell = window.package_history_table.item(0, 0).text()
-    assert SECONDS_PRECISION.fullmatch(installed_cell), installed_cell
-    assert installed_cell == format_local_datetime(history[0].installed_at)
+    labels = [window.navigation.item(i).text() for i in range(window.navigation.count())]
+    assert labels == ["首页", "标准库", "新建评价", "评价记录", "设置"]
+    assert not hasattr(window, "package_history_table")
+    assert not hasattr(window, "audit_table")
+    assert window.settings_page.advanced_toggle.isChecked() is False
+    assert window.settings_page.advanced_content.isHidden()
+    assert window.settings_page.standard_library_version_value.text()
+    # 后台对账历史仍可读取，普通设置页不提供手工包管理入口。
+    assert isinstance(window.context.application.list_package_history(10), list)
 
 
 # ---------------------------------------------------------------------------
