@@ -17,6 +17,7 @@ from uebench.application.evaluation_support import (
 )
 from uebench.application.official_sources import VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
 from uebench.bootstrap import create_context
+from uebench.infrastructure.backup import BackupValidationError
 from uebench.ui.main_window import MainWindow
 from uebench.domain.models import (
     EvaluationRequest,
@@ -450,5 +451,101 @@ def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_
     window.eval_selection_mode.setCurrentIndex(2)
     assert window.eval_standard.currentData() == future.id
     assert "尚未实施" in window.eval_standard_status.text()
+    window.close()
+    context.database.dispose()
+
+
+def test_backup_failure_shows_a_chinese_message_and_never_says_done(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """H03：创建备份失败必须有中文失败提示，且**绝不**显示“备份完成”。
+
+    ``PermissionError``（磁盘写保护 / 目标目录只读 / 文件被占用）在英文系统上
+    ``str(exc)`` 是纯英文的 “Access is denied” / “WinError 5”，直接抛给用户既看不懂
+    又会把路径暴露成正文。所以这里同时钉住两件事：正文是稳定的中文，且技术细节
+    （WinError / Access is denied / 路径）不出现在用户可见文本里。
+    """
+
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    window = MainWindow(context)
+
+    target = tmp_path / "read-only" / "uebench-20261007.uebackup"
+    monkeypatch.setattr(
+        "uebench.ui.main_window.QFileDialog.getSaveFileName",
+        staticmethod(lambda *args, **kwargs: (str(target), "")),
+    )
+
+    critical: list[tuple[str, str]] = []
+    information: list[tuple[str, str]] = []
+
+    def _capture(bucket: list[tuple[str, str]]):
+        def _show(_parent, title, message):
+            bucket.append((title, message))
+            return QMessageBox.StandardButton.Ok
+
+        return staticmethod(_show)
+
+    monkeypatch.setattr(QMessageBox, "critical", _capture(critical))
+    monkeypatch.setattr(QMessageBox, "information", _capture(information))
+
+    def _denied(_path):
+        raise PermissionError(13, "Access is denied")
+
+    monkeypatch.setattr(context.application, "create_backup", _denied)
+    window.create_backup()
+
+    assert information == []  # 失败绝不能显示“备份完成”
+    assert critical == [
+        ("备份失败", "创建备份失败：无法写入所选位置，请检查磁盘空间与文件权限，或更换保存位置后重试。")
+    ]
+    message = critical[0][1]
+    assert any("\u4e00" <= char <= "\u9fff" for char in message)
+    for technical in ("Access is denied", "WinError", "PermissionError", str(target)):
+        assert technical not in message
+
+    # 备份后端**自带中文原因**时如实保留，仍然是同一条中文失败提示格式。
+    critical.clear()
+
+    def _conflict(_path):
+        raise BackupValidationError("目标位置已被同名备份占用")
+
+    monkeypatch.setattr(context.application, "create_backup", _conflict)
+    window.create_backup()
+
+    assert information == []
+    assert critical == [("备份失败", "创建备份失败：目标位置已被同名备份占用")]
+
+    window.close()
+    context.database.dispose()
+
+
+def test_backup_success_still_reports_completion(tmp_path: Path, monkeypatch) -> None:
+    """H03 反向：备份成功路径不受影响，仍然显示“备份完成”（不把成功吞成静默）。"""
+
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    window = MainWindow(context)
+
+    target = tmp_path / "uebench-20261007.uebackup"
+    monkeypatch.setattr(
+        "uebench.ui.main_window.QFileDialog.getSaveFileName",
+        staticmethod(lambda *args, **kwargs: (str(target), "")),
+    )
+    information: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        QMessageBox,
+        "information",
+        staticmethod(
+            lambda _parent, title, message: information.append((title, message))
+            or QMessageBox.StandardButton.Ok
+        ),
+    )
+
+    window.create_backup()
+
+    assert target.exists()  # 真的写出了备份文件
+    assert information == [("备份完成", str(target))]
+
     window.close()
     context.database.dispose()
