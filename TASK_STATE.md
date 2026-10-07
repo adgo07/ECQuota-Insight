@@ -1,6 +1,6 @@
 # TASK_STATE
 
-更新时间：2026-10-03
+更新时间：2026-10-07
 
 ## 当前产品目标
 
@@ -14,48 +14,24 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-**`ECQ-RS05` — `IN PROGRESS / RELEASE CANDIDATE`**（Windows V1 Release Candidate）
+**ECQ-RS05 — Product Simplification & Standard Library Pairing（IN PROGRESS）**
 
-- `ECQ-GOV01 = DONE`（验收载体 PR #8）；
-- `ECQ-RS01 = DONE`（验收载体 PR #9）；
-- `ECQ-RS02 = DONE`（验收载体 PR #10）；
-- `ECQ-RS03 = DONE`（验收载体 PR #11）；
-- `ECQ-RS04 = DONE`（验收载体 PR #12）；
-- **`ECQ-RS05 = IN PROGRESS / RELEASE CANDIDATE`**（验收载体 PR #13）——
-  **不得**在本阶段写成 `DONE` 或 `UEBench 0.2.0 = RELEASED`；
-  只有独立验收 + merge + final release cut 之后才能写 `DONE`；
-- 目标版本：**`UEBench 0.2.0`**；唯一版本源为 `pyproject.toml` `[project] version`，
-  其余正式发布链文件由 `tools/release_version.py` 生成或读取；
-- `GB29446 Business Capability = COMPLETE`；`GB29446 Product Lifecycle = COMPLETE`；
-  `GB29446 Excel Adapter = COMPLETE`；**`GB29446 Product Golden = ADOPTED (v1)`**；
-- `Reference Standard 产品证据 = READY FOR RS05 WINDOWS ACCEPTANCE`；
-- `Reference Standard Product Closure = PARTIAL`（尚欠 RS05 完成）；
-- 本质检视结论：**Reference Standard Product Closure 保持 `PARTIAL`**，
-  `D-ECQ-006` 仍 **OPEN**。
+- ECQ-GOV01 = DONE（PR #8）；ECQ-RS01 = DONE（PR #9）；ECQ-RS02 = DONE（PR #10）；
+  ECQ-RS03 = DONE（PR #11，Excel Adapter 技术能力）；ECQ-RS04 = DONE（PR #12）；
+- ECQ-RS05 = IN PROGRESS：按“安装完整 UEBench → 自动使用配套标准库 → 用户直接评价”的产品模型收口；
+  本阶段不得写成 DONE，不得发布 UEBench 0.2.0；
+- ECQ-RS06 = NOT STARTED，不得开始第二标准；
+- GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；
+- Excel Adapter technical capability = RETAINED；Excel user-facing formal workflow = DEFERRED；
+- 用户无需管理标准包；标准库随完整软件版本配套更新；
+- Reference Standard Product Closure = PARTIAL；
+- Numeric v1、GB29446 计算规则、标准解释、数据库 Schema、标准包格式与 platform-lock 均保持现有基线。
 
-### RS05 Blocker 状态
+PR #13 的 Windows Candidate 与对账工作是本阶段既有基线，不代表 RS05 已完成或正式发布。本轮只记录当前状态；验收结果以本次执行报告和 PR 为准。
 
-**已关闭 Blocker 1（固定标准包内 GB29446 定义落后）** —— 项目负责人批准方案 B 后执行：
-以已签名 `2026.09-published.2`（SHA256 `4f025b8a…1727`）为父基线，**只**把 GB29446 定义
-由 `rule_revision=1` 替换为当前 `rule_revision=2`，其余 46 项标准内容逐字节保持不变，
-重新签名生成新的完整正式标准包 `2026.10-published.3`（SHA256 `14db53be…32b0`）。
-全程未使用 `统一标准规则确认表.xlsx`。RS04 Product Golden 回放 15/15 通过，
-冻结 EXE 自检由 `exit 1` 变为 `exit 0`。详见 `release/standard-packages/PIN.json` 与
-`docs/governance/RS05_EXECUTION_REPORT.md` §5.2A/§7.4。
+### RS05 前置阶段背景（历史记录）
 
-**未关闭 Blocker 2（Windows 验收证据不完整，如实记录）**
-2. **Windows 验收证据不完整（如实记录，不伪造 PASS）**
-   - 本机仅有 **Windows 10 Build 19045**，**无 Windows 11 环境** → `BLOCKED`；
-   - 本机仅 **1 个显示器**，无法实测“不同 DPI 显示器之间拖动窗口” → `BLOCKED`；
-   - **DPI 100/125/150/175/200 五档实机实测** → `BLOCKED`；
-   - 标准（非管理员）账户、Windows 10 实机 → `PASS`；
-   - 离线运行 → 本次为 `OBSERVED-ONLINE`，需在断网验收机复测。
-
-- RS05 的两个未关闭 blocker 见本文件“当前任务”一节；
-> `READY FOR RS05 WINDOWS ACCEPTANCE` **不等于“可发布”**；Windows 正式交付证据尚未建立。
->
-> 本文件只记录稳定状态。PR head SHA、审查进度与合并状态一律以对应 PR 为准，不写入本文件。
-
+RS05 既有 Candidate 已包含 GB29446 r2 配套、启动期标准库对账、安全升级、Candidate 溯源与基础自检能力。原阶段的 Win11、多显示器跨屏及多档 DPI 实机证据仍未在本地环境完成；本任务须重建当前源码 Candidate 并记录真实 Gate 结果，不得把历史 Candidate 当作当前源码交付。
 ## 当前治理基线
 
 | 项目 | 值 |
@@ -92,7 +68,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Windows V1 最终验收与发布                     IN PROGRESS / RELEASE CANDIDATE  ← 当前阶段
+→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  ← 当前阶段
 → RS06 第二标准架构验证                              NOT STARTED
 ```
 
@@ -106,18 +82,17 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 | GB29446 Calculator / Numeric 主链 | `DONE` |
 | GB29446 业务 Vertical Slice 完整闭环 | `DONE`（业务能力 `COMPLETE`） |
 | GB29446 产品生命周期闭环（保存 / 历史恢复） | `DONE`（Product Lifecycle = `COMPLETE`） |
-| GB29446 Excel Adapter 闭环 | `DONE`（Excel Adapter = `COMPLETE`） |
+| GB29446 Excel Adapter 技术能力 | RETAINED（用户正式工作流 DEFERRED） |
 | GB29446 Product Golden | `ADOPTED (v1)` |
-| Reference Standard 产品证据 | `READY FOR RS05 WINDOWS ACCEPTANCE` |
+| Reference Standard 产品证据 | `PARTIAL` |
 | Reference Standard Product Closure | `PARTIAL`（尚欠 RS05） |
-| Windows V1 最终验收与发布 | `IN PROGRESS / RELEASE CANDIDATE`（RS05 进行中，未 DONE） |
+| Product Simplification & Standard Library Pairing | `IN PROGRESS`（RS05 进行中，未 DONE） |
 | 第二标准架构验证 | `NOT STARTED`（RS06 处理） |
 
 ## 发布物状态
 
 - **上一正式发布物 / Previous Release**：`UEBench 0.1.0`、standard package `2026.09-published.2`。历史已发布版本，**不代表当前 main 源码**。
-- **当前 Candidate / Current Release Candidate**：`UEBench 0.2.0`（RS05 产出；**未正式发布**，待独立验收与 final release cut）。
-  便携包 / 安装程序 / 源码包的文件名与 SHA256 以交付目录中的 `SHA256SUMS.txt` 与 `release-build-info.json` 为准，不在本文件内固定。
+- **0.2.0 Candidate 规则**：只有从本轮 RS05 最终干净 Head 构建并通过 Candidate 门禁的产物可代表当前源码；更早的候选产物不作为当前基线。产物身份与哈希记录在交付目录；本阶段不授权正式发布。
 - **当前开发源码 / Current Development Source**：以执行时实际 `main` SHA 为准。
 
 ## 当前 OPEN
@@ -170,19 +145,22 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - **单一 ACTIVE Candidate**：旧的 `dist/candidate` 已归档为
   `dist/archive/SUPERSEDED-candidate-2026-10-04-before-identity`（含 SHA256 证据）；
   构建脚本在组装前清空输出目录并写入 `ACTIVE-CANDIDATE.json`。
-- 状态仍为 **`RS05 = IN PROGRESS / RELEASE CANDIDATE`**；`D-ECQ-006` 继续 OPEN；
+- 状态仍为 **`RS05 = IN PROGRESS`**；`D-ECQ-006` 继续 OPEN；
   `Reference Standard Product Closure = PARTIAL`。
 
 ## 下一步
 
 - `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；
-- 当前阶段 = **`RS05` — Windows V1 最终验收与发布**（`IN PROGRESS / RELEASE CANDIDATE`）；RS06 未开始；
-- `READY FOR RS05 WINDOWS ACCEPTANCE` 不等于“可发布”；Windows 正式交付证据尚未建立；
+- 当前阶段 = **`RS05` — Product Simplification & Standard Library Pairing**（`IN PROGRESS`）；RS06 未开始；
+- `PARTIAL` 不等于“可发布”；Windows 正式交付证据尚未建立；
 - 历史便携 ZIP 缺失仍是已知发布资产问题；具体执行证据见对应 PR，不据此宣布 Windows 最终交付完成。
 
 本任务停在 RS05 候选阶段，未开始 RS06。
 
-## Phase 7 收口进度（进行中，未验收）
+## Phase 7 历史收口记录（原阶段记录）
+
+> 本节记录 PR #13 所在阶段的历史事实；当前 RS05 目标、状态和交付约束以本文前部“当前任务”及最新 RS05 执行报告为准。
+
 
 > 本节为**追加**记录，不改写上文历史。上文关于 `2026.10-published.3` 的叙述是其时事实；
 > 自本轮起，**当前正式标准包已变更为不含标准 PDF 的 `2026.10-published.4`**。

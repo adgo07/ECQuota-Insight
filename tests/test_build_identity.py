@@ -248,9 +248,11 @@ def test_window_diagnostics_report_contains_live_facts_without_private_keys(
         if clipboard is not None:
             assert clipboard.text() == text
 
-        # Reachable from the existing UI (帮助 → 关于 / 诊断信息), no layout change.
-        assert window.diagnostics_action in window.help_menu.actions()
-        window.diagnostics_action.trigger()
+        # 诊断信息仅从默认折叠的「设置 → 高级」进入。
+        window.navigation.setCurrentRow(4)
+        assert window.settings_page.advanced_toggle.isChecked() is False
+        window.settings_page.advanced_toggle.click()
+        window.settings_page.view_diagnostics_button.click()
         application.processEvents()
         assert window.diagnostics_content.toPlainText() == text
         assert window.diagnostics_content.isReadOnly()
@@ -363,62 +365,176 @@ def test_diagnostics_text_reports_not_executed_when_facade_has_no_outcome() -> N
     assert "未知" in text and "未执行" in text
 
 
-def test_window_diagnostics_report_includes_reconciliation_and_notice(tmp_path: Path) -> None:
+def test_window_keeps_package_details_advanced_and_blocks_new_evaluations(tmp_path: Path) -> None:
     from PySide6.QtWidgets import QApplication
 
+    from uebench.application.package_reconciliation import FORMAL_EVALUATION_MISMATCH_MESSAGE
     from uebench.bootstrap import create_context
+    from uebench.domain.models import StandardDefinition
     from uebench.ui.main_window import MainWindow
 
     application = QApplication.instance() or QApplication([])
-    context = create_context(tmp_path / "appdata")
+    context = create_context(tmp_path / "appdata", enforce_standard_library_readiness=True)
+    definition = StandardDefinition.model_validate_json(DEFINITION_PATH.read_text(encoding="utf-8"))
+    context.standards.install(definition)
+    from .test_gb29446 import _request
+    historical_request = _request(definition, "炼焦煤", process="重介", electricity="560", raw_coal="100")
+    historical_result = context.application.preview_evaluation(historical_request)
+    context.evaluations.save(historical_request, historical_result, definition)
     outcome = _conflict_outcome()
+    context.package_reconciliation._last_outcome = outcome
     context.application.record_package_reconciliation(outcome)
 
     window = MainWindow(context)
     try:
-        text = window.diagnostics_report()
-        assert f"对账动作（action）：{outcome.action.value}" in text
-        assert f"对账原因（reason）：{outcome.reason.value}" in text
-        assert outcome.message in text
+        assert window.context.application.formal_evaluation_block_message() == FORMAL_EVALUATION_MISMATCH_MESSAGE
+        assert window.home_compatibility_notice.text() == FORMAL_EVALUATION_MISMATCH_MESSAGE
+        assert not window.home_start_evaluation.isEnabled()
+        assert not window.calculate_button.isEnabled()
+        assert "package_id" not in window.home_compatibility_notice.text()
+        assert "SHA" not in window.home_compatibility_notice.text()
 
-        # (b) 非阻断提示，且不弹模态对话框。
-        label = window.package_reconciliation_notice_label
-        assert label is not None
-        assert label.text().startswith("标准数据未更新或标准数据状态异常")
-        assert outcome.message in label.text()
-        assert window.package_reconciliation_notice_dismiss is not None
-        assert window.isModal() is False
-
-        # Dismissible and lightweight.
-        window.package_reconciliation_notice_dismiss.click()
+        window.navigation.setCurrentRow(4)
+        assert window.settings_page.advanced_toggle.isChecked() is False
+        assert window.settings_page.advanced_content.isHidden()
+        assert not hasattr(window, "package_history_table")
+        assert not hasattr(window, "audit_table")
+        window.settings_page.advanced_toggle.click()
+        window.settings_page.view_diagnostics_button.click()
         application.processEvents()
-        assert window.package_reconciliation_notice_label is None
-        assert window.package_reconciliation_notice_dismiss is None
+        diagnostic_text = window.diagnostics_content.toPlainText()
+        assert f"对账动作（action）：{outcome.action.value}" in diagnostic_text
+        assert "pkg-installed-conflict" in diagnostic_text
+        assert "package_id" in diagnostic_text
+
+        # 错配仅暂停新正式评价；历史记录仍可列出并按已保存结果查看。
+        from unittest.mock import patch
+        from PySide6.QtWidgets import QTextEdit
+        window.navigation.setCurrentRow(3)
+        assert window.record_table.rowCount() == 1
+        window.record_table.selectRow(0)
+        with patch("uebench.domain.engine.EvaluationEngine.evaluate", side_effect=AssertionError("history view ran Engine")):
+            window.view_selected_record()
+        detail = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+        assert detail is not None
+        assert "选煤电力单耗" in detail.toPlainText()
+        assert str(historical_result.results[0].actual_value) in detail.toPlainText()
     finally:
         window.close()
         context.database.dispose()
 
 
-@pytest.mark.parametrize("outcome_factory", ["none", "noop"])
-def test_no_reconciliation_notice_for_healthy_outcome(
-    tmp_path: Path, outcome_factory: str
+@pytest.mark.parametrize(
+    ("action", "expected_message"),
+    [
+        ("noop", None),
+        ("install", None),
+        ("upgrade", None),
+        ("no-downgrade", "mismatch"),
+        ("conflict", "mismatch"),
+        ("invalid", "install"),
+        ("missing", "install"),
+        ("unavailable", "install"),
+    ],
+)
+def test_readiness_message_classifies_reconciliation_outcomes(action: str, expected_message: str | None) -> None:
+    from uebench.application.package_reconciliation import (
+        FORMAL_EVALUATION_INSTALLATION_MESSAGE,
+        FORMAL_EVALUATION_MISMATCH_MESSAGE,
+        PackageReconciliationService,
+        ReconciliationAction,
+        ReconciliationOutcome,
+        ReconciliationReason,
+    )
+
+    reason_by_action = {
+        "noop": ReconciliationReason.IDENTICAL_PACKAGE,
+        "install": ReconciliationReason.NO_INSTALLED_PACKAGE,
+        "upgrade": ReconciliationReason.BUNDLED_NEWER,
+        "no-downgrade": ReconciliationReason.INSTALLED_NEWER,
+        "conflict": ReconciliationReason.SAME_DATA_VERSION_DIFFERENT_IDENTITY,
+        "invalid": ReconciliationReason.BUNDLED_INVALID,
+        "missing": ReconciliationReason.NO_BUNDLED_PACKAGE,
+        "unavailable": ReconciliationReason.PACKAGE_SERVICE_UNAVAILABLE,
+    }
+    service = PackageReconciliationService(None, data_version_key=lambda _value: None)
+    service._last_outcome = ReconciliationOutcome(
+        action=ReconciliationAction(action), reason=reason_by_action[action], message="diagnostic detail"
+    )
+    actual = service.formal_evaluation_block_message()
+    if expected_message == "mismatch":
+        assert actual == FORMAL_EVALUATION_MISMATCH_MESSAGE
+    elif expected_message == "install":
+        assert actual == FORMAL_EVALUATION_INSTALLATION_MESSAGE
+    else:
+        assert actual is None
+
+
+@pytest.mark.parametrize(
+    ("action", "reason", "message_kind"),
+    [
+        ("no-downgrade", "installed-data-version-newer", "mismatch"),
+        ("conflict", "same-data-version-different-identity", "mismatch"),
+        ("invalid", "bundled-invalid", "installation"),
+    ],
+)
+def test_application_and_excel_formal_paths_stop_before_engine_when_library_is_blocked(
+    action: str, reason: str, message_kind: str
 ) -> None:
-    from PySide6.QtWidgets import QApplication
+    from types import SimpleNamespace
+    from unittest.mock import Mock
 
-    from uebench.bootstrap import create_context
-    from uebench.ui.main_window import MainWindow
+    from uebench.application.facade import ApplicationFacade
+    from uebench.application.package_reconciliation import (
+        FORMAL_EVALUATION_INSTALLATION_MESSAGE,
+        FORMAL_EVALUATION_MISMATCH_MESSAGE,
+        PackageReconciliationService,
+        ReconciliationAction,
+        ReconciliationOutcome,
+        ReconciliationReason,
+    )
+    from uebench.application.services import EvaluationService
+    from uebench.domain.models import StandardDefinition
+    from .test_gb29446 import _request
 
-    application = QApplication.instance() or QApplication([])
-    context = create_context(tmp_path / "appdata")
-    if outcome_factory != "none":
-        context.application.record_package_reconciliation(_noop_outcome())
+    standard = StandardDefinition.model_validate_json(DEFINITION_PATH.read_text(encoding="utf-8"))
+    request = _request(standard, "炼焦煤", process="重介", electricity="560", raw_coal="100")
+    expected_message = (
+        FORMAL_EVALUATION_MISMATCH_MESSAGE
+        if message_kind == "mismatch"
+        else FORMAL_EVALUATION_INSTALLATION_MESSAGE
+    )
+    reconciliation = PackageReconciliationService(None, data_version_key=lambda _value: None)
+    reconciliation._last_outcome = ReconciliationOutcome(
+        action=ReconciliationAction(action),
+        reason=ReconciliationReason(reason),
+        message="diagnostic detail",
+    )
+    standards = Mock()
+    evaluations = Mock()
+    engine = Mock()
+    service = EvaluationService(
+        standards,
+        evaluations,
+        engine=engine,
+        formal_evaluation_block=reconciliation.formal_evaluation_block_message,
+    )
+    importer = Mock()
+    importer.prepare.return_value = SimpleNamespace(request=request)
+    facade = ApplicationFacade(
+        standards=standards,
+        evaluations=evaluations,
+        evaluation_service=service,
+        import_service=importer,
+    )
 
-    window = MainWindow(context)
-    try:
-        assert window.package_reconciliation_notice() is None
-        assert getattr(window, "package_reconciliation_notice_label", None) is None
-        assert "标准数据未更新或标准数据状态异常" not in window.diagnostics_report()
-    finally:
-        window.close()
-        context.database.dispose()
-
+    assert facade.formal_evaluation_block_message() == expected_message
+    phrase = "暂时不能新建评价" if message_kind == "mismatch" else "重新安装完整版本"
+    with pytest.raises(ValueError, match=phrase):
+        facade.evaluate(request)
+    with pytest.raises(ValueError, match=phrase):
+        facade.evaluate_workbook("batch-1")
+    standards.get_for_evaluation.assert_not_called()
+    engine.evaluate.assert_not_called()
+    evaluations.save.assert_not_called()
+    importer.mark_evaluated.assert_not_called()

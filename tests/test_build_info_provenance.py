@@ -612,6 +612,15 @@ def test_build_scripts_refuse_a_dirty_tree_and_pass_the_identity() -> None:
         assert "UEBench-Setup-0.2.0" not in text
 
 
+def test_windowed_candidate_self_check_waits_for_report_process() -> None:
+    candidate = (ROOT / "scripts" / "build_candidate.ps1").read_text(encoding="utf-8")
+    evidence = (ROOT / "tools" / "windows_acceptance_evidence.ps1").read_text(encoding="utf-8")
+    for text in (candidate, evidence):
+        assert "Start-Process -FilePath $SelfCheckExe" in text
+        assert "-Wait -PassThru -WindowStyle Hidden" in text
+    assert "$SelfCheckProcess.ExitCode" in candidate
+    assert "$selfCheckProcess.ExitCode" in evidence
+
 def test_build_scripts_pass_the_candidate_suffix_to_iscc() -> None:
     for name in ("build_release.ps1", "build_candidate.ps1"):
         text = (ROOT / "scripts" / name).read_text(encoding="utf-8")

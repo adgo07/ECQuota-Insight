@@ -21,7 +21,7 @@ def test_user_facing_documents_have_no_hidden_control_characters() -> None:
 #: NOT STARTED, and the RS05 mandate requires exactly this wording in the stable
 #: documents.  Keeping it in one place preserves the cross-document consistency
 #: check that is the real value of this test.
-_STATE = r"(DONE|NOT STARTED|PARTIAL|BLOCKED|IN PROGRESS / RELEASE CANDIDATE)"
+_STATE = r"(DONE|NOT STARTED|PARTIAL|BLOCKED|IN PROGRESS / RELEASE CANDIDATE|IN PROGRESS)"
 
 
 def _stage_states(content: str) -> dict[str, str]:
@@ -48,3 +48,13 @@ def test_three_stable_documents_have_consistent_stage_states() -> None:
     for path in STABLE_DOCUMENTS:
         content = path.read_text(encoding="utf-8")
         assert not re.search(r"等待独立验收|等待合并|不合并 PR", content), path
+
+def test_rs05_product_pairing_status_is_consistent_in_stable_documents() -> None:
+    for path in STABLE_DOCUMENTS:
+        content = path.read_text(encoding="utf-8")
+        assert "Product Simplification & Standard Library Pairing" in content, path
+        assert "Excel Adapter technical capability = RETAINED" in content, path
+        assert "Excel user-facing formal workflow = DEFERRED" in content, path
+        assert "RS06" in content and "NOT STARTED" in content, path
+        assert "Reference Standard Product Closure" in content and "PARTIAL" in content, path
+        assert "无需管理标准包" in content or "不再要求用户管理标准包" in content, path

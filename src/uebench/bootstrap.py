@@ -5,12 +5,13 @@ import logging
 from pathlib import Path
 
 from uebench.application.facade import ApplicationFacade
+from uebench.application.package_reconciliation import PackageReconciliationService
 from uebench.application.services import EvaluationService
 from uebench.infrastructure.backup import BackupService
 from uebench.infrastructure.database import DatabaseManager
 from uebench.infrastructure.logging import configure_logging
 from uebench.infrastructure.excel import WorkbookExportService, WorkbookImportService, WorkbookTemplateService
-from uebench.infrastructure.packages import StandardPackageService
+from uebench.infrastructure.packages import StandardPackageService, _data_version_key
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.sources import StandardSourceService
 from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRepository, SqlStandardRepository
@@ -32,9 +33,16 @@ class AppContext:
     export_service: WorkbookExportService
     backup_service: BackupService
     package_service: StandardPackageService | None
+    package_reconciliation: PackageReconciliationService
 
 
-def create_context(root: Path | None = None, public_key_path: Path | None = None) -> AppContext:
+def create_context(
+    root: Path | None = None,
+    public_key_path: Path | None = None,
+    *,
+    enforce_standard_library_readiness: bool | None = None,
+    bundled_package_directory: Path | None = None,
+) -> AppContext:
     paths = AppPaths.from_root(root) if root is not None else AppPaths.default()
     paths.ensure()
     configure_logging(paths.logs)
@@ -48,7 +56,6 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
     audit = AuditRepository(database)
     standards = SqlStandardRepository(database, audit)
     evaluations = SqlEvaluationRepository(database, audit)
-    evaluation_service = EvaluationService(standards, evaluations)
     template_service = WorkbookTemplateService()
     import_service = WorkbookImportService(database, audit, standards)
     export_service = WorkbookExportService(evaluations, audit)
@@ -65,6 +72,21 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
             standards,
             audit,
         )
+    reconciliation_service = PackageReconciliationService(
+        package_service,
+        data_version_key=_data_version_key,
+    )
+    bundle_directory = bundled_package_directory or (Path(__file__).resolve().parent / "resources")
+    enforce_readiness = (
+        True if enforce_standard_library_readiness is None else enforce_standard_library_readiness
+    )
+    evaluation_service = EvaluationService(
+        standards,
+        evaluations,
+        formal_evaluation_block=(
+            reconciliation_service.formal_evaluation_block_message if enforce_readiness else None
+        ),
+    )
     application = ApplicationFacade(
         standards=standards,
         evaluations=evaluations,
@@ -73,6 +95,8 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
         import_service=import_service,
         export_service=export_service,
         package_service=package_service,
+        package_reconciliation_service=reconciliation_service,
+        bundled_package_directory=bundle_directory,
         backup_service=backup_service,
         audit=audit,
         source_service=source_service,
@@ -99,4 +123,5 @@ def create_context(root: Path | None = None, public_key_path: Path | None = None
         export_service=export_service,
         backup_service=backup_service,
         package_service=package_service,
+        package_reconciliation=reconciliation_service,
     )

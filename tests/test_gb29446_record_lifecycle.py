@@ -562,7 +562,7 @@ def test_backup_restore_preserves_old_r2_after_r3(lifecycle, tmp_path):
 def test_two_real_processes_restore_ui_then_create_b_without_drifting_a(tmp_path):
     env = os.environ.copy()
     env.update(UEBENCH_DATA_DIR=str(tmp_path / "跨进程中文数据"), PYTHONPATH=str(ROOT / "src") + os.pathsep + str(ROOT), QT_QPA_PLATFORM="offscreen", PYTHONIOENCODING="utf-8")
-    common = "from tests.test_gb29446_record_lifecycle import *\ncontext=create_context()\n"
+    common = "from tests.test_gb29446_record_lifecycle import *\ncontext=create_context(enforce_standard_library_readiness=False)\n"
     process_a = common + '''
 standard=standard_r2()
 context.standards.install(standard)

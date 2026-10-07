@@ -136,7 +136,11 @@ def context(tmp_path: Path):
     """真实组合根 + 真实更新公钥 + 真实随包发布标准包。"""
     assert PUBLIC_KEY.is_file(), f"缺少更新公钥：{PUBLIC_KEY}"
     assert PUBLISHED_PACKAGE.is_file(), f"缺少随包发布的标准包：{PUBLISHED_PACKAGE}"
-    ctx = create_context(tmp_path / "appdata", public_key_path=PUBLIC_KEY)
+    ctx = create_context(
+        tmp_path / "appdata",
+        public_key_path=PUBLIC_KEY,
+        enforce_standard_library_readiness=False,
+    )
     assert ctx.application.has_package_service(), "有更新公钥时必须能装配标准包服务"
     ctx.application.install_package(PUBLISHED_PACKAGE)
     try:
@@ -357,7 +361,11 @@ def no_qt(stage):
 no_qt("启动")
 root, public_key, package = (Path(item) for item in sys.argv[1:4])
 
-context = create_context(root, public_key_path=public_key)
+context = create_context(
+    root,
+    public_key_path=public_key,
+    enforce_standard_library_readiness=False,
+)
 no_qt("create_context")
 
 context.application.install_package(package)

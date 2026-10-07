@@ -1,6 +1,6 @@
 # HANDOFF — ECQuota 当前交接
 
-更新时间：2026-10-02
+更新时间：2026-10-07
 
 > 本文件是**当前**交接入口，只描述现行权威状态。
 > 历史材料（QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账、旧交付哈希、旧开发机绝对路径）已移至
@@ -38,9 +38,9 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：**产品闭环 `PARTIAL`**。GB29446 Business Capability = `COMPLETE`；GB29446 Product Lifecycle = `COMPLETE`；GB29446 Excel Adapter = `COMPLETE`；**GB29446 Product Golden = `ADOPTED (v1)`**。RS01 / RS02 / RS03 / RS04 已完成（验收载体 PR #9–#12）。**RS05 = IN PROGRESS / RELEASE CANDIDATE**（验收载体 PR #13）：正在构建 `UEBench 0.2.0` Windows Release Candidate。**Reference Standard 产品证据 = `READY FOR RS05 WINDOWS ACCEPTANCE`**；尚欠 Windows V1 最终验收。详见 `参考标准开发路线.md` 与 `docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`。
+当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = NOT STARTED。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
 
-> `READY FOR RS05 WINDOWS ACCEPTANCE` **不等于“可发布”**；Windows 正式交付证据尚未建立。
+> `PARTIAL` **不等于“可发布”**；Windows 正式交付证据尚未建立。
 
 ## 5. 当前 Numeric 规则
 
@@ -56,7 +56,7 @@
 
 ## 6. 当前产品能力
 
-已完成：标准库 / 标准选择 / 新建评价 / 输入与校验 / Calculator / 等级 / Numeric v1 Conformance / GB29446 专用页面基础 / 标准包签名与安装 / 备份恢复 / 审计日志 / Excel 导入与导出报告 / Windows 打包链。
+已完成：标准库 / 标准选择 / 新建评价 / 输入与校验 / Calculator / 等级 / Numeric v1 Conformance / GB29446 专用页面基础 / 标准包签名与安装 / 备份恢复 / 审计日志 / Excel Adapter 后台能力（用户正式流程暂缓） / Windows 打包链。
 
 当前限制：
 
@@ -74,7 +74,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Windows V1 最终验收与发布                     IN PROGRESS / RELEASE CANDIDATE  ← 当前阶段
+→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  ← 当前阶段
 → RS06 第二标准架构验证                              NOT STARTED
 ```
 
@@ -118,17 +118,14 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；
-- 当前阶段 = **`RS05` — Windows V1 最终验收与发布**（`IN PROGRESS / RELEASE CANDIDATE`）；RS06 未开始；
-- RS01 业务 Gate：`tests/test_gb29446_reference_slice.py`；RS02 生命周期 Gate：`tests/test_gb29446_record_lifecycle.py`；RS03 Excel Adapter Gate：`tests/test_gb29446_excel_adapter.py`；**RS04 Product Golden Gate：`tests/test_gb29446_product_golden.py`**；
-- Golden v1 数据：`tests/golden/gb29446_product_golden_v1.json`；说明：`docs/golden/GB29446_PRODUCT_GOLDEN_V1.md`；
-- Golden 使用白名单业务投影比较，**禁止** `result.model_dump_json() == expected`；expected 由标准原文 / Definition / Numeric Contract 独立推导，**不得**由软件输出反向生成；
-- Excel 仅为 Adapter：正式入口是 `ApplicationFacade.evaluate_workbook(import_id)`，计算仍由同一个 `EvaluationService` / `EvaluationEngine` 执行；权威数值入口为 text 十进制 lexical，XLSX numeric cell 与 Excel 公式一律拒绝；
-- GUI 与 Excel 共用 `src/uebench/application/gb29446.py` 的周期 codec 与字段口径，同一输入产生同一 `EvaluationRequest` 与同一业务投影；
-- Request / Result / Rule Snapshot 历史模型与 evaluate() 保存语义保持兼容；Calculator、Numeric、阈值、标准解释与数据库 Schema 不变；
-- 验收载体：RS03 = PR #11；RS04 = PR #12；旧便携 ZIP 缺失仍是已知历史发布资产问题。
+- 当前阶段：RS05 — Product Simplification & Standard Library Pairing（IN PROGRESS）；RS06 保持 NOT STARTED；
+- 普通用户只使用随软件配套的标准库，不再手动安装、导入、扫描或管理标准包；
+- Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
+- 完成本阶段设置页收敛、标准包普通入口移除、版本配套与 Application readiness gate、恢复后即时 reconciliation；
+- 按本任务要求运行定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及 exact-head CI；
+- 不发布 v0.2.0，不合并本任务 PR，不开始 RS06。
 
-本任务停在 RS05 候选阶段，未开始 RS06。Reference Standard Product Closure 仍为 `PARTIAL`。
+Reference Standard Product Closure 仍为 PARTIAL。
 
 ## 10. 历史材料索引
 

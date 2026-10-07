@@ -1339,13 +1339,13 @@ def test_restore_then_noop_still_passes_the_cleanup_gate(tmp_path: Path) -> None
                 name for name in archive.namelist() if name.lower().endswith(".pdf")
             ], "用例前提：历史备份里确实带着老 PDF"
 
+        # 与正常软件启动使用同一内置包目录；恢复完成后门面必须立即对账。
+        context.application._bundled_package_directory = directory
         context.application.restore_backup(backup)
 
-        # ``restore`` 把老 PDF 放回活目录——这正是缺口现场。
-        assert len(standards_pdfs(context)) == 4, "用例前提：恢复把老布局放回了活目录"
-        assert not legacy_cleanup_rows(context)
-
-        outcome = reconcile_standard_package(context, directory)
+        # 恢复调用返回前已完成对账，NOOP 情形也必须通过清理闸门。
+        outcome = context.application.last_package_reconciliation()
+        assert outcome is not None
 
         # 1) 决策仍然是 NOOP：清理不得把 no-op 变成 install。
         assert outcome.action is ReconciliationAction.NOOP
@@ -1378,6 +1378,60 @@ def test_restore_then_noop_still_passes_the_cleanup_gate(tmp_path: Path) -> None
         context.database.dispose()
         close_logging()
 
+
+def test_restore_keeps_newer_library_without_downgrade_and_preserves_history(tmp_path: Path) -> None:
+    from .test_gb29446 import _request
+    from ._legacy_assets import successor_library
+    from uebench.application.package_reconciliation import FORMAL_EVALUATION_MISMATCH_MESSAGE
+    from uebench.domain.engine import EvaluationEngine
+    from uebench.domain.models import StandardDefinition
+
+    base = synthetic_legacy_library(tmp_path / "packages")
+    bundled = successor_library(
+        tmp_path / "packages", private_key=base.private_key, package_id="rs05-bundled",
+        data_version="2026.10-published.4", rule_revision=2
+    )
+    installed_newer = successor_library(
+        tmp_path / "packages", private_key=base.private_key, package_id="rs05-newer",
+        data_version="2026.11-published.1", rule_revision=3
+    )
+    directory = bundled_directory(
+        tmp_path / "bundle",
+        (bundled, f"initial-standard-package-{bundled.name}"),
+    )
+    context = create_context(
+        tmp_path / "data", public_key_path=base.public_key_path,
+        enforce_standard_library_readiness=True, bundled_package_directory=directory
+    )
+    try:
+        context.package_service.install(installed_newer)
+        standard = StandardDefinition.model_validate_json(
+            (ROOT / "data" / "definitions" / "gb-29446-2019.json").read_text(encoding="utf-8")
+        )
+        context.standards.install(standard)
+        request = _request(standard, "炼焦煤", process="重介", electricity="560", raw_coal="100")
+        historical_result = EvaluationEngine().evaluate(standard, request)
+        context.evaluations.save(request, historical_result, standard)
+        before = [json.loads(model.model_dump_json()) for model in (request, historical_result, standard)]
+        backup = context.application.create_backup(tmp_path / "before-restore.uebackup")
+
+        # Successful restore returns only after the current software library has been reconciled.
+        context.application.restore_backup(backup)
+        outcome = context.application.last_package_reconciliation()
+        assert outcome is not None
+        assert outcome.action is ReconciliationAction.NO_DOWNGRADE
+        assert context.application.formal_evaluation_block_message() == FORMAL_EVALUATION_MISMATCH_MESSAGE
+        restored = context.application.get_evaluation(historical_result.evaluation_id)
+        assert restored is not None
+        assert [json.loads(model.model_dump_json()) for model in restored] == before
+        assert context.application.list_package_history(1)[0].data_version == "2026.11-published.1"
+        assert context.application.create_backup(tmp_path / "after-restore.uebackup").is_file()
+        with pytest.raises(ValueError, match="暂时不能新建评价"):
+            context.application.evaluate(request)
+        assert context.application.count_evaluations() == 1
+    finally:
+        context.database.dispose()
+        close_logging()
 
 def test_cleanup_gate_is_idempotent_across_repeated_startups(tmp_path: Path) -> None:
     """幂等：第二次及以后的对账不再新增审计行，也没有旧版 PDF 可清。"""

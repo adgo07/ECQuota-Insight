@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import date
 from pathlib import Path
 from typing import Callable
@@ -29,8 +30,10 @@ from .ports import (
     WorkbookImportPort,
 )
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
-from .package_reconciliation import ReconciliationOutcome
+from .package_reconciliation import PackageReconciliationService, ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
+
+logger = logging.getLogger(__name__)
 
 
 def _library_sort_key(definition: StandardDefinition) -> tuple[date, int, str]:
@@ -59,6 +62,8 @@ class ApplicationFacade:
         audit: AuditPort | None = None,
         source_service: StandardSourcePort | None = None,
         catalogue_dir: Path | None = None,
+        package_reconciliation_service: PackageReconciliationService | None = None,
+        bundled_package_directory: Path | None = None,
     ) -> None:
         self._standards = standards
         self._evaluations = evaluations
@@ -75,9 +80,14 @@ class ApplicationFacade:
         self._catalogue_cache: list[StandardDefinition] | None = None
         self._catalog = StandardCatalogService(standards)
         self._package_reconciliation: ReconciliationOutcome | None = None
+        self._package_reconciliation_service = package_reconciliation_service
+        self._bundled_package_directory = bundled_package_directory
 
     def evaluate(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.evaluate(request)
+
+    def formal_evaluation_block_message(self) -> str | None:
+        return self._evaluation.formal_evaluation_block_message()
 
     def preview_evaluation(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.preview(request)
@@ -239,8 +249,22 @@ class ApplicationFacade:
     def has_package_service(self) -> bool:
         return self._package is not None
 
-    def record_package_reconciliation(self, outcome: ReconciliationOutcome) -> None:
-        """记录最近一次启动标准包对账结果（由组合根在启动时调用）。"""
+    def reconcile_standard_library(self, directory: Path | None = None) -> ReconciliationOutcome | None:
+        """Reconcile the installed library against this software build."""
+        service = self._package_reconciliation_service
+        if service is None:
+            return None
+        package_directory = directory or self._bundled_package_directory or Path()
+        try:
+            outcome = service.reconcile(package_directory)
+        except Exception:
+            logger.exception("标准库对账失败；保留恢复后的数据并暂停新的正式评价")
+            outcome = None
+        self._package_reconciliation = outcome
+        return outcome
+
+    def record_package_reconciliation(self, outcome: ReconciliationOutcome | None) -> None:
+        """记录最近一次启动或恢复后的标准库对账结果。"""
         self._package_reconciliation = outcome
 
     def last_package_reconciliation(self) -> ReconciliationOutcome | None:
@@ -249,7 +273,10 @@ class ApplicationFacade:
         只读访问器：界面/自检据此说明“本次启动是否安装或升级了内置标准包”，
         不需要（也不允许）自己重新比较版本。
         """
-        return self._package_reconciliation
+        if self._package_reconciliation is not None:
+            return self._package_reconciliation
+        service = self._package_reconciliation_service
+        return service.last_outcome if service is not None else None
 
     def list_audit(self, limit: int = 200) -> list[AuditEntry]:
         if self._audit is None:
@@ -296,6 +323,7 @@ class ApplicationFacade:
         if self._backup is None:
             raise RuntimeError("备份服务未配置")
         self._backup.restore(path)
+        self.reconcile_standard_library()
 
     def latest_package_manifest(self) -> dict[str, object] | None:
         if self._package is None:
@@ -320,6 +348,11 @@ class ApplicationFacade:
         if loader is None:
             return []
         return list(loader(limit))
+
+    def standard_library_version(self) -> str | None:
+        history = self.list_package_history(1)
+        return str(history[0].data_version) if history else None
+
     def find_standard_source(
         self,
         standard_id: str,

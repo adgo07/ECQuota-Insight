@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date
 from typing import Protocol
 
@@ -88,10 +89,12 @@ class EvaluationService:
         standards: StandardRepository,
         evaluations: EvaluationRepository,
         engine: EvaluationEngine | None = None,
+        formal_evaluation_block: Callable[[], str | None] | None = None,
     ) -> None:
         self.standards = standards
         self.evaluations = evaluations
         self.engine = engine or EvaluationEngine(ECQUOTA_DECIMAL_FULL_VALUE_V1)
+        self._formal_evaluation_block = formal_evaluation_block
 
     def _resolve_standard(self, request: EvaluationRequest) -> StandardDefinition:
         standard = self.standards.get_for_evaluation(
@@ -120,6 +123,12 @@ class EvaluationService:
                     indicator_result.warnings.append(selection_warning)
         return result
 
+    def formal_evaluation_block_message(self) -> str | None:
+        """Return the user-facing readiness message, if formal evaluation is paused."""
+        if self._formal_evaluation_block is None:
+            return None
+        return self._formal_evaluation_block()
+
     def preview(self, request: EvaluationRequest) -> EvaluationResult:
         """Calculate a result without creating a formal evaluation record.
 
@@ -143,6 +152,9 @@ class EvaluationService:
         definition, so changing ``selection_mode`` cannot slip an out-of-scope
         standard past it.
         """
+        readiness_message = self.formal_evaluation_block_message()
+        if readiness_message:
+            raise ValueError(readiness_message)
         if not supports_formal_evaluation(request.standard_id):
             raise ValueError(
                 f"{evaluation_support_label(request.standard_id)}：该标准不能形成正式评价记录，仅可预览。"

@@ -18,7 +18,8 @@
 
 - 以执行时实际 `main` SHA 为准；不要凭文档记忆 SHA。
 - 当前正在开发下一正式版，目标是完整支持 GB 29446。
-- **在 RS05（Windows V1 最终验收与发布）完成之前，不把旧 EXE / 安装包冒充为当前源码的正式 Candidate。**
+- 普通用户无需管理标准包；标准库随完整软件版本配套更新。Excel Adapter 技术能力保留，Excel 正式用户流程暂缓开放。
+- **RS05 当前阶段为 Product Simplification & Standard Library Pairing（IN PROGRESS）；不把旧 EXE / 安装包冒充为当前源码 Candidate，也不据此发布 0.2.0。**
 
 ### 上一正式发布物 / Previous Release
 
