@@ -60,10 +60,15 @@ function Find-Artifact {
 # would report every Candidate as "missing files".
 $portable = if ($version) { "UEBench-$version$candidateSuffix-win-x64.zip" } else { Find-Artifact "UEBench-*-win-x64.zip" }
 $installer = if ($version) { "UEBench-Setup-$version$candidateSuffix-x64.exe" } else { Find-Artifact "UEBench-Setup-*-x64.exe" }
+# ECQ-RS05 M2 §三: the source ZIP is an archive/development auxiliary artifact, not
+# an official user release asset (source authority is the Git exact commit /
+# release tag).  It is hash-verified when present and never counted as a missing
+# deliverable.
 $sourceZip = if ($version) { "UEBench-source-$version$candidateSuffix.zip" } else { Find-Artifact "UEBench-source-*.zip" }
 
-$immutable = @($portable, $installer, $sourceZip, "initial-standard-package-published.uebench") |
+$immutable = @($portable, $installer, "initial-standard-package-published.uebench") |
     Where-Object { $_ }
+$auxiliary = @($sourceZip) | Where-Object { $_ }
 # The GB 29446 template is the正式 delivery template.  The legacy
 # 统一标准规则确认表.xlsx is LEGACY_REFERENCE_ONLY and is not part of the
 # 0.2.0 user release, so it is reported only if present, never required.
@@ -124,6 +129,28 @@ foreach ($name in $editable) {
     }
     else {
         $lines.Add("存在：$name")
+    }
+}
+
+# 归档/开发辅助产物：存在则校验哈希，缺失只提示，不影响验收结论。
+foreach ($name in $auxiliary) {
+    $path = Join-Path $root $name
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        $lines.Add("归档辅助产物（非正式用户交付资产）：$name 未随交付目录提供")
+        continue
+    }
+    if ($expectedHashes.ContainsKey($name)) {
+        $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actual -eq $expectedHashes[$name]) {
+            $lines.Add("通过（归档辅助）：$name")
+        }
+        else {
+            $lines.Add("失败（归档辅助）：$name（SHA256不一致）")
+            $failed++
+        }
+    }
+    else {
+        $lines.Add("存在（归档辅助，未列入哈希表）：$name")
     }
 }
 

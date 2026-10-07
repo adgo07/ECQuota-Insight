@@ -2,20 +2,28 @@ name: Windows Release Candidate
 
 # ECQ-RS05 §8: this workflow builds and verifies a Windows Release Candidate.
 #
+# ECQ-RS05 M2 §一/§二 —— 收敛后：
+#   * 本 workflow 不再对每个普通 PR 自动完整构建；Candidate 改为在明确需要
+#     发布/验收时手动触发（workflow_dispatch），普通 PR 只跑专项 Gate + 一次严格
+#     literal full suite（Pull Request Gate）；
+#   * scripts/build_candidate.ps1 是唯一正式 Candidate 构建入口，它自己完成
+#     版本一致性 Gate、Development-manifest Gate、**严格 full suite**、载荷自检、
+#     溯源写入与 **Artifact Gate**；本 workflow 不再对同一个未变化的 Candidate
+#     重复执行一次相同的 Artifact Gate；
+#   * 本 workflow 仍独立复核 provenance：精确 HA hash、source_dirty=false、
+#     payload_tree_sha256 与 ACTIVE-CANDIDATE.json 必须与本次检出 head 一致。
+#
 # It is deliberately SEPARATE from the Numeric workflows (QZC N01-A Numeric
 # Pilot / Numeric v1 Full Adoption): those two prove numeric semantics and must
-# stay free of release-build concerns.  This one owns the release chain:
+# stay free of release-build concerns.
 #
-#   Version consistency Gate -> Source Gate -> literal full suite
-#   -> Candidate build -> Artifact Gate -> Candidate artifacts
+#   Candidate build (single entry) -> provenance cross-check -> upload
 #
 # The Candidate artifacts uploaded here are Candidate deliverables, not a formal
 # release; the build declares itself unsigned (release-build-info.json:
 # authenticode_signed = false).
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [main]
 
 permissions:
   contents: read
@@ -100,19 +108,16 @@ jobs:
         shell: pwsh
         run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py -q -ra -p no:cacheprovider
 
-      - name: Execute literal full suite
-        id: literal_full_suite
-        continue-on-error: true
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-candidate-full"
-
       - name: Build the Windows Release Candidate
         shell: pwsh
         env:
           NAMES_JSON: ${{ steps.version.outputs.names }}
         run: |
+          # 唯一正式 Candidate 构建入口。脚本内部按顺序完成：版本一致性 Gate →
+          # Development-manifest Gate → **严格 literal full suite** → PyInstaller
+          # 载荷 → 打包后 EXE 自检 → 溯源写入 → SHA256SUMS → ACTIVE 标记 →
+          # **Artifact Gate**（tests/test_release_artifacts.py）。任一步失败整体失败。
+          #
           # Pass the interpreter explicitly: actions/setup-python installs the
           # pinned requirements into $env:pythonLocation, while the "py"
           # launcher on the runner resolves to the newest installed Python
@@ -126,7 +131,7 @@ jobs:
             -NamesJson $env:NAMES_JSON -OutputDir "dist/candidate" `
             -SourceCommit "${{ steps.version.outputs.source_commit }}" `
             -CandidateId "${{ steps.version.outputs.candidate_id }}"
-          if ($LASTEXITCODE -ne 0) { throw "候选构建失败（含 Artifact Gate）。" }
+          if ($LASTEXITCODE -ne 0) { throw "候选构建失败（含严格 full suite 与 Artifact Gate）。" }
 
       - name: Verify Candidate provenance against the checked-out head SHA
         shell: pwsh
@@ -134,7 +139,6 @@ jobs:
           EXPECTED_COMMIT: ${{ steps.version.outputs.source_commit }}
           EXPECTED_CANDIDATE: ${{ steps.version.outputs.candidate_id }}
         run: |
-          # The whole point of Candidate identity (ECQ-RS05) is that an artifact
           # can be traced to one exact commit.  Trusting the build to have done
           # that is not the same as checking it, so this step fails the run when
           # release-build-info.json / ACTIVE-CANDIDATE.json disagree with the
@@ -184,13 +188,6 @@ jobs:
           }
           Write-Host "Provenance verified: $headSha / $env:EXPECTED_CANDIDATE"
 
-      - name: Verify the Candidate artifacts with the Artifact Gate
-        shell: pwsh
-        env:
-          UEBENCH_ARTIFACT_DIR: dist/candidate
-        run: |
-          python -m pytest tests/test_release_artifacts.py -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-candidate-artifacts"
-
       - name: Upload Candidate artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -198,6 +195,8 @@ jobs:
           path: |
             dist/candidate/UEBench-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}-win-x64.zip
             dist/candidate/UEBench-Setup-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}-x64.exe
+            # ECQ-RS05 M2 §三: 源码 ZIP 是归档/开发辅助产物，不是正式用户发布资产；
+            # 源码权威是 Git exact commit / release tag。这里保留上传只为归档与人工核对。
             dist/candidate/UEBench-source-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}.zip
             dist/candidate/initial-standard-package-published.uebench
             dist/candidate/GB29446选煤电力消耗限额导入模板.xlsx
@@ -217,7 +216,6 @@ jobs:
         run: |
           Write-Host "Product version: ${{ steps.version.outputs.version }}"
           Write-Host "Source commit: ${{ steps.version.outputs.source_commit }}"
-          Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
           Write-Host "Candidate directory: dist/candidate"
           $markerPath = "dist/candidate/ACTIVE-CANDIDATE.json"
           if (Test-Path -LiteralPath $markerPath -PathType Leaf) {

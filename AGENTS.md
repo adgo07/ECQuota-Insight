@@ -10,7 +10,7 @@
 | 产品名称 | 单位产品能耗限额评价软件（程序包名 `uebench`） |
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
 | 当前产品阶段 | 参考标准 `GB 29446—2019` 产品闭环；当前阶段状态见 `TASK_STATE.md` 与 `参考标准开发路线.md`（RS01–RS06） |
-| 当前交付范围 | 47 项强制性能耗限额标准、753 条当前指标；开发基线 `standards/development/scope-63` |
+| 当前交付范围 | 标准库 48 项 / 765 条规则（含 1 项历史标准）；开发基线 `standards/development/scope-63`；**正式评价范围只有 GB 29446—2019** |
 | Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 
 本仓仍独立开发、独立安装、独立升级、独立离线运行。
@@ -217,38 +217,29 @@ DRAFT Contract 必须明确标识为 DRAFT。有正式 release/tag 后，应锁�
 
 ## 4. 开工前最小必要读取（Minimum Necessary Reading）
 
+### 4.1 统一读取顺序
+
+新任务默认按以下**唯一**顺序建立上下文，**不要默认通读历史资料**：
+
 ```text
 1. AGENTS.md（本文件）
-2. platform-lock.json
-3. HANDOFF.md / TASK_STATE.md
-4. STANDARD_ISSUES_REGISTER.md
-5. 当前任务直接相关的本仓文件
-6. 中央 docs/GUIDE_INDEX.md
-7. 只读取 GUIDE_INDEX 为当前任务路由的中央文件
+2. TASK_STATE.md（当前任务）
+3. 参考标准开发路线.md（本仓唯一总体产品开发路线）
+4. STANDARD_ISSUES_REGISTER.md（标准问题）
+5. platform-lock.json（治理基线）
+6. HANDOFF.md（当前交接）
+7. 当前任务直接相关的本仓文件 / 代码 / 测试
+8. 中央 docs/GUIDE_INDEX.md
+9. 只读取 GUIDE_INDEX 为当前任务路由的中央文件
 ```
 
-**不得**要求每个普通业务 Bug 都通读整个 `Qingzhou-contracts`。
+- **Numeric 任务**再读取 `docs/统一判定规范.md`；
+- 历史资料（`docs/history/`、`docs/audits/`、`docs/验收记录.md`）按需读取，**不属于默认必读**；
+- 中央文件由中央 `docs/GUIDE_INDEX.md` 路由，**不得**要求每个普通业务 Bug 都通读整个 `Qingzhou-contracts`。
 
 如任务涉及公共语义，按第 3 节的**双轨读取**执行：Frozen 权威文件走 locked SHA，ACTIVE 指南走 central 当前正式合并版本。
 
 只有任务明确要求“升级中央 Contract 基线”时，才能通过独立治理任务修改 `PLATFORM_BASELINE.md` / `platform-lock.json`。
-
-### 4.1 当前权威读取顺序
-
-新任务默认按以下顺序建立上下文，**不要默认通读历史资料**：
-
-```text
-1. AGENTS.md
-2. TASK_STATE.md
-3. 参考标准开发路线.md
-4. STANDARD_ISSUES_REGISTER.md
-5. platform-lock.json
-6. 当前任务相关代码 / 测试
-```
-
-- **Numeric 任务**再读取 `docs/统一判定规范.md`；
-- 中央文件由中央 `docs/GUIDE_INDEX.md` 路由；
-- 历史资料（`docs/history/`、`docs/audits/`、`docs/验收记录.md`）按需读取，**不属于默认必读**。
 
 `参考标准开发路线.md` 是本仓**唯一**总体产品开发路线；不得再新建与其并列的第二份总体路线。
 

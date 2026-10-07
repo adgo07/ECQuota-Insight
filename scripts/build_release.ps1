@@ -16,6 +16,15 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
+# ECQ-RS05 M2 §二 —— DEPRECATED：本脚本不再是正式发布路径。
+#
+#   scripts/build_candidate.ps1 是**唯一正式 Candidate 构建入口**，它自己完成
+#   版本一致性 Gate、Development-manifest Gate、严格 literal full suite、
+#   PyInstaller 载荷、打包后自检、溯源写入、SHA256SUMS、ACTIVE 标记与 Artifact Gate。
+#
+# 本脚本只保留为历史/内部组装工具（排查旧链路用）；普通维护者不需要它。
+Write-Warning "DEPRECATED: scripts/build_release.ps1 不再是正式发布路径；唯一正式 Candidate 构建入口是 scripts/build_candidate.ps1。"
+
 function Resolve-PythonExecutable {
     param([string]$Explicit, [string]$Root)
 

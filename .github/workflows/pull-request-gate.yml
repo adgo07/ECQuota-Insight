@@ -1,0 +1,74 @@
+name: Pull Request Gate
+
+# ECQ-RS05 M2 §一 —— 普通 PR 对 main 的 CI 只在这里执行**一次严格的** literal full suite。
+#
+# 收敛之前：三个 workflow 各自跑 full suite，其中两个先 ``continue-on-error: true``
+# 跑一次、再无条件重跑一次，同一个 PR 会执行 3 次以上全量套件；而 Windows Release
+# Candidate 还会为每个普通 PR 完整构建一次候选。
+#
+# 收敛之后：
+#   * 专项 Gate 继续在各自 workflow 里真实执行——Frozen Numeric v1 Conformance、
+#     N01-A vectors / Excel/openpyxl 探针、release Source Gate；
+#   * literal full suite 只有本 workflow 的这一个 job，严格执行一次：
+#     不用 continue-on-error，也不在失败后再无条件重跑；
+#   * 同一 PR 新 Head 推送后，旧 Head 的运行由 concurrency 自动取消；
+#   * 没有减少任何测试：这里跑的仍是 ``pytest -q`` 的全量套件。
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-suite:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout pull request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install project and test dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Compile and static import check
+        shell: pwsh
+        run: python -m compileall -q src tests tools
+
+      - name: Execute release source gate
+        shell: pwsh
+        run: |
+          # 版本一致性 / 源码卫生 / Candidate 身份 / 构建溯源：这些是源码树层面就能
+          # 判定的事实，先跑一遍以便失败时给出更直接的信号（它们在下面的全量套件里
+          # 也会被收集执行，这里不是替代，只是前置）。
+          python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py -q -ra -p no:cacheprovider
+
+      - name: Execute the single strict literal full suite
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force work | Out-Null
+          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-pr-gate-full"
+
+      - name: Summarize the gate
+        shell: pwsh
+        run: |
+          Write-Host "Literal full suite: strict, exactly one execution (no error-tolerant first pass, no unconditional re-run)."
+          Write-Host "Numeric专项: Numeric v1 Full Adoption / QZC N01-A Numeric Pilot workflows."
+          Write-Host "Release Candidate build is manual (workflow_dispatch); Artifact Gate runs once inside scripts/build_candidate.ps1."

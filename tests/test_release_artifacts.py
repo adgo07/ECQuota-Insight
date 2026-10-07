@@ -200,6 +200,20 @@ REQUIRED_KEYS: tuple[str, ...] = (
 #: other required artifact must be listed and must recompute.
 HASHED_KEYS: tuple[str, ...] = tuple(key for key in REQUIRED_KEYS if key != "sha256sums")
 
+#: ECQ-RS05 M2 §三 —— 正式**用户**发布资产。源码权威是 Git exact commit / release tag；
+#: 正式用户资产只有安装程序、便携包、哈希清单与发布说明。
+USER_RELEASE_ASSET_KEYS: tuple[str, ...] = (
+    "installer",
+    "portable",
+    "sha256sums",
+    "release_notes",
+)
+
+#: 归档 / 开发辅助产物：必须随 Candidate 产出（归档完整性由 ``REQUIRED_KEYS`` 覆盖），
+#: 但**不是**普通用户单独管理或下载的正式资产。``UEBench-source-*.zip`` 不再承诺为
+#: “独立可复现源码包”，它只是源码归档与人工核对材料。
+AUXILIARY_ARTIFACT_KEYS: tuple[str, ...] = ("source",)
+
 
 @pytest.mark.parametrize("key", REQUIRED_KEYS)
 def test_required_artifact_exists(
@@ -246,6 +260,36 @@ def test_required_files_list_matches_audit_release() -> None:
     assert tuple(audit_release.required_files()) == tuple(
         expected[key] for key in REQUIRED_KEYS
     ), "Artifact Gate 的必需交付物清单与 tools/audit_release.required_files() 不一致"
+
+
+def test_source_zip_is_auxiliary_not_an_official_user_release_asset() -> None:
+    """ECQ-RS05 M2 §三：源码权威是 Git exact commit / release tag。
+
+    ``UEBench-source-*.zip`` 继续随 Candidate 产出并登记哈希（归档与人工核对价值），
+    但它**不是**正式用户发布资产：正式用户资产只有安装程序、便携包、SHA256SUMS 与
+    发布说明。本 Gate 与产品自带审计器（``tools/audit_release.py``）必须分类一致，
+    否则“文档说不是资产、门禁却当必需品”就会重新漂移。
+    """
+    audit_release = _load_sibling_module(
+        "audit_release_user_assets", ROOT / "tools" / "audit_release.py"
+    )
+    for label, user_assets, auxiliary in (
+        (
+            "Artifact Gate",
+            tuple(USER_RELEASE_ASSET_KEYS),
+            tuple(AUXILIARY_ARTIFACT_KEYS),
+        ),
+        (
+            "tools/audit_release.py",
+            tuple(audit_release.USER_RELEASE_ASSET_KEYS),
+            tuple(audit_release.AUXILIARY_ARTIFACT_KEYS),
+        ),
+    ):
+        assert user_assets == ("installer", "portable", "sha256sums", "release_notes"), label
+        assert auxiliary == ("source",), label
+        assert set(user_assets) <= set(REQUIRED_KEYS), label
+        assert set(auxiliary) <= set(REQUIRED_KEYS), label
+        assert set(user_assets).isdisjoint(auxiliary), label
 
 
 # --------------------------------------------------------------------------
@@ -660,6 +704,14 @@ def test_acceptance_helper_does_not_hard_code_the_previous_version(
     suffix = f"-{build_info['candidate_id']}" if build_info.get("candidate_id") else ""
     assert names["portable"] == f"UEBench-{version}{suffix}-win-x64.zip"
     assert names["installer"] == f"UEBench-Setup-{version}{suffix}-x64.exe"
+    # ECQ-RS05 M2 §三：源码 ZIP 是归档辅助产物，不再作为“必需交付文件”；
+    # 它只在存在时校验哈希，缺失不计入 missing。
+    immutable_line = next(
+        line for line in text.splitlines() if line.strip().startswith("$immutable =")
+    )
+    assert "$sourceZip" not in immutable_line, (
+        f"{names['helper_ps1']} 不得再把源码 ZIP 当作必需交付文件"
+    )
     assert names["source"] == f"UEBench-source-{version}{suffix}.zip"
     assert build_info.get("version") == version, (
         "release-build-info.json 的版本必须是当前产品版本，验收助手据此定位产物"

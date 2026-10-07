@@ -527,7 +527,8 @@ def test_new_evaluation_page_reads_the_full_standard_and_is_not_duplicated(windo
     assert "GB 29446-2019" in text and "选煤电力消耗限额" in text
     # 下拉框足够宽，编号与名称都能读完。
     assert window.eval_standard.minimumWidth() >= 360
-    # 版本下拉框已经说明选择方式；右侧不再重复一句「当前有效」。
+    # 新建评价只列出正式可评价的标准（ECQ-RS05 M2 §四 起不再有版本范围下拉框）；
+    # 右侧状态区只在需要警告时显示文字，因此这里为空。
     assert window.eval_standard_status.text() == ""
     assert "当前有效" not in window.eval_standard_status.text()
     # 页面右上角有官方来源入口与支持状态。

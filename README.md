@@ -18,6 +18,7 @@
 
 - 以执行时实际 `main` SHA 为准；不要凭文档记忆 SHA。
 - 当前正在开发下一正式版，目标是完整支持 GB 29446。
+- **源码权威是 Git exact commit / release tag**；正式 Candidate 只有 `scripts/build_candidate.ps1` 一个构建入口（含严格全量测试与 Artifact Gate），普通 PR 不再触发完整候选构建。见 [仓库使用说明](docs/仓库使用说明.md)。
 - 普通用户无需管理标准包；标准库随完整软件版本配套更新。Excel Adapter 技术能力保留，Excel 正式用户流程暂缓开放。
 - **RS05 当前阶段为 Product Simplification & Standard Library Pairing（IN PROGRESS）；不把旧 EXE / 安装包冒充为当前源码 Candidate，也不据此发布 0.2.0。**
 
@@ -37,7 +38,7 @@ python -m venv .venv
 .\.venv\Scripts\python -m uebench.main
 ```
 
-启动及测试前提见 [仓库使用说明](docs/仓库使用说明.md)。
+启动、测试与构建说明见 [仓库使用说明](docs/仓库使用说明.md)（**不需要**手工安装标准包、包内 PDF 或旧版 ZIP）。
 
 ## 当前 Numeric 规则
 
@@ -58,11 +59,10 @@ python -m venv .venv
 
 ## 当前交付范围
 
-- 正式范围为用户确认的 47 项强制性标准，共 753 条当前指标；开发基线 `standards/development/scope-63` 共 63 项，其中 16 项仍为草案。
-- GB 29435-2025 的 51 条规则已成为 `published`，但生命周期为 `future`，实施日期 2027-01-01 前只能预览。
-- 其中 7 条原文存在缺级或非单调限额，已保留警告并禁止静默修正。
-- GB 29447-2022 已由 GB 29447-2026 替代，并新增 GB 47834-2026、GB 47835-2026。
-- 当前开发基线为 `standards/development/scope-63`；`standards/development/scope-65` 仅作历史对照，禁止作为发布入口。
+- 标准库随软件版本配套（当前 48 项标准、765 条规则，含 1 项历史标准）；开发基线为 `standards/development/scope-63`，`standards/development/scope-65` 仅作历史对照，禁止作为发布入口。
+- **正式评价范围只有 GB 29446—2019《选煤电力消耗限额》**；其余标准仍可在标准库中作为目录/参考信息查看，界面显示「尚未纳入正式评价范围」——“标准库里有该标准”不等于“软件已正式支持评价”。
+- 标准原文不随软件分发、也不保存在软件数据目录；普通界面通过已登记的官方网页查看。
+- 普通用户不安装、不导入、不扫描也不维护标准包；标准规则确认表为 `LEGACY_REFERENCE_ONLY`，不作为发布正确性依据。
 
 ## 常用命令
 

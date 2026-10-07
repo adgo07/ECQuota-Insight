@@ -173,12 +173,12 @@ def test_incompatible_definition_shows_chinese_message_and_refuses_evaluation(
     )
     monkeypatch.setattr(QMessageBox, "information", lambda *args, **kwargs: None)
     try:
-        # 1) explicit Chinese message: 不完整/不兼容 + 更新标准数据
+        # 1) explicit Chinese message: 不完整/不兼容 + 安装完整的新版本
         message = window.gb29446_incompatibility_message
         assert message.isVisible(), "不兼容规则必须显示中文提示"
         text = message.text()
         assert "不完整" in text or "不兼容" in text
-        assert "更新标准数据" in text
+        assert "请安装完整的新版本" in text
         assert text == GB29446_RULE_INCOMPATIBLE_MESSAGE
 
         # 2) no selector that looks usable while being empty/meaningless
