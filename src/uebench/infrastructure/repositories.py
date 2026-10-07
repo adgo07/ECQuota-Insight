@@ -100,6 +100,10 @@ class SqlStandardRepository:
         self.database = database
         self.audit = audit or AuditRepository(database)
 
+    def _definition(self, payload: str) -> StandardDefinition:
+        """Parse one stored definition payload into a fresh definition."""
+        return StandardDefinition.model_validate_json(payload)
+
     def get_for_evaluation(
         self,
         standard_id: str,
@@ -112,7 +116,7 @@ class SqlStandardRepository:
                 .where(StandardRow.standard_id == standard_id, StandardRow.status == "published")
                 .order_by(desc(StandardRow.effective_date), desc(StandardRow.rule_revision), desc(StandardRow.installed_at))
             )
-            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            definitions = [self._definition(row.definition_json) for row in rows]
             if selection_mode is StandardSelectionMode.CURRENT:
                 return next((item for item in definitions if item.is_effective_on(evaluation_date)), None)
             if selection_mode is StandardSelectionMode.HISTORICAL:
@@ -140,7 +144,7 @@ class SqlStandardRepository:
                     desc(StandardRow.installed_at),
                 )
             )
-            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            definitions = [self._definition(row.definition_json) for row in rows]
         result: list[StandardDefinition] = []
         seen_families: set[str] = set()
         for item in definitions:
@@ -156,13 +160,13 @@ class SqlStandardRepository:
     def list_historical(self) -> list[StandardDefinition]:
         with self.database.session() as session:
             rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, desc(StandardRow.effective_date), desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
-            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            definitions = [self._definition(row.definition_json) for row in rows]
         return [item for item in definitions if item.lifecycle_status is LifecycleStatus.OBSOLETE or item.obsolete_date is not None]
 
     def list_future(self, evaluation_date: date) -> list[StandardDefinition]:
         with self.database.session() as session:
             rows = session.scalars(select(StandardRow).where(StandardRow.status == "published").order_by(StandardRow.number, StandardRow.effective_date, desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
-            definitions = [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            definitions = [self._definition(row.definition_json) for row in rows]
         return [item for item in definitions if item.effective_date > evaluation_date and item.lifecycle_status is not LifecycleStatus.OBSOLETE]
 
     def get_published(self, standard_id: str) -> StandardDefinition | None:
@@ -174,7 +178,21 @@ class SqlStandardRepository:
                 .limit(1)
             )
             row = session.scalar(statement)
-            return StandardDefinition.model_validate_json(row.definition_json) if row else None
+            return self._definition(row.definition_json) if row else None
+
+    def list_by_id(self, standard_id: str) -> list[StandardDefinition]:
+        """Read every installed revision of one standard id only.
+
+        Minimal by-id read for catalogue lookups: reading the whole library (one
+        parse per installed row) just to pick one standard out of it is duplicate
+        work.  Ordering is deliberately left to the caller's own selection rule,
+        which is where "newest revision wins" already lives.
+        """
+        with self.database.session() as session:
+            rows = session.scalars(
+                select(StandardRow).where(StandardRow.standard_id == standard_id)
+            )
+            return [self._definition(row.definition_json) for row in rows]
 
     def list_published(self) -> list[StandardDefinition]:
         with self.database.session() as session:
@@ -191,7 +209,7 @@ class SqlStandardRepository:
             definitions: list[StandardDefinition] = []
             seen_families: set[str] = set()
             for row in rows:
-                item = StandardDefinition.model_validate_json(row.definition_json)
+                item = self._definition(row.definition_json)
                 if item.family_id in seen_families:
                     continue
                 seen_families.add(item.family_id)
@@ -201,7 +219,7 @@ class SqlStandardRepository:
     def list_all(self) -> list[StandardDefinition]:
         with self.database.session() as session:
             rows = session.scalars(select(StandardRow).order_by(StandardRow.number, StandardRow.effective_date, desc(StandardRow.rule_revision), desc(StandardRow.installed_at)))
-            return [StandardDefinition.model_validate_json(row.definition_json) for row in rows]
+            return [self._definition(row.definition_json) for row in rows]
 
     def install(self, definition: StandardDefinition, package_id: str | None = None, *, session=None) -> None:
         def upsert(target_session) -> None:

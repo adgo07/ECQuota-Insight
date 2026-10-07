@@ -369,6 +369,10 @@ def test_total_count_is_not_recent_ten_and_ids_are_hidden(lifecycle):
     assert window.home_evaluation_count.text() == "12"
     assert window.home_recent.rowCount() == 10
     assert window.home_recent.columnCount() == 3
+    # ECQ-RS05 M3：「评价记录」页首次进入时才加载。这里显式进入，使下面的记录表
+    # 循环保持非空（否则该循环会静默变成空转）。
+    window.navigation.setCurrentRow(3)
+    assert window.record_table.rowCount() == 12
     assert window.record_table.columnCount() == 6
     for table in [window.home_recent, window.record_table]:
         for row in range(table.rowCount()):
