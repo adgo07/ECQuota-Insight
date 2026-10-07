@@ -236,6 +236,20 @@ def _friendly_error(exc: Exception, operation: str) -> str:
     return f"{operation}失败，请检查输入数据、单位和适用条件后重试。"
 
 
+def _backup_failure_message(exc: Exception) -> str:
+    """创建备份失败时给用户的中文提示（H03）。
+
+    ``_friendly_error`` 的兜底文案是面向**评价**的（“输入数据、单位”），对备份
+    场景不适用；而 ``PermissionError`` 之类的 ``str(exc)`` 在英文系统上是纯英文，
+    中文系统上又带着路径。因此备份走专用文案：技术细节（异常类型、errno、路径）
+    一律只进日志，用户看到的是稳定、明确的中文失败原因。
+    """
+    detail = str(exc).strip()
+    if not isinstance(exc, OSError) and detail and any("\u4e00" <= char <= "\u9fff" for char in detail):
+        return f"创建备份失败：{detail}"
+    return "创建备份失败：无法写入所选位置，请检查磁盘空间与文件权限，或更换保存位置后重试。"
+
+
 # ---------------------------------------------------------------------------
 # GB 29446 规则兼容性（FAIL-FAST）
 # ---------------------------------------------------------------------------
@@ -2425,9 +2439,17 @@ class MainWindow(QMainWindow):
 
     def create_backup(self) -> None:
         path, _ = QFileDialog.getSaveFileName(self, "创建备份", f"uebench-{date.today():%Y%m%d}.uebackup", "UEBench备份 (*.uebackup)")
-        if path:
+        if not path:
+            return
+        try:
             self.context.application.create_backup(Path(path))
-            QMessageBox.information(self, "备份完成", path)
+        except Exception as exc:
+            # 技术详情（异常类型 / errno / 路径）只进日志；用户必须看到明确的
+            # 中文失败提示，且失败绝不显示“备份完成”，异常也不得传播成未处理。
+            _LOGGER.exception("创建备份失败：%s", path)
+            QMessageBox.critical(self, "备份失败", _backup_failure_message(exc))
+            return
+        QMessageBox.information(self, "备份完成", path)
 
     def restore_backup(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "恢复备份", "", "UEBench备份 (*.uebackup)")

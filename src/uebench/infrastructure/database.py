@@ -32,6 +32,50 @@ MANAGED_TABLES = frozenset(
 )
 
 
+def resolve_migrations_directory() -> Path:
+    """Locate the Alembic ``migrations/`` directory (source tree or frozen build).
+
+    PyInstaller 6 one-folder builds may expose ``_MEIPASS`` as either
+    the collected ``_internal`` directory or the application folder,
+    depending on bootloader/platform version.  Resolve both layouts so
+    a frozen install never stalls before the database is created merely
+    because the migration resource is one level deeper.
+
+    Raised as ``RuntimeError`` when no candidate exists — the same
+    failure :meth:`DatabaseManager.initialize` has always produced.
+    """
+
+    frozen_root = getattr(sys, "_MEIPASS", None)
+    if frozen_root is None:
+        migration_candidates = [Path(__file__).resolve().parents[3] / "migrations"]
+    else:
+        root = Path(frozen_root)
+        migration_candidates = [root / "migrations", root / "_internal" / "migrations"]
+        executable_root = Path(sys.executable).resolve().parent
+        migration_candidates.extend(
+            [executable_root / "migrations", executable_root / "_internal" / "migrations"]
+        )
+    migrations = next((path for path in migration_candidates if path.exists()), None)
+    if migrations is None:
+        searched = ", ".join(str(path) for path in migration_candidates)
+        raise RuntimeError(f"数据库迁移资源缺失，已搜索：{searched}")
+    return migrations
+
+
+def alembic_config(database_path: Path) -> Config:
+    """Build the Alembic ``Config`` for ``database_path``.
+
+    One shared construction for every consumer (schema upgrade *and* the
+    restore-time schema compatibility check), so the restore path can never
+    disagree with the migration path about where the migrations live.
+    """
+
+    config = Config()
+    config.set_main_option("script_location", str(resolve_migrations_directory()))
+    config.set_main_option("sqlalchemy.url", f"sqlite:///{Path(database_path).as_posix()}")
+    return config
+
+
 class Base(DeclarativeBase):
     pass
 
@@ -160,28 +204,10 @@ class DatabaseManager:
         was needed.  The same value is kept on ``last_migration_backup``.
         """
 
-        # PyInstaller 6 one-folder builds may expose ``_MEIPASS`` as either
-        # the collected ``_internal`` directory or the application folder,
-        # depending on bootloader/platform version.  Resolve both layouts so
-        # a frozen install never stalls before the database is created merely
-        # because the migration resource is one level deeper.
-        frozen_root = getattr(sys, "_MEIPASS", None)
-        if frozen_root is None:
-            migration_candidates = [Path(__file__).resolve().parents[3] / "migrations"]
-        else:
-            root = Path(frozen_root)
-            migration_candidates = [root / "migrations", root / "_internal" / "migrations"]
-            executable_root = Path(sys.executable).resolve().parent
-            migration_candidates.extend(
-                [executable_root / "migrations", executable_root / "_internal" / "migrations"]
-            )
-        migrations = next((path for path in migration_candidates if path.exists()), None)
-        if migrations is None:
-            searched = ", ".join(str(path) for path in migration_candidates)
-            raise RuntimeError(f"数据库迁移资源缺失，已搜索：{searched}")
-        config = Config()
-        config.set_main_option("script_location", str(migrations))
-        config.set_main_option("sqlalchemy.url", f"sqlite:///{self.path.as_posix()}")
+        # 迁移脚本目录的定位（源码树 / 冻结安装两种布局）与 Alembic Config 的构造
+        # 已抽成模块级函数，恢复前的 Schema 兼容性校验复用同一份实现，避免两条
+        # 路径对“迁移在哪里”得出不同结论。
+        config = alembic_config(self.path)
         # Early development builds created the same schema with SQLAlchemy
         # before Alembic was wired in.  A complete such database is safe to
         # adopt: stamp the initial migration instead of attempting to create
@@ -288,6 +314,15 @@ class DatabaseManager:
         self.engine.dispose()
 
     def reconnect(self) -> None:
+        """Replace the engine with a fresh one, disposing the previous engine first.
+
+        Swapping the engine without disposing the old one leaks its pooled
+        connection.  On Windows that leaked connection keeps the ``-wal`` /
+        ``-shm`` sidecars open (``WinError 32``), which is exactly the "somebody
+        still holds the old database file" state the restore chain must never
+        leave behind.
+        """
+        self.dispose()
         self.engine = create_engine(f"sqlite:///{self.path.as_posix()}", future=True)
         event.listen(self.engine, "connect", self._configure_sqlite)
         self.session_factory.configure(bind=self.engine)
