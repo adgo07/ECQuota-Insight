@@ -432,25 +432,63 @@ def test_rule_declared_product_selection_cascades_and_keeps_product_id(tmp_path:
     context.database.dispose()
 
 
-def test_standard_selector_restores_first_option_when_version_scope_changes(tmp_path: Path, monkeypatch) -> None:
+def test_new_evaluation_offers_no_version_scope_selector(tmp_path: Path, monkeypatch) -> None:
+    """ECQ-RS05 M2 §四：普通用户不再看到“当前 / 历史 / 未来”评价模式选择。
+
+    新建评价只展示**正式可评价**的当前标准；版本范围选择控件必须消失，
+    但标准选择本身、官方来源入口与支持状态照旧。
+    """
+
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
-    current = make_standard()
-    future = make_standard().model_copy(update={
-        "id": "gb-future-selector",
-        "number": "GB 00006-2027",
-        "version": "2027",
-        "effective_date": date(2027, 1, 1),
-    })
-    context.standards.install(current)
-    context.standards.install(future)
-    # 两个版本都要在正式评价范围内，才能在各自的版本选择方式里出现。
-    _in_formal_scope(monkeypatch, current.id, future.id)
+    supported = make_standard(standard_id="gb-29446-2019", standard_number="GB 29446-2019")
+    unrelated = make_standard()
+    context.standards.install(supported)
+    context.standards.install(unrelated)
+    _in_formal_scope(monkeypatch, supported.id)
     window = MainWindow(context)
-    assert window.eval_standard.currentData() == current.id
-    window.eval_selection_mode.setCurrentIndex(2)
-    assert window.eval_standard.currentData() == future.id
-    assert "尚未实施" in window.eval_standard_status.text()
+
+    assert not hasattr(window, "eval_selection_mode"), "不得再向普通用户提供版本范围选择"
+    assert window.eval_standard.count() == 1
+    assert window.eval_standard.currentData() == supported.id
+    item_text = window.eval_standard.itemText(0)
+    assert "GB 29446-2019" in item_text
+    for removed in ("历史标准", "尚未实施", "仅预览", "当前有效标准（自动）"):
+        assert removed not in item_text
+    window.close()
+    context.database.dispose()
+
+
+def test_new_evaluation_is_disabled_when_no_formally_evaluable_standard(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """§四：没有正式可评价标准时禁用新评价并给出可执行说明，绝不“空选择仍可计算”。"""
+
+    application = QApplication.instance() or QApplication([])
+    context = create_context(tmp_path / "appdata")
+    # 只装一个范围外标准：标准库里有它，但它不是正式评价对象。
+    context.standards.install(make_standard())
+    window = MainWindow(context)
+    window.navigation.setCurrentRow(2)
+    application.processEvents()
+
+    assert window.eval_standard.count() == 0
+    assert window.eval_standard.currentData() is None
+    assert window.calculate_button.isEnabled() is False
+    assert window.home_start_evaluation.isEnabled() is False
+    assert "请安装完整的新版本" in window.eval_standard_status.text()
+
+    # 首页入口同样给出可执行动作，而不是留下一个空下拉框。
+    information: list[str] = []
+    monkeypatch.setattr(
+        QMessageBox,
+        "information",
+        staticmethod(lambda _parent, _title, message: information.append(message) or QMessageBox.StandardButton.Ok),
+    )
+    window.start_formal_evaluation()
+    assert information and "请安装完整的新版本" in information[0]
+    assert window.navigation.currentRow() == 2  # 没有带任何标准进入新建评价
+
     window.close()
     context.database.dispose()
 

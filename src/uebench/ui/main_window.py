@@ -273,7 +273,7 @@ GB29446_COAL_TYPE_KEY = "coal_type"
 GB29446_PROCESS_FACTOR_KEY = "process_factor"
 
 #: 规则数据不完整/版本不兼容时的中文提示（必须说明“更新标准数据”）。
-GB29446_RULE_INCOMPATIBLE_MESSAGE = "标准规则数据不完整或版本不兼容，请更新标准数据后再评价。"
+GB29446_RULE_INCOMPATIBLE_MESSAGE = "标准规则数据不完整或版本不兼容，请安装完整的新版本后再评价。"
 
 def _gb29446_product_has_process_factor_rows(product) -> bool:
     """该煤种是否存在可用的“选煤工艺 → 折算系数 k”查表行。
@@ -576,12 +576,9 @@ class MainWindow(QMainWindow):
         form_card, form_layout = self._card()
         form_layout.addWidget(QLabel("一、评价信息与数据填写"))
         form = QFormLayout()
-        self.eval_selection_mode = QComboBox()
-        self.eval_selection_mode.addItem("当前有效标准（自动）", StandardSelectionMode.CURRENT.value)
-        self.eval_selection_mode.addItem("历史标准（需提示确认）", StandardSelectionMode.HISTORICAL.value)
-        self.eval_selection_mode.addItem("尚未实施标准（仅预览）", StandardSelectionMode.FUTURE.value)
-        self.eval_selection_mode.currentIndexChanged.connect(self.refresh_standard_combo)
-        self.eval_selection_mode.currentIndexChanged.connect(self.refresh_formal_evaluation_readiness)
+        # ECQ-RS05 M2 §四：普通用户不再选择“当前 / 历史 / 未来”版本范围。
+        # 0.2.0 只有正式支持的当前标准，新建评价只列出正式可评价的标准；
+        # “评价记录”里的历史记录查看不受影响（它读的是已保存的请求与结果快照）。
         self.eval_standard = QComboBox()
         self.eval_standard.setEditable(True)
         self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
@@ -690,9 +687,7 @@ class MainWindow(QMainWindow):
         standard_row = QHBoxLayout()
         standard_row.addWidget(QLabel("标准"))
         standard_row.addWidget(self.eval_standard, 3)
-        standard_row.addWidget(QLabel("版本"))
-        standard_row.addWidget(self.eval_selection_mode, 2)
-        standard_row.addWidget(self.eval_standard_status, 3)
+        standard_row.addWidget(self.eval_standard_status, 4)
         form.addRow(standard_row)
         form_layout.addLayout(form)
         form_layout.addWidget(self.generic_form_container)
@@ -937,6 +932,11 @@ class MainWindow(QMainWindow):
         except Exception:
             message = "当前安装文件不完整或已损坏，请重新安装完整版本。历史记录和备份仍可继续使用。"
         message = str(message).strip() if message else None
+        # ECQ-RS05 M2 §四：没有正式可评价标准时，新建评价必须被禁用并给出用户真正
+        # 能执行的动作；不得保留“空选择但仍可点击计算”。这只是一个额外阻断条件，
+        # 不改变任何判定语义，也不影响“评价记录”里的历史记录查看。
+        if message is None and hasattr(self, "eval_standard") and self.eval_standard.count() == 0:
+            message = self._formal_scope_hint()
         if hasattr(self, "home_compatibility_notice"):
             self.home_compatibility_notice.setText(message or "")
             self.home_compatibility_notice.setVisible(message is not None)
@@ -951,12 +951,11 @@ class MainWindow(QMainWindow):
                 message is None and supports_formal_evaluation(standard_id)
             )
         if hasattr(self, "calculate_button"):
-            preview = (
-                hasattr(self, "eval_selection_mode")
-                and self._selection_mode() is StandardSelectionMode.FUTURE
+            has_evaluable_standard = (
+                self.eval_standard.count() > 0 if hasattr(self, "eval_standard") else False
             )
             self.calculate_button.setEnabled(
-                self.gb29446_rule_compatible and (message is None or preview)
+                self.gb29446_rule_compatible and message is None and has_evaluable_standard
             )
 
     def refresh_home(self) -> None:
@@ -976,7 +975,7 @@ class MainWindow(QMainWindow):
             )
             self.home_start_evaluation.setEnabled(True)
         else:
-            self.home_scope_label.setText("本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。")
+            self.home_scope_label.setText("本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。")
             self.home_start_evaluation.setEnabled(False)
         self.home_evaluation_count.setText(str(self.context.application.count_evaluations()))
         self.home_standard_library_version.setText(self._standard_library_version_text())
@@ -1109,8 +1108,14 @@ class MainWindow(QMainWindow):
         self.refresh_formal_evaluation_readiness()
 
     def _selection_mode(self) -> StandardSelectionMode:
-        value = self.eval_selection_mode.currentData() if hasattr(self, "eval_selection_mode") else StandardSelectionMode.CURRENT.value
-        return StandardSelectionMode(value or StandardSelectionMode.CURRENT.value)
+        """新建评价固定使用**当前正式可评价**标准（ECQ-RS05 M2 §四）。
+
+        请求模型仍带 ``selection_mode`` 字段：既有存档、历史记录与领域层
+        （``StandardSelectionMode`` 的 CURRENT / HISTORICAL / FUTURE 语义）都保持不变，
+        只是普通界面不再提供“历史 / 尚未实施”入口——0.2.0 没有它们的用户用途。
+        """
+
+        return StandardSelectionMode.CURRENT
 
     def _standards_for_selection(self) -> list[StandardDefinition]:
         return self.context.application.list_standards_for_selection(date.today(), self._selection_mode())
@@ -1125,7 +1130,7 @@ class MainWindow(QMainWindow):
 
         evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
         if not evaluable:
-            return "本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。"
+            return "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
         names = "、".join(f"{item.number} {item.title}" for item in evaluable)
         return f"本版本正式评价范围：{names}。"
 
@@ -1499,11 +1504,11 @@ class MainWindow(QMainWindow):
                 self.eval_product.addItem(display_name, product.id)
             self.eval_date.setDate(QDate.currentDate())
             warning = self.current_standard.selection_warning(date.today())
-            # 版本下拉框已经说明选择方式（“当前有效标准（自动）”），这里不再重复一句
-            # 「当前有效」；只有确实需要提示（尚未实施 / 历史标准）时才显示警告文字。
+            # 新建评价只提供“当前正式可评价”的标准，因此正常情况下这里没有需要重复的
+            # 说明；只有规则数据本身带出的警告（例如尚未实施）才显示。
             self.eval_standard_status.setText(warning or "")
         else:
-            self.eval_standard_status.setText("当前选择方式下没有可正式评价的标准")
+            self.eval_standard_status.setText("本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。")
         self.eval_product.blockSignals(False)
         self._refresh_official_source_controls()
         self._rebuild_selection_widgets()
@@ -2265,12 +2270,8 @@ class MainWindow(QMainWindow):
 
     def _load_request_into_form(self, request: EvaluationRequest) -> bool:
         """Populate the wizard from a saved request without changing its data."""
-        requested_mode = request.selection_mode
-        mode_index = self.eval_selection_mode.findData(requested_mode.value)
-        if mode_index < 0:
-            mode_index = self.eval_selection_mode.findData(StandardSelectionMode.HISTORICAL.value)
-        if mode_index >= 0:
-            self.eval_selection_mode.setCurrentIndex(mode_index)
+        # ECQ-RS05 M2 §四：普通界面不再提供版本范围选择。请求里的 ``selection_mode``
+        # 仍按原值保留（历史存档/领域层语义不变），只是不再驱动任何界面控件。
         standard_index = self.eval_standard.findData(request.standard_id)
         if standard_index < 0:
             # “库里没有”“软件不正式支持”“当前选择方式取不到”是三件事，提示必须区分。
@@ -2284,7 +2285,7 @@ class MainWindow(QMainWindow):
                 )
             else:
                 self.eval_standard_status.setText(
-                    "该标准在当前的“版本”选择方式下不可正式评价，请切换选择方式后重试。"
+                    "该标准当前不在可正式评价的标准列表中，请安装完整的新版本后重试。"
                 )
             return False
         self.eval_standard.setCurrentIndex(standard_index)
@@ -2632,7 +2633,7 @@ class MainWindow(QMainWindow):
         evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
         if not evaluable:
             QMessageBox.information(
-                self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请先更新标准数据。"
+                self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
             )
             return
         self.open_evaluation_for_standard(evaluable[0].id)
@@ -2660,16 +2661,13 @@ class MainWindow(QMainWindow):
                 "标准原文仍可在标准库中查看。",
             )
             return False
-        current_mode = self.eval_selection_mode.findData(StandardSelectionMode.CURRENT.value)
-        if current_mode >= 0 and self.eval_selection_mode.currentIndex() != current_mode:
-            self.eval_selection_mode.setCurrentIndex(current_mode)
         self.refresh_standard_combo()
         combo_index = self.eval_standard.findData(standard_id)
         if combo_index < 0:
             QMessageBox.warning(
                 self,
                 "标准不可用",
-                "该标准当前不在可正式评价的标准列表中，请先更新标准数据后重试。",
+                "该标准当前不在可正式评价的标准列表中，请安装完整的新版本后重试。",
             )
             return False
         self.eval_standard.setCurrentIndex(combo_index)

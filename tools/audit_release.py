@@ -97,6 +97,19 @@ EMBEDDED_IDENTITY_KEYS: tuple[str, ...] = (
 #: The single-ACTIVE-Candidate marker (ECQ-RS05 §十一).
 ACTIVE_MARKER_NAME = "ACTIVE-CANDIDATE.json"
 
+#: ECQ-RS05 M2 §三 —— 正式**用户**发布资产：安装程序、便携包、哈希清单、发布说明。
+#: 源码权威是 Git exact commit / release tag，不是打包出来的源码 ZIP。
+USER_RELEASE_ASSET_KEYS: tuple[str, ...] = (
+    "installer",
+    "portable",
+    "sha256sums",
+    "release_notes",
+)
+
+#: 归档 / 开发辅助产物：随 Candidate 产出并登记哈希，供归档与人工核对，
+#: 但不是普通用户单独管理或下载的正式资产，因此不承诺“独立可复现源码包”。
+AUXILIARY_ARTIFACT_KEYS: tuple[str, ...] = ("source",)
+
 
 def release_candidate_id(root: Path, build_info_name: str) -> str | None:
     """Candidate identity declared by the directory itself (``None`` = formal).
@@ -121,6 +134,15 @@ def release_candidate_id(root: Path, build_info_name: str) -> str | None:
 def required_files(
     version: str | None = None, candidate_id: str | None = None
 ) -> tuple[str, ...]:
+    """Every file a Candidate directory must contain and hash-register.
+
+    ECQ-RS05 M2 §三 notes that "must exist in an audited Candidate directory" is
+    not the same as "official user release asset": ``USER_RELEASE_ASSET_KEYS``
+    lists the latter (installer / portable / SHA256SUMS / release notes) while
+    ``AUXILIARY_ARTIFACT_KEYS`` lists the archive-only artifacts.  This tuple
+    stays the integrity list, so the source ZIP keeps being verified without
+    being promised as a reproducible-source deliverable.
+    """
     names = artifact_names(version or project_version(), candidate_id)
     return (
         names["portable"],
@@ -704,6 +726,22 @@ def audit_release(
         "payload": payload_report,
         "build_info": build_info_report,
         "published_package": package_report,
+        "user_release_assets": {
+            "keys": list(USER_RELEASE_ASSET_KEYS),
+            "files": [names[key] for key in USER_RELEASE_ASSET_KEYS],
+            "note": (
+                "正式用户发布资产只有安装程序、便携包、SHA256SUMS 与发布说明；"
+                "源码权威是 Git exact commit / release tag。"
+            ),
+            "auxiliary": {
+                "keys": list(AUXILIARY_ARTIFACT_KEYS),
+                "files": [names[key] for key in AUXILIARY_ARTIFACT_KEYS],
+                "note": (
+                    "归档/开发辅助产物：随 Candidate 产出并登记哈希，"
+                    "不承诺为普通用户单独管理或下载的正式资产。"
+                ),
+            },
+        },
         "no_standard_pdf": {key: value for key, value in pdf_report.items() if key != "errors"},
         "legacy_reference_only": {
             "files_present": legacy_present,

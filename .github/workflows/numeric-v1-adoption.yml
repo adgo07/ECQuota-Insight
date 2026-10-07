@@ -11,6 +11,11 @@ on:
 permissions:
   contents: read
 
+# ECQ-RS05 M2 §一：同一 PR 新 Head 推送后取消旧 Head 的运行，避免继续消耗资源。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   numeric-v1-adoption:
     runs-on: windows-latest
@@ -92,26 +97,18 @@ jobs:
         shell: pwsh
         run: python -m pytest tests/test_ui.py -q -ra -p no:cacheprovider
 
-      - name: Execute literal full suite
-        id: literal_full_suite
-        continue-on-error: true
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force work | Out-Null
-          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-numeric-v1-full"
-
-      - name: Verify all tests
-        shell: pwsh
-        run: |
-          python -m pytest -q -ra -p no:cacheprovider --basetemp "${{ runner.temp }}/pytest-numeric-v1-clean"
-
       - name: Record resolved Numeric dependency versions
         shell: pwsh
         run: |
           python -m pip freeze | Select-String -Pattern '^(jsonschema|jsonschema-specifications|attrs|referencing|rpds-py)='
 
-      - name: Summarize literal suite
+      - name: Summarize the numeric gate
         shell: pwsh
         run: |
-          Write-Host "Literal full-suite outcome: ${{ steps.literal_full_suite.outcome }}"
-          Write-Host "Release-asset checks now live in the Source Gate (tests/test_release_source.py) and the Artifact Gate (tests/test_release_artifacts.py, enabled by UEBENCH_ARTIFACT_DIR); neither is deselected here."
+          # ECQ-RS05 M2 §一：literal full suite 不再在本 workflow 里重复执行。
+          # 它由 Pull Request Gate 严格执行一次（见 .github/workflows/pull-request-gate.yml）；
+          # 本 job 只承担 Frozen Numeric v1 专项、N01-A migration evidence 与 Numeric/UI 回归。
+          # Artifact Gate 只在 scripts/build_candidate.ps1 内部执行一次。
+          Write-Host "Numeric v1 Conformance + N01-A migration evidence + Numeric/UI regressions executed."
+          Write-Host "Literal full suite (strict, single execution): Pull Request Gate / full-suite."
+          Write-Host "Release-asset checks stay in the Source Gate (tests/test_release_source.py); the Artifact Gate runs inside scripts/build_candidate.ps1 (tests/test_release_artifacts.py with UEBENCH_ARTIFACT_DIR)."
