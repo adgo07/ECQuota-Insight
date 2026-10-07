@@ -39,17 +39,6 @@ class StandardRepository(Protocol):
         selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
     ) -> StandardDefinition | None: ...
 
-    def begin_definition_snapshot(self) -> None:
-        """Start reusing parsed definitions until :meth:`end_definition_snapshot`.
-
-        Implementations must not keep the snapshot beyond that pair of calls: it
-        exists to remove the duplicate ``model_validate_json`` work of a single
-        refresh, not to become a cache that outlives it.
-        """
-        ...
-
-    def end_definition_snapshot(self) -> None: ...
-
 
 class EvaluationRepository(Protocol):
     def save(

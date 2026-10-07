@@ -99,52 +99,10 @@ class SqlStandardRepository:
     def __init__(self, database: DatabaseManager, audit: AuditRepository | None = None) -> None:
         self.database = database
         self.audit = audit or AuditRepository(database)
-        #: Parsed definitions reused inside one caller-scoped read burst; ``None``
-        #: while no snapshot is active.  See :meth:`begin_definition_snapshot`.
-        self._definition_snapshot: dict[str, StandardDefinition] | None = None
-        self._definition_snapshot_depth = 0
-
-    # -- short-lived definition reuse (ECQ-RS05 M3) -------------------------
-
-    def begin_definition_snapshot(self) -> None:
-        """Reuse already-parsed definitions until :meth:`end_definition_snapshot`.
-
-        One UI refresh reads the same installed rows for several projections (the
-        current count, the all/scoped count and the formal evaluation scope), and
-        each read used to re-run ``model_validate_json`` on payloads that had been
-        parsed microseconds earlier.  Re-reading the rows stays as it was; only
-        the duplicate parse is removed.
-
-        The scope is opened and closed around a single refresh, so nothing
-        outlives it: a package install, a restore or a rule replacement between
-        two refreshes is always read from the database again.  Scopes nest, and
-        only the outermost one clears the snapshot.
-        """
-        if self._definition_snapshot is None:
-            self._definition_snapshot = {}
-        self._definition_snapshot_depth += 1
-
-    def end_definition_snapshot(self) -> None:
-        if self._definition_snapshot_depth == 0:
-            return
-        self._definition_snapshot_depth -= 1
-        if self._definition_snapshot_depth == 0:
-            self._definition_snapshot = None
 
     def _definition(self, payload: str) -> StandardDefinition:
-        """Parse one stored definition, reusing the active snapshot when there is one."""
-        snapshot = self._definition_snapshot
-        if snapshot is None:
-            return StandardDefinition.model_validate_json(payload)
-        parsed = snapshot.get(payload)
-        if parsed is None:
-            parsed = StandardDefinition.model_validate_json(payload)
-            snapshot[payload] = parsed
-        # Every caller keeps getting its own *deeply* independent instance, exactly as a
-        # fresh parse did: a shallow copy would still share the nested products / indicators,
-        # so mutating one caller's nested data could leak into the snapshot and into every
-        # later read.  Keep the isolation a fresh parse gave us.
-        return parsed.model_copy(deep=True)
+        """Parse one stored definition payload into a fresh definition."""
+        return StandardDefinition.model_validate_json(payload)
 
     def get_for_evaluation(
         self,

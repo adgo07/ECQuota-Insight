@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterable, Iterator
-from contextlib import contextmanager
+from collections.abc import Iterable
 from datetime import date
 from pathlib import Path
 from typing import Callable
@@ -202,25 +201,6 @@ class ApplicationFacade:
             (item for item in self._load_catalogue_standards() if item.id == standard_id),
             None,
         )
-
-    @contextmanager
-    def standard_definition_snapshot(self) -> Iterator[None]:
-        """Reuse parsed standard definitions for the duration of one refresh.
-
-        A single UI refresh asks the same installed rows for several projections
-        (the current count, the all/scoped count and the formal evaluation
-        scope).  Inside this scope the repository parses each stored definition
-        once instead of once per projection.
-
-        The scope is opened and closed around one refresh, so it cannot hide a
-        package upgrade, a restore or a rule replacement: the next refresh reads
-        the database again.  Scopes nest, and only the outermost one clears.
-        """
-        self._standards.begin_definition_snapshot()
-        try:
-            yield
-        finally:
-            self._standards.end_definition_snapshot()
 
     def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)

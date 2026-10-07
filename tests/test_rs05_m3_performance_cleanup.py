@@ -1,9 +1,9 @@
 """ECQ-RS05 M3：删除已实测的重复工作。
 
-本模块只覆盖两件事：
+本模块覆盖两件事：
 
-1. 标准定义不再被重复解析——按 ID 只读一个标准；一次刷新内同一份标准定义只解析
-   一次，且**不跨刷新**保留（见 ``test_definitions_are_not_reused_across_refreshes``）；
+1. 标准定义不再被重复解析——标准库条目的读取只解析被请求的那一个标准（见
+   ``test_get_standard_*``），选择规则与标准库条目完全一致；
 2. 「评价记录」页只在首次进入（或变脏后再次进入）时加载，全局刷新不再为从未打开过
    的页面读取最近 200 条记录，首页的最近 10 条照旧加载。
 
@@ -33,8 +33,8 @@ ROOT = Path(__file__).resolve().parents[1]
 GB29446_DEFINITION = ROOT / "data" / "definitions" / "gb-29446-2019.json"
 GB29446_ID = "gb-29446-2019"
 
-#: 标准库规模保持小而可读。断言写的是"每个已安装标准最多解析一次"，不是任何和机器
-#: 负载相关的绝对秒数。
+#: 标准库规模保持小而可读。断言写的是"解析了几个标准"，不是任何和机器负载相关的
+#: 绝对秒数。
 LIBRARY_SIZE = 6
 
 
@@ -236,23 +236,12 @@ def test_get_standard_falls_back_to_the_catalogue_without_installing_it(tmp_path
 
 
 # ---------------------------------------------------------------------------
-# 2. 一次刷新内复用已解析的标准定义
+# 2. 刷新结果与过滤语义保持不变
 # ---------------------------------------------------------------------------
 
 
-def test_one_refresh_parses_each_installed_definition_once(context, parse_counter, qt_app):
-    window = MainWindow(context)
-    try:
-        single_page = count_parses(parse_counter, window.refresh_home)
-        assert single_page <= LIBRARY_SIZE
-        full = count_parses(parse_counter, window.refresh_all)
-        assert full <= LIBRARY_SIZE
-    finally:
-        window.close()
-
-
 def test_refresh_all_keeps_its_existing_results(context, qt_app):
-    """复用解析不得改变刷新结果：计数、标准库表、评价下拉框都必须照旧。"""
+    """刷新计数、标准库表、评价下拉框都必须照旧。"""
 
     window = MainWindow(context)
     try:
@@ -267,7 +256,7 @@ def test_refresh_all_keeps_its_existing_results(context, qt_app):
 
 
 def test_refresh_still_filters_current_standards_by_effective_date(context, qt_app):
-    """延迟/复用读取不得改变"当前有效"过滤：尚未实施的标准不计入当前数量。"""
+    """读取路径不得改变"当前有效"过滤：尚未实施的标准不计入当前数量。"""
 
     future = identity_variant(
         "gb-77777-2099",
@@ -284,83 +273,6 @@ def test_refresh_still_filters_current_standards_by_effective_date(context, qt_a
         assert window.standard_table.rowCount() == LIBRARY_SIZE + 1
     finally:
         window.close()
-
-
-def test_definitions_are_not_reused_across_refreshes(context, parse_counter, qt_app):
-    """快照只活在一次刷新内：下一次刷新必须重新读取数据库。"""
-
-    window = MainWindow(context)
-    try:
-        first = count_parses(parse_counter, window.refresh_all)
-        second = count_parses(parse_counter, window.refresh_all)
-        assert first == second, "跨刷新不得缓存标准定义"
-        assert second > 0
-    finally:
-        window.close()
-
-
-def test_definitions_are_not_reused_outside_the_scope(context, parse_counter):
-    """作用域之外没有任何残留快照。"""
-
-    outside = count_parses(
-        parse_counter,
-        lambda: (context.standards.list_all(), context.standards.list_all()),
-    )
-    assert outside == 2 * LIBRARY_SIZE, f"作用域之外应逐次解析，实际 {outside}"
-
-    def two_reads_in_scope():
-        with context.application.standard_definition_snapshot():
-            context.standards.list_all()
-            context.standards.list_all()
-
-    in_scope = count_parses(parse_counter, two_reads_in_scope)
-    assert in_scope == LIBRARY_SIZE, f"作用域内同一份定义只应解析一次，实际 {in_scope}"
-
-    after = count_parses(parse_counter, context.standards.list_all)
-    assert after == LIBRARY_SIZE, "作用域结束后不得保留任何解析结果"
-
-
-def test_snapshot_returns_independent_definitions(context):
-    """复用解析不得把同一个对象交给两个调用方（保持原有的对象隔离）。"""
-
-    with context.application.standard_definition_snapshot():
-        first = context.standards.list_all()
-        second = context.standards.list_all()
-    assert first[0] is not second[0]
-    assert first[0].model_dump() == second[0].model_dump()
-
-
-def test_snapshot_nested_data_is_deeply_isolated(context):
-    """快照复用必须返回**深层**独立副本，保持原「每次新鲜解析」的嵌套隔离语义。
-
-    浅拷贝（model_copy()）仍会共享 products / indicators：修改一份的嵌套内容会污染
-    快照本身，并泄漏到同一作用域内之后的每一次读取。
-    """
-
-    with context.application.standard_definition_snapshot():
-        first = context.standards.list_all()[0]
-        assert first.products, "夹具必须含 products"
-        assert first.products[0].indicators, "夹具必须含 indicators"
-        expected_products = len(first.products)
-        expected_name = first.products[0].indicators[0].name
-
-        # 篡改第一份的嵌套内容
-        first.products[0].indicators[0].name = "被篡改的指标名称"
-        first.products.pop()
-
-        second = context.standards.list_all()[0]
-        third = context.standards.list_all()[0]
-
-    assert len(second.products) == expected_products, "第一份的嵌套修改不得影响第二份"
-    assert second.products[0].indicators[0].name == expected_name, "嵌套 indicator 必须独立"
-    assert len(third.products) == expected_products, "快照不得被第一份的嵌套修改污染"
-    assert third.products[0].indicators[0].name == expected_name
-    assert second.model_dump() == third.model_dump()
-
-    # 作用域结束后的全新解析当然也不受影响
-    after = context.standards.list_all()[0]
-    assert len(after.products) == expected_products
-    assert after.products[0].indicators[0].name == expected_name
 
 
 # ---------------------------------------------------------------------------

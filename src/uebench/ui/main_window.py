@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 import html
 import logging
 import re
@@ -380,24 +379,6 @@ def standard_scope_line(standard_id: str | None) -> str:
     text = standard_scope_text(standard_id)
     return text if text == STANDARD_SCOPE_PENDING_LABEL else f"适用范围：{text}"
 
-
-
-def _reuse_standard_definitions(method):
-    """Run one refresh with already-parsed standard definitions reused.
-
-    ECQ-RS05 M3: a single refresh asks the standard library for the current
-    count, the all/scoped count and the formal evaluation scope -- three reads of
-    the same installed rows.  The scope is opened per call and never outlives the
-    refresh that opened it, so it cannot hide a package upgrade, a restore or a
-    replaced rule revision.  Nested refreshes share the outermost scope.
-    """
-
-    @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
-        with self.context.application.standard_definition_snapshot():
-            return method(self, *args, **kwargs)
-
-    return wrapper
 
 
 class MainWindow(QMainWindow):
@@ -919,7 +900,6 @@ class MainWindow(QMainWindow):
         for column, value in enumerate(values):
             table.setItem(row, column, _item(value))
 
-    @_reuse_standard_definitions
     def _page_changed(self, index: int) -> None:
         if index < 0:
             return
@@ -936,7 +916,6 @@ class MainWindow(QMainWindow):
             self.refresh_settings()
         self.refresh_formal_evaluation_readiness()
 
-    @_reuse_standard_definitions
     def refresh_all(self) -> None:
         self.refresh_home()
         self.refresh_standards()
@@ -958,7 +937,6 @@ class MainWindow(QMainWindow):
         if page is not None:
             page.set_standard_library_version(self._standard_library_version_text())
 
-    @_reuse_standard_definitions
     def refresh_formal_evaluation_readiness(self) -> None:
         try:
             message = self.context.application.formal_evaluation_block_message()
@@ -991,7 +969,6 @@ class MainWindow(QMainWindow):
                 self.gb29446_rule_compatible and message is None and has_evaluable_standard
             )
 
-    @_reuse_standard_definitions
     def refresh_home(self) -> None:
         today = date.today()
         standards = self.context.application.list_current_standards(today)
@@ -1028,7 +1005,6 @@ class MainWindow(QMainWindow):
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
                 self.home_recent.setItem(row, column, cell)
 
-    @_reuse_standard_definitions
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
         # The library is a catalogue of the 63 in-scope standards, not only
@@ -1086,7 +1062,6 @@ class MainWindow(QMainWindow):
         # 只读取被选中的那一个标准：原本为了取一条而重建整个标准库。
         return self.context.application.get_standard(standard_id)
 
-    @_reuse_standard_definitions
     def refresh_standard_detail(self) -> None:
         """Show the selected standard's 适用范围 line, then its limits."""
         if not hasattr(self, "standard_indicator_table"):
@@ -1168,7 +1143,6 @@ class MainWindow(QMainWindow):
         names = "、".join(f"{item.number} {item.title}" for item in evaluable)
         return f"本版本正式评价范围：{names}。"
 
-    @_reuse_standard_definitions
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None
         self.eval_standard.blockSignals(True)
