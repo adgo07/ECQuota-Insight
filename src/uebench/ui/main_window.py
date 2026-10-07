@@ -2178,10 +2178,12 @@ class MainWindow(QMainWindow):
         首次进入该页、用户点「刷新」，或被标记为待刷新后再次进入时调用；这是
         唯一读取最近 200 条记录的地方（首页的最近 10 条仍按原样加载）。
         """
-        self._records_loaded = True
-        self._records_dirty = False
+        # Read before touching the table or the flags: if this read fails transiently the
+        # page must stay retryable, so loaded/clean are set only after the read *and* the
+        # rebuild both succeeded.
+        records = list(self.context.application.list_recent_evaluations(200))
         self.record_table.setRowCount(0)
-        for record in self.context.application.list_recent_evaluations(200):
+        for record in records:
             row = self.record_table.rowCount()
             self.record_table.insertRow(row)
             values = [
@@ -2202,6 +2204,11 @@ class MainWindow(QMainWindow):
                     cell.setText(f"{RECORD_CORRUPTED_LABEL}（{record.corruption_reason}）")
                     cell.setToolTip(record.corruption_reason)
                 self.record_table.setItem(row, column, cell)
+
+        # Only now is the page genuinely loaded and clean; a failure above leaves it
+        # retryable (still not loaded / still dirty) so the next entry reads again.
+        self._records_loaded = True
+        self._records_dirty = False
 
     def mark_records_dirty(self) -> None:
         """记录列表已过期，但不一定现在就去读它。

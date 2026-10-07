@@ -330,6 +330,39 @@ def test_snapshot_returns_independent_definitions(context):
     assert first[0].model_dump() == second[0].model_dump()
 
 
+def test_snapshot_nested_data_is_deeply_isolated(context):
+    """快照复用必须返回**深层**独立副本，保持原「每次新鲜解析」的嵌套隔离语义。
+
+    浅拷贝（model_copy()）仍会共享 products / indicators：修改一份的嵌套内容会污染
+    快照本身，并泄漏到同一作用域内之后的每一次读取。
+    """
+
+    with context.application.standard_definition_snapshot():
+        first = context.standards.list_all()[0]
+        assert first.products, "夹具必须含 products"
+        assert first.products[0].indicators, "夹具必须含 indicators"
+        expected_products = len(first.products)
+        expected_name = first.products[0].indicators[0].name
+
+        # 篡改第一份的嵌套内容
+        first.products[0].indicators[0].name = "被篡改的指标名称"
+        first.products.pop()
+
+        second = context.standards.list_all()[0]
+        third = context.standards.list_all()[0]
+
+    assert len(second.products) == expected_products, "第一份的嵌套修改不得影响第二份"
+    assert second.products[0].indicators[0].name == expected_name, "嵌套 indicator 必须独立"
+    assert len(third.products) == expected_products, "快照不得被第一份的嵌套修改污染"
+    assert third.products[0].indicators[0].name == expected_name
+    assert second.model_dump() == third.model_dump()
+
+    # 作用域结束后的全新解析当然也不受影响
+    after = context.standards.list_all()[0]
+    assert len(after.products) == expected_products
+    assert after.products[0].indicators[0].name == expected_name
+
+
 # ---------------------------------------------------------------------------
 # 3. 「评价记录」页延迟加载
 # ---------------------------------------------------------------------------
@@ -374,6 +407,52 @@ def test_records_page_loads_on_first_entry_and_is_not_read_again_when_clean(
     window.navigation.setCurrentRow(0)
     window.navigation.setCurrentRow(3)
     assert record_calls.count(200) == 1, "列表未变脏时重进页面不应重复读取"
+
+
+def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app, monkeypatch):
+    """首次加载失败不得把页面错标为已加载/干净：再次进入必须重新读取并成功。"""
+
+    context = create_context(tmp_path / "appdata")
+    install_library(context)
+    save_one_record(context)
+    calls: list[int] = []
+    original = context.application.list_recent_evaluations
+    failures = {"remaining": 1}
+
+    def flaky(limit: int = 100):
+        calls.append(limit)
+        if limit == 200 and failures["remaining"] > 0:
+            failures["remaining"] -= 1
+            raise RuntimeError("临时读取失败")
+        return original(limit)
+
+    monkeypatch.setattr(context.application, "list_recent_evaluations", flaky)
+    window = MainWindow(context)
+    try:
+        try:
+            window.navigation.setCurrentRow(3)
+        except RuntimeError:
+            # 允许异常沿调用链向上传播的实现；状态不变量才是本用例的重点。
+            pass
+        assert calls.count(200) == 1, "首次进入记录页必须尝试加载"
+        assert window._records_loaded is False, "读取失败后不得标记为已加载"
+        assert window._records_dirty is True, "读取失败后必须保持可重试状态"
+        assert window.record_table.rowCount() == 0, "失败时不得留下半填的表格"
+
+        window.navigation.setCurrentRow(0)
+        window.navigation.setCurrentRow(3)
+        assert calls.count(200) == 2, "再次进入记录页必须重新读取"
+        assert window._records_loaded is True
+        assert window._records_dirty is False
+        assert window.record_table.rowCount() == 1
+
+        # 干净之后重进不应再读
+        window.navigation.setCurrentRow(0)
+        window.navigation.setCurrentRow(3)
+        assert calls.count(200) == 2, "成功加载且未变脏后不得重复读取"
+    finally:
+        window.close()
+        context.database.dispose()
 
 
 def test_saving_a_record_marks_the_list_dirty_and_reloads_on_next_entry(

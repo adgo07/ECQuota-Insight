@@ -140,8 +140,11 @@ class SqlStandardRepository:
         if parsed is None:
             parsed = StandardDefinition.model_validate_json(payload)
             snapshot[payload] = parsed
-        # Every caller keeps getting its own instance, exactly as a fresh parse did.
-        return parsed.model_copy()
+        # Every caller keeps getting its own *deeply* independent instance, exactly as a
+        # fresh parse did: a shallow copy would still share the nested products / indicators,
+        # so mutating one caller's nested data could leak into the snapshot and into every
+        # later read.  Keep the isolation a fresh parse gave us.
+        return parsed.model_copy(deep=True)
 
     def get_for_evaluation(
         self,
