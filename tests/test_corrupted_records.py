@@ -266,6 +266,9 @@ def test_main_window_starts_and_refreshes_with_corrupted_row(context, qt_app, mo
     window.refresh_all()
     try:
         assert window.home_recent.rowCount() == 2, "损坏行不得从首页消失"
+        # ECQ-RS05 M3：refresh_all 不再为从未打开过的「评价记录」页读取 200 条；
+        # 该页在首次进入时加载。断言内容与强度不变。
+        window.navigation.setCurrentRow(3)
         assert window.record_table.rowCount() == 2, "损坏行不得从评价记录页消失"
 
         select_record(window, corrupted.evaluation_id)

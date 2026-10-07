@@ -24,6 +24,8 @@ class StandardRepository(Protocol):
 
     def list_all(self) -> list[StandardDefinition]: ...
 
+    def list_by_id(self, standard_id: str) -> list[StandardDefinition]: ...
+
     def list_current(self, evaluation_date: date) -> list[StandardDefinition]: ...
 
     def list_historical(self) -> list[StandardDefinition]: ...
@@ -36,6 +38,17 @@ class StandardRepository(Protocol):
         evaluation_date: date,
         selection_mode: StandardSelectionMode = StandardSelectionMode.CURRENT,
     ) -> StandardDefinition | None: ...
+
+    def begin_definition_snapshot(self) -> None:
+        """Start reusing parsed definitions until :meth:`end_definition_snapshot`.
+
+        Implementations must not keep the snapshot beyond that pair of calls: it
+        exists to remove the duplicate ``model_validate_json`` work of a single
+        refresh, not to become a cache that outlives it.
+        """
+        ...
+
+    def end_definition_snapshot(self) -> None: ...
 
 
 class EvaluationRepository(Protocol):

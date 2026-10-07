@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
 from typing import Callable
@@ -43,6 +45,20 @@ def _library_sort_key(definition: StandardDefinition) -> tuple[date, int, str]:
     intent, but states it explicitly instead of depending on row order.
     """
     return (definition.effective_date, definition.rule_revision, definition.version)
+
+
+def _newest_revision(definitions: Iterable[StandardDefinition]) -> StandardDefinition | None:
+    """Return the newest rule revision among ``definitions``, or ``None``.
+
+    The single place where "which revision of this standard does the library
+    show" is decided, so the whole-library view and the by-id lookup cannot drift
+    apart.
+    """
+    best: StandardDefinition | None = None
+    for item in definitions:
+        if best is None or _library_sort_key(item) > _library_sort_key(best):
+            best = item
+    return best
 
 
 class ApplicationFacade:
@@ -116,10 +132,13 @@ class ApplicationFacade:
         view then reported the superseded rule as if it were the current one.
         """
         by_id: dict[str, StandardDefinition] = {}
+        collected: dict[str, list[StandardDefinition]] = {}
         for item in self._standards.list_all():
-            current = by_id.get(item.id)
-            if current is None or _library_sort_key(item) > _library_sort_key(current):
-                by_id[item.id] = item
+            collected.setdefault(item.id, []).append(item)
+        for standard_id, revisions in collected.items():
+            newest = _newest_revision(revisions)
+            if newest is not None:
+                by_id[standard_id] = newest
         for item in self._load_catalogue_standards():
             by_id.setdefault(item.id, item)
         return sorted(by_id.values(), key=lambda item: (item.number, item.effective_date, item.rule_revision))
@@ -170,8 +189,38 @@ class ApplicationFacade:
         and therefore accepts published rules only.  This separate lookup lets
         the standard library show a future or pending-confirmation entry and
         explain its status without accidentally making it executable.
+
+        Only the requested id is read.  Building the whole library (one parse per
+        installed definition) and then iterating to find one entry was duplicate
+        work; the by-id read reuses the same "newest installed revision wins,
+        catalogue as fallback" rule as :meth:`list_library_standards`.
         """
-        return next((item for item in self.list_library_standards() if item.id == standard_id), None)
+        installed = _newest_revision(self._standards.list_by_id(standard_id))
+        if installed is not None:
+            return installed
+        return next(
+            (item for item in self._load_catalogue_standards() if item.id == standard_id),
+            None,
+        )
+
+    @contextmanager
+    def standard_definition_snapshot(self) -> Iterator[None]:
+        """Reuse parsed standard definitions for the duration of one refresh.
+
+        A single UI refresh asks the same installed rows for several projections
+        (the current count, the all/scoped count and the formal evaluation
+        scope).  Inside this scope the repository parses each stored definition
+        once instead of once per projection.
+
+        The scope is opened and closed around one refresh, so it cannot hide a
+        package upgrade, a restore or a rule replacement: the next refresh reads
+        the database again.  Scopes nest, and only the outermost one clears.
+        """
+        self._standards.begin_definition_snapshot()
+        try:
+            yield
+        finally:
+            self._standards.end_definition_snapshot()
 
     def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)

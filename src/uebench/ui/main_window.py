@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import html
 import logging
 import re
@@ -381,6 +382,24 @@ def standard_scope_line(standard_id: str | None) -> str:
 
 
 
+def _reuse_standard_definitions(method):
+    """Run one refresh with already-parsed standard definitions reused.
+
+    ECQ-RS05 M3: a single refresh asks the standard library for the current
+    count, the all/scoped count and the formal evaluation scope -- three reads of
+    the same installed rows.  The scope is opened per call and never outlives the
+    refresh that opened it, so it cannot hide a package upgrade, a restore or a
+    replaced rule revision.  Nested refreshes share the outermost scope.
+    """
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        with self.context.application.standard_definition_snapshot():
+            return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
@@ -389,6 +408,10 @@ class MainWindow(QMainWindow):
         self.last_result_id: str | None = None
         #: 当前加载的 GB 29446 规则是否满足正式 r2 结构；非 GB29446 标准恒为 True。
         self.gb29446_rule_compatible = True
+        #: ECQ-RS05 M3：「评价记录」只在首次进入时加载（或在被标记为待刷新后重进时
+        #: 加载）。全局刷新只把它标记为脏，绝不为用户从未打开过的页面读取 200 条记录。
+        self._records_loaded = False
+        self._records_dirty = True
         self.setWindowTitle("单位产品能耗对标软件")
         # Leave room for the ten-column energy table on ordinary 1366x768 and
         # 1920x1080 screens.  Users can still resize the window smaller.
@@ -418,8 +441,12 @@ class MainWindow(QMainWindow):
         for title, builder in page_builders:
             self.navigation.addItem(QListWidgetItem(title))
             self.pages.addWidget(builder())
-        self.navigation.currentRowChanged.connect(self._page_changed)
+        # 先把首页设为当前项再连信号：否则 setCurrentRow(0) 会立刻触发一次
+        # `_page_changed(0)`，紧接着的 `refresh_all()` 又把首页刷新一遍——同一份
+        # 标准定义在一次构造里被完整解析两遍。最终状态与从前一致（页面栈默认就是
+        # 第 0 页，首页刷新与就绪检查都由 refresh_all 完成）。
         self.navigation.setCurrentRow(0)
+        self.navigation.currentRowChanged.connect(self._page_changed)
         self.refresh_all()
 
     def _page(self, title: str) -> tuple[QWidget, QVBoxLayout]:
@@ -892,6 +919,7 @@ class MainWindow(QMainWindow):
         for column, value in enumerate(values):
             table.setItem(row, column, _item(value))
 
+    @_reuse_standard_definitions
     def _page_changed(self, index: int) -> None:
         if index < 0:
             return
@@ -901,16 +929,20 @@ class MainWindow(QMainWindow):
         elif index == 1:
             self.refresh_standards()
         elif index == 3:
-            self.refresh_records()
+            # 首次进入必须加载；已加载且未变脏则沿用现有列表。
+            if self._records_dirty or not self._records_loaded:
+                self.refresh_records()
         elif index == 4:
             self.refresh_settings()
         self.refresh_formal_evaluation_readiness()
 
+    @_reuse_standard_definitions
     def refresh_all(self) -> None:
         self.refresh_home()
         self.refresh_standards()
         self.refresh_standard_combo()
-        self.refresh_records()
+        # 记录页只标记待刷新：全局刷新不再为用户没打开过的页面读取 200 条记录。
+        self.mark_records_dirty()
         self.refresh_settings()
         self.refresh_formal_evaluation_readiness()
 
@@ -926,6 +958,7 @@ class MainWindow(QMainWindow):
         if page is not None:
             page.set_standard_library_version(self._standard_library_version_text())
 
+    @_reuse_standard_definitions
     def refresh_formal_evaluation_readiness(self) -> None:
         try:
             message = self.context.application.formal_evaluation_block_message()
@@ -958,6 +991,7 @@ class MainWindow(QMainWindow):
                 self.gb29446_rule_compatible and message is None and has_evaluable_standard
             )
 
+    @_reuse_standard_definitions
     def refresh_home(self) -> None:
         today = date.today()
         standards = self.context.application.list_current_standards(today)
@@ -994,6 +1028,7 @@ class MainWindow(QMainWindow):
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
                 self.home_recent.setItem(row, column, cell)
 
+    @_reuse_standard_definitions
     def refresh_standards(self) -> None:
         query = self.standard_search.text().strip().lower() if hasattr(self, "standard_search") else ""
         # The library is a catalogue of the 63 in-scope standards, not only
@@ -1048,11 +1083,10 @@ class MainWindow(QMainWindow):
     def _library_standard(self, standard_id: str | None) -> StandardDefinition | None:
         if not standard_id:
             return None
-        return next(
-            (item for item in self.context.application.list_library_standards() if item.id == standard_id),
-            None,
-        )
+        # 只读取被选中的那一个标准：原本为了取一条而重建整个标准库。
+        return self.context.application.get_standard(standard_id)
 
+    @_reuse_standard_definitions
     def refresh_standard_detail(self) -> None:
         """Show the selected standard's 适用范围 line, then its limits."""
         if not hasattr(self, "standard_indicator_table"):
@@ -1134,6 +1168,7 @@ class MainWindow(QMainWindow):
         names = "、".join(f"{item.number} {item.title}" for item in evaluable)
         return f"本版本正式评价范围：{names}。"
 
+    @_reuse_standard_definitions
     def refresh_standard_combo(self) -> None:
         selected = self.eval_standard.currentData() if self.eval_standard.count() else None
         self.eval_standard.blockSignals(True)
@@ -1879,7 +1914,8 @@ class MainWindow(QMainWindow):
             self.eval_summary.setText("")
             self.refresh_home()
             if not is_preview:
-                self.refresh_records()
+                # 新记录只把「评价记录」标记为待刷新：用户此时在「新建评价」页。
+                self.mark_records_dirty()
             if any(item.grade is Grade.INCOMPLETE for item in result.results):
                 QMessageBox.warning(
                     self,
@@ -1937,7 +1973,8 @@ class MainWindow(QMainWindow):
                 self.eval_results.setItem(row, column, cell)
         self.refresh_home()
         if not is_preview:
-            self.refresh_records()
+            # 新记录只把「评价记录」标记为待刷新，不在这一刻读取 200 条。
+            self.mark_records_dirty()
         message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
 
@@ -2136,6 +2173,13 @@ class MainWindow(QMainWindow):
         return "\n".join(lines)
 
     def refresh_records(self) -> None:
+        """（重新）加载「评价记录」列表。
+
+        首次进入该页、用户点「刷新」，或被标记为待刷新后再次进入时调用；这是
+        唯一读取最近 200 条记录的地方（首页的最近 10 条仍按原样加载）。
+        """
+        self._records_loaded = True
+        self._records_dirty = False
         self.record_table.setRowCount(0)
         for record in self.context.application.list_recent_evaluations(200):
             row = self.record_table.rowCount()
@@ -2158,6 +2202,17 @@ class MainWindow(QMainWindow):
                     cell.setText(f"{RECORD_CORRUPTED_LABEL}（{record.corruption_reason}）")
                     cell.setToolTip(record.corruption_reason)
                 self.record_table.setItem(row, column, cell)
+
+    def mark_records_dirty(self) -> None:
+        """记录列表已过期，但不一定现在就去读它。
+
+        保存、删除、恢复只把列表标记为待刷新：用户正看着「评价记录」页时立即重建，
+        否则等下次进入该页时再重建。这样全局刷新不会替一个从未打开过的页面读取
+        200 条记录，而页面上显示的内容又不会过期。
+        """
+        self._records_dirty = True
+        if self.navigation.currentRow() == 3:
+            self.refresh_records()
 
     def _selected_record_id(self) -> str | None:
         row = self.record_table.currentRow()
