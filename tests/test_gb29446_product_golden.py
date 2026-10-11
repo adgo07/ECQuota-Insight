@@ -39,7 +39,7 @@ from uebench.domain.models import (
 ROOT = Path(__file__).resolve().parents[1]
 GOLDEN_PATH = ROOT / "tests" / "golden" / "gb29446_product_golden_v1.json"
 DEFINITION_PATH = ROOT / "data" / "definitions" / "gb-29446-2019.json"
-ISSUE_REGISTER_PATH = ROOT / "STANDARD_ISSUES_REGISTER.md"
+PLATFORM_LOCK_PATH = ROOT / "platform-lock.json"
 STANDARD_ID = "gb-29446-2019"
 PROFILE_ID = "ECQUOTA_DECIMAL_FULL_VALUE_V1"
 EVALUATION_DATE = date(2026, 6, 1)
@@ -267,51 +267,54 @@ def independently_derive(definition: dict, case: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
-ISSUE_ROW_RE = re.compile(r"^\|\s*状态\s*\|\s*(?P<value>.+?)\s*\|\s*$", re.MULTILINE)
+def numeric_governance_report() -> dict:
+    """Check the adopted frozen Numeric authority, not a retired Standard Issue.
 
-
-def _issue_status(issue_id: str) -> str | None:
-    """Read the status code of one registered Standard Issue.
-
-    The register is a Markdown table, so the status row is matched with a
-    tolerant regex rather than by exact line prefix.
+    ROUND6 was an implementation defect resolved by Numeric v1 adoption.
+    Its former register entry was deliberately removed in 2026-10-11; a
+    standard-issues register must not serve as this Golden's numeric policy.
     """
-    lines = ISSUE_REGISTER_PATH.read_text(encoding="utf-8").splitlines()
-    heading = next(
-        (index for index, line in enumerate(lines) if line.startswith(f"### {issue_id} ")),
-        None,
-    )
-    if heading is None:
-        return None
-    section: list[str] = []
-    for line in lines[heading + 1:]:
-        if line.startswith("### "):
-            break
-        section.append(line)
-    match = ISSUE_ROW_RE.search("\n".join(section))
-    if not match:
-        return None
-    raw = match.group("value").strip()
-    # Strip emphasis/backticks and any trailing Chinese parenthetical note.
-    return raw.strip("`* ").replace("`", "").split("（")[0].strip()
+    lock = json.loads(PLATFORM_LOCK_PATH.read_text(encoding="utf-8"))
+    policy_path = ROOT / GOLDEN["numeric_policy_document"]
+    policy = policy_path.read_text(encoding="utf-8") if policy_path.is_file() else ""
+    expected_phrase = GOLDEN["numeric_comparison_policy"]
+    return {
+        "numeric_contract_status": lock["numeric_contract"]["status"],
+        "numeric_contract_version": lock["numeric_contract"]["version"],
+        "numeric_profile_status": lock["numeric_profiles"]["status"],
+        "numeric_profile_id": lock["numeric_profiles"]["project_profile_id"],
+        "numeric_comparison_policy": (
+            expected_phrase
+            if expected_phrase in policy
+            and "comparison value = full calculation value" in policy
+            else "MISSING_OR_CHANGED"
+        ),
+    }
 
 
 def applicability_report() -> dict:
     definition = definition_json()
+    numeric = numeric_governance_report()
     return {
         "standard_id": definition["id"],
         "standard_version": definition["version"],
         "standard_source_sha256": definition["source_sha256"],
         "rule_revision": definition["rule_revision"],
-        "numeric_profile_id": PROFILE_ID,
-        "standard_issue_status": _issue_status(GOLDEN["standard_issue_ref"]),
+        "numeric_profile_id": numeric["numeric_profile_id"],
+        "numeric_contract_version": numeric["numeric_contract_version"],
+        "numeric_contract_status": numeric["numeric_contract_status"],
+        "numeric_profile_status": numeric["numeric_profile_status"],
+        "numeric_comparison_policy": numeric["numeric_comparison_policy"],
         "golden_declared": {
             "standard_id": GOLDEN["standard_id"],
             "standard_version": GOLDEN["standard_version"],
             "standard_source_sha256": GOLDEN["standard_source_sha256"],
             "rule_revision": GOLDEN["rule_revision"],
             "numeric_profile_id": GOLDEN["numeric_profile_id"],
-            "standard_issue_status": GOLDEN["standard_issue_expected_status"],
+            "numeric_contract_version": GOLDEN["numeric_contract_version"],
+            "numeric_contract_status": GOLDEN["numeric_contract_expected_status"],
+            "numeric_profile_status": GOLDEN["numeric_profile_expected_status"],
+            "numeric_comparison_policy": GOLDEN["numeric_comparison_policy"],
         },
     }
 
@@ -327,7 +330,10 @@ def _applicability_mismatches() -> list[str]:
             "standard_source_sha256",
             "rule_revision",
             "numeric_profile_id",
-            "standard_issue_status",
+            "numeric_contract_version",
+            "numeric_contract_status",
+            "numeric_profile_status",
+            "numeric_comparison_policy",
         )
         if str(report[key]) != str(declared[key])
     ]
@@ -437,8 +443,11 @@ def test_golden_declares_required_metadata() -> None:
         "rule_revision",
         "standard_source_sha256",
         "numeric_profile_id",
-        "standard_issue_ref",
-        "standard_issue_expected_status",
+        "numeric_contract_version",
+        "numeric_contract_expected_status",
+        "numeric_profile_expected_status",
+        "numeric_policy_document",
+        "numeric_comparison_policy",
         "approval_basis",
         "derivation_method",
         "business_data_summary",
@@ -446,7 +455,10 @@ def test_golden_declares_required_metadata() -> None:
     ):
         assert key in GOLDEN, f"Golden 缺少必需字段：{key}"
     assert GOLDEN["golden_version"] == 1
-    assert GOLDEN["standard_issue_expected_status"] == "PROVISIONAL"
+    assert GOLDEN["numeric_contract_expected_status"] == "FROZEN"
+    assert GOLDEN["numeric_profile_expected_status"] == "FROZEN"
+    assert GOLDEN["numeric_policy_document"] == "docs/统一判定规范.md"
+    assert GOLDEN["numeric_comparison_policy"] == "full-value exact comparison"
 
 
 def test_golden_upstream_basis_matches_repository() -> None:
@@ -461,16 +473,22 @@ def test_golden_upstream_basis_matches_repository() -> None:
     )
 
 
-def test_standard_issue_stays_provisional() -> None:
-    assert GOLDEN["standard_issue_ref"] == "ECQ-STD-GB29446-001"
-    assert _issue_status("ECQ-STD-GB29446-001") == "PROVISIONAL"
-
-
-def test_golden_does_not_claim_official_interpretation() -> None:
-    marker = "无发布机构正式解释"
+def test_full_value_trap_tracks_adopted_numeric_governance() -> None:
     trap = case_by_id("gb29446-coking-full-value-trap")
-    assert marker in trap["confirmation_degree"]
-    assert "ECQ-STD-GB29446-001" in trap["software_interpretation_ref"]
+    assert trap["source_type"] == "软件实现决定"
+    assert "Numeric Contract v1" in trap["confirmation_degree"]
+    assert PROFILE_ID in trap["software_interpretation_ref"]
+    assert GOLDEN["numeric_policy_document"] in trap["software_interpretation_ref"]
+    assert "ECQ-STD-GB29446-001" not in trap["software_interpretation_ref"]
+
+
+def test_numeric_applicability_gate_detects_governance_drift(monkeypatch) -> None:
+    """An altered frozen Numeric status must fail without touching Golden expected."""
+    monkeypatch.setitem(GOLDEN, "numeric_contract_expected_status", "DRAFT")
+    try:
+        assert any("numeric_contract_status:" in x for x in _applicability_mismatches())
+    finally:
+        monkeypatch.setitem(GOLDEN, "numeric_contract_expected_status", "FROZEN")
 
 
 # ===========================================================================
@@ -591,8 +609,8 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
 
     Note: 13 is **not** a mathematical minimum.  The trap could be folded into
     another coefficient case as a second E_d input.  It is kept separate because
-    its ``source_type`` is 技术判断 (it depends on the ECQ-STD-GB29446-001
-    position) while the 12 clusters are 标准原文事实; mixing two different
+    its ``source_type`` is 软件实现决定 (adopted Numeric Contract v1)
+    while the 12 clusters are 标准原文事实; mixing two different
     authority classes in one case would weaken provenance traceability.  This
     assertion pins both numbers so a silent shrink is caught.
     """
@@ -602,9 +620,9 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
     assert len(cluster_keys) == 12, f"系数簇数量应为 12，实际 {len(cluster_keys)}"
     trap = case_by_id("gb29446-coking-full-value-trap")
     assert trap in cases
-    # The 12 clusters are 原文事实; the trap is the single 技术判断 business case.
-    technical = [case for case in cases if case["source_type"] == "技术判断"]
-    assert technical == [trap], "技术判断类正常案例应只有 full-value trap"
+    # The 12 clusters are 标准原文事实; the trap is the sole numeric-governed software decision.
+    numeric_decisions = [case for case in cases if case["source_type"] == "软件实现决定"]
+    assert numeric_decisions == [trap], "软件Numeric决定类正常案例应只有 full-value trap"
 
 
 def test_expected_sources_match_the_definition(definition: dict) -> None:

@@ -105,11 +105,10 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - `D-ECQ-005` Unit Contract 仍未正式采用；
 - `D-ECQ-006` 中央 lossless XLSX numeric-cell 公共方案仍 OPEN。RS03 已把本仓 Excel 权威入口收紧为 text 十进制 lexical，RS04 的 Excel 安全语义案例继续以此为前提，但这**不表示中央公共方案已冻结**。
 
-标准问题：
+标准问题与Numeric治理：
 
-- `ECQ-STD-GB29446-001` —— 状态 `PROVISIONAL`，见 `STANDARD_ISSUES_REGISTER.md`。
-  RS04 **未关闭**该问题，也**未**写成官方解释；Golden 的 full-value trap 案例只把当前软件口径
-  冻结为可回归的产品证据。
+- 当前标准问题按 `STANDARD_ISSUES_REGISTER.md` 核对；GB 29446 的历史 ROUND6 属于**已修复的软件缺陷**，不再登记为标准问题。
+- RS04 Golden 的 full-value trap 继续保留，以冻结Numeric v1正式全值比较的可回归业务证据；其上游锁定依据为 `platform-lock.json`、`docs/统一判定规范.md` 和Numeric v1。
 
 **RS05 已修复（RS04 登记的 Release Gate）**：
 

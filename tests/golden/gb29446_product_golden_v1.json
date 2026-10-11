@@ -11,9 +11,7 @@
   "standard_source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
   "numeric_profile_id": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
   "numeric_contract_version": "v1",
-  "standard_issue_ref": "ECQ-STD-GB29446-001",
-  "standard_issue_expected_status": "PROVISIONAL",
-  "approval_basis": "RS04 ECQ-RS04 任务书；expected 由标准原文（表1/表2/式(1)/表A.1）+ Definition + Numeric Contract v1 独立手工推导，未使用软件输出反向生成。",
+  "approval_basis": "RS04 ECQ-RS04 任务书；expected 由标准原文（表1/表2/式(1)/表A.1）+ Definition + 已冻结 Numeric Contract v1/ECQUOTA_DECIMAL_FULL_VALUE_V1 独立手工推导；2026-10-11将历史ROUND6问题从标准问题台账移出，仅调整治理来源，不更改任何业务 expected，未使用软件输出反向生成。",
   "derivation_method": "e_d = E_d × k ÷ m（标准式(1)），k 取自附录A表A.1，等级按表1/表2 的 ≤ 限值逐级判定。所有案例刻意选取可精确表达的 Decimal 运算，expected 可手工复核。",
   "source_type_legend": {
     "标准原文事实": "标准原文（含表/公式/附录）直接给出的事实",
@@ -380,12 +378,12 @@
         "grade": "LEVEL_2",
         "actual_value": "5.0000004"
       },
-      "source_type": "技术判断",
-      "confirmation_degree": "受 ECQ-STD-GB29446-001（PROVISIONAL）约束的软件实现口径；未发现标准要求比较前统一六位小数修约的依据。无发布机构正式解释。",
+      "source_type": "软件实现决定",
+      "confirmation_degree": "采用项目 Numeric Contract v1（FROZEN）与 ECQUOTA_DECIMAL_FULL_VALUE_V1：正式业务比较采用full-value exact；不再将已修复的历史ROUND6行为视为待解释的标准问题。",
       "source_clause": "3.1 炼焦煤选煤企业选煤电力单耗限额等级（等级边界比较；标准原文未规定比较前的统一修约）",
       "source_table": "表1；式（1）；表A.1",
       "derivation": "e_d = 500.00004 × 1.00 ÷ 100 = 5.0000004（Decimal 精确）；表1 1级为 ≤5.0，5.0000004 > 5.0，故不得判 1级。5.0 < 5.0000004 ≤ 7.0 → 2级。若在比较前做六位小数 ROUND_HALF_UP，5.0000004 会被抹平为 5.000000 而误判 1级；本案例即冻结该差异。",
-      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1；ECQ-STD-GB29446-001 (PROVISIONAL)",
+      "software_interpretation_ref": "ECQUOTA_DECIMAL_FULL_VALUE_V1；docs/统一判定规范.md；docs/governance/NUMERIC_V1_ADOPTION_REPORT.md",
       "expected_sources": [
         [
           "3.1 炼焦煤选煤企业选煤电力单耗限额等级",
@@ -830,5 +828,9 @@
     "煤种 + 不兼容工艺最终归类为哪一种 INCOMPLETE/error（继续由 RS01 linkage Gate 保护）",
     "corrupted historical result_json 的爆炸半径（登记为 RS05 Release Gate，本阶段不修复）",
     "E_d 缺失 / E_d=0 是否形成 INCOMPLETE Record"
-  ]
+  ],
+  "numeric_contract_expected_status": "FROZEN",
+  "numeric_profile_expected_status": "FROZEN",
+  "numeric_policy_document": "docs/统一判定规范.md",
+  "numeric_comparison_policy": "full-value exact comparison"
 }

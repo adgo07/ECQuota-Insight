@@ -30,7 +30,7 @@ Golden 的 expected **不是**由当前软件输出反向生成的。每一个 e
 | 标准原文 | GB 29446—2019《选煤电力消耗限额》正文、表1、表2、式（1）、附录A 表A.1 | 给出 12 个工艺系数 k 与 6 个等级阈值；SHA-256 `72011768…cb15d`（与 Definition 记录一致，本次已实际核对） |
 | 已发布 Definition | `data/definitions/gb-29446-2019.json`（`rule_revision=2`） | 标准事实的软件可执行转写；Golden 逐项比对 k 与阈值 |
 | Numeric Contract v1 + 项目 Profile | `ECQUOTA_DECIMAL_FULL_VALUE_V1`（full-value exact，无隐式修约） | 决定边界比较语义 |
-| Standard Issue | `ECQ-STD-GB29446-001`（`PROVISIONAL`） | 说明“无隐式修约”这一口径的来源与确认程度 |
+| Numeric 治理依据 | `Numeric Contract v1`（`FROZEN`）；`ECQUOTA_DECIMAL_FULL_VALUE_V1`；`docs/统一判定规范.md` | 无隐式修约、full-value exact 及冻结状态 |
 
 **判级规则（来自标准原文）**：`e_d = E_d × k ÷ m`（式(1)），等级按表1/表2 的 `≤` 限值逐级判定：
 
@@ -70,7 +70,7 @@ Golden 的 expected **不是**由当前软件输出反向生成的。每一个 e
 **full-value trap**，它使用非阈值精确值 `500.00004 × 1.00 ÷ 100 = 5.0000004`。
 **13 不是数学上的最小案例数**：trap 完全可以与另一个系数案例（例如 #2 跳汰）合并为
 “同一系数、两个 E_d 输入”的形式，从而压到 12 个案例。本 Golden 选择独立成例，是因为
-trap 的 `source_type` 是 `技术判断`（依赖 `ECQ-STD-GB29446-001` 口径），而 12 个系数簇
+trap 的 `source_type` 是 `软件实现决定`（依据已采用的 Numeric v1），而 12 个系数簇
 都是 `标准原文事实` —— 把两类依据不同的期望放在同一个案例里会削弱来源可追溯性。
 这是**可读性与证据分离**的取舍，不是覆盖能力的下限。门禁同时断言“13 个正常案例”
 与“12 个系数簇”，因此压缩案例数会被立即发现。
@@ -101,7 +101,7 @@ e_d = 500.00004 × 1.00 ÷ 100 = 5.0000004
 
 若在比较前执行六位小数 `ROUND_HALF_UP`，`5.0000004` 会被抹平为 `5.000000` 而**误判 1级**。
 该案例正是用来冻结这一差异。其来源类型登记为 `技术判断`，因为它依赖的不是标准明文，
-而是 `ECQ-STD-GB29446-001` 记录的口径。
+而是项目已采用的 Numeric Contract v1（FROZEN）规定的正式比较口径。
 
 **独立复核机制**：门禁中的 `independently_derive()` 从 Definition 的 表A.1 系数与表1/表2 阈值
 重新计算 e_d 与等级，**不使用软件输出**，并与 Golden 声明的 expected 逐例比对
@@ -165,20 +165,15 @@ Golden 内含 `business_data_summary`：12 个 k、6 个等级阈值、关键 cl
 
 ---
 
-## 7. Standard Issue 的角色
+## 7. Numeric v1 的角色（2026-10-11治理来源更新）
 
-`ECQ-STD-GB29446-001`（**仍为 `PROVISIONAL`**）记录“正式比较中历史 ROUND6 缺少标准依据”。
+历史的隐式 ROUND6 是**软件实现缺陷**，已通过 Numeric v1 Full Adoption 修复；用户决定将其从`STANDARD_ISSUES_REGISTER.md`移除，不再作为对 GB 29446 原文的疑似标准问题。相关历史证据仍保留于`docs/governance/NUMERIC_V1_ADOPTION_REPORT.md`、Numeric Conformance 和迁移测试。
 
-- 本 Golden **不关闭**该问题，**不**把它写成官方解释；
-- 本 Golden 只把当前软件口径（full-value exact，无隐式修约）冻结为 **可回归的产品证据**；
-- trap 案例的 `confirmation_degree` 明确写有“**无发布机构正式解释**”，并由
-  `test_golden_does_not_claim_official_interpretation` 守护；
-- 若未来取得标准原文定位或发布机构解释，应重新评估该 Issue 与本 Golden 的 trap 案例。
+- 本 Golden 的正式比较遵循`ECQUOTA_DECIMAL_FULL_VALUE_V1`及`docs/统一判定规范.md`，而非标准问题登记号。
+- Golden 的业务expected、等级、算式、12个系数、13个正常案例及trap `5.0000004 → 2级`**全部保持不变**；本次只调整治理来源元数据和Applicability Gate。
+- `platform-lock.json`的`numeric_contract`/`numeric_profiles`状态、版本、项目Profile和判定规范中的full-value语义共同作为上游依据；若发生漂移，仍应报“Golden上游依据已变化，需要重新复核/批准”，不能静默修改expected。
+- 不声明存在官方修约解释，也不因已移除旧台账条目而放松正式全值比较或边界测试。
 
-**Applicability Gate**：Golden 加载时先核对 `standard_id` / `standard_version` /
-`standard_source_sha256` / `rule_revision` / `numeric_profile_id` /
-`ECQ-STD-GB29446-001` 当前 status。任一变化时**不报告普通业务 regression**，
-而是明确报告“**Golden 上游依据已变化，需要重新复核/批准**”。
 
 ---
 
