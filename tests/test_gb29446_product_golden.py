@@ -609,8 +609,8 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
 
     Note: 13 is **not** a mathematical minimum.  The trap could be folded into
     another coefficient case as a second E_d input.  It is kept separate because
-    its ``source_type`` is 技术判断 (it depends on the ECQ-STD-GB29446-001
-    position) while the 12 clusters are 标准原文事实; mixing two different
+    its ``source_type`` is 软件实现决定 (adopted Numeric Contract v1)
+    while the 12 clusters are 标准原文事实; mixing two different
     authority classes in one case would weaken provenance traceability.  This
     assertion pins both numbers so a silent shrink is caught.
     """
@@ -620,9 +620,9 @@ def test_normal_case_count_is_twelve_coefficient_clusters_plus_trap() -> None:
     assert len(cluster_keys) == 12, f"系数簇数量应为 12，实际 {len(cluster_keys)}"
     trap = case_by_id("gb29446-coking-full-value-trap")
     assert trap in cases
-    # The 12 clusters are 原文事实; the trap is the single 技术判断 business case.
-    technical = [case for case in cases if case["source_type"] == "技术判断"]
-    assert technical == [trap], "技术判断类正常案例应只有 full-value trap"
+    # The 12 clusters are 标准原文事实; the trap is the sole numeric-governed software decision.
+    numeric_decisions = [case for case in cases if case["source_type"] == "软件实现决定"]
+    assert numeric_decisions == [trap], "软件Numeric决定类正常案例应只有 full-value trap"
 
 
 def test_expected_sources_match_the_definition(definition: dict) -> None:
