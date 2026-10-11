@@ -90,10 +90,10 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - `D-ECQ-005` Unit Contract 仍未正式采用；
 - `D-ECQ-006` 中央 lossless XLSX numeric-cell 公共方案仍 OPEN。
 
-标准问题：
+标准问题与Numeric治理：
 
-- `ECQ-STD-GB29446-001` —— 状态 `PROVISIONAL`，见 `STANDARD_ISSUES_REGISTER.md`。
-  RS04 **未关闭**该问题，也**未**写成官方解释。
+- 当前标准问题统一以 `STANDARD_ISSUES_REGISTER.md` 为准；历史 ROUND6 是已修复的Numeric软件缺陷，原GB29446标准问题编号不再有效。
+- RS04 Golden保留正式全值比较边界案例，依赖锁定的Numeric v1 / Profile / 判定规范，不再依赖旧标准问题条目。
 
 **RS05 已修复（RS04 登记的 Release Gate）**：
 
