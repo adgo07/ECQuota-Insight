@@ -13,9 +13,12 @@ standards/mappings/
 ├── README.md
 └── GB16780-2021/
     ├── 标准映射表_用户原稿_V1_待复核.md
-    ├── 审核报告_20261011.md
-    └── DECISIONS_NEEDED.md
+    ├── 标准映射表_V1.1_修订稿.md     # 当前待实施映射
+    ├── 审核报告_20261011.md          # V1原稿审查证据
+    └── DECISIONS_NEEDED.md         # 已确认解释与Stage B/C待办
 ```
+
+**当前 GB16780 应先读 `标准映射表_V1.1_修订稿.md`，原稿仅供历史核对。**目前仅进入映射/决策阶段，未同步修改正式JSON/计算程序，也未宣告可正式支持。
 
 下一标准用同样的 `标准号-年份` 文件夹。一个标准涉及多个产品或工序时，仍按同一标准建目录，在 Mapping 内区分评价对象，避免按产品重复一套原文依据。
 
@@ -32,8 +35,10 @@ standards/mappings/
 | `standards/development/scope-63/` | 开发标准定义/规则 JSON 快照，不用来存放未审定 Mapping |
 | `data/definitions/` | 已发布标准定义，绝不由 Mapping 草稿自动覆盖 |
 | `knowledge/` | 专业解释，不能代替 Standard / Rule |
-| `STANDARD_ISSUES_REGISTER.md` | 疑似笔误、条款歧义、缺失及实现争议的稳定编号登记 |
+| `STANDARD_ISSUES_REGISTER.md` | 标准**原文本身**的笔误、歧义和冲突固定台账；不把已修复的软件缺陷作为标准问题登记 |
 
 依据：中央 `docs/governance/STANDARD_DEVELOPMENT_GUIDE_V0.1.md`（ACTIVE / EVOLVING）。
 
 **注意：原始国家标准 PDF 依仓库已有来源管理流程独立保管，不直接在本目录提交原文 PDF。**
+
+**台账执行约定（自2026-10-11起）**：每新增一个标准，Mapping中的原文疑义先检查仓库根目录 `STANDARD_ISSUES_REGISTER.md` 是否已有相同问题，再按稳定编号记录“原文事实/技术解释/用户软件决定/官方确认程度/当前实施状态/测试关联”。单纯软件设计取舍写在Mapping或决策文件，不强制登记标准问题，也不为填表制造编号。
