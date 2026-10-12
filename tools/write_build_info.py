@@ -98,6 +98,8 @@ EMBEDDED_IDENTITY_RELATIVE_PATH = Path("_internal/uebench/resources/build-identi
 #: CI provenance check both rely on them.
 REQUIRED_BUILD_INFO_KEYS: tuple[str, ...] = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -111,6 +113,8 @@ REQUIRED_BUILD_INFO_KEYS: tuple[str, ...] = (
 #: The embedded identity: the same provenance minus ``payload_tree_sha256``.
 IDENTITY_KEYS: tuple[str, ...] = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -126,6 +130,7 @@ IDENTITY_KEYS: tuple[str, ...] = (
 #: deliberately not listed in ``SHA256SUMS.txt``, because a document that names
 #: the assembly cannot be part of what it describes.
 ACTIVE_MARKER_NAME = "ACTIVE-CANDIDATE.json"
+ACTIVE_RELEASE_MARKER_NAME = "ACTIVE-RELEASE.json"
 
 SOURCE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -321,6 +326,8 @@ def build_info(
     *,
     built_at: str | None = None,
     candidate_id: str | None = None,
+    build_channel: str = "candidate",
+    release_tag: str | None = None,
     commit: str | None = None,
     dirty: bool | None = None,
     payload_tree_sha256: str | None = None,
@@ -345,8 +352,10 @@ def build_info(
         "schema": SCHEMA,
         "version": version,
         "built_at": timestamp,
-        # --- Candidate provenance (ECQ-RS05) -------------------------------
+        # --- Candidate / formal release provenance (ECQ-RS05) --------------
         "product_version": version,
+        "build_channel": build_channel,
+        "release_tag": release_tag,
         "candidate_id": candidate_id,
         "source_commit": commit,
         "source_dirty": bool(dirty),
@@ -402,6 +411,8 @@ def active_candidate_document(info: dict[str, Any]) -> dict[str, Any]:
         "schema": ACTIVE_SCHEMA,
         "status": "ACTIVE",
         "candidate_id": info.get("candidate_id"),
+        "build_channel": info.get("build_channel"),
+        "release_tag": info.get("release_tag"),
         "product_version": info.get("product_version"),
         "source_commit": info.get("source_commit"),
         "source_dirty": info.get("source_dirty"),
@@ -411,6 +422,37 @@ def active_candidate_document(info: dict[str, Any]) -> dict[str, Any]:
         "payload_tree_sha256": info.get("payload_tree_sha256"),
         "assembled_at_utc": info.get("build_time_utc"),
     }
+
+
+def active_release_document(info: dict[str, Any]) -> dict[str, Any]:
+    """The formal-release marker for the exact tag, source and payload assembled."""
+    return {
+        "schema": "ecq.active-release.v1",
+        "status": "ACTIVE",
+        "build_channel": info.get("build_channel"),
+        "release_tag": info.get("release_tag"),
+        "candidate_id": info.get("candidate_id"),
+        "product_version": info.get("product_version"),
+        "source_commit": info.get("source_commit"),
+        "source_dirty": info.get("source_dirty"),
+        "standard_package_id": info.get("standard_package_id"),
+        "standard_data_version": info.get("standard_data_version"),
+        "standard_package_sha256": info.get("standard_package_sha256"),
+        "payload_tree_sha256": info.get("payload_tree_sha256"),
+        "assembled_at_utc": info.get("build_time_utc"),
+    }
+
+
+def _active_release_marker_problems(marker: dict[str, Any]) -> list[str]:
+    problems = []
+    if marker.get("build_channel") != "formal-release":
+        problems.append("build_channel 必须为 formal-release")
+    if marker.get("candidate_id") is not None:
+        problems.append("正式发布的 candidate_id 必须为 null")
+    if marker.get("release_tag") != f"v{marker.get('product_version')}":
+        problems.append("release_tag 必须与 product_version 一致")
+    problems.extend(_active_marker_problems(marker))
+    return problems
 
 
 def _active_marker_problems(marker: dict[str, Any]) -> list[str]:
@@ -437,14 +479,31 @@ def write_json(path: Path, payload: dict[str, Any]) -> Path:
 
 
 def _identity_is_traceable(identity: dict[str, Any]) -> list[str]:
-    """Problems that make an embedded identity useless for traceability."""
+    """Problems that make an embedded Candidate or formal-release identity untraceable."""
     problems: list[str] = []
-    if not identity.get("product_version"):
+    version = identity.get("product_version")
+    channel = identity.get("build_channel")
+    candidate = identity.get("candidate_id")
+    release_tag = identity.get("release_tag")
+    commit = identity.get("source_commit")
+
+    if not version:
         problems.append("product_version 为空")
-    if not identity.get("candidate_id"):
-        problems.append("candidate_id 为空（必须由 --source-commit/--candidate-id 提供）")
-    if not SOURCE_COMMIT_RE.match(str(identity.get("source_commit") or "")):
+    if not SOURCE_COMMIT_RE.match(str(commit or "")):
         problems.append("source_commit 不是 40 位小写十六进制")
+    if channel == "candidate":
+        if not isinstance(candidate, str) or candidate != f"rc-{str(commit)[:7]}":
+            problems.append("Candidate 身份必须是与 source_commit 前缀一致的 rc-<7位 SHA>")
+        if release_tag is not None:
+            problems.append("Candidate 的 release_tag 必须为 null")
+    elif channel == "formal-release":
+        if candidate is not None:
+            problems.append("正式发布的 candidate_id 必须为 null")
+        if release_tag != f"v{version}":
+            problems.append("正式发布的 release_tag 必须与产品版本一致（v<version>）")
+    else:
+        problems.append("build_channel 必须是 candidate 或 formal-release")
+
     if not SHA256_RE.match(str(identity.get("standard_package_sha256") or "")):
         problems.append("standard_package_sha256 不是 64 位小写十六进制")
     return problems
@@ -483,12 +542,25 @@ def main(argv: list[str] | None = None) -> int:
         help=f"ACTIVE-CANDIDATE.json（{ACTIVE_MARKER_NAME}）写入路径；仅用于已装配完成的候选目录",
     )
     parser.add_argument(
+        "--active-release-marker",
+        type=Path,
+        default=None,
+        help=f"ACTIVE-RELEASE.json（{ACTIVE_RELEASE_MARKER_NAME}）写入路径；仅用于已装配完成的正式发布目录",
+    )
+    parser.add_argument(
         "--payload-manifest",
         type=Path,
         default=None,
         help="payload-manifest.json 路径；用于记录 payload_tree_sha256",
     )
     parser.add_argument("--candidate-id", default=None, help="候选标识 rc-<7位提交前缀>")
+    parser.add_argument(
+        "--build-channel",
+        choices=("candidate", "formal-release"),
+        default="candidate",
+        help="构建通道；正式发布必须同时提供 --release-tag v<product-version>",
+    )
+    parser.add_argument("--release-tag", default=None, help="正式发布 Git tag，例如 v0.2.0")
     parser.add_argument("--source-commit", default=None, help="源提交 SHA（40 位十六进制）")
     parser.add_argument("--built-at", default=None, help="构建时间（UTC，默认当前时间）")
     parser.add_argument(
@@ -508,6 +580,7 @@ def main(argv: list[str] | None = None) -> int:
         and args.identity_output is None
         and args.payload_dir is None
         and args.active_marker is None
+        and args.active_release_marker is None
     ):
         print(
             "必须至少指定 --output、--payload-dir/--identity-output 或 --active-marker。",
@@ -522,8 +595,24 @@ def main(argv: list[str] | None = None) -> int:
             return 2
 
     try:
-        candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
         commit = verified_source_commit(args.source_commit)
+        if args.build_channel == "formal-release":
+            expected_tag = f"v{project_version()}"
+            if args.candidate_id:
+                raise ValueError("正式发布不得指定 --candidate-id。")
+            if args.release_tag != expected_tag:
+                raise ValueError(
+                    f"正式发布 tag 必须是 {expected_tag}，实际：{args.release_tag!r}"
+                )
+            candidate = None
+        else:
+            if args.release_tag:
+                raise ValueError("Candidate 构建不得指定 --release-tag。")
+            candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
+        if args.active_marker is not None and args.build_channel != "candidate":
+            raise ValueError("--active-marker 仅适用于 Candidate 构建。")
+        if args.active_release_marker is not None and args.build_channel != "formal-release":
+            raise ValueError("--active-release-marker 仅适用于正式发布。")
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -552,6 +641,8 @@ def main(argv: list[str] | None = None) -> int:
         names,
         built_at=timestamp,
         candidate_id=candidate,
+        build_channel=args.build_channel,
+        release_tag=args.release_tag,
         commit=commit,
         dirty=dirty,
         payload_tree_sha256=tree_sha256,
@@ -587,7 +678,7 @@ def main(argv: list[str] | None = None) -> int:
             print(
                 "内嵌构建标识不完整，拒绝写入："
                 + "；".join(problems)
-                + "。请提供 --source-commit 与 --candidate-id。",
+                + "。Candidate 请提供 --source-commit；正式发布请提供 --source-commit 与 --release-tag。",
                 file=sys.stderr,
             )
             return 1
@@ -609,6 +700,19 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         write_json(args.active_marker, marker)
         print(f"wrote {args.active_marker}")
+
+    if args.active_release_marker is not None:
+        marker = active_release_document(info)
+        problems = _active_release_marker_problems(marker)
+        if problems:
+            print(
+                f"拒绝写入 {ACTIVE_RELEASE_MARKER_NAME}（ACTIVE 正式发布声明不完整）："
+                + "；".join(problems),
+                file=sys.stderr,
+            )
+            return 1
+        write_json(args.active_release_marker, marker)
+        print(f"wrote {args.active_release_marker}")
 
     return 0
 

@@ -410,3 +410,16 @@ def test_cli_print_and_names_agree_with_the_module(
     assert release_version.main(["--names"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload == release_version.artifact_names(version)
+
+
+def test_formal_release_names_do_not_derive_a_candidate_suffix(
+    release_version: ModuleType, version: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source_commit = "0123456789abcdef0123456789abcdef01234567"
+    assert release_version.main(
+        ["--names", "--source-commit", source_commit, "--formal-release"]
+    ) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload == release_version.artifact_names(version)
+    assert "-rc-" not in payload["portable"]
+    assert "-rc-" not in payload["installer"]

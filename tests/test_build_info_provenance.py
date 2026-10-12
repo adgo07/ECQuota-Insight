@@ -42,6 +42,8 @@ TREE_SHA256 = "c" * 64
 
 REQUIRED_BUILD_INFO_KEYS = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -54,6 +56,8 @@ REQUIRED_BUILD_INFO_KEYS = (
 
 IDENTITY_KEYS = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -126,6 +130,8 @@ def test_build_info_contains_the_full_provenance(
 
     assert info["product_version"] == version
     assert info["version"] == version, "旧字段 version 必须与 product_version 一致"
+    assert info["build_channel"] == "candidate"
+    assert info["release_tag"] is None
     assert info["candidate_id"] == CANDIDATE
     assert COMMIT_RE.match(info["source_commit"]), info["source_commit"]
     assert info["source_dirty"] is False
@@ -180,6 +186,8 @@ def test_embedded_identity_has_the_contract_keys(
         "内嵌标识位于 payload 内，不能包含描述该 payload 的 payload_tree_sha256"
     )
     assert identity["product_version"] == version
+    assert identity["build_channel"] == "candidate"
+    assert identity["release_tag"] is None
     assert identity["candidate_id"] == CANDIDATE
     assert identity["source_commit"] == COMMIT
     assert identity["source_dirty"] is False
@@ -219,6 +227,8 @@ def test_active_marker_document_matches_the_contract(
         "schema",
         "status",
         "candidate_id",
+        "build_channel",
+        "release_tag",
         "product_version",
         "source_commit",
         "source_dirty",
@@ -425,6 +435,71 @@ def test_clean_tree_passes_the_formal_run(
     info = json.loads(output.read_text(encoding="utf-8"))
     assert info["source_dirty"] is False
     assert info["payload_tree_sha256"] == TREE_SHA256
+
+
+def test_formal_release_identity_binds_tag_source_payload_and_active_marker(
+    write_build_info: ModuleType,
+    release_version: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    version: str,
+) -> None:
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
+    monkeypatch.setattr(write_build_info, "source_dirty", lambda root=None: False)
+    names = release_version.artifact_names(version)
+    manifest = _manifest_file(tmp_path, names, TREE_SHA256)
+    output = tmp_path / names["build_info"]
+    payload = tmp_path / "payload"
+    marker = tmp_path / "ACTIVE-RELEASE.json"
+
+    rc = write_build_info.main(
+        [
+            "--names", json.dumps(names),
+            "--output", str(output),
+            "--payload-manifest", str(manifest),
+            "--payload-dir", str(payload),
+            "--active-release-marker", str(marker),
+            "--source-commit", COMMIT,
+            "--build-channel", "formal-release",
+            "--release-tag", f"v{version}",
+            "--built-at", BUILT_AT,
+            "--require-clean",
+        ]
+    )
+    assert rc == 0
+    info = json.loads(output.read_text(encoding="utf-8"))
+    identity = json.loads(
+        (payload / "_internal/uebench/resources/build-identity.json").read_text(encoding="utf-8")
+    )
+    active = json.loads(marker.read_text(encoding="utf-8"))
+    assert info["build_channel"] == identity["build_channel"] == active["build_channel"] == "formal-release"
+    assert info["release_tag"] == identity["release_tag"] == active["release_tag"] == f"v{version}"
+    assert info["candidate_id"] is identity["candidate_id"] is active["candidate_id"] is None
+    assert info["source_commit"] == identity["source_commit"] == active["source_commit"] == COMMIT
+    assert info["source_dirty"] is identity["source_dirty"] is active["source_dirty"] is False
+    assert info["payload_tree_sha256"] == active["payload_tree_sha256"] == TREE_SHA256
+
+
+def test_formal_release_rejects_a_tag_that_does_not_match_product_version(
+    write_build_info: ModuleType,
+    release_version: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    version: str,
+) -> None:
+    monkeypatch.setattr(write_build_info, "source_commit", lambda root=None: COMMIT)
+    names = release_version.artifact_names(version)
+    rc = write_build_info.main(
+        [
+            "--names", json.dumps(names),
+            "--output", str(tmp_path / names["build_info"]),
+            "--source-commit", COMMIT,
+            "--build-channel", "formal-release",
+            "--release-tag", f"v{version}-rc-1",
+        ]
+    )
+    assert rc == 2
+    assert not (tmp_path / names["build_info"]).exists()
 
 
 def test_embedded_identity_is_written_to_the_payload_before_the_manifest(
@@ -756,9 +831,13 @@ def _build_release_dir(
     # ECQ-RS05 溯源：候选必须在**载荷内部**携带完整身份，否则外部声明可被单独
     # 改写而不被发现。这里的字段必须与下面写出的 release-build-info.json 一致。
     package_bytes = _standard_package_bytes()
+    build_channel = "candidate" if candidate_id is not None else "formal-release"
+    release_tag = None if candidate_id is not None else f"v{version}"
     embedded_identity = {
         "schema": "ecq.build-identity.v1",
         "product_version": version,
+        "build_channel": build_channel,
+        "release_tag": release_tag,
         "candidate_id": candidate_id,
         "source_commit": COMMIT,
         "source_dirty": False,
@@ -808,6 +887,8 @@ def _build_release_dir(
         "version": version,
         "built_at": BUILT_AT,
         "product_version": version,
+        "build_channel": build_channel,
+        "release_tag": release_tag,
         "candidate_id": candidate_id,
         "source_commit": COMMIT,
         "source_dirty": False,
@@ -845,6 +926,25 @@ def _build_release_dir(
         data = (root / name).read_bytes()
         lines.append(f"{_sha256(data)}  {name}")
     (root / names["sha256sums"]).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    marker_name = "ACTIVE-CANDIDATE.json" if candidate_id is not None else "ACTIVE-RELEASE.json"
+    marker_schema = "ecq.active-candidate.v1" if candidate_id is not None else "ecq.active-release.v1"
+    marker = {
+        "schema": marker_schema,
+        "status": "ACTIVE",
+        "build_channel": build_channel,
+        "release_tag": release_tag,
+        "candidate_id": candidate_id,
+        "product_version": version,
+        "source_commit": COMMIT,
+        "source_dirty": False,
+        "standard_package_id": "pkg-synthetic",
+        "standard_data_version": "2026.10-published.3",
+        "standard_package_sha256": _sha256(package_bytes),
+        "payload_tree_sha256": tree_sha256,
+        "assembled_at_utc": BUILT_AT,
+    }
+    (root / marker_name).write_text(json.dumps(marker, ensure_ascii=False, indent=2), encoding="utf-8")
     return root
 
 
@@ -1026,6 +1126,37 @@ def test_audit_accepts_a_formal_release_directory_without_an_identity(
     assert report["valid"] is True, report["errors"]
     assert report["candidate_id"] is None
     assert (root / f"UEBench-{version}-win-x64.zip").is_file()
+    assert (root / "ACTIVE-RELEASE.json").is_file()
+
+
+def test_formal_release_audit_rejects_a_missing_active_marker(
+    audit_release: ModuleType,
+    release_version: ModuleType,
+    version: str,
+    tmp_path: Path,
+) -> None:
+    root = _build_release_dir(
+        tmp_path / "release", release_version, version, candidate_id=None
+    )
+    (root / "ACTIVE-RELEASE.json").unlink()
+    report = audit_release.audit_release(root)
+    assert report["valid"] is False
+    assert any("ACTIVE-RELEASE.json" in error for error in report["errors"])
+
+
+def test_formal_release_audit_binds_exact_version_tag(
+    audit_release: ModuleType,
+    release_version: ModuleType,
+    version: str,
+    tmp_path: Path,
+) -> None:
+    root = _build_release_dir(
+        tmp_path / "release", release_version, version, candidate_id=None,
+        build_info_overrides={"release_tag": f"v{version}-rc-1"},
+    )
+    report = audit_release.audit_release(root)
+    assert report["valid"] is False
+    assert any("release_tag" in error for error in report["errors"])
 
 
 def test_audit_required_files_follow_the_candidate_identity(

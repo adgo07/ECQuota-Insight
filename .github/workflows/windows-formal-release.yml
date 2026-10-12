@@ -1,0 +1,134 @@
+name: Windows Formal Release
+
+# Build and upload formal user assets only after the owner publishes the matching tag.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  formal-release:
+    if: github.event.release.prerelease == false
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out the published tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.13 x64
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          architecture: x64
+          cache: pip
+
+      - name: Install pinned dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+
+      - name: Verify tag, clean source and formal names
+        id: release
+        shell: pwsh
+        run: |
+          $event = Get-Content -LiteralPath $env:GITHUB_EVENT_PATH -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($event.release.draft -ne $false -or $event.release.prerelease -ne $false) { throw "仅接受已发布的正式 GitHub Release。" }
+          $tag = [string]$event.release.tag_name
+          $version = (python tools/release_version.py --print).Trim()
+          if ($tag -cne "v$version") { throw "Release tag 必须严格匹配产品版本 v$version，实际：$tag" }
+          git fetch origin main --quiet
+          if ($LASTEXITCODE -ne 0) { throw "无法读取 origin/main。" }
+          $head = (git rev-parse HEAD).Trim()
+          $tagCommit = (git rev-parse "refs/tags/$($tag)^{commit}").Trim()
+          $main = (git rev-parse refs/remotes/origin/main).Trim()
+          if ($head -cne $tagCommit) { throw "检出 HEAD 与发布 tag 指向不一致：$head / $tagCommit" }
+          if ($head -notmatch '^[0-9a-f]{40}$') { throw "HEAD 不是完整 40 位 SHA：$head" }
+          git merge-base --is-ancestor $head refs/remotes/origin/main
+          if ($LASTEXITCODE -ne 0) { throw "发布 tag 必须指向当前 origin/main 历史中的提交。" }
+          $status = @(git status --porcelain)
+          if ($LASTEXITCODE -ne 0 -or $status.Count -ne 0) { throw "正式发布构建工作区必须干净。" }
+          $namesJson = (python tools/release_version.py --names --source-commit $head --formal-release) -join [Environment]::NewLine
+          if ($LASTEXITCODE -ne 0) { throw "无法推导正式无后缀文件名。" }
+          $names = $namesJson | ConvertFrom-Json
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "release_tag=$tag" >> $env:GITHUB_OUTPUT
+          "source_commit=$head" >> $env:GITHUB_OUTPUT
+          foreach ($key in @("portable", "installer", "sha256sums", "release_notes")) { "$key=$($names.$key)" >> $env:GITHUB_OUTPUT }
+          "names<<NAMES_EOF" >> $env:GITHUB_OUTPUT
+          $namesJson >> $env:GITHUB_OUTPUT
+          "NAMES_EOF" >> $env:GITHUB_OUTPUT
+          Write-Host "Formal release: $tag / source $head / main $main"
+          Write-Host "Portable: $($names.portable)"
+          Write-Host "Installer: $($names.installer)"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $candidates = @("C:\Program Files (x86)\Inno Setup 6\ISCC.exe", "C:\Program Files\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe")
+          $iscc = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+          if (-not $iscc) { $iscc = (Get-ChildItem -Path "C:\Program Files (x86)","C:\Program Files" -Recurse -Filter ISCC.exe -ErrorAction SilentlyContinue | Select-Object -First 1).FullName }
+          if (-not $iscc) { throw "未找到 Inno Setup 6 编译器 ISCC.exe" }
+          Split-Path -Parent $iscc >> $env:GITHUB_PATH
+
+      - name: Run release Source Gate
+        shell: pwsh
+        run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py tests/test_formal_release_workflow.py -q -ra -p no:cacheprovider
+
+      - name: Build and verify the formal Windows release
+        shell: pwsh
+        env:
+          NAMES_JSON: ${{ steps.release.outputs.names }}
+        run: |
+          scripts/build_candidate.ps1 -FormalRelease -ReleaseTag "${{ steps.release.outputs.release_tag }}" -PythonExe "$env:pythonLocation\python.exe" -NamesJson $env:NAMES_JSON -OutputDir "dist/formal-release"
+          if ($LASTEXITCODE -ne 0) { throw "正式发布构建失败（含 literal full suite、EXE self-check 与 Artifact Gate）。" }
+
+      - name: Verify release provenance and official assets
+        shell: pwsh
+        env:
+          EXPECTED_TAG: ${{ steps.release.outputs.release_tag }}
+          EXPECTED_COMMIT: ${{ steps.release.outputs.source_commit }}
+          PORTABLE: ${{ steps.release.outputs.portable }}
+          INSTALLER: ${{ steps.release.outputs.installer }}
+          SHA256SUMS: ${{ steps.release.outputs.sha256sums }}
+          RELEASE_NOTES: ${{ steps.release.outputs.release_notes }}
+        run: |
+          $info = Get-Content -LiteralPath "dist/formal-release/release-build-info.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          $marker = Get-Content -LiteralPath "dist/formal-release/ACTIVE-RELEASE.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          $manifest = Get-Content -LiteralPath "dist/formal-release/payload-manifest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          if ($info.build_channel -cne "formal-release" -or $info.release_tag -cne $env:EXPECTED_TAG -or $null -ne $info.candidate_id) { throw "正式 build-info 的 channel/tag/candidate_id 不正确。" }
+          if ($info.source_commit -cne $env:EXPECTED_COMMIT -or $info.source_dirty -ne $false) { throw "正式 build-info 未绑定精确干净 source SHA。" }
+          if ($info.standard_data_version -cne "2026.10-published.4") { throw "标准库版本错误：$($info.standard_data_version)" }
+          if ($info.payload_tree_sha256 -cne $manifest.payload_tree_sha256 -or $marker.payload_tree_sha256 -cne $manifest.payload_tree_sha256 -or $marker.source_commit -cne $info.source_commit -or $marker.release_tag -cne $env:EXPECTED_TAG) { throw "正式包、活动标记与 payload manifest 身份不一致。" }
+          $releaseDir = "dist/formal-release"
+          $sums = Get-Content -LiteralPath (Join-Path $releaseDir $env:SHA256SUMS) -Encoding UTF8
+          foreach ($asset in @($env:PORTABLE, $env:INSTALLER, $env:RELEASE_NOTES)) {
+            $line = $sums | Where-Object { $_ -match ("  " + [regex]::Escape($asset) + "$") } | Select-Object -First 1
+            if (-not $line) { throw "SHA256SUMS 缺少正式用户资产：$asset" }
+            $expectedHash = ($line -split '\s+')[0].ToLowerInvariant()
+            $actualHash = (Get-FileHash -LiteralPath (Join-Path $releaseDir $asset) -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actualHash -cne $expectedHash) { throw "正式资产哈希不匹配：$asset" }
+          }
+          if (@(Get-ChildItem -LiteralPath $releaseDir -Filter *.pdf -File -Recurse).Count -gt 0) { throw "普通用户交付目录不得包含标准 PDF。" }
+          Write-Host "Verified: $($info.release_tag) source=$($info.source_commit) package=$($info.standard_data_version) payload=$($info.payload_tree_sha256)"
+
+      - name: Upload formal user assets to the published GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          PORTABLE: ${{ steps.release.outputs.portable }}
+          INSTALLER: ${{ steps.release.outputs.installer }}
+          SHA256SUMS: ${{ steps.release.outputs.sha256sums }}
+          RELEASE_NOTES: ${{ steps.release.outputs.release_notes }}
+        run: |
+          gh release upload $env:RELEASE_TAG "dist/formal-release/$env:INSTALLER" "dist/formal-release/$env:PORTABLE" "dist/formal-release/$env:SHA256SUMS" "dist/formal-release/$env:RELEASE_NOTES" --clobber
+          if ($LASTEXITCODE -ne 0) { throw "正式用户资产上传失败。" }

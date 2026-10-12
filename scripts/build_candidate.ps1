@@ -6,6 +6,8 @@ param(
     [switch]$SkipDevelopmentManifestCheck,
     [string]$SourceCommit,
     [string]$CandidateId,
+    [switch]$FormalRelease,
+    [string]$ReleaseTag,
     [switch]$AllowDirty
 )
 
@@ -64,10 +66,9 @@ function Resolve-PythonExecutable {
 $PythonExe = Resolve-PythonExecutable -Explicit $PythonExe -Root $ProjectRoot
 Write-Host "使用 Python：$PythonExe"
 
-# --- ECQ-RS05 candidate identity / provenance --------------------------------
-# The product version alone cannot tell two Candidates apart: every artifact
-# name and the embedded build identity carry rc-<commit prefix>, and a Candidate
-# that claims to be formal must come from a clean checkout.
+# --- ECQ-RS05 build identity / provenance ------------------------------------
+# Candidate artifacts carry rc-<commit prefix>; formal release artifacts carry
+# the matching version tag. Both channels bind identity to a clean exact HEAD.
 function Resolve-SourceCommit {
     # ECQ-RS05 发布溯源：显式提交**只能确认**当前 HEAD，不能替换它。
     # 旧实现让 -SourceCommit 直接覆盖 git rev-parse HEAD，于是可以在一棵干净的
@@ -107,32 +108,48 @@ function Test-SourceDirty {
 }
 
 $SourceCommit = Resolve-SourceCommit -Explicit $SourceCommit -Root $ProjectRoot
+$Version = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --print).Trim()
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($Version)) { throw "无法从 tools/release_version.py 取得产品版本。" }
+if ($FormalRelease -and $AllowDirty) { throw "正式发布不能使用 -AllowDirty。" }
 if (Test-SourceDirty -Root $ProjectRoot) {
     if (-not $AllowDirty) {
-        throw "工作区存在未提交改动，拒绝正式候选构建（source_dirty 必须为 false）。请先提交或清理改动；仅本地实验可使用 -AllowDirty。"
+        throw "工作区存在未提交改动，拒绝正式构建（source_dirty 必须为 false）。请先提交或清理改动；仅本地实验可使用 -AllowDirty。"
     }
     Write-Warning "工作区存在未提交改动：本构建仅用于本地实验，不可作为正式候选交付。"
 }
-if ([string]::IsNullOrWhiteSpace($CandidateId)) {
-    $CandidateId = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --source-commit $SourceCommit --print-candidate-id).Trim()
-    if ($LASTEXITCODE -ne 0) { throw "无法由源提交推导候选标识。" }
+$BuildChannel = "candidate"
+if ($FormalRelease) {
+    if (-not [string]::IsNullOrWhiteSpace($CandidateId)) { throw "正式发布不能指定 -CandidateId。" }
+    $ExpectedTag = "v$Version"
+    if ([string]::IsNullOrWhiteSpace($ReleaseTag) -or $ReleaseTag -cne $ExpectedTag) {
+        throw "正式发布必须使用与产品版本一致的 tag：$ExpectedTag。"
+    }
+    $BuildChannel = "formal-release"
+    $CandidateId = $null
 }
 else {
-    $CandidateId = $CandidateId.Trim()
+    if (-not [string]::IsNullOrWhiteSpace($ReleaseTag)) { throw "Candidate 构建不能指定 -ReleaseTag。" }
+    if ([string]::IsNullOrWhiteSpace($CandidateId)) {
+        $CandidateId = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --source-commit $SourceCommit --print-candidate-id).Trim()
+        if ($LASTEXITCODE -ne 0) { throw "无法由源提交推导候选标识。" }
+    }
+    else { $CandidateId = $CandidateId.Trim() }
 }
 Write-Host "源提交：$SourceCommit"
-Write-Host "候选标识：$CandidateId"
+Write-Host "构建通道：$BuildChannel"
+if ($CandidateId) { Write-Host "候选标识：$CandidateId" }
+if ($ReleaseTag) { Write-Host "正式发布 tag：$ReleaseTag" }
 
 # --- version source of truth (never hard-coded) ------------------------------
 $RequiredNameKeys = @("portable", "installer", "source", "standard_package", "template", "sha256sums",
     "payload_manifest", "build_info", "helper_ps1", "helper_cmd", "release_notes", "delivery_list")
-$Version = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --print).Trim()
-if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($Version)) {
-    throw "无法从 tools/release_version.py 取得产品版本。"
+if ($FormalRelease) {
+    $NamesFromTool = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --names --source-commit $SourceCommit --formal-release) -join [Environment]::NewLine
 }
-$NamesFromTool = ((& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --names `
-            --source-commit $SourceCommit --candidate-id $CandidateId) -join "`n")
-if ($LASTEXITCODE -ne 0) { throw "无法取得候选产物文件名。" }
+else {
+    $NamesFromTool = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --names --source-commit $SourceCommit --candidate-id $CandidateId) -join [Environment]::NewLine
+}
+if ($LASTEXITCODE -ne 0) { throw "无法取得产物文件名。" }
 $NamesJsonResolved = if ([string]::IsNullOrWhiteSpace($NamesJson)) { $NamesFromTool } else { $NamesJson }
 $Names = $NamesJsonResolved | ConvertFrom-Json
 $NamesTool = $NamesFromTool | ConvertFrom-Json
@@ -149,12 +166,13 @@ foreach ($Key in $RequiredNameKeys) {
 Write-Host "产品版本：$Version"
 
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
-    $OutputDir = Join-Path $ProjectRoot ("dist\candidate-{0}" -f $Version)
+    $OutputFolder = if ($FormalRelease) { "dist\formal-release-{0}" -f $Version } else { "dist\candidate-{0}" -f $Version }
+    $OutputDir = Join-Path $ProjectRoot $OutputFolder
 }
 $Release = [IO.Path]::GetFullPath($OutputDir)
 $ProjectPrefix = $ProjectRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if (-not $Release.StartsWith($ProjectPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Candidate 目录必须位于项目目录内：$Release"
+    throw "发布目录必须位于项目目录内：$Release"
 }
 
 # --- Gates before building ---------------------------------------------------
@@ -193,7 +211,7 @@ if (-not (Test-Path -LiteralPath $PayloadDir -PathType Container)) {
     throw "PyInstaller 未产出 payload 目录：$PayloadDir"
 }
 
-# Run the packaged executable self-check before assembling the Candidate.
+# Run the packaged executable self-check before assembling either channel.
 # This validates the frozen EXE with its bundled key and standard library,
 # using an isolated database instead of the developer's user data.
 $SelfCheckRoot = Join-Path (Join-Path $ProjectRoot "work") ("candidate-self-check-" + [guid]::NewGuid().ToString("N"))
@@ -245,16 +263,18 @@ finally {
 
 # ECQ-RS05 §11: the embedded build identity must exist in the payload BEFORE the
 # payload manifest is generated, so the manifest covers and hashes it.  One
-# build timestamp is shared with release-build-info.json and ACTIVE-CANDIDATE.json
-# so the three documents cannot disagree.
+# build timestamp is shared by the payload identity and external build/ACTIVE
+# documents so the provenance documents cannot disagree.
 $BuildTimeUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 $IdentityArgs = @(
     "--names", $NamesFromTool,
     "--payload-dir", $PayloadDir,
     "--source-commit", $SourceCommit,
-    "--candidate-id", $CandidateId,
+    "--build-channel", $BuildChannel,
     "--built-at", $BuildTimeUtc
 )
+if ($FormalRelease) { $IdentityArgs += @("--release-tag", $ReleaseTag) }
+else { $IdentityArgs += @("--candidate-id", $CandidateId) }
 if ($AllowDirty) { $IdentityArgs += "--allow-dirty" } else { $IdentityArgs += "--require-clean" }
 & $PythonExe (Join-Path $ProjectRoot "tools\write_build_info.py") @IdentityArgs
 if ($LASTEXITCODE -ne 0) { throw "内嵌构建标识写入失败（payload 不可追溯）。" }
@@ -280,10 +300,15 @@ if (-not $Iscc) {
 }
 if (-not $Iscc) { throw "未找到 Inno Setup 6 编译器 ISCC.exe" }
 Write-Host "使用 Inno Setup 编译器：$Iscc"
-Write-Host "安装程序候选后缀：-$CandidateId"
-# The Candidate identity reaches the installer as an Inno preprocessor symbol,
-# never through version.iss (which must stay commit-independent).
-& $Iscc "/DMyAppCandidateSuffix=-$CandidateId" (Join-Path $ProjectRoot "packaging\installer.iss")
+if ($FormalRelease) {
+    Write-Host "正式安装程序使用无 RC 后缀命名。"
+    & $Iscc (Join-Path $ProjectRoot "packaging\installer.iss")
+}
+else {
+    Write-Host "安装程序候选后缀：-$CandidateId"
+    # Candidate identity reaches the installer as an Inno symbol, never through version.iss.
+    & $Iscc "/DMyAppCandidateSuffix=-$CandidateId" (Join-Path $ProjectRoot "packaging\installer.iss")
+}
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup 安装程序构建失败。" }
 $Installer = Join-Path $ProjectRoot "dist\installer" $Names.installer
 if (-not (Test-Path -LiteralPath $Installer -PathType Leaf)) {
@@ -304,7 +329,7 @@ if ($ProtectedTargets -contains $Release) {
     throw "拒绝清空受保护目录：$Release"
 }
 if (Test-Path -LiteralPath $Release) {
-    Write-Host "清空候选目录（防止旧构建产物混入）：$Release"
+    Write-Host "清空候选目录/正式发布目录（防止旧构建产物混入）：$Release"
     Get-ChildItem -LiteralPath $Release -Force | ForEach-Object {
         Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction Stop
     }
@@ -368,10 +393,17 @@ foreach ($Helper in @($Names.helper_ps1, $Names.helper_cmd)) {
 }
 
 # 6) Build information (full provenance + unsigned-release declaration).
-& $PythonExe (Join-Path $ProjectRoot "tools\write_build_info.py") `
-    --names $NamesFromTool --output (Join-Path $Release $Names.build_info) `
-    --payload-manifest (Join-Path $Release $Names.payload_manifest) `
-    --source-commit $SourceCommit --candidate-id $CandidateId --built-at $BuildTimeUtc
+$BuildInfoArgs = @(
+    "--names", $NamesFromTool,
+    "--output", (Join-Path $Release $Names.build_info),
+    "--payload-manifest", (Join-Path $Release $Names.payload_manifest),
+    "--source-commit", $SourceCommit,
+    "--build-channel", $BuildChannel,
+    "--built-at", $BuildTimeUtc
+)
+if ($FormalRelease) { $BuildInfoArgs += @("--release-tag", $ReleaseTag) }
+else { $BuildInfoArgs += @("--candidate-id", $CandidateId) }
+& $PythonExe (Join-Path $ProjectRoot "tools\write_build_info.py") @BuildInfoArgs
 if ($LASTEXITCODE -ne 0) { throw "构建信息生成失败。" }
 
 # 7) SHA256SUMS over every required artifact.
@@ -402,18 +434,25 @@ $HashLines = foreach ($Name in $HashNames) {
 #    也不运行 Artifact Gate（它必然因 source_dirty=true 失败），只是让开发者拿到
 #    一份可检查的产物。正式构建（CI）从不传 -AllowDirty。
 if ($AllowDirty) {
-    Write-Warning "本地实验模式（-AllowDirty）：不写 ACTIVE-CANDIDATE.json，也不运行 Artifact Gate；$Release 不可作为正式候选交付。"
+    Write-Warning "本地实验模式（-AllowDirty）：不写 ACTIVE 标记，也不运行 Artifact Gate；$Release 不可作为交付。"
 }
 else {
-    $ActiveMarker = Join-Path $Release "ACTIVE-CANDIDATE.json"
-    & $PythonExe (Join-Path $ProjectRoot "tools\write_build_info.py") `
-        --names $NamesFromTool --active-marker $ActiveMarker `
-        --payload-manifest (Join-Path $Release $Names.payload_manifest) `
-        --source-commit $SourceCommit --candidate-id $CandidateId --built-at $BuildTimeUtc
-    if ($LASTEXITCODE -ne 0) { throw "ACTIVE 候选标记写入失败。" }
+    $ActiveName = if ($FormalRelease) { "ACTIVE-RELEASE.json" } else { "ACTIVE-CANDIDATE.json" }
+    $ActiveMarker = Join-Path $Release $ActiveName
+    $MarkerArgs = @(
+        "--names", $NamesFromTool,
+        "--payload-manifest", (Join-Path $Release $Names.payload_manifest),
+        "--source-commit", $SourceCommit,
+        "--build-channel", $BuildChannel,
+        "--built-at", $BuildTimeUtc
+    )
+    if ($FormalRelease) { $MarkerArgs += @("--active-release-marker", $ActiveMarker, "--release-tag", $ReleaseTag) }
+    else { $MarkerArgs += @("--active-marker", $ActiveMarker, "--candidate-id", $CandidateId) }
+    & $PythonExe (Join-Path $ProjectRoot "tools\write_build_info.py") @MarkerArgs
+    if ($LASTEXITCODE -ne 0) { throw "ACTIVE 标记写入失败。" }
 
     # 9) The Artifact Gate, run against the directory we just produced.
-    Write-Host "以 Candidate 目录运行 Artifact Gate：$Release"
+    Write-Host "以构建目录运行 Artifact Gate：$Release"
     $PreviousArtifactDir = $env:UEBENCH_ARTIFACT_DIR
     $env:UEBENCH_ARTIFACT_DIR = $Release
     try {
@@ -435,8 +474,9 @@ else {
             Remove-Item -LiteralPath $GateBase -Recurse -Force -ErrorAction SilentlyContinue
         }
     }
-    Write-Host "Candidate 已生成并通过 Artifact Gate：$Release"
-    Write-Host "ACTIVE 候选：$CandidateId（源提交 $SourceCommit）"
+    Write-Host "$BuildChannel 已生成并通过 Artifact Gate：$Release"
+    if ($FormalRelease) { Write-Host "ACTIVE 正式发布：$ReleaseTag（源提交 $SourceCommit）" }
+    else { Write-Host "ACTIVE 候选：$CandidateId（源提交 $SourceCommit）" }
 }
 
 Get-ChildItem -LiteralPath $Release -File | Sort-Object Name |

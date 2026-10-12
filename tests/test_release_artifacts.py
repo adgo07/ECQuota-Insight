@@ -510,6 +510,8 @@ def test_build_info_carries_the_full_candidate_provenance(
     version = release_version.project_version()
     for key in (
         "product_version",
+        "build_channel",
+        "release_tag",
         "candidate_id",
         "source_commit",
         "source_dirty",
@@ -522,6 +524,11 @@ def test_build_info_carries_the_full_candidate_provenance(
         assert key in build_info, f"release-build-info.json 缺少溯源字段：{key}"
     assert build_info["product_version"] == version
     assert build_info["version"] == version
+    if build_info["build_channel"] == "candidate":
+        assert build_info["release_tag"] is None
+    else:
+        assert build_info["build_channel"] == "formal-release"
+        assert build_info["release_tag"] == f"v{version}"
     assert re.fullmatch(r"[0-9a-f]{40}", str(build_info["source_commit"])), (
         f"source_commit 必须是 40 位小写十六进制：{build_info['source_commit']!r}"
     )
@@ -543,21 +550,35 @@ ACTIVE_MARKER = "ACTIVE-CANDIDATE.json"
 
 
 @pytest.fixture(scope="session")
-def active_marker(artifact_dir: Path) -> dict[str, Any]:
-    path = artifact_dir / ACTIVE_MARKER
-    assert path.is_file(), (
-        f"候选目录缺少 {ACTIVE_MARKER}；§11 要求装配完成的候选目录声明唯一 ACTIVE 候选"
+def active_marker(artifact_dir: Path, build_info: dict[str, Any]) -> dict[str, Any]:
+    marker_name = (
+        "ACTIVE-RELEASE.json"
+        if build_info.get("build_channel") == "formal-release"
+        else ACTIVE_MARKER
     )
+    path = artifact_dir / marker_name
+    assert path.is_file(), (
+        f"构建目录缺少 {marker_name}；装配完成的交付目录必须声明唯一 ACTIVE 身份"
+    )
+    other_marker = ACTIVE_MARKER if marker_name == "ACTIVE-RELEASE.json" else "ACTIVE-RELEASE.json"
+    assert not (artifact_dir / other_marker).exists(), f"交付目录同时含有冲突活动标记：{other_marker}"
     marker = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(marker, dict)
     return marker
 
 
-def test_active_marker_declares_one_active_candidate(
+def test_active_marker_declares_one_build_identity(
     active_marker: dict[str, Any], build_info: dict[str, Any], release_version: ModuleType
 ) -> None:
-    assert active_marker.get("schema") == "ecq.active-candidate.v1"
+    expected_schema = (
+        "ecq.active-release.v1"
+        if build_info.get("build_channel") == "formal-release"
+        else "ecq.active-candidate.v1"
+    )
+    assert active_marker.get("schema") == expected_schema
     assert active_marker.get("status") == "ACTIVE"
+    assert active_marker.get("build_channel") == build_info.get("build_channel")
+    assert active_marker.get("release_tag") == build_info.get("release_tag")
     assert active_marker.get("candidate_id") == build_info.get("candidate_id")
     assert active_marker.get("product_version") == release_version.project_version()
     assert active_marker.get("source_commit") == build_info.get("source_commit")
@@ -581,15 +602,20 @@ def test_active_marker_payload_tree_sha256_equals_the_manifest(
         (artifact_dir / names["payload_manifest"]).read_text(encoding="utf-8")
     )
     assert active_marker.get("payload_tree_sha256") == manifest["payload_tree_sha256"], (
-        "ACTIVE-CANDIDATE.json 的 payload_tree_sha256 与 payload-manifest.json 不一致"
+        "活动标记的 payload_tree_sha256 与 payload-manifest.json 不一致"
     )
 
 
 def test_active_marker_is_not_hashed_by_sha256sums(
-    sha256sums: dict[str, str]
+    sha256sums: dict[str, str], build_info: dict[str, Any]
 ) -> None:
     """A document that names the assembly cannot be one of the files it pins."""
-    assert ACTIVE_MARKER not in sha256sums
+    marker_name = (
+        "ACTIVE-RELEASE.json"
+        if build_info.get("build_channel") == "formal-release"
+        else ACTIVE_MARKER
+    )
+    assert marker_name not in sha256sums
 
 
 # --------------------------------------------------------------------------
