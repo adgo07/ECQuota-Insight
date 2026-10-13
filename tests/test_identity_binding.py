@@ -103,6 +103,8 @@ def _identity(commit: str = "a" * 40, candidate: str = "rc-aaaaaaa") -> dict:
     return {
         "schema": "ecq.build-identity.v1",
         "product_version": "0.2.0",
+        "build_channel": "candidate",
+        "release_tag": None,
         "candidate_id": candidate,
         "source_commit": commit,
         "source_dirty": False,
@@ -116,6 +118,8 @@ def _identity(commit: str = "a" * 40, candidate: str = "rc-aaaaaaa") -> dict:
 def _external(commit: str = "a" * 40, candidate: str = "rc-aaaaaaa") -> dict:
     info = {
         "product_version": "0.2.0",
+        "build_channel": "candidate",
+        "release_tag": None,
         "candidate_id": candidate,
         "source_commit": commit,
         "source_dirty": False,
@@ -162,6 +166,13 @@ def _release_dir(
             json.dumps({
                 "schema": "ecq.active-candidate.v1",
                 "status": "ACTIVE",
+                "build_channel": external["build_channel"],
+                "release_tag": external["release_tag"],
+                "product_version": external["product_version"],
+                "source_dirty": external["source_dirty"],
+                "standard_package_id": external["standard_package_id"],
+                "standard_data_version": external["standard_data_version"],
+                "standard_package_sha256": external["standard_package_sha256"],
                 "candidate_id": external["candidate_id"],
                 "source_commit": external["source_commit"],
                 "payload_tree_sha256": external["payload_tree_sha256"],

@@ -64,6 +64,8 @@ REQUIRED_UNSIGNED_REASON = "no_signing_certificate"
 #: Provenance fields ``release-build-info.json`` must carry (ECQ-RS05).
 REQUIRED_BUILD_INFO_KEYS: tuple[str, ...] = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -86,6 +88,8 @@ EMBEDDED_IDENTITY_MEMBER = "UEBench/_internal/uebench/resources/build-identity.j
 #: Fields the embedded identity must agree on with ``release-build-info.json``.
 EMBEDDED_IDENTITY_KEYS: tuple[str, ...] = (
     "product_version",
+    "build_channel",
+    "release_tag",
     "candidate_id",
     "source_commit",
     "source_dirty",
@@ -96,6 +100,7 @@ EMBEDDED_IDENTITY_KEYS: tuple[str, ...] = (
 
 #: The single-ACTIVE-Candidate marker (ECQ-RS05 §十一).
 ACTIVE_MARKER_NAME = "ACTIVE-CANDIDATE.json"
+ACTIVE_RELEASE_MARKER_NAME = "ACTIVE-RELEASE.json"
 
 #: ECQ-RS05 M2 §三 —— 正式**用户**发布资产：安装程序、便携包、哈希清单、发布说明。
 #: 源码权威是 Git exact commit / release tag，不是打包出来的源码 ZIP。
@@ -280,12 +285,32 @@ def _audit_build_info(
         )
 
     candidate = info.get("candidate_id")
-    if candidate is not None and (
-        not isinstance(candidate, str) or not CANDIDATE_ID_RE.match(candidate)
-    ):
+    channel = info.get("build_channel")
+    release_tag = info.get("release_tag")
+    if channel == "candidate":
+        if not isinstance(candidate, str) or not CANDIDATE_ID_RE.match(candidate):
+            errors.append(
+                f"{build_info_name} 的 candidate_id 非法：{candidate!r}；"
+                "Candidate 必须使用 rc-<7位提交前缀>"
+            )
+        elif not str(info.get("source_commit") or "").startswith(candidate[3:]):
+            errors.append(
+                f"{build_info_name} 的 candidate_id 与 source_commit 不一致："
+                f"{candidate!r} / {info.get('source_commit')!r}"
+            )
+        if release_tag is not None:
+            errors.append(f"{build_info_name} 的 Candidate release_tag 必须为 null")
+    elif channel == "formal-release":
+        if candidate is not None:
+            errors.append(f"{build_info_name} 的正式发布 candidate_id 必须为 null")
+        expected_tag = f"v{version}"
+        if release_tag != expected_tag:
+            errors.append(
+                f"{build_info_name} 的正式发布 release_tag 必须是 {expected_tag}，实际：{release_tag!r}"
+            )
+    else:
         errors.append(
-            f"{build_info_name} 的 candidate_id 非法：{candidate!r}；"
-            "应为 rc-<7位十六进制提交前缀> 或 null（正式发布）"
+            f"{build_info_name} 的 build_channel 非法：{channel!r}；应为 candidate 或 formal-release"
         )
 
     if info.get("authenticode_signed") is not False:
@@ -402,43 +427,31 @@ def _audit_identity_binding(
     if not (isinstance(commit, str) and SOURCE_COMMIT_RE.match(commit)):
         return {"errors": [], "note": "source_commit 非法，已由 build_info 审计报错"}
 
-    # A formal release cut has no candidate identity at all: its artifact names carry
-    # no ``-rc-`` suffix and there is nothing embedded to cross-check.  Demanding a
-    # candidate identity here would wrongly fail every formal directory.
+    # Candidate names carry the source SHA prefix. Formal release names are
+    # deliberately unsuffixed, but both channels cross-check embedded identity.
     if candidate is None:
-        formal_errors: list[str] = []
+        report["formal"] = True
         for key in ("portable", "installer", "source"):
             name = names.get(key)
             if name and re.search(r"-rc-[0-9a-f]{7,40}", name):
-                formal_errors.append(
-                    f"正式发布目录的文件名不得携带候选标识：{name}"
+                errors.append(f"正式发布目录的文件名不得携带候选标识：{name}")
+    else:
+        prefix = commit[:7]
+        report["filename_prefix"] = prefix
+        for key in ("portable", "installer", "source"):
+            name = names.get(key)
+            if not name:
+                continue
+            match = re.search(r"-rc-([0-9a-f]{7,40})", name)
+            if match is None:
+                errors.append(
+                    f"交付文件名未携带候选标识（-rc-<short7>）：{name}；"
+                    "候选构建的产物名必须唯一可区分"
                 )
-        return {"errors": formal_errors, "formal": True, "embedded": None}
-
-    # --- 2. file-name prefix must be this commit ---------------------------
-    prefix = commit[:7]
-    report["filename_prefix"] = prefix
-    for key in ("portable", "installer", "source"):
-        name = names.get(key)
-        if not name:
-            continue
-        match = re.search(r"-rc-([0-9a-f]{7,40})", name)
-        if match is None:
-            errors.append(
-                f"交付文件名未携带候选标识（-rc-<short7>）：{name}；"
-                "候选构建的产物名必须唯一可区分"
-            )
-        elif commit.startswith(match.group(1)):
-            continue
-        elif isinstance(candidate, str) and match.group(1) != candidate[3:]:
-            errors.append(
-                f"{name} 的候选标识 rc-{match.group(1)} 与身份不一致："
-                f"source_commit 前缀为 {prefix}，candidate_id 为 {candidate!r}"
-            )
-        else:
-            errors.append(
-                f"{name} 的候选标识 rc-{match.group(1)} 与 source_commit 不一致：{commit}"
-            )
+            elif not commit.startswith(match.group(1)):
+                errors.append(
+                    f"{name} 的候选标识 rc-{match.group(1)} 与 source_commit 不一致：{commit}"
+                )
 
     # --- 1 vs 3. external declaration vs payload-embedded identity ---------
     portable = root / names["portable"]
@@ -479,18 +492,53 @@ def _audit_identity_binding(
                     "不可能同时位于该载荷之内（应只写外部文档）"
                 )
 
-    # --- ACTIVE marker must repeat the same identity ----------------------
-    if ACTIVE_MARKER_NAME in {p.name for p in root.glob("*.json")}:
-        marker_path = root / ACTIVE_MARKER_NAME
+    # --- ACTIVE marker must repeat the same channel identity ---------------
+    expected_marker_name = (
+        ACTIVE_RELEASE_MARKER_NAME
+        if info.get("build_channel") == "formal-release"
+        else ACTIVE_MARKER_NAME
+    )
+    unexpected_marker_name = (
+        ACTIVE_MARKER_NAME
+        if expected_marker_name == ACTIVE_RELEASE_MARKER_NAME
+        else ACTIVE_RELEASE_MARKER_NAME
+    )
+    if (root / unexpected_marker_name).exists():
+        errors.append(f"目录同时含有不适用的活动标记：{unexpected_marker_name}")
+    marker_path = root / expected_marker_name
+    if not marker_path.is_file():
+        errors.append(f"缺少活动构建标记：{expected_marker_name}")
+    else:
         try:
             marker = json.loads(marker_path.read_text(encoding="utf-8"))
         except Exception as exc:  # noqa: BLE001
-            errors.append(f"{ACTIVE_MARKER_NAME} 无法解析：{exc}")
+            errors.append(f"{expected_marker_name} 无法解析：{exc}")
         else:
-            for key in ("candidate_id", "source_commit", "payload_tree_sha256"):
+            expected_schema = (
+                "ecq.active-release.v1"
+                if expected_marker_name == ACTIVE_RELEASE_MARKER_NAME
+                else "ecq.active-candidate.v1"
+            )
+            if marker.get("schema") != expected_schema or marker.get("status") != "ACTIVE":
+                errors.append(
+                    f"{expected_marker_name} 的 schema/status 非法："
+                    f"{marker.get('schema')!r}/{marker.get('status')!r}"
+                )
+            for key in (
+                "build_channel",
+                "release_tag",
+                "candidate_id",
+                "product_version",
+                "source_commit",
+                "source_dirty",
+                "standard_package_id",
+                "standard_data_version",
+                "standard_package_sha256",
+                "payload_tree_sha256",
+            ):
                 if marker.get(key) != info.get(key):
                     errors.append(
-                        f"{ACTIVE_MARKER_NAME} 的 {key} 与 {names['build_info']} 不一致："
+                        f"{expected_marker_name} 的 {key} 与 {names['build_info']} 不一致："
                         f"{marker.get(key)!r} != {info.get(key)!r}"
                     )
     return {"errors": errors, **report}

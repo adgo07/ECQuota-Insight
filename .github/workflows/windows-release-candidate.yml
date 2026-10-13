@@ -106,7 +106,7 @@ jobs:
 
       - name: Execute release source gate
         shell: pwsh
-        run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py -q -ra -p no:cacheprovider
+        run: python -m pytest tests/test_release_version_consistency.py tests/test_release_source.py tests/test_candidate_identity.py tests/test_build_info_provenance.py tests/test_formal_release_workflow.py -q -ra -p no:cacheprovider
 
       - name: Build the Windows Release Candidate
         shell: pwsh
@@ -157,6 +157,9 @@ jobs:
           if ($info.source_dirty -ne $false) {
             throw "release-build-info.json 声明 source_dirty=$($info.source_dirty)；正式候选必须来自干净检出。"
           }
+          if ($info.build_channel -cne "candidate" -or $null -ne $info.release_tag) {
+            throw "release-build-info.json 的 Candidate 通道身份不正确。"
+          }
           if ($info.candidate_id -cne $env:EXPECTED_CANDIDATE) {
             throw "release-build-info.json 的 candidate_id（$($info.candidate_id)）与推导值不一致。"
           }
@@ -173,6 +176,9 @@ jobs:
           $marker = Get-Content -LiteralPath $markerPath -Raw -Encoding UTF8 | ConvertFrom-Json
           if ($marker.schema -ne "ecq.active-candidate.v1" -or $marker.status -ne "ACTIVE") {
             throw "ACTIVE-CANDIDATE.json 的 schema/status 非法：$($marker.schema)/$($marker.status)"
+          }
+          if ($marker.build_channel -cne "candidate" -or $null -ne $marker.release_tag) {
+            throw "ACTIVE-CANDIDATE.json 的构建通道身份不正确。"
           }
           if ($marker.candidate_id -cne $env:EXPECTED_CANDIDATE) {
             throw "ACTIVE-CANDIDATE.json 的候选标识（$($marker.candidate_id)）与本次构建不一致。"

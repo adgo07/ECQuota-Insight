@@ -61,6 +61,7 @@ def test_pull_request_gate_setup_is_discoverable() -> None:
         "numeric-v1-adoption.yml",
         "pull-request-gate.yml",
         "qzc-n01-a.yml",
+        "windows-formal-release.yml",
         "windows-release-candidate.yml",
     }, sorted(texts)
 

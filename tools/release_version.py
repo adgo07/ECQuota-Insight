@@ -312,16 +312,30 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="候选构建的源提交 SHA；据此推导候选标识，不写入任何生成文件",
     )
+    parser.add_argument(
+        "--formal-release",
+        action="store_true",
+        help="仅与 --names 一起使用，生成不带 Candidate 后缀的正式文件名",
+    )
     parser.add_argument("--root", type=Path, default=None, help="仓库根目录（默认自动定位）")
     args = parser.parse_args(argv)
 
     base = args.root or ROOT
     version = project_version(base / "pyproject.toml")
-    try:
-        resolved_candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
-    except ValueError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
+    if args.formal_release:
+        if not args.names:
+            print("--formal-release 只能与 --names 一起使用。", file=sys.stderr)
+            return 2
+        if args.candidate_id:
+            print("--formal-release 不得同时指定 --candidate-id。", file=sys.stderr)
+            return 2
+        resolved_candidate = None
+    else:
+        try:
+            resolved_candidate = resolve_candidate_id(args.candidate_id, args.source_commit)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
 
     if args.generate:
         # Deliberately commit-independent: the git SHA never reaches a generated
