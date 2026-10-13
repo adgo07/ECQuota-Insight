@@ -12,6 +12,7 @@
 | 总体开发路线 | [`参考标准开发路线.md`](参考标准开发路线.md)（唯一路线入口） |
 | 当前任务 | [`TASK_STATE.md`](TASK_STATE.md) |
 | 当前交接 | [`HANDOFF.md`](HANDOFF.md) |
+| 标准映射 | [映射总索引](standards/mappings/INDEX.md)、[目录与版本规范](standards/mappings/README.md) |
 | 治理基线 | [`PLATFORM_BASELINE.md`](PLATFORM_BASELINE.md)、[`platform-lock.json`](platform-lock.json) |
 
 ## 当前开发源码 / Current Development Source
