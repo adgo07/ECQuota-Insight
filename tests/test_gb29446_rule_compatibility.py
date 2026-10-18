@@ -117,7 +117,7 @@ def _qt_app() -> QApplication:
 def test_predicate_accepts_current_repository_definition() -> None:
     definition = r2_definition()
     # The r2 definition is the one the formal Golden was frozen against.
-    assert definition.rule_revision == 2
+    assert definition.rule_revision == 3
     assert gb29446_rule_is_compatible(definition) is True
     assert [level.key for level in definition.selection_schema] == ["coal_type"]
 

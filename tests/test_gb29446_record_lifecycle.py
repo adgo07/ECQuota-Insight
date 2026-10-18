@@ -32,7 +32,8 @@ FIXTURE = ROOT / "tests/fixtures/gb29446_record_r2.json"
 
 
 def standard_r2():
-    return StandardDefinition.model_validate_json((ROOT / "data/definitions/gb-29446-2019.json").read_text(encoding="utf-8"))
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    return StandardDefinition.model_validate_json(fixture["rule_snapshot_json"])
 
 
 def request_r2(standard, electricity="560"):
@@ -257,7 +258,9 @@ def test_legacy_record_without_numeric_metadata_keeps_saved_conclusion(lifecycle
     window.view_selected_record()
     ordinary = detail_text(window)
     # A5：旧 Profile 的记录只展示当时保存的结论，不替它补写当前比较语义。
-    assert "判定：1级（当时保存的结果" in ordinary
+    assert "判定：1级" in ordinary
+    assert "历史记录的数值规则以原保存结果为准；本报告不重新判级。" in ordinary
+    assert "原结果未重新计算" in ordinary
     assert "5.0000004" in ordinary
     assert "5.0000004 ≤ 5" not in ordinary
     assert "判级使用完整计算值" not in ordinary

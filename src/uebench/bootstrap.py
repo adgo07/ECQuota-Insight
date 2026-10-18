@@ -15,6 +15,7 @@ from uebench.infrastructure.packages import StandardPackageService, _data_versio
 from uebench.infrastructure.paths import AppPaths
 from uebench.infrastructure.sources import StandardSourceService
 from uebench.infrastructure.repositories import AuditRepository, SqlEvaluationRepository, SqlStandardRepository
+from uebench.infrastructure.word_report import WordReportWriter
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class AppContext:
     template_service: WorkbookTemplateService
     import_service: WorkbookImportService
     export_service: WorkbookExportService
+    word_report_writer: WordReportWriter
     backup_service: BackupService
     package_service: StandardPackageService | None
     package_reconciliation: PackageReconciliationService
@@ -59,6 +61,7 @@ def create_context(
     template_service = WorkbookTemplateService()
     import_service = WorkbookImportService(database, audit, standards)
     export_service = WorkbookExportService(evaluations, audit)
+    word_report_writer = WordReportWriter()
     backup_service = BackupService(paths, database, audit)
     source_service = StandardSourceService(paths.standards)
     package_service = None
@@ -94,6 +97,7 @@ def create_context(
         template_service=template_service,
         import_service=import_service,
         export_service=export_service,
+        word_report_writer=word_report_writer,
         package_service=package_service,
         package_reconciliation_service=reconciliation_service,
         bundled_package_directory=bundle_directory,
@@ -121,6 +125,7 @@ def create_context(
         template_service=template_service,
         import_service=import_service,
         export_service=export_service,
+        word_report_writer=word_report_writer,
         backup_service=backup_service,
         package_service=package_service,
         package_reconciliation=reconciliation_service,

@@ -490,18 +490,18 @@ def test_new_gb29446_evaluation_works_after_upgrade(tmp_path: Path) -> None:
     context = create_context(root)
     try:
         current = current_gb29446()
-        # 0.1.0 留下的是第 1 版规则；0003 的新唯一索引允许同版本号的第 2 版并存，
+        # 0.1.0 留下的是第 1 版规则；0003 的新唯一索引允许同版本号的新修订并存，
         # 这在 0001/0002 的 (standard_id, version) 唯一索引下是不可能的。
-        assert current.rule_revision == golden["rule_revision"] == 2
+        assert current.rule_revision == golden["rule_revision"]
         context.standards.install(current)
         revisions = sorted(
             row["rule_revision"] for row in standard_rows(root / "uebench.sqlite3")
         )
-        assert revisions == [1, 2]
+        assert revisions == [1, current.rule_revision]
 
         published = context.application.get_published_standard(GB29446_ID)
         assert published is not None
-        assert published.rule_revision == current.rule_revision == 2
+        assert published.rule_revision == current.rule_revision
 
         result = context.application.evaluate(golden_request(current, case))
         assert result.standard_id == GB29446_ID

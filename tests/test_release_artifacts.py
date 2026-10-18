@@ -177,7 +177,7 @@ def sha256sums(artifact_dir: Path, names: dict[str, str]) -> dict[str, str]:
 # --------------------------------------------------------------------------
 
 
-#: The twelve artifacts a formal Candidate must contain.  Kept in sync with
+#: Required Candidate artifacts. Kept in sync with
 #: ``tools/audit_release.required_files()`` by
 #: ``test_required_files_list_matches_audit_release`` below, so neither list can
 #: drift away from the other.
@@ -186,7 +186,6 @@ REQUIRED_KEYS: tuple[str, ...] = (
     "installer",
     "source",
     "standard_package",
-    "template",
     "sha256sums",
     "payload_manifest",
     "build_info",
@@ -677,22 +676,14 @@ def test_payload_manifest_matches_the_portable_zip(
 
 
 # --------------------------------------------------------------------------
-# 8. GB 29446 template really is an Excel workbook with the 评价数据 sheet
+# 8. Excel workbook is deferred from Candidate delivery
 # --------------------------------------------------------------------------
 
 
-def test_template_is_a_valid_xlsx_with_the_evaluation_sheet(
+def test_candidate_does_not_ship_excel_workbook(
     artifact_dir: Path, names: dict[str, str]
 ) -> None:
-    openpyxl = pytest.importorskip("openpyxl")
-    path = artifact_dir / names["template"]
-    workbook = openpyxl.load_workbook(path, read_only=False, data_only=False)
-    try:
-        assert "评价数据" in workbook.sheetnames, (
-            f"{names['template']} 缺少“评价数据”工作表；实际：{workbook.sheetnames}"
-        )
-    finally:
-        workbook.close()
+    assert not (artifact_dir / names["template"]).exists()
 
 
 # --------------------------------------------------------------------------

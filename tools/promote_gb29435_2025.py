@@ -204,6 +204,10 @@ def update_dev_catalog(path: Path) -> None:
 
 
 def main() -> None:
+    raise SystemExit(
+        "历史GB29435转正writer已退役：scope-63现为只读快照。"
+        "请从现行批准映射和data/definitions唯一机器源开展独立标准开发任务。"
+    )
     parser = argparse.ArgumentParser(description="将GB 29435-2025的51条规则按用户批准记录纳入正式数据集")
     parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCE_DIR)
     parser.add_argument("--reviewer", default="王玮")

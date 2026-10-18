@@ -186,14 +186,9 @@ def test_installer_does_not_reference_the_legacy_confirmation_workbook() -> None
     )
 
 
-def test_installer_references_the_gb29446_template() -> None:
+def test_installer_does_not_ship_a_gb29446_template() -> None:
     text = INSTALLER_ISS.read_text(encoding="utf-8")
-    assert GB29446_TEMPLATE in text, (
-        f"packaging/installer.iss 必须交付 GB 29446 导入模板 {GB29446_TEMPLATE}"
-    )
-    assert f"dist\\release\\{GB29446_TEMPLATE}" in text, (
-        "GB 29446 导入模板必须从交付目录 dist\\release 安装"
-    )
+    assert GB29446_TEMPLATE not in text
 
 
 # --------------------------------------------------------------------------

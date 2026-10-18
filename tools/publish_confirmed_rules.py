@@ -79,6 +79,10 @@ def main() -> None:
     parser.add_argument("--data-version", default="2026.08-published.1", help="写入标准包清单的数据版本")
     parser.add_argument("--apply", action="store_true", help="确认验证通过后实际写入published状态并构建标准包")
     args = parser.parse_args()
+    # Current governance: TASK_STATE.md:131 and HANDOFF.md:49 retain only the
+    # read-only confirmation check. The former multi-definition writer is retired.
+    if args.apply:
+        raise SystemExit("旧确认表 --apply 写入通道已退役；请从批准映射与显式交付范围建立新标准包。")
 
     data_dir = args.data_dir.resolve()
     if args.scope:

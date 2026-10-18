@@ -4,7 +4,8 @@ from __future__ import annotations
 
 A standard number identifies one published edition, while standard_family_id groups editions and explicit replacement chains.
 Missing rule_revision values are initialized to 1 and existing positive values are preserved.
-The tool can update formal data and development snapshots; it never changes publication status or rule values.
+The tool writes only current data. Historical development snapshots may be checked
+read-only; it never changes publication status or rule values.
 """
 
 import argparse
@@ -16,10 +17,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_ROOTS = (
-    ROOT / "standards" / "development" / "scope-63",
-    ROOT / "standards" / "development" / "scope-65",
-)
+DEFAULT_ROOTS = (ROOT / "data",)
 DEFAULT_REPLACEMENTS = ROOT / "data" / "standard-replacements.json"
 _NUMBER_RE = re.compile(r"^(?P<prefix>[A-Z]+(?:/[A-Z]+)?\s+\d+)(?:-(?P<year>\d{4}))?$", re.IGNORECASE)
 
@@ -197,7 +195,7 @@ def normalize_root(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="补全标准家族ID和规则修订号（适用于正式库或开发快照）")
+    parser = argparse.ArgumentParser(description="补全现行定义的标准家族ID和规则修订号；历史快照只读")
     parser.add_argument("--root", dest="roots", action="append", type=Path, help="快照目录；可重复指定")
     parser.add_argument("--catalog", dest="catalogs", action="append", type=Path, help="目录JSON文件；可重复指定")
     parser.add_argument("--replacements", type=Path, default=DEFAULT_REPLACEMENTS)
@@ -207,6 +205,11 @@ def main() -> int:
     roots = [root.resolve() for root in (args.roots or DEFAULT_ROOTS)]
     catalogs = [path.resolve() for path in (args.catalogs or [])]
     try:
+        if not args.check:
+            if any(root != (ROOT / "data").resolve() for root in roots):
+                raise IdentityError("历史快照只读；写入仅允许仓库data目录")
+            if any(not path.is_relative_to((ROOT / "data").resolve()) for path in catalogs):
+                raise IdentityError("目录写入仅允许仓库data目录")
         replacements = load_replacements(args.replacements.resolve())
         reports = [
             normalize_root(

@@ -103,9 +103,14 @@ jobs:
           $info = Get-Content -LiteralPath "dist/formal-release/release-build-info.json" -Raw -Encoding UTF8 | ConvertFrom-Json
           $marker = Get-Content -LiteralPath "dist/formal-release/ACTIVE-RELEASE.json" -Raw -Encoding UTF8 | ConvertFrom-Json
           $manifest = Get-Content -LiteralPath "dist/formal-release/payload-manifest.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          $pin = Get-Content -LiteralPath "release/standard-packages/PIN.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+          $pinnedPackage = Join-Path "release/standard-packages" $pin.file
+          if (-not (Test-Path -LiteralPath $pinnedPackage -PathType Leaf)) { throw "PIN 声明的标准包不存在：$pinnedPackage" }
+          $pinnedHash = (Get-FileHash -LiteralPath $pinnedPackage -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($pinnedHash -cne $pin.sha256.ToLowerInvariant()) { throw "正式标准包与 PIN 哈希不一致。" }
           if ($info.build_channel -cne "formal-release" -or $info.release_tag -cne $env:EXPECTED_TAG -or $null -ne $info.candidate_id) { throw "正式 build-info 的 channel/tag/candidate_id 不正确。" }
           if ($info.source_commit -cne $env:EXPECTED_COMMIT -or $info.source_dirty -ne $false) { throw "正式 build-info 未绑定精确干净 source SHA。" }
-          if ($info.standard_data_version -cne "2026.10-published.4") { throw "标准库版本错误：$($info.standard_data_version)" }
+          if ($info.standard_data_version -cne $pin.data_version -or $info.standard_package_id -cne $pin.package_id -or $info.standard_package_sha256 -cne $pinnedHash) { throw "正式 build-info 的标准包身份与 PIN 不一致。" }
           if ($info.payload_tree_sha256 -cne $manifest.payload_tree_sha256 -or $marker.payload_tree_sha256 -cne $manifest.payload_tree_sha256 -or $marker.source_commit -cne $info.source_commit -or $marker.release_tag -cne $env:EXPECTED_TAG) { throw "正式包、活动标记与 payload manifest 身份不一致。" }
           $releaseDir = "dist/formal-release"
           $sums = Get-Content -LiteralPath (Join-Path $releaseDir $env:SHA256SUMS) -Encoding UTF8

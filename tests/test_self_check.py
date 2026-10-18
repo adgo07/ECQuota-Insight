@@ -162,6 +162,10 @@ def test_fresh_isolated_data_dir_passes_with_every_required_section(cli_run: dic
         assert section["status"] == "passed", f"{check_id}: {section['errors']}"
         assert section["errors"] == [], check_id
         assert isinstance(section["details"], dict) and section["details"], check_id
+    assert found["standard_package"]["details"]["packaged_golden_rule_revision"] == (
+        self_check_module.GOLDEN_RULE_REVISION
+    )
+    assert found["golden_replay"]["details"]["rule_source"] == "standard-package"
 
 
 def test_fresh_report_is_json_serialisable(cli_run: dict) -> None:
@@ -267,8 +271,18 @@ def test_golden_replay_reports_the_three_embedded_cases(cli_run: dict) -> None:
     assert trap["actual_grade"] != "LEVEL_1"
 
 
+def test_embedded_golden_revision_matches_adopted_metadata() -> None:
+    """打包内嵌案例的采用身份须与 Golden 元数据同步，数值期望独立保留。"""
+    adopted = json.loads(
+        (ROOT / "tests/golden/gb29446_product_golden_v1.json").read_text(encoding="utf-8")
+    )
+    assert self_check_module.GOLDEN_ID == adopted["golden_id"]
+    assert self_check_module.GOLDEN_VERSION == adopted["golden_version"]
+    assert self_check_module.GOLDEN_RULE_REVISION == adopted["rule_revision"]
+
+
 def test_golden_replay_records_which_rule_was_evaluated(cli_run: dict) -> None:
-    """规则来源必须显式记录，且落后于 Golden 的 payload 必须产生警告。"""
+    """规则来源必须显式记录，旧 payload 回退须产生警告。"""
     golden = sections(cli_run["report"])["golden_replay"]["details"]
     assert golden["rule_source"] in {"standard-package", "repository-definition"}
     assert golden["installed_rule_revision"] == self_check_module.GOLDEN_RULE_REVISION
@@ -276,7 +290,7 @@ def test_golden_replay_records_which_rule_was_evaluated(cli_run: dict) -> None:
         assert golden["rule_source_path"] == str(
             ROOT / "data" / "definitions" / f"{self_check_module.GOLDEN_STANDARD_ID}.json"
         )
-        assert any("known_gap" in warning for warning in cli_run["report"]["warnings"])
+        assert any("payload 落差" in warning for warning in cli_run["report"]["warnings"])
 
 
 # ---------------------------------------------------------------------------

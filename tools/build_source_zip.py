@@ -12,7 +12,7 @@ except ModuleNotFoundError:  # pragma: no cover - package-import style
     from tools.release_version import artifact_names, project_version
 
 
-INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development"]
+INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development", "standards/mappings"]
 
 #: Root-level files shipped in the source package.  ECQ-RS05 additionally
 #: requires the governance/state documents so a source recipient can reproduce

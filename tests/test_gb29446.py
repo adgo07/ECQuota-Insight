@@ -210,8 +210,8 @@ def test_direct_zero_power_consumption_is_incomplete(standard, coal_type):
 @pytest.mark.parametrize(
     ("changes", "label", "internal_key"),
     [
-        ({"electricity": None}, "统计期选煤电力消耗量 E_d", "electricity_consumption"),
-        ({"raw_coal": None}, "统计期入选原煤量 m", "raw_coal_input"),
+        ({"electricity": None}, "统计期内选煤电力消耗量 E_d", "electricity_consumption"),
+        ({"raw_coal": None}, "统计期内入选原煤量 m", "raw_coal_input"),
     ],
 )
 def test_missing_detail_warnings_use_chinese_rule_labels(standard, changes, label, internal_key):
@@ -287,7 +287,7 @@ def test_result_and_request_survive_save_and_read(tmp_path: Path, standard):
         assert loaded_indicator.compliance_result is None
         assert loaded_indicator.calculation_trace
         assert loaded_indicator.source_references[-1].table == "表A.1"
-        assert snapshot.rule_revision == 2
+        assert snapshot.rule_revision == 3
     finally:
         context.database.dispose()
 
@@ -314,10 +314,10 @@ def test_gb29446_definition_round_trips_through_signed_package_builder(tmp_path:
     with zipfile.ZipFile(output) as package:
         manifest = PackageManifest.model_validate_json(package.read("manifest.json"))
         packaged_definition = StandardDefinition.model_validate_json(
-            package.read("definitions/gb-29446-2019-2019-r2.json")
+            package.read("definitions/gb-29446-2019-2019-r3.json")
         )
     assert manifest.standard_count == 1
     assert manifest.rule_count == 2
-    assert packaged_definition.rule_revision == 2
+    assert packaged_definition.rule_revision == 3
     assert packaged_definition.products[0].indicators[0].compliance_rule is not None
     assert packaged_definition.products[0].indicators[0].display_calculations

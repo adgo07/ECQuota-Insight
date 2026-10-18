@@ -24,7 +24,7 @@ from uebench.application.official_sources import (
 from uebench.bootstrap import create_context
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import Grade, InputMode, InputValue, StandardDefinition, parse_decimal
-from uebench.ui.main_window import MainWindow
+from uebench.ui.main_window import MainWindow, _rich_text
 
 from .test_gb29446 import PROCESSES, _request
 
@@ -132,7 +132,7 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     explanation = window.gb29446_explanation.text()
     lines = explanation.split("<br>")
     assert len(lines) == 3, explanation
-    assert lines[0] == "选煤工艺：重介，折算系数 k = 1.12"
+    assert lines[0] == "选煤工艺类型：重介，选煤工艺类型折算系数 k = 1.12"
     assert lines[1] == (
         "计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = 560 × 1.12 ÷ 100 = 6.272 kW·h/t"
     )
@@ -165,6 +165,10 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     loaded = context.application.get_evaluation(window.last_result_id)
     assert loaded is not None
     saved_request, saved_result, _snapshot = loaded
+    shared = context.application.get_report_view(saved_result.evaluation_id)
+    assert window.gb29446_result_ed.text() == f"{shared.actual.value} {shared.actual.unit}"
+    assert window.gb29446_result_grade.text() == shared.grade.value
+    assert window.gb29446_explanation.text() == _rich_text("\n".join((*shared.explanation, *shared.warnings)))
     assert saved_request.organization_name is None
     assert "enterprise_status" not in saved_request.inputs
     assert "single_coal_single_process" not in saved_request.inputs
@@ -178,14 +182,14 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert window.gb29446_result_message.text() == "尚未计算"
     window.calculate_evaluation()
     assert window.gb29446_result_ed.text() == "11.20 kW·h/t"
-    assert window.gb29446_result_grade.text() == "超出3级"
+    assert window.gb29446_result_grade.text() == "未达3级"
     assert "未达标" not in window.gb29446_result_grade.text()
 
     assert not window.gb29446_scope_details.isVisible()
     window.gb29446_scope_toggle.click()
     application.processEvents()
     assert window.gb29446_scope_details.isVisible()
-    assert "原煤输送至选煤厂 → 选煤产品运输出选煤厂" in window.gb29446_scope_details.text()
+    assert "统计起点：原煤输送至选煤厂；统计终点：选煤产品运输出选煤厂" in window.gb29446_scope_details.text()
     assert "化验室" in window.gb29446_scope_details.text()
     window.close()
     context.database.dispose()
@@ -273,7 +277,7 @@ def test_gb29446_custom_period_must_be_filled_and_is_saved(tmp_path: Path, monke
     window.gb29446_process.setCurrentIndex(window.gb29446_process.findData("重介"))
     assert not window.gb29446_custom_period.isHidden()
     window.calculate_evaluation()
-    assert warnings == ["请填写自定义核算周期。"]
+    assert warnings == ["请填写自定义统计期。"]
     assert context.application.list_recent_evaluations() == []
 
     window.gb29446_custom_period.setText("2026年第一季度")
@@ -320,16 +324,16 @@ def test_gb29446_month_period_is_saved_and_restored(tmp_path: Path, monkeypatch)
     ("electricity", "raw_coal", "expected_message", "expected_warning", "internal_key"),
     [
         (
-            "", "100", "统计期选煤电力消耗量 E_d",
-            "统计期选煤电力消耗量 E_d 不能为空。", "electricity_consumption",
+            "", "100", "统计期内选煤电力消耗量 E_d",
+            "统计期内选煤电力消耗量 E_d 不能为空。", "electricity_consumption",
         ),
         (
-            "100", "", "统计期入选原煤量 m",
-            "统计期入选原煤量 m 不能为空。", "raw_coal_input",
+            "100", "", "统计期内入选原煤量 m",
+            "统计期内入选原煤量 m 不能为空。", "raw_coal_input",
         ),
         (
             "0", "100", "必须大于 0",
-            "统计期选煤电力消耗量 E_d 必须大于 0。", "electricity_consumption",
+            "统计期内选煤电力消耗量 E_d 必须大于 0。", "electricity_consumption",
         ),
     ],
 )
@@ -392,7 +396,7 @@ def test_gb29446_full_value_boundary_explanation_matches_formal_grade(tmp_path: 
     assert "5.0000004" in lines[1], explanation
     assert lines[1].startswith("计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = ")
     assert lines[2].startswith("判定：2级（")
-    assert lines[3] == "判级使用完整计算值，界面显示值仅作简化展示。"
+    assert lines[3] == "判级使用完整计算值 5.0000004 kW·h/t；5.00 kW·h/t 仅用于显示。"
     assert "ROUND(" not in explanation
     assert "numeric_behavior=" not in explanation
 
@@ -427,16 +431,27 @@ def _fill_reference_form(window, *, coal="炼焦煤", process="重介", electric
     window.gb29446_raw_coal.setText(raw_coal)
 
 
-def test_gb29446_data_and_scope63_definitions_are_semantically_equal():
+def test_gb29446_scope63_is_historical_r2_with_unchanged_numeric_rules():
     runtime = json.loads(GB29446_STANDARD_PATH.read_text(encoding="utf-8"))
-    current = json.loads((ROOT / "standards/development/scope-63/definitions/gb-29446-2019.json").read_text(encoding="utf-8"))
-    assert runtime == current
+    historical = json.loads((ROOT / "standards/development/scope-63/definitions/gb-29446-2019.json").read_text(encoding="utf-8"))
+    assert historical["rule_revision"] == 2
+    assert runtime["rule_revision"] == 3
+    assert [p["id"] for p in runtime["products"]] == [p["id"] for p in historical["products"]]
+    for new, old in zip(runtime["products"], historical["products"]):
+        for new_indicator, old_indicator in zip(new["indicators"], old["indicators"]):
+            assert new_indicator["base_thresholds"] == old_indicator["base_thresholds"]
+            assert new_indicator["thresholds"] == old_indicator["thresholds"]
+            new_rows = new_indicator["detail_formula"]["args"][0]["args"][1]["rows"]
+            old_rows = old_indicator["detail_formula"]["args"][0]["args"][1]["rows"]
+            assert [(row["condition"]["value"], row["expression"]["value"]) for row in new_rows] == [
+                (row["condition"]["value"], row["expression"]["value"]) for row in old_rows
+            ]
 
 
 def test_gb29446_catalog_revision_matches_current_definition():
     catalog = json.loads((ROOT / "data/catalog.json").read_text(encoding="utf-8"))
     row = next(item for item in catalog["standards"] if item["id"] == "gb-29446-2019")
-    assert row["rule_revision"] == _gb29446_standard().rule_revision == 2
+    assert row["rule_revision"] == _gb29446_standard().rule_revision == 3
 
 
 def test_gb29446_discovery_to_new_evaluation(reference_window):
@@ -477,7 +492,7 @@ def test_gb29446_discovery_to_new_evaluation(reference_window):
     assert window.standard_indicator_table.item(0, 2).text() == "kW·h/t"
     window.navigation.setCurrentRow(2)
     window.eval_standard.setCurrentIndex(window.eval_standard.findData(standard.id))
-    assert window.current_standard.rule_revision == 2
+    assert window.current_standard.rule_revision == 3
     _fill_reference_form(window)
     window.calculate_evaluation()
     assert window.gb29446_result_grade.text() == "2级"
@@ -612,7 +627,7 @@ def test_gb29446_domain_rejects_bad_decimal_with_business_label(field, lexical):
     standard = _gb29446_standard()
     request = _request(standard, "炼焦煤")
     request.inputs[field] = InputValue(value=lexical, unit="kW·h" if field == "electricity_consumption" else "t")
-    expected_label = "统计期选煤电力消耗量 E_d" if field == "electricity_consumption" else "统计期入选原煤量 m"
+    expected_label = "统计期内选煤电力消耗量 E_d" if field == "electricity_consumption" else "统计期内入选原煤量 m"
     with pytest.raises(ValueError) as error:
         EvaluationEngine().evaluate(standard, request)
     assert expected_label in str(error.value)
@@ -663,7 +678,7 @@ def test_gb29446_attempt_failure_clears_stale_result_before_work(reference_windo
         if failure == "request":
             raise ValueError("请选择选煤工艺。")
         if failure == "domain":
-            raise ValueError("统计期入选原煤量 m 必须是有限十进制数")
+            raise ValueError("统计期内入选原煤量 m 必须是有限十进制数")
         raise RuntimeError("内部 CalculationStep schema/field_id 发生错误")
     if failure == "request":
         monkeypatch.setattr(window, "_collect_request", fail)
@@ -684,7 +699,7 @@ def test_gb29446_unselected_or_illegal_process_cannot_produce_grade(reference_wi
     warnings = []
     monkeypatch.setattr(QMessageBox, "warning", lambda _parent, _title, message: warnings.append(message))
     window.calculate_evaluation()
-    assert warnings == ["请选择选煤工艺。"]
+    assert warnings == ["请选择选煤工艺类型。"]
     assert window.last_result_id is None
     assert window.gb29446_result_grade.text() == "—"
     request = _request(standard, "炼焦煤", process="干法选煤")
@@ -757,7 +772,7 @@ def test_gb29446_finite_scientific_input_has_no_invented_business_maximum(refere
     assert parse_decimal("1e999", field_name="电力消耗量") == Decimal("1e999")
     _fill_reference_form(window, process="跳汰、浮选联合", electricity="1e999", raw_coal="1")
     window.calculate_evaluation()
-    assert window.gb29446_result_grade.text() == "超出3级"
+    assert window.gb29446_result_grade.text() == "未达3级"
     item = context.application.get_evaluation(window.last_result_id)[1].results[0]
     assert item.actual_value == Decimal("1e999")
     assert item.actual_value.is_finite()
@@ -775,4 +790,4 @@ def test_gb29446_explanation_preserves_exact_small_boundary_difference(reference
     lines = explanation.split("<br>")
     assert "5.0000000000000001" in lines[1], explanation
     assert next(line for line in lines if line.startswith("判定：")).startswith("判定：2级")
-    assert lines[-1] == "判级使用完整计算值，界面显示值仅作简化展示。"
+    assert lines[-1] == "判级使用完整计算值 5.0000000000000001 kW·h/t；5.00 kW·h/t 仅用于显示。"

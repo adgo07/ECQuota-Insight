@@ -1,4 +1,4 @@
-"""Pin the ECQ-RS05 standard package (source-free, provenance-only).
+"""Verify the current signed package and preserve ECQ-RS05 history.
 
 History, compressed:
 
@@ -12,12 +12,10 @@ History, compressed:
   every ``definitions/*.json`` member and ``corrections.json`` stays
   byte-identical, and the manifest declares ``source_policy=provenance-only``.
 
-These tests fail loudly if a later change:
-* re-pins a package whose GB29446 is not r2 (which would re-break the RS04 Golden),
-* silently rewrites any definition or ``corrections.json``,
-* removes or adds anything other than ``sources/*``,
-* re-introduces standard原文 PDFs into the distribution,
-* or lets ``PIN.json`` drift from the file it claims to describe.
+The signed 2026.10-published.4 fixture is the exact package from Git commit
+``a230f806ec4fcfd384a25bb7bea239a9c38623f3`` (SHA256 below). It is
+reference-only test evidence, never an installer or release input. The current
+2026.10-published.5 package changes only the GB29446 r2 definition to r3.
 """
 
 from __future__ import annotations
@@ -32,6 +30,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
 PINNED = PACKAGE_DIR / "initial-standard-package-published.uebench"
+REVISION_PARENT = ROOT / "tests" / "fixtures" / "standard-packages" / "2026.10-published.4.uebench"
 #: 直接父基线（含 sources/*）已移出仓库（SUPERSEDED，项目外只读归档）；这里取得的是**副本**。
 try:  # 测试目录既可能是普通目录，也可能被当作包
     from _legacy_assets import session_source_bearing_predecessor
@@ -44,7 +43,8 @@ PIN = PACKAGE_DIR / "PIN.json"
 GHOST = "signature.ed25519"
 STRUCTURAL = {"manifest.json", GHOST}
 TARGET = "gb-29446-2019"
-PINNED_SHA256 = "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff"
+PINNED_SHA256 = "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
+REVISION_PARENT_SHA256 = "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff"
 PARENT_SHA256 = "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0"
 
 ARCHIVE_UNAVAILABLE = (
@@ -140,7 +140,10 @@ def test_pin_keeps_absolute_paths_out_of_committed_files() -> None:
         assert "archive_relative_path" in entry and not Path(
             entry["archive_relative_path"]
         ).is_absolute()
-        assert entry["archive_pointer"].startswith("release/standard-packages/LEGACY-REFERENCE.json#")
+    assert record["ancestor_baseline"]["archive_pointer"].startswith(
+        "release/standard-packages/LEGACY-REFERENCE.json#"
+    )
+    assert "Git" in record["parent_baseline"]["archive_pointer"]
 
 
 # --------------------------------------------------------------------------
@@ -178,13 +181,13 @@ def test_pinned_package_contains_no_standard_source_members() -> None:
     assert manifest["rule_count"] == 765
 
 
-def test_pinned_package_gb29446_is_revision_2_with_coal_type() -> None:
-    """Without this the RS04 Product Golden Applicability Gate fails again."""
+def test_pinned_package_gb29446_is_revision_3_with_coal_type() -> None:
+    """The current signed package must contain the approved mapping revision."""
     with zipfile.ZipFile(PINNED) as archive:
         members = [n for n in archive.namelist() if n.startswith("definitions/gb-29446")]
         assert len(members) == 1, f"GB29446 定义成员应唯一，实际 {members}"
         definition = json.loads(archive.read(members[0]))
-    assert definition["rule_revision"] == 2, "固定标准包内 GB29446 必须是 r2"
+    assert definition["rule_revision"] == 3, "固定标准包内 GB29446 必须是 r3"
     assert [entry["key"] for entry in definition["selection_schema"]] == ["coal_type"]
     assert all(
         "coal_type" in (product.get("selection_values") or {})
@@ -221,20 +224,18 @@ def _parent_or_skip() -> Path:
     return PARENT
 
 
-def test_parent_baseline_is_byte_identical_to_the_archived_copy() -> None:
-    parent = _parent_or_skip()
+def test_revision_parent_is_the_signed_git_baseline() -> None:
     record = pin()
-    assert sha256_of(parent) == record["parent_baseline"]["sha256"] == PARENT_SHA256, (
-        "父基线标准包被修改；它必须保持为已发布资产的逐字节副本"
-    )
-    assert parent.stat().st_size == record["parent_baseline"]["size"]
+    assert sha256_of(REVISION_PARENT) == record["parent_baseline"]["sha256"] == REVISION_PARENT_SHA256
+    assert REVISION_PARENT.stat().st_size == record["parent_baseline"]["size"]
+    assert read_manifest(REVISION_PARENT)["data_version"] == "2026.10-published.4"
 
 
 def test_every_definition_is_byte_identical_to_the_parent_baseline() -> None:
-    """All definitions, including GB29446 r2, must be untouched by the去原文 change."""
+    """Historical .3→.4 source removal left all definitions untouched."""
     parent = _parent_or_skip()
     parent_defs = definitions_of(parent)
-    pinned_defs = definitions_of(PINNED)
+    pinned_defs = definitions_of(REVISION_PARENT)
 
     assert len(parent_defs) == len(pinned_defs) == 48
     assert set(parent_defs) == set(pinned_defs), (
@@ -257,10 +258,10 @@ def test_every_definition_is_byte_identical_to_the_parent_baseline() -> None:
 
 
 def test_only_sources_were_removed_from_the_parent_baseline() -> None:
-    """(c) 只允许 sources/* 消失；不得新增、不得改动其它成员。"""
+    """Historical .3→.4 transition removed only sources/* members."""
     parent = _parent_or_skip()
     parent_members = content_members(parent)
-    pinned_members = content_members(PINNED)
+    pinned_members = content_members(REVISION_PARENT)
 
     removed = sorted(set(parent_members) - set(pinned_members))
     added = sorted(set(pinned_members) - set(parent_members))
@@ -285,11 +286,34 @@ def test_only_sources_were_removed_from_the_parent_baseline() -> None:
 
     # ... and the manifest must agree on counts.
     parent_manifest = read_manifest(parent)
-    pinned_manifest = read_manifest(PINNED)
+    pinned_manifest = read_manifest(REVISION_PARENT)
     assert pinned_manifest["standard_count"] == parent_manifest["standard_count"] == 48
     assert pinned_manifest["rule_count"] == parent_manifest["rule_count"] == 765
     assert pinned_manifest["data_version"] != parent_manifest["data_version"]
     assert pinned_manifest["package_id"] != parent_manifest["package_id"]
+
+
+def test_current_revision_changes_only_gb29446_definition() -> None:
+    """The signed r3 package keeps the other 47 definitions byte-identical."""
+    parent_defs = definitions_of(REVISION_PARENT)
+    current_defs = definitions_of(PINNED)
+    parent_target = [key for key in parent_defs if key[0] == TARGET]
+    current_target = [key for key in current_defs if key[0] == TARGET]
+    assert len(parent_defs) == len(current_defs) == 48
+    assert len(parent_target) == len(current_target) == 1
+    assert parent_target[0][2] == 2
+    assert current_target[0][2] == 3
+    assert set(parent_defs) - {parent_target[0]} == set(current_defs) - {current_target[0]}
+    for key in set(parent_defs) - {parent_target[0]}:
+        assert parent_defs[key] == current_defs[key], key
+    parent_members = content_members(REVISION_PARENT)
+    current_members = content_members(PINNED)
+    assert set(parent_members) - set(current_members) == {parent_defs[parent_target[0]][0]}
+    assert set(current_members) - set(parent_members) == {current_defs[current_target[0]][0]}
+    for name in set(parent_members) & set(current_members):
+        assert parent_members[name] == current_members[name], name
+    assert read_manifest(PINNED)["source_policy"] == "provenance-only"
+    assert read_manifest(PINNED)["data_version"] == "2026.10-published.5"
 
 
 def test_pinned_data_version_sorts_after_the_retired_one() -> None:

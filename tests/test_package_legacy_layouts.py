@@ -579,7 +579,10 @@ def test_real_bundled_gb29446_evaluation_survives_the_cleanup(tmp_path: Path) ->
         assert loaded_after[1].rule_revision == loaded_before[1].rule_revision
         assert loaded_after[2].rule_revision == loaded_before[2].rule_revision
         assert context.application.count_evaluations() == 1
-        assert context.standards.get_published(GB29446).rule_revision == 2
+        current_definition = json.loads(
+            (ROOT / "data/definitions/gb-29446-2019.json").read_text(encoding="utf-8")
+        )
+        assert context.standards.get_published(GB29446).rule_revision == current_definition["rule_revision"]
         assert len(context.application.list_package_history(5)) == 1
         # 已产生的备份仍然都在（清理不改写任何 .uebackup）。
         assert backup_names(context.paths)

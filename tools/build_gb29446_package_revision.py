@@ -218,16 +218,20 @@ def build_revision_package(
     # Locate the parent's member for this standard by parsing, never by name guess.
     removed: list[str] = []
     kept: dict[str, bytes] = {}
+    parent_definition: StandardDefinition | None = None
     for entry in parent_manifest.files:
         if entry.kind != "definition":
             continue
         candidate = StandardDefinition.model_validate_json(members[entry.path])
         if candidate.id == TARGET_STANDARD_ID:
             removed.append(entry.path)
+            parent_definition = candidate
     if len(removed) != 1:
         raise SystemExit(
             f"父基线中 {TARGET_STANDARD_ID} 的定义成员数应为 1，实际 {len(removed)}：{removed}"
         )
+    if parent_definition is None or definition.rule_revision <= parent_definition.rule_revision:
+        raise SystemExit("替换定义的 rule_revision 必须高于父基线")
 
     suffix = "" if definition.rule_revision == 1 else f"-r{definition.rule_revision}"
     new_definition_member = f"definitions/{definition.id}-{definition.version}{suffix}.json"
@@ -242,12 +246,16 @@ def build_revision_package(
         raise SystemExit(f"新定义成员已存在于父基线：{new_definition_member}")
     kept[new_definition_member] = canonical_definition_payload(definition)
 
-    # The definition's source PDF must already be in the parent, unmodified.
+    # A provenance-only parent deliberately contains no source PDFs. Preserve
+    # that policy rather than reintroducing source files in a revision package.
     source_member = f"sources/{definition.source_file}"
-    if source_member not in kept:
-        raise SystemExit(f"父基线缺少该标准的原文：{source_member}")
-    if _sha256_bytes(kept[source_member]) != definition.source_sha256.lower():
-        raise SystemExit("父基线中该标准原文的哈希与当前定义不一致")
+    if parent_manifest.source_policy == SOURCE_POLICY_EMBEDDED:
+        if source_member not in kept:
+            raise SystemExit(f"父基线缺少该标准的原文：{source_member}")
+        if _sha256_bytes(kept[source_member]) != definition.source_sha256.lower():
+            raise SystemExit("父基线中该标准原文的哈希与当前定义不一致")
+    elif any(name.startswith("sources/") for name in kept):
+        raise SystemExit("provenance-only 父基线意外含有标准原文")
 
     rule_count = 0
     definition_count = 0
@@ -267,12 +275,12 @@ def build_revision_package(
         )
 
     new_manifest = PackageManifest(
-        package_id=package_id or f"gb29446-r2-from-{parent_manifest.data_version}",
+        package_id=package_id or f"gb29446-r{definition.rule_revision}-from-{parent_manifest.data_version}",
         data_version=data_version,
         issued_at=issued_at or datetime.now(timezone.utc),
         minimum_app_version=minimum_app_version,
         package_mode="full",
-        source_policy=SOURCE_POLICY_EMBEDDED,
+        source_policy=parent_manifest.source_policy,
         rule_engine_version=parent_manifest.rule_engine_version,
         # Forbidden for a full package by validate_lineage; see module docstring.
         parent_package_id=None,
@@ -294,7 +302,7 @@ def build_revision_package(
         "package_id": new_manifest.package_id,
         "minimum_app_version": minimum_app_version,
         "source_policy": new_manifest.source_policy,
-        "source_free": False,
+        "source_free": parent_manifest.source_policy != SOURCE_POLICY_EMBEDDED,
         "standard_count": definition_count,
         "rule_count": rule_count,
         "replaced_definition_member": removed,
@@ -586,6 +594,11 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
         if not is_gb29446_definition(name):
             problems.append(f"非目标成员内容被改变：{name}")
 
+    gb_old = None
+    for name in removed:
+        parsed = StandardDefinition.model_validate_json(parent_members[name])
+        if parsed.id == TARGET_STANDARD_ID:
+            gb_old = parsed
     gb_new = None
     for name in added:
         parsed = StandardDefinition.model_validate_json(candidate_members[name])
@@ -593,8 +606,8 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
             gb_new = parsed
     if gb_new is None:
         problems.append("候选包中没有新的 GB29446 定义成员")
-    elif gb_new.rule_revision != 2:
-        problems.append(f"新 GB29446 规则修订应为 2，实际 {gb_new.rule_revision}")
+    elif gb_old is None or gb_new.rule_revision <= gb_old.rule_revision:
+        problems.append("新 GB29446 规则修订必须高于父基线")
 
     if candidate_manifest.standard_count != parent_manifest.standard_count:
         problems.append(
@@ -605,6 +618,8 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
         problems.append("data_version 未变更")
     if candidate_manifest.package_id == parent_manifest.package_id:
         problems.append("package_id 未变更")
+    if candidate_manifest.source_policy != parent_manifest.source_policy:
+        problems.append("标准原文分发策略不得在规则修订时改变")
 
     return {
         "valid": not problems,

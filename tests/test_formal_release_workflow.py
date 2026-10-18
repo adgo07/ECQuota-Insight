@@ -16,7 +16,11 @@ def test_formal_release_workflow_is_tagged_and_uploads_existing_release_assets()
     assert "refs/tags/$($tag)^{commit}" in workflow
     assert "git merge-base --is-ancestor" in workflow
     assert "git status --porcelain" in workflow
-    assert "2026.10-published.4" in workflow
+    assert '"release/standard-packages/PIN.json"' in workflow
+    assert "Get-FileHash -LiteralPath $pinnedPackage -Algorithm SHA256" in workflow
+    assert "$info.standard_data_version -cne $pin.data_version" in workflow
+    assert "$info.standard_package_id -cne $pin.package_id" in workflow
+    assert "$info.standard_package_sha256 -cne $pinnedHash" in workflow
     assert "ACTIVE-RELEASE.json" in workflow
     assert "gh release create" not in workflow
     assert "git tag " not in workflow

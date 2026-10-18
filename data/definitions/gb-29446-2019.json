@@ -5,12 +5,15 @@
   "title": "选煤电力消耗限额",
   "version": "2019",
   "standard_family_id": "GB 29446",
-  "rule_revision": 2,
+  "rule_revision": 3,
   "publication_status": "published",
   "publication_date": "2019-12-17",
   "effective_date": "2020-07-01",
   "source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
   "source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
+  "corrections": [
+    "软件映射采用（非标准勘误）：GB29446-2019/标准映射表_2026-10-18_已批准.md; sha256=d8019b19358caf52956a6b2ebde2211f5474cbd76e44bf71cfe9732c9c76a6ba"
+  ],
   "products": [
     {
       "id": "gb_29446-2019-coking-coal",
@@ -89,7 +92,7 @@
             },
             {
               "key": "electricity_consumption",
-              "label": "统计期选煤电力消耗量 E_d",
+              "label": "统计期内选煤电力消耗量 E_d",
               "data_type": "decimal",
               "unit": "kW·h",
               "required": true,
@@ -101,7 +104,7 @@
             },
             {
               "key": "raw_coal_input",
-              "label": "统计期入选原煤量 m",
+              "label": "统计期内入选原煤量 m",
               "data_type": "decimal",
               "unit": "t",
               "required": true,
@@ -127,7 +130,7 @@
                   {
                     "op": "input",
                     "input_key": "electricity_consumption",
-                    "label": "统计期选煤电力消耗量 E_d",
+                    "label": "统计期内选煤电力消耗量 E_d",
                     "unit": "kW·h"
                   },
                   {
@@ -209,7 +212,7 @@
                         "label": "重介、跳汰、浮选联合"
                       }
                     ],
-                    "label": "工艺类型折算系数 k"
+                    "label": "选煤工艺类型折算系数 k"
                   }
                 ],
                 "label": "E_d × k",
@@ -218,7 +221,7 @@
               {
                 "op": "input",
                 "input_key": "raw_coal_input",
-                "label": "统计期入选原煤量 m",
+                "label": "统计期内入选原煤量 m",
                 "unit": "t"
               }
             ],
@@ -310,7 +313,7 @@
           "display_calculations": [
             {
               "key": "process_factor",
-              "label": "工艺类型折算系数 k",
+              "label": "选煤工艺类型折算系数 k",
               "modes": [
                 "DIRECT",
                 "DETAIL"
@@ -394,7 +397,7 @@
                     "label": "重介、跳汰、浮选联合"
                   }
                 ],
-                "label": "工艺类型折算系数 k"
+                "label": "选煤工艺类型折算系数 k"
               }
             },
             {
@@ -410,13 +413,13 @@
                   {
                     "op": "input",
                     "input_key": "electricity_consumption",
-                    "label": "统计期选煤电力消耗量 E_d",
+                    "label": "统计期内选煤电力消耗量 E_d",
                     "unit": "kW·h"
                   },
                   {
                     "op": "input",
                     "input_key": "raw_coal_input",
-                    "label": "统计期入选原煤量 m",
+                    "label": "统计期内入选原煤量 m",
                     "unit": "t"
                   }
                 ],
@@ -426,7 +429,7 @@
             },
             {
               "key": "electricity_consumption",
-              "label": "统计期选煤电力消耗量 E_d",
+              "label": "统计期内选煤电力消耗量 E_d",
               "unit": "kW·h",
               "modes": [
                 "DETAIL"
@@ -434,13 +437,13 @@
               "formula": {
                 "op": "input",
                 "input_key": "electricity_consumption",
-                "label": "统计期选煤电力消耗量 E_d",
+                "label": "统计期内选煤电力消耗量 E_d",
                 "unit": "kW·h"
               }
             },
             {
               "key": "raw_coal_input",
-              "label": "统计期入选原煤量 m",
+              "label": "统计期内入选原煤量 m",
               "unit": "t",
               "modes": [
                 "DETAIL"
@@ -448,7 +451,7 @@
               "formula": {
                 "op": "input",
                 "input_key": "raw_coal_input",
-                "label": "统计期入选原煤量 m",
+                "label": "统计期内入选原煤量 m",
                 "unit": "t"
               }
             },
@@ -547,7 +550,7 @@
                         "label": "重介、跳汰、浮选联合"
                       }
                     ],
-                    "label": "工艺类型折算系数 k"
+                    "label": "选煤工艺类型折算系数 k"
                   }
                 ],
                 "label": "直接口径反算未折算电耗",
@@ -682,7 +685,7 @@
             },
             {
               "key": "electricity_consumption",
-              "label": "统计期选煤电力消耗量 E_d",
+              "label": "统计期内选煤电力消耗量 E_d",
               "data_type": "decimal",
               "unit": "kW·h",
               "required": true,
@@ -694,7 +697,7 @@
             },
             {
               "key": "raw_coal_input",
-              "label": "统计期入选原煤量 m",
+              "label": "统计期内入选原煤量 m",
               "data_type": "decimal",
               "unit": "t",
               "required": true,
@@ -720,7 +723,7 @@
                   {
                     "op": "input",
                     "input_key": "electricity_consumption",
-                    "label": "统计期选煤电力消耗量 E_d",
+                    "label": "统计期内选煤电力消耗量 E_d",
                     "unit": "kW·h"
                   },
                   {
@@ -832,7 +835,7 @@
                         "label": "重介、跳汰、浮选联合"
                       }
                     ],
-                    "label": "工艺类型折算系数 k"
+                    "label": "选煤工艺类型折算系数 k"
                   }
                 ],
                 "label": "E_d × k",
@@ -841,7 +844,7 @@
               {
                 "op": "input",
                 "input_key": "raw_coal_input",
-                "label": "统计期入选原煤量 m",
+                "label": "统计期内入选原煤量 m",
                 "unit": "t"
               }
             ],
@@ -933,7 +936,7 @@
           "display_calculations": [
             {
               "key": "process_factor",
-              "label": "工艺类型折算系数 k",
+              "label": "选煤工艺类型折算系数 k",
               "modes": [
                 "DIRECT",
                 "DETAIL"
@@ -1047,7 +1050,7 @@
                     "label": "重介、跳汰、浮选联合"
                   }
                 ],
-                "label": "工艺类型折算系数 k"
+                "label": "选煤工艺类型折算系数 k"
               }
             },
             {
@@ -1063,13 +1066,13 @@
                   {
                     "op": "input",
                     "input_key": "electricity_consumption",
-                    "label": "统计期选煤电力消耗量 E_d",
+                    "label": "统计期内选煤电力消耗量 E_d",
                     "unit": "kW·h"
                   },
                   {
                     "op": "input",
                     "input_key": "raw_coal_input",
-                    "label": "统计期入选原煤量 m",
+                    "label": "统计期内入选原煤量 m",
                     "unit": "t"
                   }
                 ],
@@ -1079,7 +1082,7 @@
             },
             {
               "key": "electricity_consumption",
-              "label": "统计期选煤电力消耗量 E_d",
+              "label": "统计期内选煤电力消耗量 E_d",
               "unit": "kW·h",
               "modes": [
                 "DETAIL"
@@ -1087,13 +1090,13 @@
               "formula": {
                 "op": "input",
                 "input_key": "electricity_consumption",
-                "label": "统计期选煤电力消耗量 E_d",
+                "label": "统计期内选煤电力消耗量 E_d",
                 "unit": "kW·h"
               }
             },
             {
               "key": "raw_coal_input",
-              "label": "统计期入选原煤量 m",
+              "label": "统计期内入选原煤量 m",
               "unit": "t",
               "modes": [
                 "DETAIL"
@@ -1101,7 +1104,7 @@
               "formula": {
                 "op": "input",
                 "input_key": "raw_coal_input",
-                "label": "统计期入选原煤量 m",
+                "label": "统计期内入选原煤量 m",
                 "unit": "t"
               }
             },
@@ -1230,7 +1233,7 @@
                         "label": "重介、跳汰、浮选联合"
                       }
                     ],
-                    "label": "工艺类型折算系数 k"
+                    "label": "选煤工艺类型折算系数 k"
                   }
                 ],
                 "label": "直接口径反算未折算电耗",
@@ -1291,7 +1294,7 @@
   "selection_schema": [
     {
       "key": "coal_type",
-      "label": "煤种",
+      "label": "选煤企业类型",
       "required": true
     }
   ]

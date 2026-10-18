@@ -9,6 +9,7 @@ import pytest
 from uebench.domain.models import PublicationStatus
 from tools.review_confirmed_rules import promote
 from tools.publish_confirmed_rules import validate_confirmation
+from tools.publish_confirmed_rules import main as legacy_publish_main
 
 
 def _workbook(path: Path, indicator_id: str, conclusion: str = "同意发布") -> None:
@@ -45,6 +46,13 @@ def test_draft_rows_cannot_be_published_without_review(tmp_path: Path) -> None:
             all_ids={"draft.indicator"},
             scope_count=1,
         )
+
+
+def test_legacy_publish_apply_is_fail_closed(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr("sys.argv", ["publish_confirmed_rules.py", str(tmp_path / "missing.xlsx"), str(tmp_path), "--apply"])
+    with pytest.raises(SystemExit, match="写入通道已退役"):
+        legacy_publish_main()
+    assert list(tmp_path.iterdir()) == []
 from .test_engine import make_standard
 
 

@@ -182,16 +182,17 @@ def test_get_standard_is_equivalent_to_the_library_entry(context):
 
 
 def test_get_standard_keeps_the_newest_installed_revision(context):
-    newer = gb29446_definition().model_copy(update={"rule_revision": 2})
+    current_revision = gb29446_definition().rule_revision
+    newer = gb29446_definition().model_copy(update={"rule_revision": current_revision + 1})
     context.standards.install(newer)
     by_id = context.application.get_standard(GB29446_ID)
-    assert by_id is not None and by_id.rule_revision == 2
+    assert by_id is not None and by_id.rule_revision == current_revision + 1
     library_revisions = {
         item.rule_revision
         for item in context.application.list_library_standards()
         if item.id == GB29446_ID
     }
-    assert library_revisions == {2}
+    assert library_revisions == {current_revision + 1}
 
 
 def test_get_standard_falls_back_to_the_catalogue_without_installing_it(tmp_path):

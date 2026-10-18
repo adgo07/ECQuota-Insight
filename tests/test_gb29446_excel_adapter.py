@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import zipfile
+from xml.etree import ElementTree as ET
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -622,8 +623,8 @@ def test_prepare_keeps_batch_retryable(ctx, tmp_path):
 def test_submit_rejects_template_when_rule_revision_changed(ctx, tmp_path):
     """A rule revision installed after validation must not be applied silently.
 
-    Reproduces the reported P1: validate against r2, install a current r3,
-    then submit.  ``source_sha256`` is unchanged, so the file hash alone cannot
+    Reproduces the reported P1: validate against the installed revision, then
+    install its successor. ``source_sha256`` is unchanged, so the file hash alone cannot
     detect this; the metadata/resolver gate must.
     """
     from uebench.domain.models import StandardDefinition
@@ -632,12 +633,12 @@ def test_submit_rejects_template_when_rule_revision_changed(ctx, tmp_path):
     path = fill(make_template(ctx, tmp_path, "stale-submit.xlsx"))
     report = validate(ctx, path)
     assert report.valid, report.issues
-    assert report.rule_revision == 2, "fixture expects the r2 definition"
+    assert report.rule_revision == definition["rule_revision"]
 
     # Install a newer revision as the currently applicable definition.  The
     # thresholds change too, so accepting the stale template would change the grade.
     updated = json.loads(json.dumps(definition))
-    updated["rule_revision"] = 3
+    updated["rule_revision"] = report.rule_revision + 1
     for product in updated["products"]:
         for indicator in product["indicators"]:
             indicator["thresholds"] = {
@@ -673,9 +674,10 @@ def test_legacy_commit_does_not_bypass_revision_gate(ctx, tmp_path):
     path = fill(make_template(ctx, tmp_path, "legacy-commit.xlsx"))
     report = validate(ctx, path)
     assert report.valid, report.issues
+    assert report.rule_revision == definition["rule_revision"]
 
     updated = json.loads(json.dumps(definition))
-    updated["rule_revision"] = 3
+    updated["rule_revision"] = report.rule_revision + 1
     ctx.standards.install(StandardDefinition.model_validate(updated))
 
     draft = ctx.application.commit_workbook(report.import_id)
@@ -961,12 +963,23 @@ def _inject_cached_formula(path: Path, formula: str, cached: str) -> None:
         names = archive.namelist()
         payload = {name: archive.read(name) for name in names}
     target = "xl/worksheets/sheet2.xml"
-    text = payload[target].decode("utf-8")
-    pattern = re.compile(r'(<c r="B8"[^>]*>)(<f>)([^<]*)(</f>)(<v\s*/>)')
-    match = pattern.search(text)
-    assert match, "unexpected sheet XML layout"
-    replacement = f"{match.group(1)}<f>{formula}</f><v>{cached}</v>"
-    payload[target] = (text[: match.start()] + replacement + text[match.end():]).encode("utf-8")
+    root = ET.fromstring(payload[target])
+    namespace = root.tag.split("}", 1)[0][1:] if root.tag.startswith("{") else ""
+
+    def qname(name: str) -> str:
+        return f"{{{namespace}}}{name}" if namespace else name
+    cell = root.find(f".//{qname('c')}[@r='B8']")
+    assert cell is not None, "formula cell B8 missing from worksheet XML"
+    formula_node = cell.find(qname("f"))
+    assert formula_node is not None, "formula node missing from B8"
+    formula_node.text = formula
+    cached_node = cell.find(qname("v"))
+    if cached_node is None:
+        cached_node = ET.SubElement(cell, qname("v"))
+    cached_node.text = cached
+    if namespace:
+        ET.register_namespace("", namespace)
+    payload[target] = ET.tostring(root, encoding="utf-8", xml_declaration=True)
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
         for name in names:
             archive.writestr(name, payload[target] if name == target else payload[name])

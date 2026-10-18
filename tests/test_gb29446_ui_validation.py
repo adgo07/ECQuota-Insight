@@ -41,8 +41,8 @@ ROOT = Path(__file__).resolve().parents[1]
 GB29446_DEFINITION = ROOT / "data" / "definitions" / "gb-29446-2019.json"
 
 #: 两个必填数量的业务标签（与规则定义逐字一致，界面不得另写一套）。
-ELECTRICITY_LABEL = "统计期选煤电力消耗量 E_d"
-RAW_COAL_LABEL = "统计期入选原煤量 m"
+ELECTRICITY_LABEL = "统计期内选煤电力消耗量 E_d"
+RAW_COAL_LABEL = "统计期内入选原煤量 m"
 
 
 @pytest.fixture(scope="module")
@@ -213,7 +213,7 @@ def test_extreme_but_finite_values_are_warn_only_and_still_computed(window) -> N
 
     assert warnings == []
     assert win.last_result_id is not None
-    assert win.gb29446_result_grade.text() == "超出3级"
+    assert win.gb29446_result_grade.text() == "未达3级"
     saved = context.application.get_evaluation(win.last_result_id)[1].results[0]
     assert saved.actual_value == Decimal("1e999") and saved.actual_value.is_finite()
     assert saved.grade is Grade.NOT_QUALIFIED
@@ -248,12 +248,12 @@ def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> 
             labels.append(widget.text())
     assert labels == [
         "企业名称（可选）",
-        "核算周期",
-        "煤种",
-        "选煤工艺",
-        "统计期选煤电力消耗量 E<sub>d</sub>（kW·h）",
-        "统计期入选原煤量 m（t）",
-        "折算系数 k（自动匹配，只读）",
+        "统计期",
+        "选煤企业类型",
+        "选煤工艺类型",
+        "统计期内选煤电力消耗量 E<sub>d</sub>（kW·h）",
+        "统计期内入选原煤量 m（t）",
+        "选煤工艺类型折算系数 k（自动匹配，只读）",
     ]
     assert not any("备注" in text for text in labels)
 

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Protocol
 
 from uebench.domain.models import AuditEntry, EvaluationRequest, PackageHistoryEntry, StandardDefinition
+from uebench.application.reporting import ReportView
 
 
 class TemplatePort(Protocol):
@@ -66,6 +67,10 @@ class WorkbookImportPort(Protocol):
 
 class WorkbookExportPort(Protocol):
     def export(self, evaluation_id: str, path: Path) -> Path: ...
+
+
+class WordReportPort(Protocol):
+    def write(self, view: ReportView, path: Path) -> Path: ...
 
 
 class StandardSourcePort(Protocol):

@@ -10,7 +10,7 @@
 | 产品名称 | 单位产品能耗限额评价软件（程序包名 `uebench`） |
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
 | 当前产品阶段 | 参考标准 `GB 29446—2019` 产品闭环；当前阶段状态见 `TASK_STATE.md` 与 `参考标准开发路线.md`（RS01–RS06） |
-| 当前交付范围 | 标准库 48 项 / 765 条规则（含 1 项历史标准）；开发基线 `standards/development/scope-63`；**正式评价范围只有 GB 29446—2019** |
+| 当前交付范围 | 单源机器定义 64 项（含 16 项原样 `draft`）；随包清单仅 48 项（含 1 项历史标准）；**正式评价范围只有 GB 29446—2019**。`standards/development/scope-63` 为既有开发范围/历史资料，不决定交付或正式评价范围 |
 | Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 
 本仓仍独立开发、独立安装、独立升级、独立离线运行。
@@ -165,8 +165,8 @@ authoritative XLSX 数值如被 openpyxl 物化为 Python `float`，**必须拒�
 
 - Windows Desktop 是当前第一交付平台；程序包名仍为 `uebench`；
 - 普通页面不含企业属性、单一煤种工艺确认及合规主结论；
-- GB 29446 专用页面显示“超出3级”，覆盖早期规范中的“未达标”措辞；
-- 新版 EXE、安装包和独立公式 Excel 尚未同步完成最新口径验收；旧发布物不代表当前源码。
+- GB 29446 现行批准映射的软件决定 D01 将有效比较后超过 3 级上限的结果命名为“未达3级”；旧页面“超出3级”是待同步实现，不代表现行批准词；D02 要求该标准 $E_d>0$、$m>0$，明确属于软件防误录规则；
+- 新版 EXE、安装包及 Word 报告尚需按当前源码验收；本轮不生成或交付新版 Excel 工作簿，旧发布物不代表当前源码。
 
 ## 3. 青舟中央治理入口
 
@@ -308,6 +308,14 @@ Stage A 标准整理
 - 新增或批准替代映射时同步维护总索引与标准入口；映射批准状态不等于软件支持状态，不以目录整理改变产品路线或支持范围。
 - 根目录只保留治理入口与唯一 `STANDARD_ISSUES_REGISTER.md`，不新增各标准映射正文、第二份问题台账或第二份总体路线。
 
+**GB 29446—2019 现行批准业务映射：**[2026-10-18 已批准版](standards/mappings/GB29446-2019/标准映射表_2026-10-18_已批准.md)；批准及原字节 SHA256 见[标准入口](standards/mappings/GB29446-2019/README.md)。后续选煤 Rule、Calculator、UI、Word 和独立 Golden 依该映射核对，不能以旧 JSON、测试或软件习惯反改映射。普通页面不恢复企业建设属性合规填写或符合性主结论。
+
+其他标准已有规则是**遗留待映射重审的工程基线**，不是已批准业务真值源；这不等于逐条断言现有规则错误。用户逐项批准映射后，按“批准映射 → 差异清单 → Stage B 设计 → Stage C 实现 → 独立 Golden → Stage D 验收”重整核算、判定及展示。该重审描述不是新增软件支持状态，五态枚举仍按第 6 节。历史评价及其规则快照不自动重算。
+
+UI、Word 与未来可能的 Excel 中，标准相关字段名、单位、选项、说明和结果含义均来自现行批准映射；特殊命名须 Owner 明确特批并记录采用范围。各渠道尽量表达同一业务内容，仅布局、分页、展开方式可不同。Excel 本轮暂不实施新版工作簿，不因此删除已有后台安全能力。
+
+跨标准共同软件标签“未达3级”的适用边界集中见[统一判定规范 §10](docs/统一判定规范.md)；各标准的阈值、比较方向和汇总仍由各自批准映射确定。
+
 ## 7. 标准问题与解释治理
 
 开工前必须读取根目录 `STANDARD_ISSUES_REGISTER.md`，检查当前任务是否涉及已有 Standard Issue。
@@ -329,7 +337,7 @@ Standard Issue
 
 ## 8. 桌面 UI 前置原则
 
-后续涉及桌面 UI 的 Design / Execution / Acceptance 必须检查中央 `docs/ui/UI_DESIGN_GUIDELINES_V0.1.md` 的**当前适用版本**（ACTIVE / EVOLVING 指南，不是 Frozen Contract）。
+后续涉及桌面 UI 的 Design / Execution / Acceptance，先读中央 `docs/GUIDE_INDEX.md`，再按其当前路由检查 UI 指南（当前为 `docs/ui/UI_DESIGN_GUIDELINES_V0.2.md`）、产品家族规格与适用验收清单。它们是 ACTIVE / EVOLVING 指南，不是 Frozen Contract；不得用历史 v0.1 取代当前路由。本轮新 Word 决定与中央 ACTIVE 产品规格的旧“无报告导出”条目需另行同步，不改 `platform-lock.json`。
 
 本仓相关要点：
 
