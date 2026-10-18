@@ -36,11 +36,13 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 - 除选煤外，现有其他标准规则是**遗留待映射重审的工程基线**，不是批准业务真值源；不据此断言所有旧规则均已证实错误。用户逐项批准映射后，按“映射 → 差异清单 → 设计 → 实现 → 独立 Golden → 验收”重整核算、判定和展示；旧状态五态枚举不增加新值。历史评价与规则快照不自动重算。
 - 已按 Owner 批准将 16 项原样 `draft` 候选迁入唯一可编辑机器定义源 `data/definitions/`：当前共 64 项。`data/delivery-scope.json` 显式选择随包 48 项（含既有历史项）、正式评价仅 `gb-29446-2019`；定义迁入不等于业务批准。`standards/development/scope-63/` 与 `scope-65/` 保留为只读历史快照，不是发布输入、不得反向覆盖当前定义。开发索引由单源及交付清单派生；旧 writer 入口退出，本轮源码集成验收已通过。
 - 本轮新增选煤 Word 报告目标。中央 ACTIVE 产品家族规格 A-12、验收清单和 UI 指南已通过 [Qingzhou-contracts PR #13](https://github.com/adgo07/Qingzhou-contracts/pull/13) 同步并合并（`c5fc6d438c9200060649e47c016b9b48218de72c`）；这不是 Frozen Contract 变更，`platform-lock.json` 不升级。RS05 仍 IN PROGRESS，Reference Standard Product Closure 仍 PARTIAL，未授权发布。
-- **标准包输入与上一轮 Candidate（非正式产品发布）：**[PIN](release/standard-packages/PIN.json) 指向 `2026.10-published.5`，`package_id=gb29446-r3-from-2026.10-published.4`，132,966 B，SHA256 `9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5`；其中 GB29446 规则修订为 r3、48 项随包、765 条规则、`source_policy=provenance-only`。上一轮 Candidate 构建源码 commit 为 `025d8c5a1bdb63afd53c61df7c5435604259d314`；PR #28 后的新 Candidate 须从后续干净源码重新构建并验收，不能把旧实物冒充新源码产物。
+- **标准包输入与上一轮 Candidate（非正式产品发布）：**[PIN](release/standard-packages/PIN.json) 指向 `2026.10-published.5`，`package_id=gb29446-r3-from-2026.10-published.4`，132,966 B，SHA256 `9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5`；其中 GB29446 规则修订为 r3、48 项随包、765 条规则、`source_policy=provenance-only`。上一轮 Candidate 构建源码 commit 为 `025d8c5a1bdb63afd53c61df7c5435604259d314`；PR #28 后新 Candidate 的独立构建与验收身份见下段，不能把旧实物冒充新源码产物。
 
 **本轮源码集成验收通过**，详见[实施与验收记录](docs/governance/映射驱动单源规则与同源报告_V3_验收记录_20261018.md)：本地 full suite 为 1110 passed、62 skipped、0 failed、1 warning。实际 Candidate 的 Artifact Gate 63/63、安装版与便携版 EXE、自检、安装版保存重启及 Word 导出、真实 Microsoft Word 与 WPS 四场景、同版本覆盖与卸载保留数据、可信旧 0.2.0 Candidate `.4`→本轮 `.5` 升级保留 r2 历史结果、构建源码 exact-head 三项 GitHub CI 均已取得证据；具体边界见[交付补充验收记录](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。0.1.0→0.2.0 无可信旧安装包供实测，原生 Windows DPI／跨屏和 Windows 11 等环境覆盖仍待证据；中央 ACTIVE 四文件已合并。RS05 仍 IN PROGRESS，产品闭环仍 PARTIAL。
 
-PR #13 的历史 Windows Candidate 与对账工作是本阶段既有基线；`025d8c5` Candidate 的已完成验收保持历史证据。[业务 PR #28](https://github.com/adgo07/ECQuota-Insight/pull/28) 已按 Owner 授权合并到 `main`（merge `8914d31da35ffb3e8f42cbea9a55a9075fea4d0e`），新 Candidate 重建及受影响验收待记录。上述通过项不代表 RS05 已完成或正式发布。
+PR #13 的历史 Windows Candidate 与对账工作是本阶段既有基线；`025d8c5` Candidate 的已完成验收保持历史证据。[业务 PR #28](https://github.com/adgo07/ECQuota-Insight/pull/28) 已按 Owner 授权合并到 `main`（merge `8914d31da35ffb3e8f42cbea9a55a9075fea4d0e`），新 Candidate 的独立构建及受影响验收见下段。上述通过项不代表 RS05 已完成或正式发布。
+
+**PR #28 合并后新 Candidate 已重建并完成本机受影响续验：**构建输入干净提交 `4e4349068bb56fa500d20cfab98ef6640e63605c`，`rc-4e43490`；身份、10 条文件哈希、冻结 EXE 自检 6/6、Artifact Gate 63/63 及该源码三项 exact-head CI 均通过。新安装版 GUI 保存／重启读回、临界与未达3级 Word/WPS 实开、中文路径便携 GUI 启停、可信旧 r2 数据克隆升级且历史 JSON 不变，证据与范围见[交付补充验收记录 §6](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。上段 `025d8c5` 仅是旧 Candidate 历史证据；新候选仍未正式发布。Win11、原生系统 DPI／跨屏和可信 0.1.0 安装包升级暂无实测证据；RS05 仍 IN PROGRESS、产品闭环 PARTIAL。
 
 ### RS05 前置阶段背景（历史记录）
 
