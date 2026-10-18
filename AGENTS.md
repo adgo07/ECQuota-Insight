@@ -337,7 +337,7 @@ Standard Issue
 
 ## 8. 桌面 UI 前置原则
 
-后续涉及桌面 UI 的 Design / Execution / Acceptance，先读中央 `docs/GUIDE_INDEX.md`，再按其当前路由检查 UI 指南（当前为 `docs/ui/UI_DESIGN_GUIDELINES_V0.2.md`）、产品家族规格与适用验收清单。它们是 ACTIVE / EVOLVING 指南，不是 Frozen Contract；不得用历史 v0.1 取代当前路由。本轮新 Word 决定与中央 ACTIVE 产品规格的旧“无报告导出”条目需另行同步，不改 `platform-lock.json`。
+后续涉及桌面 UI 的 Design / Execution / Acceptance，先读中央 `docs/GUIDE_INDEX.md`，再按其当前路由检查 UI 指南（当前为 `docs/ui/UI_DESIGN_GUIDELINES_V0.2.md`）、产品家族规格与适用验收清单。它们是 ACTIVE / EVOLVING 指南，不是 Frozen Contract；不得用历史 v0.1 取代当前路由。本轮选煤 Word 决定已由中央 [PR #13](https://github.com/adgo07/Qingzhou-contracts/pull/13) 同步 ACTIVE 产品规格 A-12 与适用清单，不改 `platform-lock.json`。
 
 本仓相关要点：
 
