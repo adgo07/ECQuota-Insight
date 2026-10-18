@@ -49,8 +49,10 @@ def definition(path: Path, catalog: dict, number: str, indicators: list[dict]) -
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", type=Path, default=Path("data"))
+    parser.add_argument("--data-dir", type=Path, help="仅允许显式指定隔离草案目录")
     args = parser.parse_args()
+    if args.data_dir is None or args.data_dir.resolve() == Path(__file__).resolve().parents[1] / "data":
+        raise SystemExit("历史人工候选写入口已退役；必须显式指定隔离--data-dir，不得覆盖当前data。")
     root = args.data_dir.resolve()
     catalog = {x["number"]: x for x in json.loads((root / "catalog.json").read_text(encoding="utf-8"))["standards"]}
 

@@ -73,10 +73,6 @@ Type: filesandordirs; Name: "{app}\模板"
 [Files]
 Source: "..\dist\UEBench\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "uebench.ico"; DestDir: "{app}"; Flags: ignoreversion
-; The GB 29446 import template is generated headlessly by
-; tools/build_release_templates.py through the real WorkbookTemplateService, so
-; producing a release never requires opening the GUI and saving by hand.
-Source: "..\dist\release\GB29446选煤电力消耗限额导入模板.xlsx"; DestDir: "{app}\模板"; Flags: ignoreversion
 Source: "..\docs\用户手册.md"; DestDir: "{app}\文档"; Flags: ignoreversion
 ; The document file names carry the product version, so they are built from the
 ; same macro that names the installer instead of being written out by hand.

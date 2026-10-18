@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
-
-from uebench.domain.models import StandardDefinition
 
 
 FIRST_BATCH = [
@@ -875,38 +871,10 @@ BUILDERS = {
 
 
 def main() -> None:
-    data_root = Path("data")
-    catalog_path = data_root / "catalog.json"
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    by_number = {item["number"]: item for item in catalog["standards"]}
-    summary: list[dict[str, Any]] = []
-    for number in FIRST_BATCH:
-        meta = by_number[number]
-        definition_path = data_root / "definitions" / f"{meta['id']}.json"
-        raw = json.loads(definition_path.read_text(encoding="utf-8"))
-        raw["publication_status"] = "reviewed"
-        raw["products"] = BUILDERS[number](meta)
-        definition = StandardDefinition.model_validate(raw)
-        definition_path.write_text(definition.model_dump_json(indent=2) + "\n", encoding="utf-8")
-        meta["status"] = "reviewed"
-        indicators = [indicator for product in definition.products for indicator in product.indicators]
-        summary.append(
-            {
-                "number": number,
-                "title": definition.title,
-                "product_count": len(definition.products),
-                "indicator_count": len(indicators),
-                "source_file": definition.source_file,
-                "source_sha256": definition.source_sha256,
-                "status": definition.publication_status.value,
-            }
-        )
-    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    (data_root / "first-batch-review.json").write_text(
-        json.dumps({"schema_version": "1.0", "standards": summary}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
+    raise SystemExit(
+        "历史首批规则写入口已退役；不得覆盖data/catalog.json和data/definitions。"
+        "请从现行批准映射开展独立标准开发。"
     )
-    print(f"已生成首批 {len(summary)} 项 reviewed 规则，共 {sum(item['indicator_count'] for item in summary)} 个指标。")
 
 
 if __name__ == "__main__":

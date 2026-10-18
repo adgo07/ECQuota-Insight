@@ -18,7 +18,6 @@ param(
 #
 #   tools/release_version.py --check      version consistency Gate
 #   tools/build_development_manifest.py   development-library index Gate
-#   tools/build_release_templates.py      GB 29446 template through the real service
 #   tools/build_payload_manifest.py       same-origin payload manifest
 #   tools/build_source_zip.py             source package
 #   tools/write_build_info.py             unsigned-release declaration
@@ -141,7 +140,7 @@ if ($CandidateId) { Write-Host "候选标识：$CandidateId" }
 if ($ReleaseTag) { Write-Host "正式发布 tag：$ReleaseTag" }
 
 # --- version source of truth (never hard-coded) ------------------------------
-$RequiredNameKeys = @("portable", "installer", "source", "standard_package", "template", "sha256sums",
+$RequiredNameKeys = @("portable", "installer", "source", "standard_package", "sha256sums",
     "payload_manifest", "build_info", "helper_ps1", "helper_cmd", "release_notes", "delivery_list")
 if ($FormalRelease) {
     $NamesFromTool = (& $PythonExe (Join-Path $ProjectRoot "tools\release_version.py") --names --source-commit $SourceCommit --formal-release) -join [Environment]::NewLine
@@ -180,6 +179,13 @@ if (-not $Release.StartsWith($ProjectPrefix, [StringComparison]::OrdinalIgnoreCa
 if ($LASTEXITCODE -ne 0) {
     throw "版本一致性校验失败，停止构建。请运行 tools/release_version.py --generate。"
 }
+& $PythonExe (Join-Path $ProjectRoot "tools\check_delivery_scope.py") `
+    --package (Join-Path $ProjectRoot "release\standard-packages\initial-standard-package-published.uebench")
+if ($LASTEXITCODE -ne 0) { throw "随包与正式评价范围校验失败，停止构建。" }
+& $PythonExe (Join-Path $ProjectRoot "tools\sync_catalogue_resource.py") --check
+if ($LASTEXITCODE -ne 0) { throw "目录预览派生资源与定义源不一致，停止构建。" }
+& $PythonExe (Join-Path $ProjectRoot "tools\sync_gb29446_factor_rows.py") --check
+if ($LASTEXITCODE -ne 0) { throw "选煤系数派生副本与公式参数源不一致，停止构建。" }
 
 if (-not $SkipDevelopmentManifestCheck) {
     & $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
@@ -280,15 +286,6 @@ if ($AllowDirty) { $IdentityArgs += "--allow-dirty" } else { $IdentityArgs += "-
 if ($LASTEXITCODE -ne 0) { throw "内嵌构建标识写入失败（payload 不可追溯）。" }
 
 # --- installer ---------------------------------------------------------------
-# The installer ships the GB 29446 import template, and packaging\installer.iss
-# reads it from dist\release.  It must therefore exist BEFORE ISCC runs, even
-# when the Candidate is assembled into a different -OutputDir.  Generating it
-# here (rather than only during assembly below) is what makes the build order
-# correct; the tool is deterministic, so the later call is a cheap no-op.
-& $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") `
-    --output-dir (Join-Path $ProjectRoot "dist\release")
-if ($LASTEXITCODE -ne 0) { throw "Excel 模板生成失败，停止安装程序构建。" }
-
 $Iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
 if (-not $Iscc) {
     $Candidates = @(
@@ -338,14 +335,7 @@ else {
     New-Item -ItemType Directory -Path $Release -Force | Out-Null
 }
 
-# 1) Excel templates through the real WorkbookTemplateService.
-& $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") `
-    --output-dir (Join-Path $ProjectRoot "dist\release")
-if ($LASTEXITCODE -ne 0) { throw "Excel 模板生成失败。" }
-Copy-Item -LiteralPath (Join-Path $ProjectRoot "dist\release" $Names.template) `
-    -Destination (Join-Path $Release $Names.template) -Force
-
-# 2) Same-origin payload manifest.
+# 1) Same-origin payload manifest.
 & $PythonExe (Join-Path $ProjectRoot "tools\build_payload_manifest.py") `
     --payload-dir $PayloadDir --output (Join-Path $Release $Names.payload_manifest)
 if ($LASTEXITCODE -ne 0) { throw "payload 同源清单生成失败。" }
@@ -410,7 +400,7 @@ if ($LASTEXITCODE -ne 0) { throw "构建信息生成失败。" }
 #    SHA256SUMS.txt is deliberately NOT listed in itself: a file cannot carry
 #    its own digest.  The Artifact Gate applies the same rule.
 $HashNames = @(
-    $Names.portable, $Names.installer, $Names.source, $Names.standard_package, $Names.template,
+    $Names.portable, $Names.installer, $Names.source, $Names.standard_package,
     $Names.payload_manifest, $Names.build_info, $Names.helper_ps1, $Names.helper_cmd,
     $Names.release_notes, $Names.delivery_list
 )

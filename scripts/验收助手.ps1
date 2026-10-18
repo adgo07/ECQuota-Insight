@@ -69,10 +69,8 @@ $sourceZip = if ($version) { "UEBench-source-$version$candidateSuffix.zip" } els
 $immutable = @($portable, $installer, "initial-standard-package-published.uebench") |
     Where-Object { $_ }
 $auxiliary = @($sourceZip) | Where-Object { $_ }
-# The GB 29446 template is the正式 delivery template.  The legacy
-# 统一标准规则确认表.xlsx is LEGACY_REFERENCE_ONLY and is not part of the
-# 0.2.0 user release, so it is reported only if present, never required.
-$editable = @("GB29446选煤电力消耗限额导入模板.xlsx", "payload-manifest.json", "release-build-info.json")
+# 本轮不交付 Excel 工作簿；历史确认表仅供追溯。
+$editable = @("payload-manifest.json", "release-build-info.json")
 
 $hashFile = Join-Path $root "SHA256SUMS.txt"
 $expectedHashes = @{}

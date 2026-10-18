@@ -29,7 +29,9 @@ from .ports import (
     TemplatePort,
     WorkbookExportPort,
     WorkbookImportPort,
+    WordReportPort,
 )
+from .reporting import ReportView, build_report_view
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
 from .package_reconciliation import PackageReconciliationService, ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
@@ -72,6 +74,7 @@ class ApplicationFacade:
         template_service: TemplatePort | None = None,
         import_service: WorkbookImportPort | None = None,
         export_service: WorkbookExportPort | None = None,
+        word_report_writer: WordReportPort | None = None,
         package_service: StandardPackagePort | None = None,
         backup_service: BackupPort | None = None,
         audit: AuditPort | None = None,
@@ -86,6 +89,7 @@ class ApplicationFacade:
         self._template = template_service
         self._import = import_service
         self._export = export_service
+        self._word_report_writer = word_report_writer
         self._package = package_service
         self._package_updates = PackageDirectoryService(package_service) if package_service is not None else None
         self._backup = backup_service
@@ -210,6 +214,17 @@ class ApplicationFacade:
         evaluation_id: str,
     ) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None:
         return self._evaluations.get(evaluation_id)
+
+    def get_report_view(self, evaluation_id: str) -> ReportView:
+        loaded = self._evaluations.get(evaluation_id)
+        if loaded is None:
+            raise LookupError("评价记录已删除或不存在。")
+        return build_report_view(*loaded)
+
+    def export_word_report(self, evaluation_id: str, path: Path) -> Path:
+        if self._word_report_writer is None:
+            raise RuntimeError("Word报告服务未配置。")
+        return self._word_report_writer.write(self.get_report_view(evaluation_id), path)
 
     def count_evaluations(self) -> int:
         return self._evaluations.count()

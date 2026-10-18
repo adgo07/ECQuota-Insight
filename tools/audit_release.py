@@ -4,12 +4,9 @@ ECQ-RS05 changed four things here:
 
 1. **No hard-coded version.**  Required artifact names come from
    ``tools/release_version.py``, which reads ``pyproject.toml``.
-2. **The 统一标准规则确认表.xlsx is no longer a release input.**  It is
-   downgraded to ``LEGACY_REFERENCE_ONLY``: it is not a correctness basis for
-   the 0.2.0 product or the standard package, not a PASS condition here, not
-   installer content, and its "同意发布" column must never be read as proof that
-   the other 46 standards were formally verified.  If the file is present it is
-   reported as legacy information only and never fails the audit.
+2. **Excel workbooks are deferred from delivery.** Historical confirmation
+   workbooks remain available outside the Candidate directory for reference,
+   but any ``*.xlsx`` inside a Candidate fails the artifact audit.
 3. **Same-origin payload verification.**  ``payload-manifest.json`` records
    ``sha256``/``size`` for every file of the PyInstaller payload plus a
    ``payload_tree_sha256``.  The audit re-derives those from the portable ZIP,
@@ -154,7 +151,6 @@ def required_files(
         names["installer"],
         names["source"],
         names["standard_package"],
-        names["template"],
         names["sha256sums"],
         names["payload_manifest"],
         names["build_info"],
@@ -762,7 +758,11 @@ def audit_release(
     pdf_report = _audit_no_standard_pdf(root, names, package_report)
     errors.extend(pdf_report["errors"])
 
-    # Legacy reference material: reported, never a PASS condition.
+    workbooks = sorted(path.name for path in root.glob("*.xlsx") if path.is_file())
+    if workbooks:
+        errors.append(f"本轮交付目录不得包含 Excel 工作簿：{workbooks}")
+
+    # Legacy reference material is reported separately for diagnosis.
     legacy_present = [name for name in LEGACY_FILES if (root / name).exists()]
 
     return {
@@ -791,12 +791,13 @@ def audit_release(
             },
         },
         "no_standard_pdf": {key: value for key, value in pdf_report.items() if key != "errors"},
+        "no_excel_workbook": {"valid": not workbooks, "files_present": workbooks},
         "legacy_reference_only": {
             "files_present": legacy_present,
             "correctness_basis": False,
             "note": (
                 "统一标准规则确认表.xlsx 为 LEGACY_REFERENCE_ONLY：不作为 0.2.0 发布正确性依据、"
-                "不作为正式标准包正确性依据、不是本审计的 PASS 条件、不随普通用户 release 交付，"
+                "不作为正式标准包正确性依据、不随普通用户 release 交付；若误入交付目录将导致审计失败，"
                 "其“同意发布”也不代表其余 46 个标准已正式验证。"
             ),
         },

@@ -874,7 +874,6 @@ def _build_release_dir(
     (root / names["installer"]).write_bytes(b"MZ" + b"\x00" * 2048)
     with zipfile.ZipFile(root / names["source"], "w") as archive:
         archive.writestr("pyproject.toml", "[project]\n")
-    (root / names["template"]).write_bytes(b"PK\x03\x04synthetic-template")
     (root / names["helper_ps1"]).write_text("# helper\n", encoding="utf-8")
     (root / names["helper_cmd"]).write_text("@echo off\n", encoding="utf-8")
     (root / names["release_notes"]).write_text("# notes\n", encoding="utf-8")
@@ -913,7 +912,6 @@ def _build_release_dir(
         names["installer"],
         names["source"],
         names["standard_package"],
-        names["template"],
         names["payload_manifest"],
         names["build_info"],
         names["helper_ps1"],

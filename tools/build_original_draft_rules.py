@@ -86,9 +86,11 @@ def indicator(number: str, row: dict, source_file: str, sha256: str, index: int,
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", type=Path, default=Path("data"))
+    parser.add_argument("--data-dir", type=Path, help="仅允许显式指定隔离草案目录")
     parser.add_argument("--candidates", type=Path, default=Path("work/verification/table-candidates-pages.json"))
     args = parser.parse_args()
+    if args.data_dir is None or args.data_dir.resolve() == Path(__file__).resolve().parents[1] / "data":
+        raise SystemExit("历史原文候选写入口已退役；必须显式指定隔离--data-dir，不得覆盖当前data。")
     data_dir = args.data_dir.resolve()
     candidates = json.loads(args.candidates.resolve().read_text(encoding="utf-8"))
     catalog = {row["number"]: row for row in json.loads((data_dir / "catalog.json").read_text(encoding="utf-8"))["standards"]}

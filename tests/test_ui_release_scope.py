@@ -543,7 +543,7 @@ def test_calculation_explanation_keeps_the_basis_in_plain_language(window) -> No
     # 普通情形只有三行：选煤工艺与折算系数 / 代入计算 / 判定与必要标准依据。
     lines = explanation.split(EXPLANATION_LINE_BREAK)
     assert len(lines) == 3, explanation
-    assert lines[0] == "选煤工艺：重介，折算系数 k = 1.12"
+    assert lines[0] == "选煤工艺类型：重介，选煤工艺类型折算系数 k = 1.12"
     assert lines[1] == (
         "计算：e<sub>d</sub> = E<sub>d</sub> × k ÷ m = 560 × 1.12 ÷ 100 = 6.272 kW·h/t"
     )
@@ -590,7 +590,7 @@ def test_full_value_boundary_adds_the_display_caveat(window) -> None:
     assert window.gb29446_result_grade.text() == "3级"
     explanation = window.gb29446_explanation.text()
     assert explanation.split(EXPLANATION_LINE_BREAK)[-1] == (
-        "判级使用完整计算值，界面显示值仅作简化展示。"
+        "判级使用完整计算值 7.0000000000000001 kW·h/t；7.00 kW·h/t 仅用于显示。"
     )
     assert len(explanation.split(EXPLANATION_LINE_BREAK)) == 4, explanation
 

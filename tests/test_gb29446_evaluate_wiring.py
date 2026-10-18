@@ -124,7 +124,7 @@ def test_setup_has_both_revisions_installed(window) -> None:
     }
     if not LEGACY_PACKAGE.is_file():
         pytest.skip("旧包归档不可用（CI 无项目外只读归档），无法构造 r1+r2 并存状态")
-    assert revisions == {1, 2}, f"夹具应同时装有 r1 与 r2，实际 {revisions}"
+    assert revisions == {1, 3}, f"夹具应同时装有 r1 与 r3，实际 {revisions}"
 
 
 def test_clicked_signal_does_not_pass_its_bool_into_the_request(window) -> None:
@@ -203,7 +203,7 @@ def test_library_lists_the_newest_revision_of_each_standard(window) -> None:
         for item in application.list_library_standards()
         if item.id == STANDARD_ID
     }
-    assert revisions == {2}, f"标准库必须显示最新规则修订，实际 {revisions}"
+    assert revisions == {3}, f"标准库必须显示最新规则修订，实际 {revisions}"
 
 
 def test_library_has_one_entry_per_standard_while_rows_retain_history(window) -> None:
@@ -224,7 +224,7 @@ def test_diagnostics_reports_the_current_revision(window) -> None:
     """The diagnostics view must not report the superseded revision."""
     application = window.context.application
     current = application.get_published_standard(STANDARD_ID)
-    assert current is not None and current.rule_revision == 2
+    assert current is not None and current.rule_revision == 3
     library = next(
         item for item in application.list_library_standards() if item.id == STANDARD_ID
     )

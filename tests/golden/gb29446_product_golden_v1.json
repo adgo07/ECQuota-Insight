@@ -6,7 +6,7 @@
   "standard_number": "GB 29446-2019",
   "standard_title": "选煤电力消耗限额",
   "standard_version": "2019",
-  "rule_revision": 2,
+  "rule_revision": 3,
   "standard_source_file": "28.GB 29446-2019选煤电力消耗限额.pdf",
   "standard_source_sha256": "72011768d81cc35db8e53f6470fadc3b14140b61bd4f9ee3546a3e225e9cb15d",
   "numeric_profile_id": "ECQUOTA_DECIMAL_FULL_VALUE_V1",

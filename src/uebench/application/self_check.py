@@ -132,11 +132,12 @@ Golden 的**子集**，既不替代完整 Golden，也不得被修改成软件�
 Golden 规则来源（payload 漂移的处置）
 -------------------------------------
 
-RS04 Golden 冻结的是 ``gb-29446-2019`` 的 ``rule_revision = 2``。自检按以下顺序
+当前已采用 Golden 的 ``gb-29446-2019`` 身份为 ``rule_revision = 3``；
+案例数值期望未随修订改变。自检按以下顺序
 解析用于回放的规则定义，并在 ``golden_replay.details`` 中如实记录
 ``rule_source``：
 
-1. **standard-package** — 内置已签名标准包内已经是 ``rule_revision 2`` 的
+1. **standard-package** — 内置已签名标准包内已经是 ``rule_revision 3`` 的
    ``gb-29446-2019`` 定义（打包 payload 的正常状态，也是唯一能让
    ``UEBench.exe --self-check`` 通过的状态）；
 2. **repository-definition** — 标准包内定义版本落后、而仓库
@@ -146,9 +147,8 @@ RS04 Golden 冻结的是 ``gb-29446-2019`` 的 ``rule_revision = 2``。自检按
 3. 两者都不可用时，回放**失败**（退出码 ``1``），错误信息直接说明 payload
    落后，不静默跳过。
 
-第 2 条是当前 ``release/standard-packages/`` 固定标准包已知缺口的显式处置；
-缺口本身记录在 ``release/standard-packages/PIN.json`` 的 ``known_gap`` 中，属于
-发布治理决定，本模块只负责如实暴露，不修改标准包。
+第 2 条只用于识别旧包或源码检出中的 payload 落差；当前固定包应直接使用
+standard-package。回放仍须保留缺包或版本不匹配的失败语义，不修改标准包。
 """
 
 from __future__ import annotations
@@ -223,7 +223,7 @@ EXPECTED_SCHEMA_REVISION = "0003"
 GOLDEN_ID = "gb29446_product_golden"
 GOLDEN_VERSION = 1
 GOLDEN_STANDARD_ID = "gb-29446-2019"
-GOLDEN_RULE_REVISION = 2
+GOLDEN_RULE_REVISION = 3
 GOLDEN_EVALUATION_DATE = date(2026, 6, 1)
 GOLDEN_ORGANIZATION = "RS05 自检"
 GOLDEN_NOTE = "RS05 self-check（RS04 Product Golden v1 子集）"
@@ -1016,7 +1016,7 @@ class _Runner:
                 f"内置标准包内 {GOLDEN_STANDARD_ID} 规则版本为 r{packaged_revision}，"
                 f"RS04 Product Golden 需要 r{GOLDEN_RULE_REVISION}；"
                 f"本次回放改用仓库定义 {definition_path}，"
-                "该 payload 落差见 release/standard-packages/PIN.json 的 known_gap。"
+                "请核对 release/standard-packages/PIN.json 的当前包与父包身份。"
             )
             return resolved
 

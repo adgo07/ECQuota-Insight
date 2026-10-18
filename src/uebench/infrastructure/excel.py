@@ -1521,11 +1521,17 @@ class WorkbookExportService:
         green_fill = PatternFill("solid", fgColor="D9EAD3")
         sheet.conditional_formatting.add(
             f"G6:G{max(6, sheet.max_row)}",
-            FormulaRule(formula=["G6=\"未达标\""], fill=red_fill),
+            FormulaRule(formula=[f'G6="{GRADE_LABELS[Grade.NOT_QUALIFIED]}"'], fill=red_fill),
         )
         sheet.conditional_formatting.add(
             f"G6:G{max(6, sheet.max_row)}",
-            FormulaRule(formula=["OR(G6=\"1级\",G6=\"2级\",G6=\"3级\")"], fill=green_fill),
+            FormulaRule(
+                formula=["OR(" + ",".join(
+                    f'G6="{GRADE_LABELS[grade]}"'
+                    for grade in (Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3)
+                ) + ")"],
+                fill=green_fill,
+            ),
         )
 
     def _info(self, sheet, request, result) -> None:

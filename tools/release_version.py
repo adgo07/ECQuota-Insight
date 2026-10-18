@@ -167,10 +167,13 @@ def artifact_names(version: str, candidate_id: str | None = None) -> dict[str, s
     * ``UEBench-Setup-<version>-<candidate_id>-x64.exe``
     * ``UEBench-source-<version>-<candidate_id>.zip``
 
-    Everything else keeps its name: the pinned standard package and the GB
-    29446 template are version-less release *inputs*, and the manifest / build
+    Everything else keeps its name: the pinned standard package is a version-less
+    release input, and the manifest / build
     info / checksum / helper / document names are per-directory fixed so the
     audit and the acceptance helper do not have to guess.
+
+    The legacy ``template`` name remains for explicit background tooling, but
+    Candidate build and artifact audit do not include it in delivery.
     """
     suffix = f"-{normalize_candidate_id(candidate_id)}" if candidate_id else ""
     return {

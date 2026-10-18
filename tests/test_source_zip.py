@@ -17,4 +17,5 @@ def test_source_zip_contains_development_standard_baseline(tmp_path):
     assert "standards/development/manifest.json" in names
     assert "standards/development/library-index.json" in names
     assert "standards/development/scope-63/scope-63.json" in names
-    assert any(name.startswith("standards/development/scope-63/definitions/") for name in names)
+    assert "standards/mappings/INDEX.md" in names
+    assert any(name.startswith("data/definitions/") for name in names)

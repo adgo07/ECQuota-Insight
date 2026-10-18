@@ -18,7 +18,7 @@
 因此核心场景既不需要 ``G:\\ECQuota-Archive``，也不需要
 ``work/signing/development-private-key.pem``，并且不会因为二者缺失而 skip。
 只有显式以「归档历史证据」为目的的用例（``source_bearing_predecessor`` 逐字节对比、
-真实 r1→r2 取代关系）才在归档不可用时优雅跳过，跳过原因会在 ``-ra`` 摘要里列出。
+真实旧 r1→现行修订升级关系）才在归档不可用时优雅跳过，跳过原因会在 ``-ra`` 摘要里列出。
 """
 
 from __future__ import annotations
@@ -79,7 +79,7 @@ except ModuleNotFoundError:  # pragma: no cover - 取决于 pytest 的导入模�
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_KEY = ROOT / "src" / "uebench" / "resources" / "update_public_key.pem"
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
-#: 固定（已发布）标准包：当前 = 2026.10-published.4（GB29446 r2，去原文包）。
+#: 固定标准包由 PIN 锁定；当前选煤规则修订从签名包读取。
 CURRENT_PACKAGE = PACKAGE_DIR / "initial-standard-package-published.uebench"
 #: 旧包已移出仓库（REFERENCE ONLY）；取得的是归档件的**副本**。核心场景不再依赖它。
 OLD_PACKAGE = session_legacy_package()
@@ -114,6 +114,18 @@ def require_archived_old_package() -> None:
 def manifest_of(path: Path) -> dict:
     with zipfile.ZipFile(path) as archive:
         return json.loads(archive.read("manifest.json"))
+
+
+def gb29446_revision_of(path: Path) -> int:
+    with zipfile.ZipFile(path) as archive:
+        definitions = [
+            json.loads(archive.read(name))
+            for name in archive.namelist()
+            if name.startswith("definitions/") and name.endswith(".json")
+        ]
+    revisions = [entry["rule_revision"] for entry in definitions if entry["id"] == GB29446]
+    assert len(revisions) == 1
+    return revisions[0]
 
 
 def bundled_directory(tmp_path: Path, *entries: tuple[Path, str]) -> Path:
@@ -1197,7 +1209,7 @@ def test_archived_legacy_package_upgrades_to_pinned_package(context, tmp_path: P
     """【历史归档证据用例 / EVIDENCE-ONLY，不计入核心兼容覆盖】
 
     验证真实归档旧包（``G:\\ECQuota-Archive`` 的 ``2026.09-published.2``）到当前固定
-    包的 r1 → r2 取代关系。归档件按运维决定已移出仓库，本仓库无法再生成它的替代物
+    包的 r1 → 现行修订升级关系。归档件按运维决定已移出仓库，本仓库无法再生成它的替代物
     （合成夹具可以覆盖同一契约，但覆盖不了「真实归档件本身的字节」），因此：
 
     * 归档可用时：跑完整断言；
@@ -1211,6 +1223,7 @@ def test_archived_legacy_package_upgrades_to_pinned_package(context, tmp_path: P
     require_archived_old_package()
     old_manifest = manifest_of(OLD_PACKAGE)
     current_manifest = manifest_of(CURRENT_PACKAGE)
+    current_revision = gb29446_revision_of(CURRENT_PACKAGE)
     service = reconciler(context)
 
     old_directory = bundled_directory(tmp_path / "old", (OLD_PACKAGE, OLD_PACKAGE.name))
@@ -1227,14 +1240,14 @@ def test_archived_legacy_package_upgrades_to_pinned_package(context, tmp_path: P
     assert outcome.installed_before.package_id == old_manifest["package_id"]
     assert outcome.installed_after is not None
     assert outcome.installed_after.package_id == current_manifest["package_id"]
-    # r2 作为新修订加入，r1 仍然保留（历史评价必须可复算）。
-    assert context.standards.get_published(GB29446).rule_revision == 2
+    # 现行修订加入，r1 仍然保留（历史评价必须可复算）。
+    assert context.standards.get_published(GB29446).rule_revision == current_revision
     revisions = sorted(
         item.rule_revision
         for item in context.application.list_all_standards()
         if item.id == GB29446
     )
-    assert revisions == [1, 2], "升级必须新增 r2 而不是替换 r1"
+    assert revisions == [1, current_revision], "升级必须新增现行修订而不是替换 r1"
     assert len(context.application.list_all_standards()) == 49
     assert len(context.application.list_package_history(5)) == 2
 

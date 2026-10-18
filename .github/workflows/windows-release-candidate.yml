@@ -205,7 +205,6 @@ jobs:
             # 源码权威是 Git exact commit / release tag。这里保留上传只为归档与人工核对。
             dist/candidate/UEBench-source-${{ steps.version.outputs.version }}-${{ steps.version.outputs.candidate_id }}.zip
             dist/candidate/initial-standard-package-published.uebench
-            dist/candidate/GB29446选煤电力消耗限额导入模板.xlsx
             dist/candidate/SHA256SUMS.txt
             dist/candidate/payload-manifest.json
             dist/candidate/release-build-info.json

@@ -3,7 +3,6 @@ param(
     [string]$ReleaseDir,
     [switch]$SkipPortableZip,
     [switch]$SkipSourceZip,
-    [switch]$SkipTemplates,
     [switch]$SkipAudit,
     [string]$SourceCommit,
     [string]$CandidateId,
@@ -146,6 +145,9 @@ else {
 }
 
 # 同步源码交付包前确认统一开发标准库索引与scope-63一致。
+& $PythonExe (Join-Path $ProjectRoot "tools\check_delivery_scope.py") `
+    --package (Join-Path $ProjectRoot "release\standard-packages\initial-standard-package-published.uebench")
+if ($LASTEXITCODE -ne 0) { throw "随包与正式评价范围校验失败，停止同步。" }
 & $PythonExe (Join-Path $ProjectRoot "tools\build_development_manifest.py") --check
 if ($LASTEXITCODE -ne 0) { throw "统一开发标准库索引校验失败，停止同步。" }
 
@@ -165,12 +167,6 @@ if (-not (Test-Path -LiteralPath $Installer -PathType Leaf)) {
 }
 if (-not (Test-Path -LiteralPath $Package -PathType Leaf)) {
     throw "找不到固定的正式标准包：$Package"
-}
-
-# 1) Excel 模板：通过真实 Application/WorkbookTemplateService 无头生成。
-if (-not $SkipTemplates) {
-    & $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") --output-dir $Release
-    if ($LASTEXITCODE -ne 0) { throw "Excel 模板生成失败。" }
 }
 
 # 2) 内嵌构建标识：必须在 payload 清单之前写入 dist\UEBench，清单才会覆盖并哈希它。
@@ -260,7 +256,6 @@ $HashNames = @(
     $Names.installer,
     $Names.source,
     $Names.standard_package,
-    $Names.template,
     $Names.payload_manifest,
     $Names.build_info,
     $Names.helper_ps1,

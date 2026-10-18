@@ -6,9 +6,9 @@ conflated with "the software formally supports evaluating it", which made 43 of
 (GB 29446-2019 only) and prove the decision is independent of
 ``StandardDefinition.publication_status``.
 
-The definitions are read from ``data/definitions`` — the formal runtime source
-(``standards/development/manifest.json``: ``"formal_runtime_source": "data"``),
-i.e. exactly what ships.  They deliberately do **not** come from
+The bundled definition IDs are selected by ``data/delivery-scope.json`` from
+the editable ``data/definitions`` source. Draft definitions in that directory
+are excluded from the signed package. They deliberately do **not** come from
 ``standards/development/scope-65``: that directory is a superseded historical
 comparison snapshot (``"legacy_scopes": ["scope-65"]``) kept only for traceability,
 so loading it here would have asserted the 0.2.0 capability decision against
@@ -18,6 +18,7 @@ stale data.
 from __future__ import annotations
 
 import ast
+import json
 import re
 from pathlib import Path
 
@@ -52,9 +53,10 @@ def _definition(standard_id: str) -> StandardDefinition:
 
 
 def _installed_definitions() -> list[StandardDefinition]:
+    scope = json.loads((ROOT / "data/delivery-scope.json").read_text(encoding="utf-8"))
     return [
-        StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
-        for path in sorted(DEFINITIONS.glob("*.json"))
+        _definition(standard_id)
+        for standard_id in scope["bundled_definition_ids"]
     ]
 
 
@@ -89,7 +91,7 @@ def test_other_installed_standards_are_not_formally_evaluable() -> None:
 def test_installed_library_has_exactly_one_formally_evaluable_standard() -> None:
     """The whole published runtime library: one evaluable standard, not 43.
 
-    ``data/definitions`` is the set that actually ships (48 published standards),
+    The delivery allowlist is the set that actually ships (48 definitions),
     so "43 of 48 looked evaluable" is asserted against the real product data
     rather than against a superseded development snapshot.
     """

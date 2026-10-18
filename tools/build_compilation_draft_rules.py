@@ -79,9 +79,11 @@ def build_indicator(number: str, row: dict[str, object], source_file: str, sourc
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="从汇编候选生成draft规则；不会生成published规则")
-    parser.add_argument("--data-dir", type=Path, default=Path("data"))
+    parser.add_argument("--data-dir", type=Path, help="仅允许显式指定隔离草案目录")
     parser.add_argument("--candidates", type=Path, default=Path("work/verification/compilation-candidates.json"))
     args = parser.parse_args()
+    if args.data_dir is None or args.data_dir.resolve() == Path(__file__).resolve().parents[1] / "data":
+        raise SystemExit("历史汇编候选写入口已退役；必须显式指定隔离--data-dir，不得覆盖当前data。")
     data_dir = args.data_dir.resolve()
     candidates = json.loads(args.candidates.resolve().read_text(encoding="utf-8"))["rows"]
     catalog = json.loads((data_dir / "catalog.json").read_text(encoding="utf-8"))["standards"]

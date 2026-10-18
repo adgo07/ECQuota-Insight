@@ -126,6 +126,9 @@ Write-Host "候选标识：$CandidateId"
 if ($LASTEXITCODE -ne 0) {
     throw "版本一致性校验失败，停止构建。请运行 tools/release_version.py --generate。"
 }
+& $PythonExe (Join-Path $ProjectRoot "tools\check_delivery_scope.py") `
+    --package (Join-Path $ProjectRoot "release\standard-packages\initial-standard-package-published.uebench")
+if ($LASTEXITCODE -ne 0) { throw "随包与正式评价范围校验失败，停止构建。" }
 
 if (-not $SkipDevelopmentManifestCheck) {
     # 发布前确认Git中的统一开发标准库索引仍与scope-63定义一致。
@@ -198,15 +201,6 @@ if ($AllowDirty) { $IdentityArgs += "--allow-dirty" } else { $IdentityArgs += "-
 if ($LASTEXITCODE -ne 0) { throw "内嵌构建标识写入失败（payload 不可追溯）。" }
 
 if (-not $SkipInstaller) {
-    # The installer ships the GB 29446 import template, so it must exist before
-    # ISCC runs.  Generate it headlessly through the real application facade -
-    # never by asking a human to open the GUI and save a workbook.
-    & $PythonExe (Join-Path $ProjectRoot "tools\build_release_templates.py") `
-        --output-dir (Join-Path $ProjectRoot "dist\release")
-    if ($LASTEXITCODE -ne 0) {
-        throw "Excel 模板生成失败，停止安装程序构建。"
-    }
-
     $Iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
     if (-not $Iscc) {
         $Candidates = @(
