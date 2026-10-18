@@ -953,6 +953,45 @@ def test_import_to_export_consistency(ctx, tmp_path):
         engine_mod.EvaluationEngine.evaluate = original
 
 
+@pytest.mark.parametrize(
+    ("electricity", "expected_grade"),
+    [
+        ("4", Grade.LEVEL_1),
+        ("6", Grade.LEVEL_2),
+        ("8", Grade.LEVEL_3),
+        ("10", Grade.NOT_QUALIFIED),
+    ],
+)
+def test_real_export_conditional_formatting_matches_saved_grade(ctx, tmp_path, electricity, expected_grade):
+    """G 列标签和红/绿规则均从同一等级词表生成，并经过真实 xlsx 保存与重读。"""
+    from uebench.domain.models import GRADE_LABELS
+
+    standard = ctx.application.get_published_standard(STANDARD_ID)
+    result = ctx.application.evaluate(
+        gui_request(standard, electricity=electricity, raw_coal="1", process="跳汰、浮选联合")
+    )
+    assert result.results[0].grade is expected_grade
+    output = ctx.application.export_evaluation(result.evaluation_id, tmp_path / f"grade-{electricity}.xlsx")
+    summary = load_workbook(output)["对标结论"]
+    assert summary["G6"].value == GRADE_LABELS[expected_grade]
+
+    formats = list(summary.conditional_formatting)
+    assert len(formats) == 1
+    assert str(formats[0].sqref) == "G6"
+    rules = summary.conditional_formatting[formats[0]]
+    assert len(rules) == 2
+    red, green = rules
+    assert red.formula == [f'G6="{GRADE_LABELS[Grade.NOT_QUALIFIED]}"']
+    assert green.formula == [
+        "OR(" + ",".join(
+            f'G6="{GRADE_LABELS[grade]}"'
+            for grade in (Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3)
+        ) + ")"
+    ]
+    assert red.dxf.fill.fgColor.rgb.endswith("F4CCCC")
+    assert green.dxf.fill.fgColor.rgb.endswith("D9EAD3")
+
+
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------

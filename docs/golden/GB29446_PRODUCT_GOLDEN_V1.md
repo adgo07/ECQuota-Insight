@@ -8,6 +8,8 @@
 机读数据见 [`tests/golden/gb29446_product_golden_v1.json`](../../tests/golden/gb29446_product_golden_v1.json)，
 门禁见 [`tests/test_gb29446_product_golden.py`](../../tests/test_gb29446_product_golden.py)。
 
+**现行采用注记（2026-10-18）：**本文件以下 RS04 冻结正文保留其时“超出3级”的历史措辞，不作为当前 UI/Word 显示词。现行[批准映射 D01](../../standards/mappings/GB29446-2019/标准映射表_2026-10-18_已批准.md)及[统一判定规范 §10](../统一判定规范.md)已将有效比较后超过 3 级上限的用户显示词统一为“未达3级”；内部 `Grade.NOT_QUALIFIED` 枚举、Golden 的数值 expected 与完整值比较均不改变。Excel 工作簿本轮暂缓交付，以下 RS04 Excel Gate 仅作历史阶段说明。
+
 ---
 
 ## 1. Golden 权威来源

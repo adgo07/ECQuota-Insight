@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from decimal import Decimal, ROUND_DOWN, ROUND_UP, localcontext
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -12,7 +13,10 @@ from docx import Document
 from docx.document import Document as DocumentClass
 
 from uebench.application.facade import ApplicationFacade
-from uebench.application.reporting import ADOPTION_MARKER, _display_two_places, build_report_view, gb29446_business_labels
+from uebench.application.reporting import (
+    ADOPTION_MARKER, MAPPING_ID, MAPPING_SHA256, _display_two_places,
+    build_report_view, gb29446_business_labels,
+)
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import (
     EvaluationRequest, EvaluationResult, Grade, InputMode, InputValue, StandardDefinition,
@@ -21,6 +25,19 @@ from uebench.infrastructure.word_report import WordReportWriter
 from uebench.ui.main_window import MainWindow
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_report_mapping_hash_matches_approved_utf8_lf_document():
+    """采用标记绑定批准正文的 UTF-8 内容哈希，不使用 Git blob 对象哈希。"""
+    mapping = ROOT / "standards/mappings" / MAPPING_ID
+    source = mapping.read_bytes().decode("utf-8")
+    canonical = source.replace("\r\n", "\n").encode("utf-8")
+    assert hashlib.sha256(canonical).hexdigest() == MAPPING_SHA256
+    assert f"sha256={MAPPING_SHA256}" in ADOPTION_MARKER
+    # 工作区换行若转成 CRLF，原始字节哈希会变；按 LF 规范化后仍指向同一正文。
+    crlf = source.replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-8")
+    assert hashlib.sha256(crlf).hexdigest() != MAPPING_SHA256
+    assert hashlib.sha256(crlf.replace(b"\r\n", b"\n")).hexdigest() == MAPPING_SHA256
 
 
 def _r3() -> StandardDefinition:

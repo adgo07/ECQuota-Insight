@@ -7,7 +7,6 @@ workbook before the signed package can be used for formal evaluation.
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 
 
@@ -94,11 +93,10 @@ def indicator(number: str, identifier: str, name: str, unit: str,
 
 
 def write_definition(number: str, products: list[dict]) -> None:
-    path = DATA / "definitions" / f"{re.sub(r'[^a-z0-9]+', '-', number.lower()).strip('-')}.json"
-    old = json.loads(path.read_text(encoding="utf-8"))
-    old["publication_status"] = "reviewed"
-    old["products"] = products
-    path.write_text(json.dumps(old, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    raise RuntimeError(
+        "历史批次规则写入口已退役；不得覆盖data/definitions。"
+        "请从现行批准映射开展独立标准开发。"
+    )
 
 
 def one_product(ind: dict, name: str | None = None) -> dict:
