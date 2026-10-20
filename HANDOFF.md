@@ -50,9 +50,9 @@
 
 已按 Owner 批准将 16 项原样 `draft` 候选迁入唯一可编辑机器定义源 `data/definitions/`，现共有 64 项。`data/delivery-scope.json` 显式选择随包 48 项（含历史项）、正式评价仅 `gb-29446-2019`；目录迁入不表示业务批准。`standards/development/scope-63/` 与 `scope-65/` 只读保留为历史快照，不是发布输入，也不能反向覆盖当前定义。旧规则确认表的只读校验和测试保留作历史证据；旧 `publish_confirmed_rules.py --apply` 与覆盖多目录的 promotion 写入口不作为现行发布方式。
 
-**上一轮源码集成与 Candidate 交付续验：**[实施与验收记录](docs/governance/映射驱动单源规则与同源报告_V3_验收记录_20261018.md)记载本地 full suite 为 1110 passed、62 skipped、0 failed、1 warning；[交付补充验收记录](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)记录 `025d8c5` Candidate Artifact 63/63、安装版与便携版实测、真实 Microsoft Word/WPS 四场景、同版本覆盖及卸载保留数据、可信旧 0.2.0 Candidate `.4`→`.5` 升级保留 r2 历史结果、构建源码 exact-head 三项 GitHub CI 通过。0.1.0→0.2.0 无可信旧安装包供实测，原生 Windows DPI／跨屏和 Windows 11 仍待环境证据；中央 ACTIVE 四文件已合并，业务 [PR #28](https://github.com/adgo07/ECQuota-Insight/pull/28) 已合并到 `main`（`8914d31da35ffb3e8f42cbea9a55a9075fea4d0e`），新 Candidate 独立结论见下段。RS05 仍 IN PROGRESS，Reference Standard Product Closure 仍 PARTIAL。
+**上一轮源码集成与 Candidate 交付续验：**[实施与验收记录](docs/governance/映射驱动单源规则与同源报告_V3_验收记录_20261018.md)记载本地 full suite 为 1110 passed、62 skipped、0 failed、1 warning；[交付补充验收记录](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)记录 `025d8c5` Candidate Artifact 63/63、安装版与便携版实测、真实 Microsoft Word/WPS 四场景、同版本覆盖及卸载保留数据、可信旧 0.2.0 Candidate `.4`→`.5` 升级保留 r2 历史结果、构建源码 exact-head 三项 GitHub CI 通过。该次验收未执行 0.1.0→0.2.0 真实安装器覆盖；本次 RS05 收口已找回哈希吻合的历史安装器，升级及原生 Windows DPI／跨屏和 Windows 11 仍待证据；中央 ACTIVE 四文件已合并，业务 [PR #28](https://github.com/adgo07/ECQuota-Insight/pull/28) 已合并到 `main`（`8914d31da35ffb3e8f42cbea9a55a9075fea4d0e`），新 Candidate 独立结论见下段。RS05 仍 IN PROGRESS，Reference Standard Product Closure 仍 PARTIAL。
 
-**合并后当前 Candidate 续验：**干净构建输入 `4e4349068bb56fa500d20cfab98ef6640e63605c` 生成 `rc-4e43490`；身份与 10 条文件哈希实算相符，冻结 EXE 自检 6/6、Artifact Gate 63/63、该构建源码三项 GitHub exact-head CI 均通过。新安装版 GUI 保存／重启读回及三份 DOCX 导出、临界与未达3级真实 Word/WPS 实开、便携 ZIP 中文路径 GUI 启停、可信旧 r2 数据克隆升至 `.5` 且历史 JSON 不变，详见[交付补充验收记录 §6](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。上一段 `025d8c5` 是历史 Candidate 证据，不能替代当前构建身份；当前仍是未正式发布的 Candidate，RS05 = IN PROGRESS、产品闭环 = PARTIAL。
+**合并后当前 Candidate 续验：**干净构建输入 `4e4349068bb56fa500d20cfab98ef6640e63605c` 生成 `rc-4e43490`；身份与 10 条文件哈希实算相符，冻结 EXE 自检 6/6、Artifact Gate 63/63、该构建源码三项 GitHub exact-head CI 均通过。新安装版 GUI 保存／重启读回及三份 DOCX 导出、临界与未达3级真实 Word/WPS 实开、便携 ZIP 中文路径 GUI 启停、可信旧 r2 数据克隆升至 `.5` 且历史 JSON 不变，详见[交付补充验收记录 §6](docs/governance/映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。本次又验证可信正式 0.1.0 安装载荷的**库级**旧记录升级保真，真实旧 GUI 和两代安装器覆盖仍缺证，见 [RS05 本机收口结果](docs/governance/RS05_EXECUTION_REPORT.md)末节。上一段 `025d8c5` 是历史 Candidate 证据，不能替代当前构建身份；当前仍是未正式发布的 Candidate，RS05 = IN PROGRESS、产品闭环 = PARTIAL。
 
 > `PARTIAL` **不等于“可发布”**；Windows 交付已有本机实测证据，仍缺上述环境覆盖与正式收口结论。
 
@@ -135,9 +135,9 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - 当前阶段：RS05 — Product Simplification & Standard Library Pairing（IN PROGRESS）；RS06 保持 NOT STARTED；
 - 普通用户只使用随软件配套的标准库，不再手动安装、导入、扫描或管理标准包；
 - Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
-- 完成本阶段设置页收敛、标准包普通入口移除、版本配套与 Application readiness gate、恢复后即时 reconciliation；
-- 按本任务要求运行定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及 exact-head CI；
-- 业务 PR #28 已获 Owner 授权并合并；新 Candidate `rc-4e43490` 已从干净源码重建并记录受影响验收。后续缺口按上文真实环境边界处理；不据此正式发布 v0.2.0，不开始 RS06。
+- 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；
+- 定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及构建源码 exact-head CI 已按对应提交取得证据；后续仅在构建输入改变或实测发现缺陷时按影响复验；
+- 业务 PR #28 已获 Owner 授权并合并；`rc-4e43490` 已从干净源码重建并记录受影响验收。下一步按[RS05 当前交付收口计划与本机结果](docs/governance/RS05_EXECUTION_REPORT.md)保留真实安装器覆盖及 Win11／原生系统高 DPI／跨屏／离线缺口，不能用旧阶段便携 ZIP 缺失或“Windows 证据尚未建立”否定已有实测，也不能将未测环境写为通过；不据此正式发布 v0.2.0，不开始 RS06。
 
 Reference Standard Product Closure 仍为 PARTIAL。
 

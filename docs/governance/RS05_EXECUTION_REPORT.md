@@ -1035,3 +1035,64 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 状态保持不变：`RS05 = IN PROGRESS / RELEASE CANDIDATE`、`UEBench 0.2.0 = NOT RELEASED`、
 `Reference Standard Product Closure = PARTIAL`、`D-ECQ-006 = OPEN`、
 `ECQ-STD-GB29446-001 = PROVISIONAL`、`RS06 = NOT STARTED`。
+
+## 2026-10-20 RS05 交付收口计划（当前；以下先记计划，不预写验收结果）
+
+本节承接[当前任务](../../TASK_STATE.md)、[唯一总体路线](../../参考标准开发路线.md)和[选煤映射驱动交付补充验收 §6](映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。上文各 Phase／当时结论保留为历史执行证据；本节负责本次剩余交付门禁，不新建总体路线，也不改写已批准的选煤映射。计划执行与最终结果必须分开记录；只有取得对应实物证据才能将下表的 `PENDING` 改为通过。
+
+### 平台 / Contract 预检查
+
+| 项目 | 2026-10-20 本次计划依据 |
+|---|---|
+| 业务仓身份与 SHA | `origin=https://github.com/adgo07/ECQuota-Insight.git`；本计划从 `origin/main@08c6b8ec83d49e5baa864fdf378ab6f0f97369d4` 开始。当前已验 Candidate `rc-4e43490` 的构建源码是独立的干净提交 `4e4349068bb56fa500d20cfab98ef6640e63605c`；本轮治理文档提交不得冒充其构建身份 |
+| 中央锁定与适用文件 | `platform-lock.json` 锁 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，`auto_follow_main=false`；相关 Frozen 为 Architecture 2.1、Numeric Contract v1、Numeric Profiles v1、Numeric Conformance Vector v1。中央 `docs/GUIDE_INDEX.md` 当前已合并 `main@c5fc6d438c9200060649e47c016b9b48218de72c` 路由 ACTIVE `PRODUCT_DELIVERY_POLICY_V1.md`，不按锁定 SHA 读取 ACTIVE 指南 |
+| 适用 MUST / MUST NOT | 保持 Decimal full-value exact 正式比较、规则／包签名及历史评价与快照不重算；Windows 正式验收按中央交付 Policy §5 覆盖 Win10/11 基本兼容与主要页面高 DPI 可用。不得把显示值回流正式比较、把旧 Candidate 说成新源码、把未测环境写为 PASS、自动升级 Frozen 或以 UI／Excel 新造业务规则 |
+| 冲突分类与中央修改 | 当前未发现新增 Frozen 冲突或 `CENTRAL CONTRACT GAP`；D-ECQ-002～006 仍为 `REGISTERED DEVIATION`。本任务不修改中央 Contract、ACTIVE 指南或本仓锁定 SHA；若实测暴露公共语义缺口，先按治理分类上报 |
+| Standard Issue / 软件解释 | 当前标准问题台账无 GB 29446 现行登记项；旧 ROUND6 编号是历史软件问题，不恢复为 `PROVISIONAL`。本任务只补交付证据，不改变选煤批准映射 D01/D02、规则阈值、公式、Numeric Profile 或历史结果 |
+
+### 已有证据与复用边界
+
+`rc-4e43490` 已通过构建身份与 10 条交付文件哈希核验、冻结 EXE 自检 6/6、Candidate Artifact Gate 63/63、构建源码三项 exact-head GitHub CI；Win10 安装版保存／重启读回、临界与未达3级 DOCX 经真实 Microsoft Word 与 WPS 打开、中文路径便携版 GUI 启停、可信旧 0.2.0 Candidate `.4`→`.5` 保留历史 r2 结果均已记录在上述[交付补充验收](映射驱动单源规则与同源报告_V3_交付补充验收_20261018.md)。本次不为补文档或外部环境实测重建相同源码／资源，也不重复完整人工 Word/WPS 矩阵；如生产代码、锁依赖、标准包、构建脚本或随包资源发生变化，再按影响重建 Candidate 并复验相应门禁。
+
+### 并行任务、验收口径与依赖
+
+| 任务／责任 | 要取得的证据和通过条件 | 依赖、风险与当前状态 |
+|---|---|---|
+| A：现行治理与最终审查（治理负责人） | 清理 `TASK_STATE.md`、`HANDOFF.md`、唯一总体路线中仍把已建 Windows Candidate、便携 ZIP、修复过的历史记录或已通过门禁写作未完成的**现行**句子；保留明确标注的历史阶段事实。汇总 B/C 的原始证据、测试范围、失败与环境限制，出具 RS05 独立验收结论供 Owner 审查 | 不改批准映射正文、水泥结论、Frozen 锁、Excel 工作簿；本计划只记 `PENDING`，不因文档更新宣布 RS05 DONE |
+| B：上一正式版升级（升级验收负责人） | 已定位历史 `UEBench 0.1.0` 安装器，其 SHA256 `234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911` 与正式历史记录一致。下一步在不覆盖现有安装／HKCU 的前提下，分层核旧载荷与版本来源、隔离旧数据升级及原始 request/result/snapshot 哈希；仅具备真正隔离安装条件时，才执行旧安装器→新安装器同路径覆盖、启动、数据保留和卸载保护。失败须保留日志、原库及复现步骤 | `docs/安装与发布说明-0.2.0.md` §5 明确承诺此升级；旧 `.4`→`.5` 及可信旧 payload 数据升级均不能冒充 0.1 安装器真实覆盖。旧安装器固定 AppId／默认目录，当前不运行可能触碰现有注册项的覆盖；若无安全环境则真实安装器覆盖标 `BLOCKED`，交 Owner 裁定承诺与放行。当前资产哈希已核，升级结果 `PENDING` |
+| C：Win11／原生 DPI／跨屏与离线（桌面验收负责人） | 用现有 `rc-4e43490` 的安装包和便携包，在可核 OS 与显示器身份的 Win11 环境测基本启动／关闭、中文路径与企业名、选煤最短保存／读回／Word；以 Windows **系统 DPI**（非 Qt 模拟缩放）核主要页面可用、长内容及关键按钮可达，记录实际档位与截图；有双屏条件时检查跨屏拖动和窗口恢复；物理断网或等效可审计隔离下核启动、标准库、评价／历史记录和本地 Word 导出不依赖网络 | 中央交付 Policy §5 要求 Win10/11 基本兼容及高 DPI 主要页面可用；本仓旧 RS05 报告把跨屏／多档 DPI 与断网列为缺证。Win10、Qt 模拟缩放、Windows runner CI 不能冒充 Win11／原生 DPI／断网实测。设备不可得如实 `BLOCKED`，不得自动豁免。当前 `PENDING` |
+
+任务 B 与 C 可并行，均只在隔离数据目录操作并保留旧 Candidate 与原用户目录；A 在两者进行时可修正文档导航，最后依赖 B/C 实测对照验收。发现代码缺陷先保全证据并报主代理审查，按本任务授权处理必要的最小修复；涉及业务语义或支持范围变更再由 Owner 决定。如修复改变构建输入，重建并补受影响回归及实物验证。本机原始证据只放隔离工作树或经授权的 G 原仓 `work/rs05-closure-20261020/` 忽略目录，不纳入源码提交，也不触碰 G 仓跟踪文件或真实用户数据；正式报告记录证据身份和可审查的摘要。
+
+### 剩余门禁矩阵（计划状态，待填实测结果）
+
+| 项目 | 依据与放行性质 | 目前证据／下一步 |
+|---|---|---|
+| Win11 基本兼容 | 中央 ACTIVE `PRODUCT_DELIVERY_POLICY_V1.md` §5 的正式 Windows 交付最低范围；本任务无权自行豁免 | `PENDING-MANUAL`。本机实测 Win10 19045.6466；当前无可用 Win11／VM／Sandbox。Windows CI runner 不等于 Win11 桌面人工验收；需可核身份的 Win11 设备，或由 Owner 处理无法取得设备造成的发布阻断 |
+| 原生系统高 DPI 下主要页面可用 | 同一中央 Policy §5 的正式交付要求 | `PENDING-MANUAL`。本机当前单屏原生 96 DPI（100%）；已有 Qt 模拟缩放仅证明模拟场景。需 Windows 系统高 DPI 实测，保留档位、页面与按钮可达证据 |
+| 多显示器跨屏与窗口恢复 | 本仓 RS05 历史验收 §8 登记的 `BLOCKED` 项；中央 §5 未单列为独立最低条件 | `PENDING-MANUAL`。本机仅 2560×1440 单屏，双屏设备可得时实测；不可得时保留缺证并由 Owner 明确处置，不写作 PASS |
+| 0.1.0→0.2.0 用户数据与安装升级 | `docs/安装与发布说明-0.2.0.md` §5 的用户承诺；历史 `.4`→`.5` 升级不是该承诺的验证 | `PARTIAL`。历史正式安装器 SHA 已核；其内旧版业务模块生成记录、真实新 EXE 对旧库克隆升级且历史五字段保真，详见下节。旧 GUI 保存与两代安装器同路径覆盖未完成，不能按用户承诺判整项通过；固定 AppId／HKCU 需安全环境，真实覆盖保持 `PENDING-MANUAL` 并交 Owner 处置 |
+| 离线最短业务链 | 本仓独立离线运行承诺和历史 RS05 §8 `OBSERVED-ONLINE` 缺证 | `BLOCKED`。本机 Domain／Private／Public 防火墙 profile 均 Disabled，执行账户无管理员令牌，临时仅针对测试 EXE 的出站规则无法构成可信隔离；未创建规则、未改系统设置、未跑离线 GUI。须物理断网或其他可审计隔离环境复验启动、库、保存／读回和本地 Word；静态未见直接网络调用不等于通过 |
+| Authenticode | RS05 已记录 `UNSIGNED` 决定；中央 §5 未要求必须具备代码签名 | 当前 `UNSIGNED` 已披露，非无条件硬门禁。若目标企业安全策略要求签名，则由 Owner 确认证书、渠道和正式交付条件；标准包 Ed25519 签名不能替代 EXE 签名 |
+
+本机环境与离线探针原始记录在隔离工作树 `work/rs05-closure-20261020/environment/README.md`（本机忽略目录，非跨机器固定入口）；该记录只确认环境边界，不代替桌面功能通过证据。上述 `PENDING-MANUAL`／`BLOCKED` 状态仍需后续实测或 Owner 明确处置，不能因计划入库转成 PASS。
+
+**2026-10-20 Owner 范围决定：**目前没有可用的 Win11／多屏环境，先完成本机可做的资产、升级及治理工作。此决定仅限定本阶段执行范围，不豁免 Win11／原生系统高 DPI／跨屏验收，不授权将 RS05 标为 DONE，也不应反复要求 Owner 提供现时不存在的设备。缺失环境证据保持在后续收口清单中。
+
+### 放行边界与需 Owner 裁定事项
+
+中央交付 Policy §5 的 Win11 基本兼容与高 DPI 可用不能由本任务自行取消；跨屏是本仓既有待验项，也必须以实际证据或 Owner 明确决定处置，不写成已测。0.1.0 安装器虽已找到且哈希吻合，真实安装器覆盖仍取决于安全隔离条件；若不能实测，须由 Owner 决定用户文档升级承诺的风险处置。当前 `Authenticode=UNSIGNED` 是既有交付决定，安装包／EXE 必须如实声明，`.uebench` 的 Ed25519 内容签名不能替代代码签名；若目标企业环境要求 Authenticode，另由 Owner 决定证书与交付渠道，不把签名凭空设为已完成门禁。最终由 Owner 在证据和残余风险清单上决定 RS05 是否收口；在此之前维持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。Excel 正式工作簿继续暂缓，水泥不在本任务启动。
+
+正式发布是后续独立动作：`windows-formal-release.yml` 要求已发布且非 prerelease 的 GitHub Release、与产品版本严格相符的 tag、tag commit 属于 `main` 历史、干净源码，并重新构建、运行完整门禁后上传正式资产。RS05 证据闭合与 Owner 审查在前，不把 `rc-4e43490` 文件改名视作正式发布，也不在本计划阶段建 tag 或发布 Release。
+
+### 2026-10-20 本机执行结果（与上述计划分列）
+
+**旧版来源与数据兼容，部分通过。**从历史正式 `UEBench-Setup-0.1.0-x64.exe` 复算 127,023,093 B、SHA256 `234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911`，与历史登记一致；独立提取工具对安装器测试及提取均 exit 0，得到旧版 EXE（SHA256 `cf4c9da1e65d635d174a68c4783ea3703caaf8f3b11598637e40a67a75251218`）。该真实旧 EXE 在双隔离目录初始化数据库 revision `0003`、48 项标准、0 条评价。由于交互桌面自动化未能可靠进入旧 GUI，随后使用**该 EXE 内 PYZ 提取的旧版业务模块**在旧库副本建立 1 条 GB29446 r1 记录 `a60474e1-4856-4022-95b6-f38370374f45`，实际值 `7.0 kW·h/t`、结果 `LEVEL_2`；这不是本轮源码重造的业务结果，也不是旧 GUI 人工保存。
+
+将这份旧库再克隆到独立数据目录，用 `rc-4e43490` 便携 ZIP 中的真实 EXE（SHA256 `9b11064deb403096723e9293e889b1af156c960d8d60eeb7c081238e73af28fa`）执行自检，exit 0、6/6 通过；其中 `excel_import_chain` 是既有后台安全链自检，不表示交付 Excel 工作簿。逐项比较旧记录的 `evaluation_id`、`request_json`、`result_json`、`rule_snapshot_json`、`deleted_at` 均相同；三个 JSON 的升级前后 SHA256 分别为 `a033c4f77f2bf282bdfd5d42eed974a4e0df4d27a10fc0ae34eda8d970846ce7`、`318deb80a8624bc522a5e5bf7ec7d8208b81514381f0bf6119fafe096dda56b5`、`38e76c7faaee3f3c0ec610d4e6266cb053f43dbe8f2598100491ba1f610e2232`。旧 EXE 初始化的原始库 SHA256 `1f43ea9f299835cfae4a6ca1b1a5e2276f4d206cc11a34daa78452a71ad025a6` 未变；新增旧版评价的副本库 SHA256 `3ca6e9c4aeea3b989bde3c99c91e566205f76670325938bcf038dbca31fe2f41` 未变；升级克隆库变为 `b718bf49b8ca0633b9710339768817868a6ab9668c2c6efcaad64cb3e4e508bd`。评价数 `1→5` 是新自检增加 4 条隔离记录；数据库中标准**版本行** `48→49` 是选煤 r1/r3 并存，标准包仍只随 48 项，包记录 `1→2`。
+
+此测试证明可信旧版业务库记录可由新候选在隔离克隆上保真升级；**旧 0.1 GUI 保存和旧安装器→新安装器同路径覆盖均未通过实测**。旧安装器固定 AppId／默认目录，本机已有安装注册项；为避免覆盖现有环境，未运行旧安装向导。旧 GUI 的隔离 launcher 在当前交互桌面挂起后已中断，没有生成可用 GUI 证据。用户文档 §5 的完整安装升级承诺仍待安全隔离环境或 Owner 明确裁定，不据本次库级结果宣布完成。
+
+**环境与离线：**本机确认为 Windows 10 19045.6466、2560×1440 单屏、原生系统 96 DPI。Win11、原生高 DPI 和跨屏保持 `PENDING-MANUAL`；三类防火墙 profile 均禁用且无管理员令牌，可信离线链保持 `BLOCKED`，未创建规则、未改系统配置、未运行离线 GUI。Owner 已决定先完成本机可做项，但未豁免这些要求。RS05 仍 `IN PROGRESS`、产品闭环仍 `PARTIAL`、0.2.0 仍 `NOT RELEASED`。
+
+原始证据位于本机历史执行环境的 `G:/Python Project/能耗限额/work/rs05-closure-20261020/legacy/`（`payload-test.txt`、`payload-extract.txt`、`old-pyz-modules.json`、`old-library-result.json`、`candidate-self-check-process.json`、`candidate-self-check.json`、`upgrade-compare.json`）及隔离工作树的 `work/rs05-closure-20261020/environment/README.md`；两处均为 Git 忽略目录，不是跨机器固定入口。上述身份、旧源库哈希和升级克隆库哈希已独立复算核对；原始文件不复制进 PR。
