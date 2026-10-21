@@ -138,6 +138,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；
 - 定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及构建源码 exact-head CI 已按对应提交取得证据；后续仅在构建输入改变或实测发现缺陷时按影响复验；
 - 业务 PR #28 已获 Owner 授权并合并；`rc-4e43490` 已从干净源码重建并记录受影响验收。下一步按[RS05 当前交付收口计划与本机结果](docs/governance/RS05_EXECUTION_REPORT.md)保留真实安装器覆盖及 Win11／原生系统高 DPI／跨屏／离线缺口，不能用旧阶段便携 ZIP 缺失或“Windows 证据尚未建立”否定已有实测，也不能将未测环境写为通过；不据此正式发布 v0.2.0，不开始 RS06。
+- **2026-10-21 单一后续入口：**[RS05 验收准备包与唯一下一步](docs/governance/RS05_EXECUTION_REPORT.md#2026-10-21-验收准备包与唯一下一步当前)记录本机可携带验收包身份、2026-10-20 库级部分通过的[小型证据摘要](docs/governance/evidence/RS05_20261020_legacy_upgrade_summary.json)及待隔离环境补测项目；本日只整理核验，未新增产品实测或改变上述状态。
 
 Reference Standard Product Closure 仍为 PARTIAL。
 
