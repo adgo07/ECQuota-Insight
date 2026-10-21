@@ -419,6 +419,7 @@ workflow artifact 上传；该 workflow 的版本与产物名全部取自
 | 离线运行 | `OBSERVED-ONLINE` | 采集时本机可连通外网；离线断言需在断网验收机复测 |
 
 > **本节结论：Windows 正式交付证据尚未建立。**
+> 此为当时阶段结论；后续本机已取得的 Windows Candidate 证据及尚缺环境门禁，见[2026-10-20 本机执行结果](#2026-10-20-本机执行结果与上述计划分列)。
 > Win11 与多 DPI / 跨屏拖动两项如实记为 `BLOCKED`，需在具备相应环境的验收机上补做。
 
 ---
@@ -1068,7 +1069,7 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 | 项目 | 依据与放行性质 | 目前证据／下一步 |
 |---|---|---|
-| Win11 基本兼容 | 中央 ACTIVE `PRODUCT_DELIVERY_POLICY_V1.md` §5 的正式 Windows 交付最低范围；本任务无权自行豁免 | `PENDING-MANUAL`。本机实测 Win10 19045.6466；当前无可用 Win11／VM／Sandbox。Windows CI runner 不等于 Win11 桌面人工验收；需可核身份的 Win11 设备，或由 Owner 处理无法取得设备造成的发布阻断 |
+| Win11 基本兼容 | 中央 ACTIVE `PRODUCT_DELIVERY_POLICY_V1.md` §5 的正式 Windows 交付最低范围；本任务无权自行豁免 | `BLOCKED`（待人工补验）。本机实测 Win10 19045.6466；当前无可用 Win11／VM／Sandbox。Windows CI runner 不等于 Win11 桌面人工验收；需可核身份的 Win11 设备，或由 Owner 处理无法取得设备造成的发布阻断 |
 | 原生系统高 DPI 下主要页面可用 | 同一中央 Policy §5 的正式交付要求 | `PENDING-MANUAL`。本机当前单屏原生 96 DPI（100%）；已有 Qt 模拟缩放仅证明模拟场景。需 Windows 系统高 DPI 实测，保留档位、页面与按钮可达证据 |
 | 多显示器跨屏与窗口恢复 | 本仓 RS05 历史验收 §8 登记的 `BLOCKED` 项；中央 §5 未单列为独立最低条件 | `PENDING-MANUAL`。本机仅 2560×1440 单屏，双屏设备可得时实测；不可得时保留缺证并由 Owner 明确处置，不写作 PASS |
 | 0.1.0→0.2.0 用户数据与安装升级 | `docs/安装与发布说明-0.2.0.md` §5 的用户承诺；历史 `.4`→`.5` 升级不是该承诺的验证 | `PARTIAL`。历史正式安装器 SHA 已核；其内旧版业务模块生成记录、真实新 EXE 对旧库克隆升级且历史五字段保真，详见下节。旧 GUI 保存与两代安装器同路径覆盖未完成，不能按用户承诺判整项通过；固定 AppId／HKCU 需安全环境，真实覆盖保持 `PENDING-MANUAL` 并交 Owner 处置 |
@@ -1093,6 +1094,6 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 此测试证明可信旧版业务库记录可由新候选在隔离克隆上保真升级；**旧 0.1 GUI 保存和旧安装器→新安装器同路径覆盖均未通过实测**。旧安装器固定 AppId／默认目录，本机已有安装注册项；为避免覆盖现有环境，未运行旧安装向导。旧 GUI 的隔离 launcher 在当前交互桌面挂起后已中断，没有生成可用 GUI 证据。用户文档 §5 的完整安装升级承诺仍待安全隔离环境或 Owner 明确裁定，不据本次库级结果宣布完成。
 
-**环境与离线：**本机确认为 Windows 10 19045.6466、2560×1440 单屏、原生系统 96 DPI。Win11、原生高 DPI 和跨屏保持 `PENDING-MANUAL`；三类防火墙 profile 均禁用且无管理员令牌，可信离线链保持 `BLOCKED`，未创建规则、未改系统配置、未运行离线 GUI。Owner 已决定先完成本机可做项，但未豁免这些要求。RS05 仍 `IN PROGRESS`、产品闭环仍 `PARTIAL`、0.2.0 仍 `NOT RELEASED`。
+**环境与离线：**本机确认为 Windows 10 19045.6466、2560×1440 单屏、原生系统 96 DPI。Win11 因无可用环境为 `BLOCKED`（待人工补验）；原生高 DPI 和跨屏保持 `PENDING-MANUAL`；三类防火墙 profile 均禁用且无管理员令牌，可信离线链保持 `BLOCKED`，未创建规则、未改系统配置、未运行离线 GUI。Owner 已决定先完成本机可做项，但未豁免这些要求。RS05 仍 `IN PROGRESS`、产品闭环仍 `PARTIAL`、0.2.0 仍 `NOT RELEASED`。
 
 原始证据位于本机历史执行环境的 `G:/Python Project/能耗限额/work/rs05-closure-20261020/legacy/`（`payload-test.txt`、`payload-extract.txt`、`old-pyz-modules.json`、`old-library-result.json`、`candidate-self-check-process.json`、`candidate-self-check.json`、`upgrade-compare.json`）及隔离工作树的 `work/rs05-closure-20261020/environment/README.md`；两处均为 Git 忽略目录，不是跨机器固定入口。上述身份、旧源库哈希和升级克隆库哈希已独立复算核对；原始文件不复制进 PR。
