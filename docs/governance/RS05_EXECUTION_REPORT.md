@@ -1137,3 +1137,20 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 安装过程曾有一次测试命令参数构造错误（未触发目标安装），修正后上述安装 exit 0；此前尝试通过 Sky／Explorer 自动化进入交互桌面挂起并已中断。这两处是验收操作受阻记录，不推断为产品故障。随后 Sky 能识别已安装 EXE 窗口，但 `get_window_state` 约 123.5 秒挂起并中断，**未取得界面截图或控件树、未点击或输入**。因此标准库选中详情的选煤／水泥／其他标准三态视觉、旧限值隐藏的真实 GUI 呈现，以及选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；源码测试与进程启动不能替代这部分人工验收。本轮亦未从新实物重验 Word GUI／Word／WPS，前轮 `rc-4e43490` 的文档证据仅保留其原身份，不迁移为 `rc-f689658` 的通过结论。
 
 构建原始日志位于上述构建工作树的 `work/build-candidate-f6896584-20261023.log`；持久安装原始日志位于本机历史执行环境 `G:/Python Project/能耗限额/work/standard-confirmation-f689658-install/inno-install.log`。这些绝对路径仅定位本机原始证据，不是跨机器固定入口。当前可确认的是结构化源码／自动测试／Candidate 构建／真实用户持久安装与隔离启动关闭；GUI 视觉和操作链、此前已登记的 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖仍待对应证据或既定治理裁定。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`，不启动水泥实现或 Excel 工作簿。
+
+### 同日 PR #32 审查修正与 `rc-b102e36` 续验
+
+上述 `rc-f689658` 仍是其原提交的历史验收，不代表下述新候选。审查发现随包手册将所有标准写成会展示产品／指标／限值明细，并沿用开发目录的启动路径；本轮修正手册、交付清单及安装说明，明确**只有选煤显示完整明细表**，其他标准仅供标准级目录参考，整张产品/工序、指标、单位及限值明细表不在普通详情展示。安装版从开始菜单或桌面快捷方式启动，便携版解压 ZIP 后运行其中的 `UEBench/UEBench.exe`。同时为确认登记与映射索引增加定向一致性测试，历史 Phase 7 的“仅可预览”原样证据只加当时语境注释。批准映射正文、正式评价 ID、Excel 交付和水泥软件范围均未改变；本节沿用上方平台 / Contract 预检查，Frozen 锁与 Standard Issue 状态未变，无新增中央 Contract 修改。
+
+修正后的干净**构建源码**为 `b102e36a564e5b8874e676e4a1799395d211254b`，不是本报告后续的文档交接提交。4 个相关测试模块 60 项通过，精确源码提交的 [PR Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739735)、[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739805)、[QZC N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739975) 均为 `completed/success`。首次完整测试进程 exit 0；原日志的进度字符计为 1124 passed、62 skipped、1 warning，**不是 pytest 最终汇总行**。随后首次打包因 PowerShell 5.1 的 JSON 原生命令参数传递失败，未产出安装器；改用 PowerShell 7 对同一干净提交以 `-SkipTests` 续建 exit 0，未重复声称全量测试又运行一次。新冻结 EXE 隔离自检 6/6，构建内 Artifact Gate 63 点全部通过。这一中断属于构建执行环境参数问题，未发现源码测试失败。
+
+| 新候选核对 | 2026-10-23 实际结果 |
+|---|---|
+| 构建身份与标准包 | 本机历史构建目录 `C:/Users/WANGWEI/.codex/worktrees/standard-confirmation-rebuild/能耗限额/dist/candidate-0.2.0-b102e36`；`release-build-info.json` 为 `rc-b102e36`、`source_commit=b102e36a564e5b8874e676e4a1799395d211254b`、`source_dirty=false`、标准包 `.5`（48 项／765 条规则、SHA256 `9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5`），payload tree SHA256 `014e2e067aef0a0f2e05bc84d927cc94767523550aaaaaaec0719ccb882b8e3a` |
+| 产物 | 安装包 SHA256 `272d2cb06e215bf78ee8846a365e8a4e64a4f5c494e4e042c1c9488cb83513f4`；便携 ZIP SHA256 `843a354124c83c8749cf0672bc78cc871a790cc01adc29bb316f81dd75ea2e71`，已独立实算核对；候选根目录三份说明与源码逐字节相同，便携 ZIP 本身不含手册文件 |
+| 真实用户持久安装 | `WANGWEI` 用户的 Inno 安装 exit 0，安装日志记录成功且无需重启；已安装 EXE SHA256 `01d0cfe8241258fbd156f880026355681ae5a270f404685515a52a4d59d6dcf9` 与新 Candidate payload 相同。开始菜单和桌面快捷方式指向该持久 EXE；安装目录的手册、交付清单、安装说明三文件与候选根目录各自 SHA256 相同 |
+| 数据与启动 | 已安装 EXE 在独立数据目录自检 exit 0、6/6 通过；另以隔离数据和 `LOCALAPPDATA` 启动真实 `WANGWEI` GUI 进程（测试 PID `49956`，窗口句柄存在），再经 `CloseMainWindow()` 优雅退出。默认真实用户数据库在安装前、安装后和隔离验收后均为 3,887,104 B、SHA256 `094115c0635534ddceee50075ee78d8d4c0e26f385d7aa4760236d67c09cc92b`，时间未变、无 WAL/SHM；不将隔离库冒充默认用户数据 |
+
+本轮没有取得新候选的 GUI 控件树或截图，也没有点击标准库、保存选煤记录或重验 Word/WPS。因此三态文字与明细表隐藏的**真实界面视觉**、选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；C 的源码只读复核、定向测试与实际进程启动不能替代人工界面验收。`rc-f689658` 的旧实物记录也不自动升级为 `rc-b102e36` 的 Word/WPS 证据。当前目标仍受上方 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖缺口约束，`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`。
+
+本机原始构建记录在上述构建工作树的 `work/build-candidate-b102e36-{stdout,stderr}.log` 与 `work/build-candidate-b102e36-retry-{stdout,stderr}.log`；安装日志及自检报告在 `G:/Python Project/能耗限额/work/standard-confirmation-b102e36-install/`。这些是历史执行环境路径，不是跨机器固定入口。最终文档交接提交将与构建源码分开，不能据其 SHA 宣称 Candidate 从该文档提交重建。
