@@ -1097,3 +1097,26 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 **环境与离线：**本机确认为 Windows 10 19045.6466、2560×1440 单屏、原生系统 96 DPI。Win11 因无可用环境为 `BLOCKED`（待人工补验）；原生高 DPI 和跨屏保持 `PENDING-MANUAL`；三类防火墙 profile 均禁用且无管理员令牌，可信离线链保持 `BLOCKED`，未创建规则、未改系统配置、未运行离线 GUI。Owner 已决定先完成本机可做项，但未豁免这些要求。RS05 仍 `IN PROGRESS`、产品闭环仍 `PARTIAL`、0.2.0 仍 `NOT RELEASED`。
 
 原始证据位于本机历史执行环境的 `G:/Python Project/能耗限额/work/rs05-closure-20261020/legacy/`（`payload-test.txt`、`payload-extract.txt`、`old-pyz-modules.json`、`old-library-result.json`、`candidate-self-check-process.json`、`candidate-self-check.json`、`upgrade-compare.json`）及隔离工作树的 `work/rs05-closure-20261020/environment/README.md`；两处均为 Git 忽略目录，不是跨机器固定入口。上述身份、旧源库哈希和升级克隆库哈希已独立复算核对；原始文件不复制进 PR。
+
+## 2026-10-23 标准确认状态与稳定启动入口（计划；结果待验）
+
+本节承接[当前任务](../../TASK_STATE.md)、[映射总索引](../../standards/mappings/INDEX.md)和本报告上述 RS05 交付门禁，只处理本轮已授权的确认状态表达、普通详情限值展示及稳定启动入口。2026-10-20 的部分通过结果仍是历史证据；本节在实测前只记计划，不把待验事项预写为 PASS。
+
+### 平台 / Contract 预检查
+
+| 项目 | 本轮依据及边界 |
+|---|---|
+| 业务仓、中央身份 | 本任务从 `origin/main@694ac184d5d71b5f2f5500147a5a79b4690c8514` 开始；`platform-lock.json` 仍锁中央 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`。中央当前 `GUIDE_INDEX` 路由的 UI v0.2／产品规格／验收清单为 ACTIVE 指南，不升级本仓 Frozen 锁 |
+| 适用 Frozen 与 MUST / MUST NOT | Architecture 2.1、Numeric Contract／Profiles／Conformance v1 保持 Frozen；正式比较继续 Decimal full-value exact，历史结果及快照不重算。正式评价范围仅选煤；文档已批准、机器定义已发布或旧规则可计算，均不得自动放宽范围、冒充验收或在普通详情把未确认限值展示成正式业务结论 |
+| 冲突与中央修改 | 当前未发现新增 Frozen 冲突或 `CENTRAL CONTRACT GAP`；既有 D-ECQ-002～006 仍为已登记偏差。本任务不涉及中央公共 Contract 修改；若实施时发现真实公共语义冲突，再按既有分类治理 |
+| Standard Issue 与软件解释 | 选煤无现行 Standard Issue，D01/D02 和现行批准映射不变；水泥 `ECQ-STD-GB16780-001`／`003` 维持原台账状态。2026-10-23 用户重申确认范围，但未批准新公式、限值或解释，也未完成水泥软件 Stage B/C/D |
+
+### 分工、预定通过条件与构建边界
+
+| 工作 | 预定通过条件 | 本节当前状态 |
+|---|---|---|
+| 映射确认记录 | 在既有两个标准入口、总索引和当前交接记录 Owner 日期、依据、范围与未确认事项；不改两份批准映射正文，不新建第二台账，不概括判定所有遗留规则都错 | 治理文字待审；与代码实态分开 |
+| 软件确认状态与普通详情 | 标准库选中详情分别表达映射确认与软件正式评价支持状态；选煤已验能力与水泥 V1.2 已批准但软件未完成不混淆。未经批准映射核对与软件验收的旧限值不作为普通详情的正式限值展示；新建／保存的正式评价范围仍仅选煤，后端拒绝不能被页面绕过。状态由结构化数据投影，不运行时解析 Markdown | 应用、UI 与测试待独立实现和验证 |
+| 稳定启动与交付 | 从确定的干净源码提交构建新 Candidate，分别核安装版与便携版实际入口、启动、数据目录隔离及受影响操作；记录构建 SHA、产物哈希和实测范围。旧 `rc-4e43490` 的通过证据保留，但不能代表此次变更后的新实物 | 实物构建与验收待完成 |
+
+只有代码和随包资源冻结成干净提交后才构建；最终治理结果可另成文档提交，但应与构建源码 SHA 明确区分。交付验收仍须如实保留 Win11、原生高 DPI／跨屏、离线及 0.1.0 真实安装器覆盖等原缺口，不因本轮确认而自动豁免；Excel 工作簿仍暂缓，水泥核算实现不在本任务启动。当前 `RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。

@@ -132,8 +132,9 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     assert window.pages.currentIndex() == 1
     window.standard_table.selectRow(0)
     window.refresh_standard_detail()
-    assert window.standard_indicator_table.rowCount() == 1
-    assert window.standard_indicator_table.item(0, 1).text() == "单位产品能耗"
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
+    assert "业务映射待整理确认" in window.standard_confirmation_label.text()
     window.close()
     context.database.dispose()
 
@@ -352,12 +353,10 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
         for column in range(window.standard_indicator_table.columnCount())
     ]
     assert "适用条件/说明" not in indicator_headers
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
     library_text = " ".join(
-        [window.standard_detail_label.text()]
-        + [
-            window.standard_indicator_table.item(0, column).text()
-            for column in range(window.standard_indicator_table.columnCount())
-        ]
+        [window.standard_detail_label.text(), window.standard_confirmation_label.text()]
     )
     assert "requires_independent_review" not in library_text
     assert "需独立复核后使用" not in library_text

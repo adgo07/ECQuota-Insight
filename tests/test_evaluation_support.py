@@ -28,6 +28,8 @@ from uebench.application.evaluation_support import (
     SUPPORTED_EVALUATION_STANDARD_IDS,
     evaluation_support_label,
     filter_formally_evaluable,
+    mapping_confirmation,
+    standard_confirmation_message,
     supports_formal_evaluation,
 )
 from uebench.domain.models import PublicationStatus, StandardDefinition
@@ -207,3 +209,33 @@ def test_unknown_and_empty_ids_are_unsupported() -> None:
     assert supports_formal_evaluation("gb-29446-2018") is False
     assert supports_formal_evaluation("GB 29446-2019") is False
     assert evaluation_support_label("") == FORMAL_EVALUATION_UNSUPPORTED_LABEL
+
+
+def test_mapping_confirmation_is_distinct_from_formal_software_support() -> None:
+    coal = mapping_confirmation(SUPPORTED_ID)
+    cement = mapping_confirmation("gb-16780-2021")
+    pending = mapping_confirmation(UNSUPPORTED_INSTALLED_IDS[1])
+
+    assert (coal.confirmed, coal.version, coal.approved_on) == (
+        True, "2026-10-18 已批准版", "2026-10-18"
+    )
+    assert (cement.confirmed, cement.version, cement.approved_on) == (
+        True, "V1.2 已批准版", "2026-10-13"
+    )
+    assert (pending.confirmed, pending.version, pending.approved_on, pending.source) == (
+        False, None, None, None
+    )
+    for confirmed in (coal, cement):
+        assert confirmed.source is not None
+        assert (ROOT / confirmed.source).is_file()
+    assert supports_formal_evaluation(SUPPORTED_ID)
+    assert not supports_formal_evaluation("gb-16780-2021")
+
+
+def test_confirmation_messages_do_not_promote_unreviewed_legacy_rules() -> None:
+    assert "当前已实现核算范围已验收" in standard_confirmation_message(SUPPORTED_ID)
+    assert "软件接入及验收待完成" in standard_confirmation_message("gb-16780-2021")
+    pending_message = standard_confirmation_message(UNSUPPORTED_INSTALLED_IDS[1])
+    assert "业务映射待整理确认" in pending_message
+    assert "旧规则未作为已验收依据" in pending_message
+    assert "核算限值" in pending_message
