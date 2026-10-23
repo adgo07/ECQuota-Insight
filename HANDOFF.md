@@ -42,7 +42,7 @@
 
 **2026-10-18 当前正式业务映射：**Owner 已确认[GB29446 现行批准映射](standards/mappings/GB29446-2019/标准映射表_2026-10-18_已批准.md)为唯一正式业务映射版本，[标准入口](standards/mappings/GB29446-2019/README.md)记录原字节 SHA256。D01 将有效比较后超过 3 级上限的结果称为“未达3级”；D02 为本标准设 $E_d>0$、$m>0$ 的软件防误录边界，非标准明文。旧“超出3级”已在本轮源码展示中同步；不恢复企业建设属性合规填写或符合性主结论。映射正式不等于 RS05 完成或其他标准获正式支持。
 
-**2026-10-23 新确认边界：**Owner 认可现有已验的选煤业务核算、判级及页面／Word表现，继续采用上述批准映射；[选煤入口](standards/mappings/GB29446-2019/README.md)记确认范围与未覆盖门禁。Owner 重申[水泥 V1.2 映射](standards/mappings/GB16780-2021/README.md)已批准冻结，但水泥软件 Stage B/C/D、旧规则差异及独立验收仍未完成，不能宣称水泥核算已正确支持。其他几十项旧规则按逐项映射重审；用户指出错误较多属于风险信息，未核具体项不预断为已证实错误。确认记录仍用[映射总索引](standards/mappings/INDEX.md)、各标准入口及既有决策／问题文件，不另建台账。标准库确认状态展示与稳定启动入口是本轮实施目标，完成情况待[RS05 执行报告](docs/governance/RS05_EXECUTION_REPORT.md)记录。
+**2026-10-23 新确认边界：**Owner 认可现有已验的选煤业务核算、判级及页面／Word表现，继续采用上述批准映射；[选煤入口](standards/mappings/GB29446-2019/README.md)记确认范围与未覆盖门禁。Owner 重申[水泥 V1.2 映射](standards/mappings/GB16780-2021/README.md)已批准冻结，但水泥软件 Stage B/C/D、旧规则差异及独立验收仍未完成，不能宣称水泥核算已正确支持。其他几十项旧规则按逐项映射重审；用户指出错误较多属于风险信息，未核具体项不预断为已证实错误。确认记录仍用[映射总索引](standards/mappings/INDEX.md)、各标准入口及既有决策／问题文件，不另建台账。标准库确认状态的结构化源码、定向测试与新 Candidate 构建通过；真实用户持久安装和隔离进程启动／关闭通过，GUI 三态视觉及选煤操作链仍待补验，见[RS05 执行报告](docs/governance/RS05_EXECUTION_REPORT.md)。
 
 本轮 UI 与 Word 应共享映射术语及字段、单位、选项、说明和结果含义；未来 Excel 若启动亦如此，专业特殊命名须 Owner 明确特批。**本轮不生成或交付新版 Excel 工作簿**，保留既有 Adapter 与安全回归。新 Word 导出决定已通过 [Qingzhou-contracts PR #13](https://github.com/adgo07/Qingzhou-contracts/pull/13) 同步中央 ACTIVE 产品规格 A-12、验收清单与 UI 指南（merge `c5fc6d438c9200060649e47c016b9b48218de72c`），未修改 Frozen lock。
 
@@ -139,7 +139,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
 - 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；
 - 定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及构建源码 exact-head CI 已按对应提交取得证据；后续仅在构建输入改变或实测发现缺陷时按影响复验；
-- 业务 PR #28 已获 Owner 授权并合并；`rc-4e43490` 已从干净源码重建并记录受影响验收。下一步按[RS05 当前交付收口计划与本机结果](docs/governance/RS05_EXECUTION_REPORT.md)保留真实安装器覆盖及 Win11／原生系统高 DPI／跨屏／离线缺口，不能用旧阶段便携 ZIP 缺失或“Windows 证据尚未建立”否定已有实测，也不能将未测环境写为通过；不据此正式发布 v0.2.0，不开始 RS06。
+- 业务 PR #28 已获 Owner 授权并合并；`rc-4e43490` 的受影响验收保留为历史。当前 PR #32 的构建源码 `f6896584ad8fa9c2dd6cbe4e3b1f3fa5b51dbe17` 对应 `rc-f689658`，三项精确提交 CI、构建门禁及真实用户持久安装／隔离启动有证据；本交接的后续文档提交不改变 Candidate 身份。GUI 三态视觉与选煤操作链未实测；按[RS05 当前交付收口计划与本机结果](docs/governance/RS05_EXECUTION_REPORT.md)继续保留真实安装器覆盖及 Win11／原生系统高 DPI／跨屏／离线缺口。不能用旧阶段便携 ZIP 缺失或“Windows 证据尚未建立”否定已有实测，也不能将未测环境写为通过；不据此正式发布 v0.2.0，不开始 RS06。
 
 Reference Standard Product Closure 仍为 PARTIAL。
 
