@@ -927,6 +927,8 @@ legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实�
 
 ### 修复的独立复现证据（以真实当前标准包 + 隔离 SQLite + 归档旧包副本）
 
+下列“仅可预览”是 Phase 7 当时异常提示的原样证据，证明范围外调用不能保存正式评价；`preview()` 是不落库的底层能力，不表示当前普通界面开放其他标准的预览入口。现行用户可见范围以当前源码、用户手册与本报告末尾的阶段结果为准。
+
 ```text
 Blocker 1  gb-16780-2021 registry=False
            evaluate() -> ValueError「尚未纳入正式评价范围：该标准不能形成正式评价记录，仅可预览。」

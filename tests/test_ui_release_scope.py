@@ -328,7 +328,8 @@ def test_library_confirmation_and_limits_follow_selected_standard(window) -> Non
         window.refresh_all()
 
     window.standard_table.selectRow(_library_row(window, GB29446_ID))
-    assert "当前已实现核算范围已验收" in window.standard_confirmation_label.text()
+    assert "当前已实现的业务核算能力已通过验收" in window.standard_confirmation_label.text()
+    assert "软件交付与环境验收尚未全部完成" in window.standard_confirmation_label.text()
     coal_rows = window.standard_indicator_table.rowCount()
     assert coal_rows > 0
     assert not window.standard_indicator_table.isHidden()

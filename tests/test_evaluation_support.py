@@ -32,6 +32,7 @@ from uebench.application.evaluation_support import (
     standard_confirmation_message,
     supports_formal_evaluation,
 )
+from uebench.application.evaluation_support import _MAPPING_CONFIRMATIONS
 from uebench.domain.models import PublicationStatus, StandardDefinition
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -233,9 +234,60 @@ def test_mapping_confirmation_is_distinct_from_formal_software_support() -> None
 
 
 def test_confirmation_messages_do_not_promote_unreviewed_legacy_rules() -> None:
-    assert "当前已实现核算范围已验收" in standard_confirmation_message(SUPPORTED_ID)
+    coal_message = standard_confirmation_message(SUPPORTED_ID)
+    assert "当前已实现的业务核算能力已通过验收" in coal_message
+    assert "软件交付与环境验收尚未全部完成" in coal_message
     assert "软件接入及验收待完成" in standard_confirmation_message("gb-16780-2021")
     pending_message = standard_confirmation_message(UNSUPPORTED_INSTALLED_IDS[1])
     assert "业务映射待整理确认" in pending_message
     assert "旧规则未作为已验收依据" in pending_message
-    assert "核算限值" in pending_message
+    for standard_id in ("gb-16780-2021", UNSUPPORTED_INSTALLED_IDS[1]):
+        message = standard_confirmation_message(standard_id)
+        assert "产品/工序、指标、单位及限值明细暂不展示" in message
+
+
+def test_approved_mapping_registry_agrees_with_current_mapping_entrances() -> None:
+    """Compare the small registry with approved links, not whole Markdown prose.
+
+    An approved row added to INDEX must be registered here before the UI can
+    claim its mapping status. README's current-entry paragraph guards against
+    silently pointing the registry at a historical mapping.
+    """
+    index = ROOT / "standards" / "mappings" / "INDEX.md"
+    indexed_sources: dict[str, str] = {}
+    indexed_rows: dict[str, str] = {}
+    for line in index.read_text(encoding="utf-8").splitlines():
+        columns = [column.strip() for column in line.split("|")]
+        if len(columns) < 6:
+            continue
+        id_match = re.fullmatch(r"`(gb-[a-z0-9-]+)`", columns[2])
+        if not id_match:
+            continue
+        approved_link = re.search(r"\[[^\]]+\]\(([^)]+\.md)\)", columns[4])
+        if not approved_link:
+            continue
+        standard_id = id_match.group(1)
+        assert standard_id not in indexed_sources, f"重复的现行批准映射入口：{standard_id}"
+        source = (index.parent / approved_link.group(1)).resolve()
+        indexed_sources[standard_id] = source.relative_to(ROOT.resolve()).as_posix()
+        indexed_rows[standard_id] = line
+
+    assert indexed_sources, "INDEX 中应有现行批准映射入口"
+    assert set(indexed_sources) == set(_MAPPING_CONFIRMATIONS)
+    for standard_id, source in indexed_sources.items():
+        confirmation = mapping_confirmation(standard_id)
+        assert confirmation.confirmed and confirmation.source == source
+        assert confirmation.approved_on in indexed_rows[standard_id]
+        assert confirmation.version.split(" ", 1)[0] in indexed_rows[standard_id]
+
+        readme = (ROOT / source).parent / "README.md"
+        readme_text = readme.read_text(encoding="utf-8")
+        current_heading = "## 唯一现行批准映射"
+        current_section = (
+            readme_text.split(current_heading, 1)[1].split("## ", 1)[0]
+            if current_heading in readme_text
+            else readme_text.split("## ", 1)[0]
+        )
+        assert Path(source).name in current_section
+        assert confirmation.approved_on in current_section
+        assert confirmation.version.split(" ", 1)[0] in current_section

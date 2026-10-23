@@ -133,11 +133,11 @@ def standard_confirmation_message(standard_id: str | StandardDefinition) -> str:
     """Brief library explanation without changing evaluation capability."""
     mapping = mapping_confirmation(standard_id)
     if not mapping.confirmed:
-        return "业务映射待整理确认；旧规则未作为已验收依据，本页暂不展示核算限值。"
+        return "业务映射待整理确认；旧规则未作为已验收依据。产品/工序、指标、单位及限值明细暂不展示。"
     mapping_part = f"业务映射已确认（{mapping.version}，{mapping.approved_on}）。"
     if supports_formal_evaluation(standard_id):
-        return mapping_part + "当前已实现核算范围已验收。"
-    return mapping_part + "软件接入及验收待完成，本页暂不展示核算限值。"
+        return mapping_part + "当前已实现的业务核算能力已通过验收；软件交付与环境验收尚未全部完成。"
+    return mapping_part + "软件接入及验收待完成。产品/工序、指标、单位及限值明细暂不展示。"
 
 
 def filter_formally_evaluable(
