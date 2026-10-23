@@ -58,6 +58,7 @@ from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_UNSUPPORTED_LABEL,
     evaluation_support_label,
     filter_formally_evaluable,
+    standard_confirmation_message,
     supports_formal_evaluation,
 )
 from uebench.application.gb29446 import (
@@ -538,6 +539,10 @@ class MainWindow(QMainWindow):
         self.standard_detail_label = QLabel("选择标准后查看适用范围")
         self.standard_detail_label.setWordWrap(True)
         layout.addWidget(self.standard_detail_label)
+        self.standard_confirmation_label = QLabel("选择标准后查看业务映射与软件核算状态")
+        self.standard_confirmation_label.setObjectName("standardConfirmationStatus")
+        self.standard_confirmation_label.setWordWrap(True)
+        layout.addWidget(self.standard_confirmation_label)
         self.standard_indicator_table = QTableWidget(0, 6)
         self.standard_indicator_table.setHorizontalHeaderLabels(
             ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额"]
@@ -1074,6 +1079,8 @@ class MainWindow(QMainWindow):
         standard = self._library_standard(standard_id)
         if standard is None:
             self.standard_detail_label.setText("选择标准后查看适用范围")
+            self.standard_confirmation_label.setText("选择标准后查看业务映射与软件核算状态")
+            self.standard_indicator_table.setVisible(False)
             self.standard_evaluate_button.setEnabled(False)
             self.standard_official_button.setEnabled(False)
             self.standard_official_status.setText("请先选择标准")
@@ -1081,6 +1088,7 @@ class MainWindow(QMainWindow):
             return
         # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
         self.standard_detail_label.setText(standard_scope_line(standard.id))
+        self.standard_confirmation_label.setText(standard_confirmation_message(standard.id))
         official_url = official_source_url(standard.id)
         self.standard_official_button.setEnabled(official_url is not None)
         self.standard_official_button.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
@@ -1089,6 +1097,9 @@ class MainWindow(QMainWindow):
         )
         # 未纳入正式评价范围的标准不提供可执行的评价入口。
         supported = supports_formal_evaluation(standard.id)
+        # 旧规则可能尚未按批准映射重新验收；清空后只为正式支持的标准重建限值。
+        # 切换标准时不会把上一条标准的旧限值留在隐藏表格中。
+        self.standard_indicator_table.setVisible(supported)
         self.standard_evaluate_button.setEnabled(supported)
         self.standard_evaluate_button.setToolTip(
             "用该标准发起正式评价。"
@@ -1101,22 +1112,23 @@ class MainWindow(QMainWindow):
                 return "—"
             return expression.value if expression.op == "constant" else "公式/条件"
 
-        for product in standard.products:
-            for indicator in product.indicators:
-                base = indicator.base_thresholds or indicator.thresholds
-                # 「适用条件/说明」不再出现在普通标准库里：条件与内部备注代码都不再展示。
-                values = [
-                    product.name,
-                    indicator.name,
-                    indicator.unit,
-                    limit_value(base.level_1),
-                    limit_value(base.level_2),
-                    limit_value(base.level_3),
-                ]
-                detail_row = self.standard_indicator_table.rowCount()
-                self.standard_indicator_table.insertRow(detail_row)
-                for column, value in enumerate(values):
-                    self.standard_indicator_table.setItem(detail_row, column, _item(value))
+        if supported:
+            for product in standard.products:
+                for indicator in product.indicators:
+                    base = indicator.base_thresholds or indicator.thresholds
+                    # 「适用条件/说明」不再出现在普通标准库里：条件与内部备注代码都不再展示。
+                    values = [
+                        product.name,
+                        indicator.name,
+                        indicator.unit,
+                        limit_value(base.level_1),
+                        limit_value(base.level_2),
+                        limit_value(base.level_3),
+                    ]
+                    detail_row = self.standard_indicator_table.rowCount()
+                    self.standard_indicator_table.insertRow(detail_row)
+                    for column, value in enumerate(values):
+                        self.standard_indicator_table.setItem(detail_row, column, _item(value))
         self.refresh_formal_evaluation_readiness()
 
     def _selection_mode(self) -> StandardSelectionMode:

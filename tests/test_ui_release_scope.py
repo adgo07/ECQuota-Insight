@@ -315,6 +315,44 @@ def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None
     assert not window.standard_detail_label.text().startswith("适用范围：适用范围")
 
 
+def test_library_confirmation_and_limits_follow_selected_standard(window) -> None:
+    cement_id = "gb-16780-2021"
+    if not any(
+        standard.id == cement_id
+        for standard in window.context.application.list_library_standards()
+    ):
+        cement_definition = ROOT / "data" / "definitions" / "gb-16780-2021.json"
+        window.context.standards.install(
+            StandardDefinition.model_validate_json(cement_definition.read_text(encoding="utf-8"))
+        )
+        window.refresh_all()
+
+    window.standard_table.selectRow(_library_row(window, GB29446_ID))
+    assert "当前已实现的业务核算能力已通过验收" in window.standard_confirmation_label.text()
+    assert "软件交付与环境验收尚未全部完成" in window.standard_confirmation_label.text()
+    coal_rows = window.standard_indicator_table.rowCount()
+    assert coal_rows > 0
+    assert not window.standard_indicator_table.isHidden()
+
+    window.standard_table.selectRow(_library_row(window, cement_id))
+    assert "V1.2 已批准版" in window.standard_confirmation_label.text()
+    assert "软件接入及验收待完成" in window.standard_confirmation_label.text()
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
+    assert not window.standard_evaluate_button.isEnabled()
+
+    window.standard_table.selectRow(_library_row(window, "gb-00001-2026"))
+    assert "业务映射待整理确认" in window.standard_confirmation_label.text()
+    assert "旧规则未作为已验收依据" in window.standard_confirmation_label.text()
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
+    assert not window.standard_evaluate_button.isEnabled()
+
+    window.standard_table.selectRow(_library_row(window, GB29446_ID))
+    assert window.standard_indicator_table.rowCount() == coal_rows
+    assert not window.standard_indicator_table.isHidden()
+
+
 def test_library_no_longer_shows_internal_traceability_noise(window) -> None:
     headers = [
         window.standard_table.horizontalHeaderItem(column).text()

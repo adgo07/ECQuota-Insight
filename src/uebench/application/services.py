@@ -159,7 +159,7 @@ class EvaluationService:
             raise ValueError(readiness_message)
         if not supports_formal_evaluation(request.standard_id):
             raise ValueError(
-                f"{evaluation_support_label(request.standard_id)}：该标准不能形成正式评价记录，仅可预览。"
+                f"{evaluation_support_label(request.standard_id)}：本版本不能用该标准形成正式评价记录。"
             )
         if request.selection_mode is StandardSelectionMode.FUTURE:
             raise ValueError("尚未实施标准只能预览，不能形成正式判定或保存评价记录。")
