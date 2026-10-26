@@ -44,6 +44,8 @@ def fill_and_calculate(window):
 
 def test_shell_disabled_entries_and_named_navigation(window):
     assert window.sidebar.isHidden()
+    assert window.home_recent.isHidden()
+    assert not window.home_empty_start.isHidden()
     assert list(window.home_task_buttons) == ["standards", "evaluation", "import", "records", "factors"]
     for key, row in (("import", 3), ("factors", 5)):
         assert not window.home_task_buttons[key].isEnabled()
@@ -80,6 +82,12 @@ def test_three_standard_states_and_status_filter(window):
         assert phrase in window.standard_confirmation_label.text()
         assert window.standard_evaluate_button.isEnabled() == supported
         assert bool(window.standard_indicator_table.rowCount()) == supported
+        if supported:
+            assert "第3.1条" in window.standard_requirements_basis.text()
+            assert "表1" in window.standard_requirements_basis.text()
+            assert "第3.2条" in window.standard_requirements_basis.text()
+        else:
+            assert window.standard_requirements_basis.text() == ""
     window.standard_status_filter.setCurrentText("尚未实施")
     assert window.standard_table.rowCount() == 0
     window.standard_status_filter.setCurrentIndex(0)
@@ -105,6 +113,9 @@ def test_result_saved_once_navigation_preserves_input_and_edits_invalidate(windo
 
 def test_radio_linkage_and_responsive_fields(window):
     window.start_formal_evaluation()
+    assert window.eval_standard.isHidden()
+    assert "GB 29446-2019" in window.eval_standard_summary.text()
+    assert "选煤电力消耗限额" in window.eval_standard_summary.text()
     radio = next(b for b in window.coal_button_group.buttons() if b.text() == "动力煤")
     radio.click()
     assert window.gb29446_coal_type.currentText() == "动力煤"
@@ -120,6 +131,8 @@ def test_radio_linkage_and_responsive_fields(window):
 
 def test_home_failure_is_retryable_and_recent_values_are_saved(window, monkeypatch):
     fill_and_calculate(window)
+    assert not window.home_recent.isHidden()
+    assert window.home_empty_start.isHidden()
     assert window.home_recent.item(0, 0).text() == "未填写企业名称"
     assert "6.64" in window.home_recent.item(0, 3).text()
     original = window.context.application.list_recent_evaluations
@@ -127,10 +140,47 @@ def test_home_failure_is_retryable_and_recent_values_are_saved(window, monkeypat
     window.refresh_home()
     assert "读取失败" in window.home_recent_notice.text()
     assert not window.home_retry.isHidden()
+    assert window.home_recent.isHidden()
+    assert window.home_empty_start.isHidden()
     monkeypatch.setattr(window.context.application, "list_recent_evaluations", original)
     window.home_retry.click()
     assert window.home_recent.rowCount() == 1
     assert window.home_retry.isHidden()
+
+@pytest.mark.parametrize("render_failure", [False, True])
+def test_saved_action_transition_never_recalculates_on_view(window, monkeypatch, render_failure):
+    calls = []
+    evaluate = window.context.application.evaluate
+    def record_evaluation(request):
+        calls.append(request)
+        return evaluate(request)
+    monkeypatch.setattr(window.context.application, "evaluate", record_evaluation)
+    if render_failure:
+        monkeypatch.setattr(window, "_show_gb29446_result", lambda *a: (_ for _ in ()).throw(RuntimeError("render")))
+    fill_and_calculate(window)
+    saved = window.last_result_id
+    assert len(calls) == 1
+    assert window.calculate_button.text() == "重新计算并生成新记录"
+    assert window.gb29446_view_record.isEnabled()
+    if render_failure:
+        assert "记录已保存" in window.gb29446_result_message.text()
+        assert not window.gb29446_export_word.isEnabled()
+    viewed = []
+    monkeypatch.setattr(window, "view_selected_record", lambda: viewed.append(window._selected_record_id()))
+    window.gb29446_view_record.click()
+    assert viewed == [saved]
+    assert len(calls) == 1
+    assert window.context.application.count_evaluations() == 1
+    window.gb29446_electricity.setText("9000000")
+    assert window.calculate_button.text() == "计算并判级"
+    assert window.last_result_id is None
+    assert not window.gb29446_view_record.isEnabled()
+    assert not window.gb29446_export_word.isEnabled()
+    window.navigate("evaluation")
+    window.calculate_button.click()
+    assert len(calls) == 2
+    assert window.last_result_id != saved
+    assert window.context.application.count_evaluations() == 2
 
 def test_saved_record_remains_accessible_if_result_rendering_fails(window, monkeypatch):
     monkeypatch.setattr(window, "_show_gb29446_result", lambda *a: (_ for _ in ()).throw(RuntimeError("render")))

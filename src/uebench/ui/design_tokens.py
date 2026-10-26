@@ -16,8 +16,13 @@ QPushButton:focus, QLineEdit:focus, QComboBox:focus { border: 2px solid #197CC2;
 QPushButton[role="primary"] { background: #197CC2; color: white; border-color: #197CC2; }
 QPushButton[role="primary"]:hover { background: #116FAE; }
 QPushButton:disabled { color: #698198; background: #F0F4F8; border-color: #DAE7F1; }
-QPushButton[role="task"] { text-align: left; padding: 22px; font-size: 16px; border-radius: 14px; }
-QPushButton#standardTask { background: #183F64; color: white; text-align: left; padding: 22px; border-radius: 14px; font-size: 18px; }
+QPushButton[role="task"] { padding: 0; min-height: 172px; border-radius: 14px; }
+QPushButton[role="task"] QLabel[class="taskTitle"] { font-size: 18px; font-weight: 600; color: #18364F; }
+QPushButton[role="task"] QLabel[class="taskDescription"] { font-size: 13px; color: #698198; }
+QPushButton[role="task"] QLabel:disabled { color: #698198; }
+QPushButton#standardTask { background: #183F64; color: white; padding: 0; border-radius: 14px; }
+QPushButton#standardTask QLabel[class="taskTitle"] { color: white; }
+QPushButton#standardTask QLabel[class="taskDescription"] { color: #C9E0F2; }
 QLineEdit, QComboBox, QDateEdit, QSpinBox { background: white; border: 1px solid #DAE7F1; border-radius: 6px; padding: 8px; min-height: 22px; }
 QLineEdit:read-only { background: #F7FAFD; }
 QTextEdit, QTableWidget { background: white; border: 1px solid #DAE7F1; border-radius: 6px; gridline-color: #E8F0F6; }
