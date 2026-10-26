@@ -415,7 +415,7 @@ def test_window_keeps_package_details_advanced_and_blocks_new_evaluations(tmp_pa
         window.record_table.selectRow(0)
         with patch("uebench.domain.engine.EvaluationEngine.evaluate", side_effect=AssertionError("history view ran Engine")):
             window.view_selected_record()
-        detail = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+        detail = window.record_detail_page.findChild(QTextEdit, "record_detail_content")
         assert detail is not None
         assert "选煤电力单耗" in detail.toPlainText()
         assert str(historical_result.results[0].actual_value) in detail.toPlainText()

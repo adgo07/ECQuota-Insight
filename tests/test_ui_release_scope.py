@@ -233,11 +233,11 @@ def test_record_list_renders_local_seconds_precision(window) -> None:
     assert window.record_table.rowCount() == 1
     stored = window.context.application.list_recent_evaluations(1)[0]
 
-    rendered = window.record_table.item(0, 0).text()
+    rendered = window.record_table.item(0, 5).text()
     assert SECONDS_PRECISION.fullmatch(rendered), rendered
     assert "." not in rendered, f"普通列表不得显示微秒：{rendered}"
     assert rendered == format_local_datetime(stored.created_at)
-    assert window.record_table.item(0, 1).text() == stored.evaluation_date.strftime("%Y-%m-%d")
+    assert window.record_table.item(0, 0).text() == (stored.organization_name or "未填写企业名称")
 
     window.refresh_home()
     home_rendered = window.home_recent.item(0, 4).text()
@@ -251,7 +251,7 @@ def test_record_detail_renders_local_seconds_precision(window) -> None:
     window.record_table.selectRow(0)
     window.view_selected_record()
 
-    dialog = window.record_detail_dialog
+    dialog = window.record_detail_page
     content = dialog.findChild(QTextEdit, "record_detail_content")
     assert content is not None
     text = content.toPlainText()
@@ -536,7 +536,7 @@ def test_ordinary_ui_never_opens_a_local_pdf(tmp_path: Path, qt_app: QApplicatio
         window.refresh_records()
         window.record_table.selectRow(0)
         window.view_selected_record()
-        record_button = window.record_detail_dialog.findChild(QPushButton, "recordOfficialSourceButton")
+        record_button = window.record_detail_page.findChild(QPushButton, "recordOfficialSourceButton")
         assert record_button is not None and record_button.isEnabled()
         record_button.click()
 
@@ -638,7 +638,7 @@ def test_records_page_hides_the_export_and_technical_detail_buttons(window, monk
     window.navigate("records")
     record_buttons = [button.text() for button in window.pages.widget(3).findChildren(QPushButton)]
     assert "导出Excel" not in record_buttons
-    assert "查看原记录" in record_buttons, "查看原记录本身必须保留"
+    assert "查看" in record_buttons, "查看原记录本身必须保留"
 
     _evaluate_gb29446(window)
     window.refresh_records()
@@ -653,7 +653,7 @@ def test_records_page_hides_the_export_and_technical_detail_buttons(window, monk
     assert window.context.application.list_audit(500), "审计日志不得因移除按钮而消失"
 
     window.view_selected_record()
-    dialog = window.record_detail_dialog
+    dialog = window.record_detail_page
     assert "技术详情" not in [button.text() for button in dialog.findChildren(QPushButton)]
     assert dialog.findChild(QTextEdit, "record_detail_technical") is None
     content = dialog.findChild(QTextEdit, "record_detail_content")

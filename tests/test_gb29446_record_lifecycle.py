@@ -106,7 +106,7 @@ def select_record(window, evaluation_id):
 
 
 def detail_text(window):
-    return window.record_detail_dialog.findChild(QTextEdit, "record_detail_content").toPlainText()
+    return window.record_detail_page.result_content.toPlainText() + "\n" + window.record_detail_page.input_content.toPlainText()
 
 
 def record_trace(window, evaluation_id):
@@ -222,15 +222,15 @@ def test_view_is_readonly_no_engine_no_current_metadata(lifecycle, monkeypatch):
         assert expected in ordinary
     # A4：记录视图里的 E_d / e_d 以真下标渲染；“Ed：560”是下标文本的纯文本投影。
     assert "Ed：560" in ordinary and "m：100" in ordinary
-    content = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+    content = window.record_detail_page.input_content
     assert content is not None and "vertical-align:sub" in content.toHtml()
     assert result.evaluation_id not in ordinary
     assert "numeric_profile_id" not in ordinary
     # B1：「技术详情」按钮已从普通界面移除，但底层 trace / rule snapshot / 审计数据必须原样保留。
     assert "技术详情" not in [
-        button.text() for button in window.record_detail_dialog.findChildren(QPushButton)
+        button.text() for button in window.record_detail_page.findChildren(QPushButton)
     ]
-    assert window.record_detail_dialog.findChild(QTextEdit, "record_detail_technical") is None
+    assert window.record_detail_page.findChild(QTextEdit, "record_detail_technical") is None
     trace = record_trace(window, result.evaluation_id)
     assert trace["evaluation_id"] == result.evaluation_id
     assert trace["rule_revision"] == 2
@@ -376,7 +376,7 @@ def test_total_count_is_not_recent_ten_and_ids_are_hidden(lifecycle):
     # 循环保持非空（否则该循环会静默变成空转）。
     window.navigate("records")
     assert window.record_table.rowCount() == 12
-    assert window.record_table.columnCount() == 6
+    assert window.record_table.columnCount() == 7
     for table in [window.home_recent, window.record_table]:
         for row in range(table.rowCount()):
             hidden_id = table.item(row, 0).data(Qt.ItemDataRole.UserRole)
@@ -604,17 +604,17 @@ window.view_selected_record()
 app.processEvents()
 assert all(s in detail_text(window) for s in ["宁夏测试企业","2026年6月","炼焦煤","重介","560","100","1.12","6.272","2级","第5.2条","第3.1条"])
 assert raw_state(context,a["id"])==before
-window.record_detail_dialog.close()
+window.navigate("records")
 install_r3(context,loaded[2])
 select_record(window,a["id"])
 before=raw_state(context,a["id"])
 window.view_selected_record()
 trace=record_trace(window,a["id"])
 assert trace["rule_revision"]==2 and trace["snapshot_json"]==loaded[2].model_dump_json()
-assert "技术详情" not in [b.text() for b in window.record_detail_dialog.findChildren(QPushButton)]
+assert "技术详情" not in [b.text() for b in window.record_detail_page.findChildren(QPushButton)]
 assert "测试新版" not in detail_text(window)
 assert raw_state(context,a["id"])==before
-window.record_detail_dialog.close()
+window.navigate("records")
 notices=[]
 QMessageBox.information=lambda _p,_t,m:notices.append(m)
 window.recalculate_selected_record()

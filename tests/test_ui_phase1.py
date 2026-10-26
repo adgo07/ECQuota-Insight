@@ -165,10 +165,8 @@ def test_saved_action_transition_never_recalculates_on_view(window, monkeypatch,
     if render_failure:
         assert "记录已保存" in window.gb29446_result_message.text()
         assert not window.gb29446_export_word.isEnabled()
-    viewed = []
-    monkeypatch.setattr(window, "view_selected_record", lambda: viewed.append(window._selected_record_id()))
     window.gb29446_view_record.click()
-    assert viewed == [saved]
+    assert window.record_detail_page.record_id == saved
     assert len(calls) == 1
     assert window.context.application.count_evaluations() == 1
     window.gb29446_electricity.setText("9000000")

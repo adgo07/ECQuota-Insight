@@ -130,16 +130,13 @@ def context(tmp_path):
 
 @pytest.fixture
 def record_calls(monkeypatch, context):
-    """记录 ``list_recent_evaluations`` 的每一次 limit 参数。"""
-
-    calls: list[int] = []
-    original = context.application.list_recent_evaluations
-
-    def spy(limit: int = 100):
-        calls.append(limit)
-        return original(limit)
-
-    monkeypatch.setattr(context.application, "list_recent_evaluations", spy)
+    """记录分页查询；首页仍单独验证有界最近六条。"""
+    calls = []
+    original = context.application.query_evaluations
+    def spy(**kwargs):
+        calls.append(kwargs.get("page_size", 20))
+        return original(**kwargs)
+    monkeypatch.setattr(context.application, "query_evaluations", spy)
     return calls
 
 
@@ -314,12 +311,12 @@ def test_records_page_loads_on_first_entry_and_is_not_read_again_when_clean(
     window, record_calls
 ):
     window.navigate("records")
-    assert record_calls.count(200) == 1, "首次进入记录页必须加载"
+    assert record_calls.count(20) == 1, "首次进入记录页必须加载"
     assert window.record_table.rowCount() == 1
 
     window.navigation.setCurrentRow(0)
     window.navigate("records")
-    assert record_calls.count(200) == 1, "列表未变脏时重进页面不应重复读取"
+    assert record_calls.count(20) == 1, "列表未变脏时重进页面不应重复读取"
 
 
 def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app, monkeypatch):
@@ -329,17 +326,15 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
     install_library(context)
     save_one_record(context)
     calls: list[int] = []
-    original = context.application.list_recent_evaluations
+    original = context.application.query_evaluations
     failures = {"remaining": 1}
-
-    def flaky(limit: int = 100):
-        calls.append(limit)
-        if limit == 200 and failures["remaining"] > 0:
+    def flaky(**kwargs):
+        calls.append(kwargs.get("page_size", 20))
+        if failures["remaining"] > 0:
             failures["remaining"] -= 1
             raise RuntimeError("临时读取失败")
-        return original(limit)
-
-    monkeypatch.setattr(context.application, "list_recent_evaluations", flaky)
+        return original(**kwargs)
+    monkeypatch.setattr(context.application, "query_evaluations", flaky)
     window = MainWindow(context)
     try:
         try:
@@ -347,14 +342,14 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
         except RuntimeError:
             # 允许异常沿调用链向上传播的实现；状态不变量才是本用例的重点。
             pass
-        assert calls.count(200) == 1, "首次进入记录页必须尝试加载"
+        assert calls.count(20) == 1, "首次进入记录页必须尝试加载"
         assert window._records_loaded is False, "读取失败后不得标记为已加载"
         assert window._records_dirty is True, "读取失败后必须保持可重试状态"
         assert window.record_table.rowCount() == 0, "失败时不得留下半填的表格"
 
         window.navigation.setCurrentRow(0)
         window.navigate("records")
-        assert calls.count(200) == 2, "再次进入记录页必须重新读取"
+        assert calls.count(20) == 2, "再次进入记录页必须重新读取"
         assert window._records_loaded is True
         assert window._records_dirty is False
         assert window.record_table.rowCount() == 1
@@ -362,7 +357,7 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
         # 干净之后重进不应再读
         window.navigation.setCurrentRow(0)
         window.navigate("records")
-        assert calls.count(200) == 2, "成功加载且未变脏后不得重复读取"
+        assert calls.count(20) == 2, "成功加载且未变脏后不得重复读取"
     finally:
         window.close()
         context.database.dispose()
@@ -379,11 +374,11 @@ def test_saving_a_record_marks_the_list_dirty_and_reloads_on_next_entry(
     window.navigation.setCurrentRow(2)
     window.calculate_evaluation(request)
 
-    assert record_calls.count(200) == 0, "保存记录后不得立刻读取 200 条"
+    assert record_calls.count(20) == 0, "保存记录后不得立刻读取 200 条"
     assert window._records_dirty is True, "保存必须把记录页标记为待刷新"
 
     window.navigate("records")
-    assert record_calls.count(200) == 1, "下次进入记录页必须刷新脏数据"
+    assert record_calls.count(20) == 1, "下次进入记录页必须刷新脏数据"
     assert window.record_table.rowCount() == 2
 
 
@@ -399,26 +394,26 @@ def test_delete_marks_dirty_when_hidden_and_refreshes_immediately_when_visible(
 
     # 记录页正在显示：删除后立即重建列表。
     window.delete_selected_record()
-    assert record_calls.count(200) == 2, "记录页可见时应立即刷新"
+    assert record_calls.count(20) == 2, "记录页可见时应立即刷新"
     assert window.record_table.rowCount() == 0
 
     # 记录页隐藏时：只标记待刷新，下一次进入才读取。
     save_one_record(context)
     window.navigation.setCurrentRow(0)
     window.refresh_all()
-    assert record_calls.count(200) == 2, "隐藏时 refresh_all 不得读取 200 条"
+    assert record_calls.count(20) == 2, "隐藏时 refresh_all 不得读取 200 条"
     assert window._records_dirty is True
 
     window.navigate("records")
-    assert record_calls.count(200) == 3, "重新进入记录页必须刷新脏数据"
+    assert record_calls.count(20) == 3, "重新进入记录页必须刷新脏数据"
     assert window.record_table.rowCount() == 1
 
 
 def test_explicit_refresh_still_reloads_the_list(window, record_calls):
     window.navigate("records")
-    assert record_calls.count(200) == 1
+    assert record_calls.count(20) == 1
     window.refresh_records()
-    assert record_calls.count(200) == 2, "显式刷新必须重新读取"
+    assert record_calls.count(20) == 2, "显式刷新必须重新读取"
 
 
 def test_record_list_keeps_corrupted_row_degradation(window, context, record_calls):
@@ -432,5 +427,5 @@ def test_record_list_keeps_corrupted_row_degradation(window, context, record_cal
 
     window.navigate("records")
     assert window.record_table.rowCount() == 1
-    assert RECORD_CORRUPTED_LABEL in window.record_table.item(0, 5).text()
+    assert RECORD_CORRUPTED_LABEL in window.record_table.item(0, 4).text()
     assert window.home_recent.rowCount() == 1, "损坏行不得从首页消失"

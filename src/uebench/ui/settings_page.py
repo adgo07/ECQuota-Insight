@@ -10,6 +10,9 @@ from PySide6.QtWidgets import (
     QToolButton,
     QVBoxLayout,
     QWidget,
+    QScrollArea,
+    QFrame,
+    QSizePolicy,
 )
 
 
@@ -31,6 +34,7 @@ class SettingsPage(QWidget):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         root = QVBoxLayout(self)
         root.setContentsMargins(24, 20, 24, 20)
         root.setSpacing(14)
@@ -38,6 +42,16 @@ class SettingsPage(QWidget):
         title = QLabel("设置")
         title.setProperty("class", "pageTitle")
         root.addWidget(title)
+        outer = root
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        root = QVBoxLayout(content)
+        root.setContentsMargins(0, 0, 8, 0)
+        root.setSpacing(20)
+        scroll.setWidget(content)
+        outer.addWidget(scroll, 1)
 
         app_group = QGroupBox("应用信息")
         app_form = QFormLayout(app_group)
@@ -48,6 +62,8 @@ class SettingsPage(QWidget):
         self.data_directory_value = QLabel(data_directory)
         self.data_directory_value.setObjectName("settingsDataDirectory")
         self.data_directory_value.setWordWrap(True)
+        self.data_directory_value.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.data_directory_value.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         app_form.addRow("软件版本", self.software_version_value)
         app_form.addRow("标准库版本", self.standard_library_version_value)
         app_form.addRow("数据存储位置", self.data_directory_value)
@@ -104,6 +120,7 @@ class SettingsPage(QWidget):
         root.addWidget(self.advanced_content)
         self.advanced_toggle.toggled.connect(self._set_advanced_visible)
         root.addStretch(1)
+        self.setStyleSheet("QGroupBox { background: white; border: 1px solid #DAE7F1; border-radius: 10px; margin-top: 14px; padding: 18px; } QGroupBox::title { color: #18364F; subcontrol-origin: margin; left: 18px; }")
 
     def set_standard_library_version(self, version: str) -> None:
         self.standard_library_version_value.setText(version)

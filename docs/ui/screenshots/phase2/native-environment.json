@@ -1,0 +1,34 @@
+{
+  "platform": "windows",
+  "python": "3.13.17",
+  "pyside6": "6.10.1",
+  "isolated_data": true,
+  "records": 225,
+  "screens": [
+    {
+      "name": "\\\\.\\DISPLAY1",
+      "logical_dpi": 96.0,
+      "device_pixel_ratio": 1.5,
+      "geometry": [
+        1280,
+        720
+      ],
+      "available": [
+        1280,
+        672
+      ]
+    }
+  ],
+  "native_dpi_acceptance": false,
+  "captures": [],
+  "scale_overrides": {
+    "QT_SCALE_FACTOR": null,
+    "QT_SCREEN_SCALE_FACTORS": null,
+    "QT_FONT_DPI": null
+  },
+  "native_window_dpi": 144,
+  "window_logical_size": [
+    1256,
+    624
+  ]
+}

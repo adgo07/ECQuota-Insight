@@ -12,7 +12,7 @@ from uuid import uuid4
 
 _LOGGER = logging.getLogger(__name__)
 
-from PySide6.QtCore import QDate, Qt, QUrl, QSize
+from PySide6.QtCore import QDate, Qt, QUrl, QSize, QTimer
 from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QPainter
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtWidgets import (
@@ -104,7 +104,8 @@ from uebench.ui.presentation import format_local_date, format_local_datetime
 from uebench.ui.settings_page import SettingsPage
 from uebench.ui.design_tokens import APP_STYLE
 from uebench.ui.responsive_fields import ResponsiveFields
-from uebench.ui.task_card import TaskCard
+from uebench.ui.task_card import TaskCard, TaskCardGrid
+from uebench.ui.record_detail import RecordDetailPage
 
 
 def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
@@ -386,7 +387,11 @@ class MainWindow(QMainWindow):
         # Leave room for the ten-column energy table on ordinary 1366x768 and
         # 1920x1080 screens.  Users can still resize the window smaller.
         self.resize(1440, 900)
-        self.setMinimumSize(1180, 760)
+        self.setMinimumSize(900, 600)
+        if QApplication.platformName() != "offscreen" and self.screen() is not None:
+            available = self.screen().availableGeometry()
+            self.setMinimumSize(min(900, max(640, available.width() - 32)), min(600, max(420, available.height() - 64)))
+            self.resize(min(1440, available.width() - 24), min(900, available.height() - 48))
         self.setStyleSheet(APP_STYLE)
 
         central = QWidget()
@@ -428,6 +433,12 @@ class MainWindow(QMainWindow):
             self.pages.addWidget(self.page_widgets[key])
         self.page_widgets["standard_detail"] = self._build_standard_detail()
         self.pages.addWidget(self.page_widgets["standard_detail"])
+        self.record_detail_page = RecordDetailPage()
+        self.record_detail_page.back_requested.connect(lambda: self.navigate("records"))
+        self.record_detail_page.export_requested.connect(self.export_word_record)
+        self.record_detail_page.source_requested.connect(self.open_official_source)
+        self.page_widgets["record_detail"] = self.record_detail_page
+        self.pages.addWidget(self.record_detail_page)
         for key, title, icon_name, enabled in (
             ("home", "首页", "home", True),
             ("standards", "标准库", "standards", True),
@@ -474,7 +485,7 @@ class MainWindow(QMainWindow):
             return
         self.pages.setCurrentWidget(self.page_widgets[key])
         self.sidebar.setVisible(key != "home")
-        context_key = "standards" if key == "standard_detail" else key
+        context_key = "standards" if key == "standard_detail" else "records" if key == "record_detail" else key
         self.navigation.blockSignals(True)
         self.navigation.setCurrentRow(-1)
         for row in range(self.navigation.count()):
@@ -512,12 +523,21 @@ class MainWindow(QMainWindow):
 
     def _build_home(self) -> QWidget:
         page = QWidget()
-        layout = QVBoxLayout(page)
+        outer = QVBoxLayout(page)
+        outer.setContentsMargins(0, 0, 0, 0)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        layout = QVBoxLayout(content)
+        scroll.setWidget(content)
+        outer.addWidget(scroll)
         layout.setContentsMargins(36, 30, 36, 28)
         layout.setSpacing(26)
         header = QHBoxLayout()
         header.addWidget(self._brand(220))
         title = QLabel("单位产品能耗限额评价软件")
+        title.setWordWrap(True)
         title.setStyleSheet("font-size: 30px; font-weight: 800; color: #18364F;")
         header.addWidget(title, 1)
         settings = QPushButton("设置")
@@ -534,8 +554,7 @@ class MainWindow(QMainWindow):
         for widget in (self.home_standard_count, self.home_formal_scope_count,
                        self.home_evaluation_count, self.home_standard_library_version, self.home_scope_label):
             widget.hide()
-        tasks = QHBoxLayout()
-        tasks.setSpacing(16)
+        tasks = TaskCardGrid()
         self.home_task_buttons = {}
         for key, title, description, icon_name, enabled in (
             ("standards", "标准库", "查阅标准与要求", "standards", True),
@@ -554,8 +573,8 @@ class MainWindow(QMainWindow):
             elif enabled:
                 button.clicked.connect(lambda _=False, target=key: self.navigate(target))
             self.home_task_buttons[key] = button
-            tasks.addWidget(button, 147 if key == "standards" else 100)
-        layout.addLayout(tasks)
+            tasks.add_card(button)
+        layout.addWidget(tasks)
         self.home_compatibility_notice = QLabel("")
         self.home_compatibility_notice.setWordWrap(True)
         self.home_compatibility_notice.setStyleSheet("color: #B9484A;")
@@ -603,13 +622,7 @@ class MainWindow(QMainWindow):
             record_id = item.data(Qt.ItemDataRole.UserRole) if item else None
         if not record_id:
             return
-        self.navigate("records")
-        for row in range(self.record_table.rowCount()):
-            item = self.record_table.item(row, 0)
-            if item and item.data(Qt.ItemDataRole.UserRole) == record_id:
-                self.record_table.selectRow(row)
-                self.view_selected_record()
-                return
+        self.view_record(record_id)
 
     def _build_standards(self) -> QWidget:
         page, layout = self._page("标准库")
@@ -1083,26 +1096,67 @@ class MainWindow(QMainWindow):
 
     def _build_records(self) -> QWidget:
         page, layout = self._page("对标记录")
+        self._record_page = 1
         controls = QHBoxLayout()
-        refresh = QPushButton("刷新")
+        self.record_search = QLineEdit()
+        self.record_search.setPlaceholderText("搜索全部记录的企业、标准或历史业务文本")
+        self.record_search.setClearButtonEnabled(True)
+        self.record_status_filter = QComboBox()
+        self.record_status_filter.addItems(["全部结果状态", "1级", "2级", "3级", "未达3级", "无法判定", "分项结果", "记录损坏"])
+        self.record_search_timer = QTimer(self)
+        self.record_search_timer.setSingleShot(True)
+        self.record_search_timer.setInterval(200)
+        self.record_search_timer.timeout.connect(self._record_filters_changed)
+        self.record_search.textChanged.connect(lambda *_: self.record_search_timer.start())
+        self.record_status_filter.currentIndexChanged.connect(self._record_filters_changed)
+        refresh = QPushButton("刷新 / 重试")
         refresh.clicked.connect(self.refresh_records)
-        view = QPushButton("查看原记录")
+        view = QPushButton("查看")
         view.clicked.connect(self.view_selected_record)
-        recalculate = QPushButton("基于此记录重新评价")
-        recalculate.clicked.connect(self.recalculate_selected_record)
-        delete = QPushButton("删除记录")
+        delete = QPushButton("删除选中记录")
+        delete.setStyleSheet("color: #B42318;")
         delete.clicked.connect(self.delete_selected_record)
+        controls.addWidget(self.record_search, 1)
+        controls.addWidget(self.record_status_filter)
         controls.addWidget(refresh)
-        controls.addWidget(view)
-        controls.addWidget(recalculate)
-        controls.addStretch()
-        controls.addWidget(delete)
         layout.addLayout(controls)
-        self.record_table = QTableWidget(0, 6)
-        self.record_table.setHorizontalHeaderLabels(["评价时间", "评价日期", "标准", "企业/单位", "项目", "产品"])
+        actions = QHBoxLayout()
+        actions.addWidget(view)
+        actions.addStretch()
+        actions.addWidget(delete)
+        layout.addLayout(actions)
+        self.record_table = QTableWidget(0, 7)
+        self.record_table.setHorizontalHeaderLabels(["企业名称", "统计期", "标准", "核心结果", "结果状态", "评价时间", "操作"])
         self._configure_table(self.record_table)
+        self.record_table.setWordWrap(True)
+        self.record_table.horizontalHeader().setStretchLastSection(False)
+        self.record_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        for column, width in enumerate((170, 140, 290, 170, 110, 195, 85)):
+            self.record_table.setColumnWidth(column, width)
+        self.record_table.verticalHeader().setDefaultSectionSize(60)
+        self.record_table.itemDoubleClicked.connect(lambda *_: self.view_selected_record())
+        self.record_table.itemActivated.connect(lambda *_: self.view_selected_record())
         layout.addWidget(self.record_table, 1)
+        foot = QHBoxLayout()
+        self.record_count_label = QLabel("")
+        self.record_previous = QPushButton("上一页")
+        self.record_next = QPushButton("下一页")
+        self.record_previous.clicked.connect(lambda: self._change_record_page(-1))
+        self.record_next.clicked.connect(lambda: self._change_record_page(1))
+        foot.addWidget(self.record_count_label, 1)
+        foot.addWidget(self.record_previous)
+        foot.addWidget(self.record_next)
+        layout.addLayout(foot)
         return page
+
+    def _record_filters_changed(self, *_args) -> None:
+        self.record_search_timer.stop()
+        self._record_page = 1
+        self.refresh_records()
+
+    def _change_record_page(self, delta: int) -> None:
+        self._record_page = max(1, self._record_page + delta)
+        self.refresh_records()
 
     def _build_settings(self) -> QWidget:
         self.settings_page = SettingsPage(
@@ -2436,40 +2490,45 @@ class MainWindow(QMainWindow):
         return True
 
     def refresh_records(self) -> None:
-        """（重新）加载「评价记录」列表。
-
-        首次进入该页、用户点「刷新」，或被标记为待刷新后再次进入时调用；这是
-        唯一读取最近 200 条记录的地方（首页的最近 10 条仍按原样加载）。
-        """
-        # Read before touching the table or the flags: if this read fails transiently the
-        # page must stay retryable, so loaded/clean are set only after the read *and* the
-        # rebuild both succeeded.
-        records = list(self.context.application.list_recent_evaluations(200))
+        selected = self._selected_record_id()
+        scroll = self.record_table.verticalScrollBar().value()
+        try:
+            result = self.context.application.query_evaluations(
+                query=self.record_search.text(),
+                status="" if self.record_status_filter.currentIndex() == 0 else self.record_status_filter.currentText(),
+                page=self._record_page, page_size=20,
+            )
+        except Exception:
+            _LOGGER.exception("对标记录查询失败")
+            self.record_table.setRowCount(0)
+            self.record_count_label.setText("记录读取失败，请重试；原记录未被修改。")
+            self.record_previous.setEnabled(False)
+            self.record_next.setEnabled(False)
+            self._records_dirty = True
+            self._records_loaded = False
+            return
+        self._record_page = result.page
         self.record_table.setRowCount(0)
-        for record in records:
+        for record in result.items:
             row = self.record_table.rowCount()
             self.record_table.insertRow(row)
-            values = [
-                format_local_datetime(record.created_at),
-                format_local_date(record.evaluation_date),
-                f"{record.standard_number} {record.standard_title}".strip(),
-                record.organization_name,
-                record.project_name,
-                record.product_name or "",
-            ]
+            values = [record.organization, record.period, record.standard, record.core_result, record.status,
+                      format_local_datetime(record.created_at), "查看"]
             for column, value in enumerate(values):
-                cell = _item(value)
+                cell = _item(value, align_right=column == 3)
+                cell.setToolTip(str(value))
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
-                if record.is_corrupted and column == 5:
-                    # Explicit degradation: the row stays visible and states why
-                    # its stored conclusion cannot be shown, instead of looking
-                    # like a normal record.
-                    cell.setText(f"{RECORD_CORRUPTED_LABEL}（{record.corruption_reason}）")
-                    cell.setToolTip(record.corruption_reason)
                 self.record_table.setItem(row, column, cell)
-
-        # Only now is the page genuinely loaded and clean; a failure above leaves it
-        # retryable (still not loaded / still dirty) so the next entry reads again.
+            button = QPushButton("查看")
+            button.clicked.connect(lambda _=False, rid=record.evaluation_id: self.view_record(rid))
+            self.record_table.setCellWidget(row, 6, button)
+            if record.evaluation_id == selected:
+                self.record_table.selectRow(row)
+        self.record_table.verticalScrollBar().setValue(scroll)
+        pages = max(1, (result.total + result.page_size - 1) // result.page_size)
+        self.record_count_label.setText(f"共 {result.total} 条 · 第 {result.page} / {pages} 页" if result.total else "没有匹配记录" if self.record_search.text() or self.record_status_filter.currentIndex() else "暂无对标记录")
+        self.record_previous.setEnabled(result.page > 1)
+        self.record_next.setEnabled(result.page < pages)
         self._records_loaded = True
         self._records_dirty = False
 
@@ -2492,121 +2551,36 @@ class MainWindow(QMainWindow):
     def view_selected_record(self) -> None:
         evaluation_id = self._selected_record_id()
         if not evaluation_id:
-            QMessageBox.warning(self, "未选择", "请选择一条评价记录。")
+            QMessageBox.warning(self, "未选择", "请选择一条对标记录。")
             return
+        self.view_record(evaluation_id)
+
+    def view_record(self, evaluation_id: str) -> None:
         try:
             loaded = self.context.application.get_evaluation(evaluation_id)
-        except StorageCorruptionError as exc:
-            # Corrupted storage is not a deletion: never reuse the "不存在" wording
-            # and never blame the user's input data.
-            QMessageBox.warning(self, RECORD_CORRUPTED_LABEL, str(exc))
-            return
-        if loaded is None:
-            QMessageBox.warning(self, "记录不存在", "该评价记录已被删除或不存在。")
-            return
-        request, result, snapshot = loaded
-        dialog = QDialog(self)
-        dialog.setWindowTitle("查看原记录")
-        dialog.resize(820, 700)
-        layout = QVBoxLayout(dialog)
-        content = QTextEdit()
-        content.setObjectName("record_detail_content")
-        content.setReadOnly(True)
-        lines = [
-            f"{result.standard_number} {result.standard_title}",
-            f"评价时间：{format_local_datetime(result.evaluated_at)}",
-            f"评价日期：{format_local_date(request.evaluation_date)}",
-            f"企业名称：{request.organization_name or '—'}",
-            f"产品：{result.product_name}",
-        ]
-        if result.standard_id == "gb-29446-2019":
-            period, custom, note = self._decode_gb29446_notes(request.notes)
-            lines.extend([f"{PERIOD_LABEL}：{custom if period == '自定义' else period}", f"备注：{note or '—'}"])
-            product = next((p for p in snapshot.products if p.id == request.product_id), None)
-            labels = gb29446_business_labels(snapshot, product) if product is not None else {}
-            for key in ("washing_process", "electricity_consumption", "raw_coal_input"):
-                label = labels.get(key, key)
-                supplied = request.inputs.get(key)
-                lines.append(f"{label}：{supplied.value if supplied is not None else '—'} {supplied.unit or '' if supplied is not None else ''}")
+        except StorageCorruptionError:
+            _LOGGER.exception("保存记录损坏：%s", evaluation_id)
+            self.record_detail_page.show_error(evaluation_id, "记录损坏：保存数据无法读取。记录已保留，请联系技术支持。")
+        except Exception:
+            _LOGGER.exception("保存记录读取失败：%s", evaluation_id)
+            self.record_detail_page.show_error(evaluation_id, "记录读取失败，请返回列表后重试。")
         else:
-            product = next((p for p in snapshot.products if p.id == request.product_id), None)
-            definitions = list(product.input_definitions) if product else []
-            if product:
-                definitions.extend(d for i in product.indicators for d in i.input_definitions)
-            labels = {d.key: d.label for d in definitions}
-            lines.append(f"备注：{request.notes or '—'}")
-            lines.extend(f"{labels.get(key, '输入项')}：{value.value} {value.unit or ''}" for key, value in request.inputs.items())
-        for item in result.results:
-            grade = self._gb29446_grade_label(item.grade) if result.standard_id == "gb-29446-2019" else GRADE_LABELS[item.grade]
-            lines.extend([f"指标：{item.indicator_name}", f"等级：{grade}"])
-            if item.grade is Grade.INCOMPLETE:
-                lines.append("数据不完整，未形成正常等级或符合性结论。")
-            if item.actual_value is not None:
-                lines.append(f"实际值：{self._format_explanation_number(item.actual_value)} {item.unit}")
-                if result.standard_id != "gb-29446-2019":
-                    lines.extend(f"{GRADE_LABELS[Grade(key)]}限值：{value} {item.unit}" for key, value in item.corrected_thresholds.items())
-            if result.standard_id == "gb-29446-2019":
-                lines.append(self._gb29446_basis_for_display(item))
-                lines.extend(self._gb29446_warning_for_display(request, warning, snapshot) for warning in item.warnings)
-            # 所有依据均来自保存的 Result；包括普通结果页未展开的条款。
-            lines.append("标准依据：")
-            lines.extend(
-                f"{ref.standard_number}，第{ref.page}页，{ref.clause or ''} {ref.table or ''} {ref.note or ''}"
-                for ref in item.source_references
-            )
-        report_view = None
-        if result.standard_id == GB29446_STANDARD_ID:
-            try:
-                report_view = self.context.application.get_report_view(evaluation_id)
-            except ValueError:
-                report_view = None
-            if report_view is not None:
-                view = report_view
-                fields = (
-                    view.standard, view.evaluation_date, view.evaluated_at,
-                    view.organization, view.period, view.enterprise_type,
-                    view.process_type, view.electricity, view.raw_coal,
-                    view.factor, view.actual, view.grade, *view.thresholds,
-                )
-                lines = [
-                    *(f"{field.label}：{field.value} {field.unit}".strip() for field in fields if field is not None),
-                    *view.explanation,
-                    f"{view.scope.label}：{view.scope.value}",
-                    *view.basis,
-                    *view.warnings,
-                    view.mapping_adoption,
-                ]
-        # 展示层富文本：E_d / e_d 以真下标呈现（保存的数据本身保持原样）。
-        content.setHtml(_rich_text("\n".join(lines)))
-        layout.addWidget(content, 1)
-        buttons = QHBoxLayout()
-        # 普通界面不再打开本机 PDF，只打开已登记的官方来源页面。
-        official = official_source_url(result.standard_id)
-        source = QPushButton(VIEW_OFFICIAL_SOURCE_BUTTON_TEXT)
-        source.setObjectName("recordOfficialSourceButton")
-        source.setEnabled(official is not None)
-        source.setToolTip(official or NO_OFFICIAL_SOURCE_LABEL)
-        source.clicked.connect(lambda: self.open_evaluation_standard_source(evaluation_id))
-        close = QPushButton("关闭")
-        close.clicked.connect(dialog.accept)
-        buttons.addWidget(source)
-        if official is None:
-            buttons.addWidget(QLabel(NO_OFFICIAL_SOURCE_LABEL))
-        buttons.addStretch()
-        if result.standard_id == GB29446_STANDARD_ID:
-            export_word = QPushButton("导出Word报告")
-            export_word.setObjectName("recordExportWordButton")
-            export_word.setEnabled(report_view is not None)
-            export_word.clicked.connect(lambda: self.export_word_record(evaluation_id))
-            buttons.addWidget(export_word)
-        buttons.addWidget(close)
-        layout.addLayout(buttons)
-        previous = getattr(self, "record_detail_dialog", None)
-        if previous is not None:
-            previous.close()
-            previous.deleteLater()
-        self.record_detail_dialog = dialog
-        dialog.open()
+            if loaded is None:
+                self.record_detail_page.show_error(evaluation_id, "该对标记录已被删除或不存在。")
+            else:
+                view = None
+                reason = "该标准尚未开放 Word 报告。"
+                if loaded[1].standard_id == GB29446_STANDARD_ID:
+                    try:
+                        view = self.context.application.get_report_view(evaluation_id)
+                        reason = ""
+                    except (ValueError, LookupError) as exc:
+                        reason = str(exc)
+                    except Exception:
+                        _LOGGER.exception("历史报告视图不可用：%s", evaluation_id)
+                        reason = "保存的报告数据暂时无法读取，请重试。"
+                self.record_detail_page.show_record(loaded, view, reason)
+        self.navigate("record_detail")
 
     def open_evaluation_standard_source(self, evaluation_id: str) -> None:
         """打开该评价所依据标准的**官方来源页面**（普通界面不再打开本机 PDF）。"""
@@ -2804,7 +2778,8 @@ class MainWindow(QMainWindow):
         evaluation_id = self._selected_record_id()
         if not evaluation_id:
             return
-        if QMessageBox.question(self, "确认删除", "记录将被软删除并保留审计日志，是否继续？") != QMessageBox.StandardButton.Yes:
+        organization = self.record_table.item(self.record_table.currentRow(), 0).text()
+        if QMessageBox.question(self, "确认删除", f"删除“{organization}”的这条对标记录？原始追溯数据会保留。", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
             return
         self.context.application.delete_evaluation(evaluation_id)
         self.refresh_all()
@@ -2827,7 +2802,7 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getOpenFileName(self, "恢复备份", "", "UEBench备份 (*.uebackup)")
         if not path:
             return
-        if QMessageBox.question(self, "确认恢复", "恢复将替换当前数据，并先自动创建恢复前备份。是否继续？") != QMessageBox.StandardButton.Yes:
+        if QMessageBox.question(self, "确认恢复", "恢复将替换当前数据，并先自动创建恢复前备份。是否继续？", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No) != QMessageBox.StandardButton.Yes:
             return
         try:
             self.context.application.restore_backup(Path(path))

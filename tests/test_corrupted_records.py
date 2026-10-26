@@ -272,11 +272,11 @@ def test_main_window_starts_and_refreshes_with_corrupted_row(context, qt_app, mo
         assert window.record_table.rowCount() == 2, "损坏行不得从评价记录页消失"
 
         select_record(window, corrupted.evaluation_id)
-        marker = window.record_table.item(window.record_table.currentRow(), 5).text()
+        marker = window.record_table.item(window.record_table.currentRow(), 4).text()
         assert RECORD_CORRUPTED_LABEL in marker
 
         select_record(window, good.evaluation_id)
-        good_marker = window.record_table.item(window.record_table.currentRow(), 5).text()
+        good_marker = window.record_table.item(window.record_table.currentRow(), 4).text()
         assert RECORD_CORRUPTED_LABEL not in good_marker
     finally:
         window.close()
@@ -294,11 +294,9 @@ def test_main_window_starts_and_refreshes_with_corrupted_row(context, qt_app, mo
     finally:
         window.close()
 
-    assert warnings, "损坏记录必须显式告知用户"
-    assert any("损坏" in message for message in warnings)
-    assert not any("已被删除或不存在" in message for message in warnings), (
-        "损坏不得复用删除措辞"
-    )
+    assert "记录损坏" in window.record_detail_page.notice.text()
+    assert "已被删除或不存在" not in window.record_detail_page.notice.text()
+    assert not window.record_detail_page.export_button.isEnabled()
 
 
 def test_recalculate_corrupted_record_warns_and_does_not_raise(context, qt_app, monkeypatch):
@@ -437,7 +435,7 @@ def test_repository_exposes_corruption_only_for_damaged_rows(context, caplog):
         repository.get(corrupted.evaluation_id)
 
 
-def test_detail_dialog_not_opened_for_corrupted_record(context, qt_app, monkeypatch):
+def test_corrupted_record_opens_readonly_error_page(context, qt_app, monkeypatch):
     corrupted = save_evaluation(context, "15")
     corrupt_result_json(context, corrupted.evaluation_id)
     monkeypatch.setattr(QMessageBox, "warning", lambda *args: None)
@@ -446,8 +444,11 @@ def test_detail_dialog_not_opened_for_corrupted_record(context, qt_app, monkeypa
     try:
         select_record(window, corrupted.evaluation_id)
         window.view_selected_record()
-        dialog = getattr(window, "record_detail_dialog", None)
-        assert dialog is None or not dialog.findChild(QTextEdit, "record_detail_content")
+        page = window.record_detail_page
+        assert page.record_id == corrupted.evaluation_id
+        assert "记录损坏" in page.result_content.toPlainText()
+        assert page.result_content.isReadOnly()
+        assert not page.export_button.isEnabled()
     finally:
         window.close()
 
