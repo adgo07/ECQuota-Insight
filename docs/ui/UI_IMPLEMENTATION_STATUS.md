@@ -1,6 +1,6 @@
 # UI 实施状态与第一阶段交接
 
-日期：2026-10-26。状态：**第一阶段实现完成，等待原设计会话检查；未开始第二阶段，未作最终验收。**
+日期：2026-10-26。状态：**第一阶段首轮返修完成，等待原设计会话复验；未开始第二阶段，未作最终验收。** 最新证据见第 6 节。
 
 ## 1 分支、基线与平台 / Contract 预检查
 
@@ -9,7 +9,7 @@
 | 仓库 | `https://github.com/adgo07/ECQuota-Insight.git`，实际工作树 `D:\project\能耗限额\ECQuota-Insight` |
 | 分支 | `ui/phase1-qingzhou`，普通开发分支 |
 | 开工源码 | `cdc89c12b0b7ea6791568838fbb382cb76842002`；实际 fetch 后与 `origin/main` 相同 |
-| 当前实现提交 | `94aa8c7f014660422017a7c6b6b3e47d70a83ac6`；本状态文件另作纯交接提交，分支最终 HEAD 用 `git log -1` 查询 |
+| 当前实现提交 | `379bd9066b8cde34c12101c9fd936fec85628592`（首轮返修）；初次实现 `94aa8c7f014660422017a7c6b6b3e47d70a83ac6`，首次交接 `cb432425931b9b984732dfd505d3bbe9f9032529`；本状态文件另作纯交接提交，分支最终 HEAD 用 `git log -1` 查询 |
 | 中央 ACTIVE UI | `a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`；已读 GUIDE_INDEX、产品家族规格、指南 v0.2、验收清单；另核当前 main 的 GUIDE_INDEX blob 相同 |
 | Frozen lock | `platform-lock.json` 保持 `ee5feb0cc34dbd99790500fadd0c4c932e202a20` |
 | 相关 Frozen | Architecture V2.1、Numeric Contract v1、Numeric Profiles v1、Numeric Conformance v1，均不变 |
@@ -35,7 +35,7 @@
 
 结果服务仍为现有正式服务，没有 Widget 内第二套算法。首页只读取有界最近六条保存记录；完整记录查询仍留第二阶段。修复了重构时发现的两处实际连线问题：记录刷新残留旧页索引；规则不兼容时新版工艺块没有隐藏。另保留多信号联动后的“数据已修改”状态，避免随后信号将其覆盖。
 
-## 3 测试命令、结果与限制
+## 3 初次阶段测试命令、结果与限制（保留历史）
 
 运行环境：Windows，本项目隔离环境 `.venv-ui`，当前可用 Python **3.12.14**、PySide6 **6.10.1**。项目正式支持要求 Python **3.13**，未降低 `pyproject.toml` 的要求或修改版本断言；其余依赖按项目声明范围安装，并非正式锁定 3.13 构建环境。
 
@@ -98,3 +98,38 @@ Remove-Item Env:QT_QPA_PLATFORM -ErrorAction SilentlyContinue
 - 长标准详情标题支持换行，宽表在自身区域横滚；1180×760 时表单为单列并滚动访问底部动作，未缩小字体强塞。
 
 原设计会话可直接读取本文件、实现提交与截图，无需主动回传消息。后续在同一开发分支继续。
+
+## 6 第一阶段首轮设计返修（当前交接）
+
+返修输入：原设计会话对 `cb43242` 的独立检查及五项具体意见。当前实现提交为 **`379bd9066b8cde34c12101c9fd936fec85628592`**。仍在 `ui/phase1-qingzhou`；本轮没有改动 Application / Domain、数据定义、数据库 Schema、支持注册表或 lock，没有启动第二阶段。
+
+| 返修项 | 实际处理与证据 |
+|---|---|
+| 保存后的主要动作 | 保存成功或已保存但展示失败后，“查看对标记录”为结果区唯一主要动作；原计算按钮变为次操作“重新计算并生成新记录”。修改输入后恢复主要操作“计算并判级”，清空当前记录关联并禁用旧查看/导出；保留“重新计算将生成新记录”。`finally` 改为按当前真实状态同步操作，不再无条件恢复初始状态 |
+| 单一正式标准摘要 | 完整标准编号/名称紧靠页标题显示为可选择复制的只读文本；旧 combo 隐藏为兼容模型，不再展示禁用下拉箭头。摘要来自当前实际标准；无可用标准时显示真实缺失状态，原注册表、日期、官方来源与就绪保护不变 |
+| 首页任务卡与最近对标 | 新增本仓轻量 `task_card.py`，标题和说明独立布局，重点卡使用原几何图标的白色描边；键盘点击、禁用及中文无障碍名称仍保留。无记录时隐藏空网格，以紧凑空状态和“新建对标”按钮呈现；有记录时显示真实最近六条，表高随行数变化，操作列固定为紧凑宽度。失败提示独立于空状态，保留重试 |
+| 表单与结果层级 | 企业类型单选靠左相邻成组；k 保留原只读字段和信号，但改为紧凑无边框数值展示，完整来源仍可见。结果保留一个主要白色面板、两项核心值及完整计算/判级依据，移除嵌套卡片背景边框与重复标题。统计范围和窄窗滚动访问保持 |
+| 小限额表与依据 | 标准详情阈值表单独关闭末列拉伸，六列均衡分配、表高按实际行数；“标准要求”补显现有可信定义中第3.1条表1、第3.2条表2的等级依据，继续复用已有依据展示函数。未支持标准不展示旧限值或伪造依据 |
+
+新增有意义的状态转换验证分别覆盖正常展示与展示失败两条路径：一次计算只调用一次正式服务、生成一条记录；点击查看只打开保存记录，不再次计算；修改输入使旧关联失效；再次主动计算才生成第二条新记录。另检查空/失败状态分离、隐藏选择器后的真实标准摘要及支持/未支持详情的依据保护。
+
+本轮测试均使用项目 `.venv-ui`，Python 3.12.14 / PySide6 6.10.1。工作目录仍为本仓根；先设 `$env:PYTHONPATH=(Join-Path $PWD 'src')`。使用工作区独立 `--basetemp` 和 `-p no:cacheprovider`，避免系统临时目录/cache 权限影响。
+
+```powershell
+& .\.venv-ui\Scripts\python.exe -m pytest tests/test_ui_phase1.py tests/test_gb29446_ui_validation.py tests/test_gb29446_record_lifecycle.py tests/test_ui_release_scope.py tests/test_ui.py tests/test_gb29446_reference_slice.py tests/test_gb29446_rule_compatibility.py tests/test_gb29446_word_report.py -ra --tb=short -p no:cacheprovider --basetemp work/revision1-affected-tests
+# 196 passed in 84.66s
+
+& .\.venv-ui\Scripts\python.exe -m pytest tests/test_ui_phase1.py tests/test_build_identity.py tests/test_rs05_m3_performance_cleanup.py -ra --tb=short -p no:cacheprovider --basetemp work/revision1-final-checks
+# 48 passed in 6.97s；与上组重叠，不相加宣称总数
+
+& .\.venv-ui\Scripts\python.exe tools/capture_ui_phase1.py
+& .\.venv-ui\Scripts\python.exe -m compileall -q src tests tools
+git diff --check
+# 截图重现、编译与补丁格式检查均通过
+```
+
+日志在 `D:\project\能耗限额\ECQuota-Insight\work\revision1-affected.log`、`revision1-final.log`、`revision1-capture.log`。没有重复运行无关整库测试，没有改动正式 Python 3.13 版本断言。
+
+第 4 节同名十张截图已由最终返修代码重新生成；七张有内容变化，首页空/有记录、宽窄窗表单/结果、选煤详情均已查看核对。仍是 **offscreen、devicePixelRatio=1.0、隔离临时数据**，环境清单及绝对路径同第 4 节。示例计算仍一次保存、6.64 kW·h/t、2级。任务卡曾在中间截图暴露通用按钮样式压缩高度，已调整任务卡角色高度并重现，当前交付截图不含该中间错误。
+
+本轮等待原设计会话复验；不推送、不建 PR、不进入记录/设置重构。Python 3.13 完整回归、exact-head CI、原生 125%/150% DPI、跨屏、真实输入法与原生弹层仍未验证，不能由本次定向测试和离屏图推断通过。最小窗口仍为 1180×760，更窄有效空间及原生缩放兼容按后续阶段实际检查。
