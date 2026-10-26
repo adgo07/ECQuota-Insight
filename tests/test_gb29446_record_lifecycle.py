@@ -370,11 +370,11 @@ def test_total_count_is_not_recent_ten_and_ids_are_hidden(lifecycle):
     window.refresh_all()
     assert context.application.count_evaluations() == 12
     assert window.home_evaluation_count.text() == "12"
-    assert window.home_recent.rowCount() == 10
-    assert window.home_recent.columnCount() == 3
+    assert window.home_recent.rowCount() == 6
+    assert window.home_recent.columnCount() == 6
     # ECQ-RS05 M3：「评价记录」页首次进入时才加载。这里显式进入，使下面的记录表
     # 循环保持非空（否则该循环会静默变成空转）。
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert window.record_table.rowCount() == 12
     assert window.record_table.columnCount() == 6
     for table in [window.home_recent, window.record_table]:
@@ -480,7 +480,7 @@ def test_based_on_record_fills_only_then_creates_new_record(lifecycle, monkeypat
     assert window.gb29446_raw_coal.text() == "100"
     assert window.gb29446_coal_type.currentData() == request.product_id
     assert window.gb29446_process.currentData() == "重介"
-    assert window.gb29446_result_message.text() == "尚未计算"
+    assert window.gb29446_result_message.text() == "填写数据后计算"
     if drift:
         assert len(notices) == 1
         assert all(part in notices[0][1] for part in ["规则修订 2", "规则修订 3", "原记录不会被修改"])
@@ -595,7 +595,7 @@ assert normalized(loaded)==a["models"]
 app=QApplication.instance() or QApplication([])
 window=MainWindow(context)
 window.show()
-window.navigation.setCurrentRow(3)
+window.navigate("records")
 select_record(window,a["id"])
 before=raw_state(context,a["id"])
 original_engine=EvaluationEngine.evaluate

@@ -240,7 +240,7 @@ def test_record_list_renders_local_seconds_precision(window) -> None:
     assert window.record_table.item(0, 1).text() == stored.evaluation_date.strftime("%Y-%m-%d")
 
     window.refresh_home()
-    home_rendered = window.home_recent.item(0, 0).text()
+    home_rendered = window.home_recent.item(0, 4).text()
     assert SECONDS_PRECISION.fullmatch(home_rendered), home_rendered
     assert home_rendered == format_local_datetime(stored.created_at)
 
@@ -268,10 +268,10 @@ def test_record_detail_renders_local_seconds_precision(window) -> None:
 
 def test_settings_replaces_ordinary_package_management(window) -> None:
     _evaluate_gb29446(window)
-    window.navigation.setCurrentRow(4)
+    window.navigate("settings")
 
     labels = [window.navigation.item(i).text() for i in range(window.navigation.count())]
-    assert labels == ["首页", "标准库", "新建评价", "评价记录", "设置"]
+    assert labels == ["首页", "标准库", "新建对标", "表格导入 · 暂未开放", "对标记录", "折标系数库 · 暂未开放"]
     assert not hasattr(window, "package_history_table")
     assert not hasattr(window, "audit_table")
     assert window.settings_page.advanced_toggle.isChecked() is False
@@ -291,9 +291,8 @@ def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None
     assert window.standard_table.item(gb_row, COLUMN_SUPPORT_STATUS).text() == (
         FORMAL_EVALUATION_SUPPORTED_LABEL
     )
-    assert window.standard_table.item(gb_row, COLUMN_OFFICIAL_SOURCE).text() == (
-        OFFICIAL_SOURCE_PLATFORM_NAME
-    )
+    window.standard_table.selectRow(gb_row)
+    assert window.standard_official_button.isEnabled()
     # 选中标准后只有一行「适用范围：<scope>」，GB 29446 用 Owner 逐字确认的原文。
     window.standard_table.selectRow(gb_row)
     assert window.standard_detail_label.text() == f"适用范围：{GB29446_SCOPE_TEXT}"
@@ -364,8 +363,7 @@ def test_library_no_longer_shows_internal_traceability_noise(window) -> None:
         "标准名称",
         "标准状态",
         "实施日期",
-        "软件评价支持状态",
-        "官方来源",
+        "软件支持",
     ]
     indicator_headers = [
         window.standard_indicator_table.horizontalHeaderItem(column).text()
@@ -407,7 +405,7 @@ def test_library_page_has_no_applicability_area_not_just_a_removed_column(window
     assert [
         window.standard_indicator_table.horizontalHeaderItem(column).text()
         for column in range(window.standard_indicator_table.columnCount())
-    ] == ["产品/工序", "指标", "单位", "1级限额", "2级限额", "3级限额"]
+    ] == ["选煤企业类型", "指标", "单位", "1级上限", "2级上限", "3级上限"]
     assert window.standard_indicator_table.rowCount() == 2
     assert window.standard_indicator_table.item(0, 2).text() == "kW·h/t"
 
@@ -493,7 +491,7 @@ def test_unregistered_standard_disables_the_official_source_control(window, monk
     window.standard_table.selectRow(row)
 
     assert official_source_url(unsupported_id) is None
-    assert window.standard_table.item(row, COLUMN_OFFICIAL_SOURCE).text() == NO_OFFICIAL_SOURCE_LABEL
+    assert window.standard_table.columnCount() == 5
     assert window.standard_official_status.text() == NO_OFFICIAL_SOURCE_LABEL
     assert window.standard_official_button.isEnabled() is False
     window.standard_official_button.click()
@@ -534,7 +532,7 @@ def test_ordinary_ui_never_opens_a_local_pdf(tmp_path: Path, qt_app: QApplicatio
         window.eval_standard_open.click()
 
         _evaluate_gb29446(window)
-        window.navigation.setCurrentRow(3)
+        window.navigate("records")
         window.refresh_records()
         window.record_table.selectRow(0)
         window.view_selected_record()
@@ -637,7 +635,7 @@ def test_records_page_hides_the_export_and_technical_detail_buttons(window, monk
     """「导出Excel」按钮与「查看原记录」里的「技术详情」按钮不再出现在普通界面；
     两者的能力与数据都必须保留。"""
 
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     record_buttons = [button.text() for button in window.pages.widget(3).findChildren(QPushButton)]
     assert "导出Excel" not in record_buttons
     assert "查看原记录" in record_buttons, "查看原记录本身必须保留"

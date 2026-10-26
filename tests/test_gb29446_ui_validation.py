@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QFormLayout,
+    QLineEdit,
     QLabel,
     QMessageBox,
     QPushButton,
@@ -197,7 +198,7 @@ def test_non_positive_required_quantity_blocks_including_zero_denominator(
 
     win.calculate_button.click()
 
-    assert warnings == [f"{label} 必须大于 0。"]
+    assert warnings == [f"{label} 必须大于 0（软件防误录校验）。"]
     assert calls == []
     assert win.last_result_id is None
     assert context.application.count_evaluations() == 0
@@ -239,22 +240,15 @@ def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> 
     """§五：不新增普通用户输入项，也不新增“我已确认/是否准确/是否异常”式勾选。"""
 
     win, _context, _warnings = window
-    form: QFormLayout = win.gb29446_form_layout
-    labels = []
-    for row in range(form.rowCount()):
-        item = form.itemAt(row, QFormLayout.ItemRole.LabelRole)
-        widget = item.widget() if item is not None else None
-        if widget is not None:
-            labels.append(widget.text())
+    labels = [label.text() for label in win.gb29446_business_fields.labels.values()]
     assert labels == [
-        "企业名称（可选）",
-        "统计期",
-        "选煤企业类型",
-        "选煤工艺类型",
+        "选煤企业类型", "选煤工艺类型",
+        "选煤工艺类型折算系数 k（自动匹配，只读） · 来源：附录A 表A.1",
         "统计期内选煤电力消耗量 E<sub>d</sub>（kW·h）",
         "统计期内入选原煤量 m（t）",
-        "选煤工艺类型折算系数 k（自动匹配，只读）",
     ]
+    assert win.gb29446_factor.isReadOnly()
+    assert len(win.gb29446_form_container.findChildren(QLineEdit)) == 6
     assert not any("备注" in text for text in labels)
 
     assert win.findChildren(QCheckBox) == [], "普通界面不得新增确认勾选框"

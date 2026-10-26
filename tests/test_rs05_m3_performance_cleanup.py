@@ -5,7 +5,7 @@
 1. 标准定义不再被重复解析——标准库条目的读取只解析被请求的那一个标准（见
    ``test_get_standard_*``），选择规则与标准库条目完全一致；
 2. 「评价记录」页只在首次进入（或变脏后再次进入）时加载，全局刷新不再为从未打开过
-   的页面读取最近 200 条记录，首页的最近 10 条照旧加载。
+   的页面读取最近 200 条记录，首页的最近 6 条照旧加载。
 
 既有行为——正式评价范围、标准库浏览语义、损坏记录降级、历史记录只读——一律保持不变，
 因此本模块同时断言"新的数量"和"旧的语义"。
@@ -298,11 +298,11 @@ def test_construction_and_refresh_all_never_read_the_hidden_records_page(
     window = MainWindow(context)
     try:
         assert 200 not in calls, "构造窗口不得读取隐藏的记录页"
-        assert 10 in calls, "首页的最近 10 条必须照旧加载"
+        assert 6 in calls, "首页的最近 6 条必须照旧加载"
         calls.clear()
         window.refresh_all()
         assert 200 not in calls, "全局刷新不得读取隐藏的记录页"
-        assert 10 in calls, "全局刷新仍必须刷新首页最近 10 条"
+        assert 6 in calls, "全局刷新仍必须刷新首页最近 6 条"
         assert window.record_table.rowCount() == 0
         assert window.home_recent.rowCount() == 1
     finally:
@@ -313,12 +313,12 @@ def test_construction_and_refresh_all_never_read_the_hidden_records_page(
 def test_records_page_loads_on_first_entry_and_is_not_read_again_when_clean(
     window, record_calls
 ):
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert record_calls.count(200) == 1, "首次进入记录页必须加载"
     assert window.record_table.rowCount() == 1
 
     window.navigation.setCurrentRow(0)
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert record_calls.count(200) == 1, "列表未变脏时重进页面不应重复读取"
 
 
@@ -343,7 +343,7 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
     window = MainWindow(context)
     try:
         try:
-            window.navigation.setCurrentRow(3)
+            window.navigate("records")
         except RuntimeError:
             # 允许异常沿调用链向上传播的实现；状态不变量才是本用例的重点。
             pass
@@ -353,7 +353,7 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
         assert window.record_table.rowCount() == 0, "失败时不得留下半填的表格"
 
         window.navigation.setCurrentRow(0)
-        window.navigation.setCurrentRow(3)
+        window.navigate("records")
         assert calls.count(200) == 2, "再次进入记录页必须重新读取"
         assert window._records_loaded is True
         assert window._records_dirty is False
@@ -361,7 +361,7 @@ def test_records_page_stays_retryable_when_the_first_load_fails(tmp_path, qt_app
 
         # 干净之后重进不应再读
         window.navigation.setCurrentRow(0)
-        window.navigation.setCurrentRow(3)
+        window.navigate("records")
         assert calls.count(200) == 2, "成功加载且未变脏后不得重复读取"
     finally:
         window.close()
@@ -382,7 +382,7 @@ def test_saving_a_record_marks_the_list_dirty_and_reloads_on_next_entry(
     assert record_calls.count(200) == 0, "保存记录后不得立刻读取 200 条"
     assert window._records_dirty is True, "保存必须把记录页标记为待刷新"
 
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert record_calls.count(200) == 1, "下次进入记录页必须刷新脏数据"
     assert window.record_table.rowCount() == 2
 
@@ -393,7 +393,7 @@ def test_delete_marks_dirty_when_hidden_and_refreshes_immediately_when_visible(
     monkeypatch.setattr(
         QMessageBox, "question", lambda *args, **kwargs: QMessageBox.StandardButton.Yes
     )
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert window.record_table.rowCount() == 1
     window.record_table.selectRow(0)
 
@@ -409,13 +409,13 @@ def test_delete_marks_dirty_when_hidden_and_refreshes_immediately_when_visible(
     assert record_calls.count(200) == 2, "隐藏时 refresh_all 不得读取 200 条"
     assert window._records_dirty is True
 
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert record_calls.count(200) == 3, "重新进入记录页必须刷新脏数据"
     assert window.record_table.rowCount() == 1
 
 
 def test_explicit_refresh_still_reloads_the_list(window, record_calls):
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert record_calls.count(200) == 1
     window.refresh_records()
     assert record_calls.count(200) == 2, "显式刷新必须重新读取"
@@ -430,7 +430,7 @@ def test_record_list_keeps_corrupted_row_degradation(window, context, record_cal
             {"payload": '{"evaluation_id": "truncated", "results": ['},
         )
 
-    window.navigation.setCurrentRow(3)
+    window.navigate("records")
     assert window.record_table.rowCount() == 1
     assert RECORD_CORRUPTED_LABEL in window.record_table.item(0, 5).text()
     assert window.home_recent.rowCount() == 1, "损坏行不得从首页消失"
