@@ -1,5 +1,7 @@
 # ECQ-RS05 执行报告 — Windows V1 Release Candidate
 
+> **当前交付状态更新（2026-10-27）：** PR #33 已合并到 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；源码 UI 已有 Win11 原生 150% 隔离观察。下文早期“无 Win11 环境”、旧候选的 PASS／BLOCKED 和“未合并”等均只描述各自日期及版本，不能直接作为当前环境或最终候选结论。最新状态、缺口和证据边界见本文末节“2026-10-27 PR #33 合并后的交付衔接”。RS05 仍 IN PROGRESS，0.2.0 尚未正式发布。
+
 状态：**`RS05 = IN PROGRESS / RELEASE CANDIDATE`**
 目标版本：**`UEBench 0.2.0`**
 本报告不宣布 `RS05 = DONE`，也不宣布 `UEBench 0.2.0 = RELEASED`。
@@ -1154,3 +1156,44 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 本轮没有取得新候选的 GUI 控件树或截图，也没有点击标准库、保存选煤记录或重验 Word/WPS。因此三态文字与明细表隐藏的**真实界面视觉**、选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；C 的源码只读复核、定向测试与实际进程启动不能替代人工界面验收。`rc-f689658` 的旧实物记录也不自动升级为 `rc-b102e36` 的 Word/WPS 证据。当前目标仍受上方 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖缺口约束，`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`。
 
 本机原始构建记录在上述构建工作树的 `work/build-candidate-b102e36-{stdout,stderr}.log` 与 `work/build-candidate-b102e36-retry-{stdout,stderr}.log`；安装日志及自检报告在 `G:/Python Project/能耗限额/work/standard-confirmation-b102e36-install/`。这些是历史执行环境路径，不是跨机器固定入口。最终文档交接提交将与构建源码分开，不能据其 SHA 宣称 Candidate 从该文档提交重建。
+
+## 2026-10-27 PR #33 合并后的交付衔接
+
+### 平台 / Contract 预检查
+
+| 项目 | 本次文档收口核对 |
+|---|---|
+| 业务仓与源码 | origin 为 `https://github.com/adgo07/ECQuota-Insight.git`；独占文档工作树 `delivery/rs05-docs-20261027`，开工及 fetch 后 `origin/main` 为 `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`，PR #33 已合并 |
+| Frozen 基线 | `platform-lock.json` 保持 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture V2.1、Numeric Contract v1、Profiles v1、Conformance v1 均不变 |
+| ACTIVE 指南 | 已核对中央本地 clone origin；main `a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`，按 GUIDE_INDEX 核读交付 Policy、当前 UI 规格、指南 v0.2 与验收清单；不构成 Frozen 升级 |
+| MUST / MUST NOT | 保留 Decimal 全值比较、保存快照和仅选煤正式范围；不改公式、批准映射、支持注册表、Schema、Frozen lock；不把 UI 合并或源码截图当作最终实物通过 |
+| 冲突与中央修改 | 本任务不涉及中央公共 Contract；未发现新增冲突，不需要中央修改；D-ECQ-002～006 保持原登记状态 |
+| Standard Issue / 软件解释 | 无本轮相关新增问题；D01/D02 与现行批准映射不变；水泥问题 001/003 保持原状态，本轮不开发水泥 |
+
+### 已有结果与证据边界
+
+[PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并。统一导航、固定选煤单页、自动保存快照、全库检索分页和只读两页签详情、紧凑表格与长名称、设置和禁用入口、官方原文请求反馈及复制地址均已进入 main。当前文档据源码核对，操作入口使用“新建对标”“对标记录”；历史记录和 Word 使用保存快照，普通历史页没有重新评价入口。保存后再次主动计算另存一条记录；修改输入使旧结果的当前查看／导出关联失效。具体实施、测试及截图身份集中在[UI 实施状态第 12 节](../ui/UI_IMPLEMENTATION_STATUS.md#12-pr-33-已合并与-rs05-交付衔接2026-10-27)，不复制一份新实施报告。
+
+第二轮主体 `1425241` 的源码完整回归为 1165 passed / 66 skipped / 2 warnings；后续长名称实现 `e53ebb5` 已登记定向 25 passed。二者保持原版本边界，本次文档线没有重跑生产全套，没有取得最终候选的新 Gate、CI 或人工验收，不将旧结果改写为新版本通过。
+
+当前 Win11 环境和原生 150% 源码 UI 观察已由协调会话确认；仓内 `docs/ui/screenshots/pr33-round2/native150/observation.json` 记录窗口 DPI 144、DPR 1.5、无 Qt 缩放环境覆盖、隔离数据及源码脏树／实现提交归属。该清单的 platform 仅为 windows，不单独提供 OS 版本身份；最终候选验收仍须记录系统版本。原清单 `native_dpi_acceptance=false` 保留，因为源码截图和局部交互不等于最终安装包完整高 DPI 验收。2026-10-20 的 Win10 19045／无 Win11 设备结论继续保留为历史，不再描述当前环境。
+
+### 最终候选待验矩阵（仅列待验，不预写通过）
+
+| 项目 | 截至本次文档核对的状态与所需证据 |
+|---|---|
+| 最终构建身份与门禁 | 待构建线纳入经审核文档后，从实际干净 source SHA 构建，记录 Candidate 身份、载荷清单与哈希、Source Gate、Artifact Gate、EXE 自检及对应源码 CI。旧 Candidate／UI 试用包不代替新产物 |
+| Win10/11 安装与核心业务链 | 有历史候选及源码 UI 的分版本证据；最终候选仍待隔离实测启动／关闭、中文路径与企业名、标准库状态、保存／重启读回、Word 导出，并记录实际 OS 与安装包身份 |
+| 原生缩放／跨屏 | 源码原生 150% 已有局部观察；125%、跨屏、其他未覆盖原生尺寸及最终候选主要页面仍待验，不能以 Qt 离屏缩放或截图尺寸替代 |
+| 真实离线 | 待物理断网或等效可审计隔离下实测启动、库、计算保存、历史读回及本地 Word。官方网页本来需要网络，其不可访问不代表本地链失败 |
+| 输入法与原生弹层 | 真实中文输入法预编辑、未重测的原生展开弹层及适用键盘路径待对应实测；既有 QTest 不自动变成人工证据 |
+| 官方网页呈现 | 系统请求反馈／复制地址已实现并有测试及冻结诊断观察；真实网页呈现、原权限弹窗根因仍未核验。沿用既有受限浏览器停止边界，不据请求返回 true 宣称网页已显示 |
+| 0.1.0 → 最终候选升级 | 可信旧载荷库级保真已有历史证据；旧 GUI 保存与两代真实安装器覆盖仍待安全隔离验收。用户安装说明已区分预定路径与已验事实，不承诺兼容所有开发中间数据库 |
+
+构建与验收线使用自己的实际证据文件；本文只承接状态与边界，不预设其结果或最终候选 SHA。文档整理不修改生产代码、构建脚本、版本号、标准数据或治理锁；不操作真实用户数据库、已安装产品及旧 `UI测试版_b1346935`／`e70da765`／`ced969a3` 数据。本轮不发布、不打正式 tag，不自行推送或合并文档分支。
+
+当前保持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。64 项机器定义／48 项交付／16 项原样 draft、仅 GB29446 正式可计算不变；Excel 正式用户流程 DEFERRED，水泥不开发。产品路线仍只有根目录《参考标准开发路线》。
+
+### 文档线验证
+
+本次仅改 8 个既有 Markdown 文档；`git diff --check` 通过。默认 Python 3.11 无 pytest，尝试 pytest 命令未能启动；随后以 `runpy.run_path('tests/test_document_hygiene.py')` 直接调用其中全部 6 个无参检查，6/6 通过（控制字符、三份阶段一致性、产品配套状态、手册、仓库指南及 AGENTS 读取顺序）。这是文档一致性验证，不是 Python 3.13 生产回归或候选验收。核对当前 UI 源码及既有截图清单后，未启动桌面程序、构建或修改用户数据。
