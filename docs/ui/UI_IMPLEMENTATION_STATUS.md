@@ -1,6 +1,6 @@
 # UI 实施状态与第二阶段交接
 
-日期：2026-10-27。状态：**PR #33 用户独立验收提出小范围返修，已完成本地修复并通过原设计会话独立复验，获准更新同一草稿 PR 并制作隔离便携测试版；等待用户复验。** 当前返修见第 9 节，第 2～8 节保留原阶段证据。
+日期：2026-10-27。状态：**PR #33 第二轮用户反馈已作本地实现与一次最终完整回归；证据归档完成，等待设计会话独立复验，暂不推送。** 当前结论及未收口项见第 11 节；此前章节为历史证据。
 
 ## 1 分支、基线与平台 / Contract 预检查
 
@@ -285,3 +285,46 @@ git diff --check
 设计会话在精确 HEAD `189f31a73078d4eb7cf18e3511f32d4304fd663c` 独立复验通过：逐项审查生产 diff、导航双信号去重、结果定位、状态/纯文本和 RecordTable；查看宽窗长文本、900 成功结果、不适用详情真实 Qt 图；逐字节验证九张 JPEG 与 ced969a3 原图及清单哈希相同。独立运行 Python 3.13 的 `tests/test_record_query_ui.py tests/test_ui_phase1.py tests/test_gb29446_word_report.py -ra --tb=short -p no:cacheprovider --basetemp D:/project/能耗限额/.ui-design-work/pr33-review-fixed-0347`，38 项全通过（9+14+15）。设计会话读取实施会话最终日志确认 1149 passed / 66 skipped / 2 warnings / 0 failed，未把该全套记为其重复执行。原生及安装环境限制保留，不改变业务语义或支持范围。
 
 依据用户授权，允许正常推送原分支、更新同一草稿 PR #33、核对新精确 head 的三项适用 CI，并在 `D:\project\能耗限额\UI测试版_<最终SHA前8位>` 制作本地便携 UI 试用包。保留旧包及其数据库；新包仅通过隔离数据目录与 TEMP/TMP 的 cmd 启动，空白用户测试数据，自检另用隔离目录。沿用 tracked spec 和合法构建身份工具，不制作安装器、不声明完整 Candidate 验收、不合并发布。包、ZIP/清单/自检和本提交 CI 的动态交付证据在会话最终报告及 PR 中记录，不为回填构建后信息再次改变构建源码 SHA。平台预检查沿用第 9 节，本次仅文档提交与授权交付。
+
+
+## 11 第二轮用户实测反馈与紧凑列表返修（2026-10-27）
+
+**当前边界：** 实现提交 `142524169fa0e53dc8844f28de73652f2e06575c`；本节及截图另作证据提交，生产代码/测试/工具未再修改。暂不推送、不更新 PR、不构建下一便携测试包、不合并发布；等待设计会话独立复验。用户最新允许适度缩小两张列表文字及留白，优先默认窗口全列可见和普通行单行；不全局缩小字号，不强求任意长名称单行。
+
+**平台 / Contract 预检查：** 本轮确认本仓 origin 为 `https://github.com/adgo07/ECQuota-Insight.git`，原分支 `ui/phase1-qingzhou`，开工 HEAD `e70da765a63047a413a6076197cc1e8d4df507d2`，工作区干净；fetch 后 main 仍 `cdc89c12b0b7ea6791568838fbb382cb76842002`。重读当前中央 GUIDE_INDEX、家族规格、UI 指南 v0.2、清单，四文件 blob 与第 9 节一致；Frozen lock 仍 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`。Architecture 2.1、Numeric Contract/Profile/Conformance v1 不变；MUST 保留 Decimal 全值判定、保存快照、D01/D02 与仅选煤正式范围，MUST NOT 改 Calculator、映射、数值、Schema、支持状态或软件解释。无新增相关 Standard Issue、公共 Contract 冲突或中央修改需要；本任务不涉及中央公共 Contract。
+
+先实际查看用户三张截图：标准库右侧截断、炼焦煤选中圆点消失、设置标题压在边框上。实现与验证如下：
+
+| 项目 | 本地处理及实际边界 |
+|---|---|
+| 默认窗口列表 | 标准五列及记录七列均按 viewport 响应分配。仅这两张表正文/表头采用 13px、较紧单元格/按钮留白，其他页面仍 14px。1180、1256、1440 的正常记录日期、标准、统计期和状态尽量完整单行，全部列/操作可见；900 保留自身横滚，不藏列或强制移出屏幕。长名称按需换行增高，工具提示保留原文 |
+| 原文打开 | 只从已登记官方 https 注册表取地址；捕获 openUrl false/异常。请求后弹窗明确“无法确认浏览器是否已显示网页”，地址只读可复制，始终有“复制官方地址”。不改默认浏览器或权限，不访问本地 PDF，不虚称网页已打开 |
+| 冻结浏览器环境 | 仅 frozen Windows 的外部打开调用期间临时清除 DLL 搜索覆盖、过滤本 bundle 的 PATH 段，finally 精确恢复原值。依据 [PyInstaller 6.20 官方说明](https://pyinstaller.org/en/v6.20.0/common-issues-and-pitfalls.html#launching-external-programs-from-the-frozen-application)，属于最小可逆处理，不认定它已证明用户权限弹窗的根因 |
+| 录入滚轮 | 工艺与统计期采用 WheelSafeComboBox。收起时真实 QWheelEvent 转交所在页面滚动，聚焦/未聚焦均不改选项、k 或旧结果；弹层选择与键盘保留。未扩展无关筛选控件 |
+| 设置卡片 | 移除标题画在边线上的 QGroupBox，改为卡片内独立标题与内容布局；长路径可选中复制并换行，高级展开仍可滚动。备份/恢复及诊断信号和保护不变 |
+| 单选标记 | 明确提供选中/未选中/禁用 SVG 指示器、焦点边框；文字点击及键盘正确互斥并同步真实煤种。离屏像素检查与原生截图均看见圆环/圆点；原生实测炼焦煤→动力煤→炼焦煤 |
+
+**仍需设计复验的长文本细节：** `records-long-1256.png` 中特别长的企业名已多行增高，但末行仍出现省略号；完整原文保留在工具提示，状态/日期/操作完整。1180 同类样例未出现该末行省略。本轮不宣称任意长度名称均完整无省略；这个细节作为未收口项明确交设计会话，未在证据收尾阶段改动已跑全量的实现。
+
+**测试：** Python 3.13.17 / PySide6 6.10.1。本轮相关组 78 passed（`work/pr33-r2-affected.log`，紧凑字号最终调整之前）；最终紧凑表格与记录组 22 passed（`work/pr33-r2-compact2.log`）。新增第二轮 13 个测试实例，含四种窗口尺寸、普通行单行度量、上下文保留、聚焦/未聚焦真实滚轮和页面滚动、键盘/弹层鼠标选择、卡片标题位置、官方请求 true/false/异常及复制、单选真实点击/键盘与蓝色像素、冻结 DLL/PATH 正常及异常时恢复。各组重叠不相加。
+
+最终一次 Python 3.13 完整回归在上述实现提交后执行，后续仅等待原 session 结束并读取日志，没有重跑：
+
+```powershell
+& .\work\venv313\Scripts\python.exe -m pytest -ra --tb=short -p no:cacheprovider --basetemp work/pr33-r2-final-full
+# 1165 passed, 66 skipped, 2 warnings in 342.36s (0:05:42)，退出0
+```
+
+日志 `D:\project\能耗限额\ECQuota-Insight\work\pr33-r2-final-full.log`。66 跳过仍包含未提供 Candidate 产物、旧归档不可用及符号链接环境；两个 warning 为 junction 样例输出线程解码警告与重复 ZIP 成员样例，未抑制。完整回归含源码门禁和既有业务保护；未修改相关三项 CI workflow，不手动触发 Candidate/发布。未推送，因此旧 head CI 不作为 `1425241` 的 CI 通过证据。
+
+**实际窗口与截图：** 根目录 `D:\project\能耗限额\ECQuota-Insight\docs\ui\screenshots\pr33-round2`。离屏清单 `capture-environment.json` 记录干净源码精确 head `142524169fa0e53dc8844f28de73652f2e06575c`、DPR1.0、1256×624 / 1180×760 / 1440×900 / 900×600。标准库来自真实随包48项，记录来自225条临时保存样例，长名称另外保存一条，非用户数据库。代表图：`standards-1256.png`、`standards-1180.png`、`records-1256.png`、`records-1180.png`、`records-long-1256.png`、`records-long-1180.png`、三张 `radio-*-1256.png`、`settings-1256.png` 和 `settings-advanced-1256.png`。
+
+原生 `native150/` 十张 JPEG 及 `observation.json`：实际 GetDpiForWindow=144、QScreen DPR1.5，逻辑屏幕1280×720/可用1280×672，默认客户区 **1256×624**，无 Qt 缩放环境覆盖。已检查紧凑标准/记录全列、普通记录单行、三次煤种切换圆点、聚焦工艺滚轮保持跳汰/k1.26而页面滚动、键盘Down有效、设置与高级标题。原生图在提交前 e70da765 的脏工作树采集，对应本轮随后提交1425241的实现；表格图已由最终13px紧凑版覆盖，其余单选/设置/滚轮组件后续未改。归档清单记录图像格式/尺寸/SHA256和源文件归档哈希，不冒充从干净1425241重新启动采集。Computer Use图像可能被工具按逻辑像素缩放，不作像素比对或完整DPI验收。本人创建的业务测试窗口已关闭。
+
+**真实冻结 EXE 原文链路及停止限制：** 默认 https 关联只读检查为 `MSEdgeHTM`，命令指向系统安装的 msedge.exe。在 work 内构建仅浏览器调用的诊断 EXE，共用本轮生产 helper、QDesktopServices 及 tracked spec 的运行时hook/DLL筛选，不是下一版UI试用包。最初简化探针缺少对应DLL处理，QtWidgets导入失败，未执行浏览器请求；等同产品运行时的诊断成功启动后，真实点击已登记官方地址，日志确认 frozen=true、系统请求返回true、调用期间 DLL覆盖清空及bundle PATH段移除、调用后 DLL/PATH 完整恢复。随后窗口清单出现“国家标准 - 全国标准信息公共服务平台 - 个人 - Microsoft Edge”标题；**这仅为窗口标题证据，不等于实际页面呈现已核验。**
+
+尝试观察浏览器时，Computer Use 因无法可靠识别当前浏览器URL而自动停止；未绕过、未再次尝试浏览器视觉操作、未批准任何权限提示。用户原先描述的权限弹窗未在本轮确认复现，根因仍未确定。只提交不含完整用户PATH的摘要 `browser-request-observation.json`；完整本地诊断日志 `work/pr33-r2-browser-probe.json` 保留。后续非UI进程检查未发现该诊断EXE仍在运行，没有操作用户浏览器/旧程序来清理。
+
+**未验证及上一包状态：** 原生1180/1440/900逐尺寸调整、真实输入法预编辑、125%/跨屏、当前实现的新便携包与安装器仍未验证；本轮原生展开弹层未重测，QTest弹层鼠标/键盘已通过。浏览器实际页面视觉核验仍 OPEN。上一版 `UI测试版_e70da765` 的6项EXE自检已由设计会话通过、退出0；326文件哈希一致，设计会话更新后的ZIP SHA256为 `bffd9a572da4fba56ae73fc3468e6e54661dee92c19a5c7c156d27f23c49403e`，不恢复本执行会话早先的失败/旧ZIP结论。全部旧测试包和数据保持原状。
+
+本轮仅交本地实现、完整回归与真实证据供设计会话独立复验；长名称细节及浏览器视觉边界如上，不写用户最终验收通过。
