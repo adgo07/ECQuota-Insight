@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--interactive", action="store_true")
     parser.add_argument("--revision-evidence", action="store_true", help="额外采集返修结果定位及异常状态证据")
+    parser.add_argument("--round2-evidence", action="store_true", help="实际默认尺寸、表格与单选标记返修证据")
     parser.add_argument("--output", type=Path, default=ROOT / "docs/ui/screenshots/phase2")
     args = parser.parse_args()
     if not args.interactive:
@@ -50,6 +51,9 @@ def main():
         if not args.interactive:
             win.resize(1440,900)
         win.show()
+        if args.round2_evidence and args.interactive:
+            win.setWindowTitle("能耗限额 PR33 第二轮返修隔离检查")
+            win.navigate("standards")
         captures = []
         def settle():
             for _ in range(4):
@@ -80,6 +84,37 @@ def main():
         else:
             for name in ("information", "warning", "critical"):
                 setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
+            if args.round2_evidence:
+                for width, height in ((1256,624),(1180,760),(1440,900),(900,600)):
+                    win.resize(width,height)
+                    for key in ("standards", "records"):
+                        win.navigate(key)
+                        shot(f"{key}-{width}")
+                long_request = request.model_copy(deep=True, update={"organization_name": "长企业名称换行检查：" + "青舟选煤示例企业" * 6})
+                long_result = result.model_copy(deep=True, update={"evaluation_id": "long-name-fixture", "standard_title": "选煤电力消耗限额长名称检查：" + "保存的标准名称" * 6})
+                context.evaluations.save(long_request, long_result, standard)
+                win.mark_records_dirty()
+                win.navigate("records")
+                for width, height in ((1256,624),(1180,760)):
+                    win.resize(width,height)
+                    shot(f"records-long-{width}")
+                environment["records"] = context.application.count_evaluations()
+                win.resize(1256,624)
+                win.navigate("settings")
+                shot("settings-1256")
+                win.settings_page.advanced_toggle.click()
+                shot("settings-advanced-1256")
+                win.start_formal_evaluation()
+                win.evaluation_scroll.verticalScrollBar().setValue(0)
+                for index, name in ((0,"coking"),(1,"thermal"),(0,"coking-return")):
+                    win.coal_button_group.buttons()[index].click()
+                    shot("radio-" + name + "-1256")
+                environment["captures"] = captures
+                (args.output / "capture-environment.json").write_text(json.dumps(environment,ensure_ascii=False,indent=2),encoding="utf-8")
+                win.close()
+                context.database.dispose()
+                logging.shutdown()
+                return
             win.navigate("records")
             shot("records-1440")
             win._record_page = 12

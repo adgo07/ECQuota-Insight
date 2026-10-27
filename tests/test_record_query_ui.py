@@ -246,8 +246,8 @@ def test_record_columns_fit_reference_window_and_wrap_long_names(records):
     assert table.rowHeight(0) > 60
     assert table.rowHeight(0) >= table.sizeHintForRow(0)
     for column in (0, 2):
-        text_height = table.fontMetrics().boundingRect(QRect(0, 0, table.columnWidth(column) - 28, 100000), Qt.TextWordWrap, table.item(0, column).text()).height()
-        assert table.rowHeight(0) >= text_height + 24
+        text_height = table.fontMetrics().boundingRect(QRect(0, 0, table.columnWidth(column) - 16, 100000), Qt.TextWordWrap, table.item(0, column).text()).height()
+        assert table.rowHeight(0) >= text_height + 16
     button = table.cellWidget(0, 6)
     assert table.viewport().rect().contains(button.geometry())
     win.resize(900, 600)

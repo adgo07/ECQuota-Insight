@@ -15,7 +15,10 @@ _LOGGER = logging.getLogger(__name__)
 from PySide6.QtCore import QDate, Qt, QUrl, QSize, QTimer
 from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QPainter
 from PySide6.QtSvg import QSvgRenderer
-from .record_table import RecordTable
+from .record_table import RecordTable, StandardTable
+from .wheel_safe_combo import WheelSafeComboBox
+from .official_source_dialog import OfficialSourceDialog
+from .external_browser import external_browser_environment
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -643,7 +646,7 @@ class MainWindow(QMainWindow):
         self.standard_retry.hide()
         controls.addWidget(self.standard_retry)
         layout.addLayout(controls)
-        self.standard_table = QTableWidget(0, 5)
+        self.standard_table = StandardTable(0, 5)
         self.standard_table.setHorizontalHeaderLabels(["标准编号", "标准名称", "标准状态", "实施日期", "软件支持"])
         self._configure_table(self.standard_table)
         self.standard_table.itemSelectionChanged.connect(self.refresh_standard_detail)
@@ -652,8 +655,7 @@ class MainWindow(QMainWindow):
         self.standard_table.itemDoubleClicked.connect(lambda *_: self.show_standard_detail())
         self.standard_table.setWordWrap(True)
         self.standard_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        for column, width in enumerate((160, 390, 150, 140, 240)):
-            self.standard_table.setColumnWidth(column, width)
+        self.standard_table.horizontalHeader().setStretchLastSection(False)
         self.standard_table.verticalHeader().setDefaultSectionSize(58)
         layout.addWidget(self.standard_table, 1)
         self.standard_count_label = QLabel("")
@@ -824,7 +826,7 @@ class MainWindow(QMainWindow):
         self.gb29446_organization = QLineEdit()
         self.gb29446_organization.setPlaceholderText("可选填写")
         self.gb29446_organization.textChanged.connect(self._gb29446_inputs_changed)
-        self.gb29446_period = QComboBox()
+        self.gb29446_period = WheelSafeComboBox()
         for period in GB29446_PERIOD_OPTIONS:
             self.gb29446_period.addItem(period, period)
         self.gb29446_period.currentIndexChanged.connect(self._gb29446_period_changed)
@@ -848,7 +850,7 @@ class MainWindow(QMainWindow):
         coal_layout.setSpacing(28)
         coal_layout.addStretch()
         self.gb29446_coal_type.currentIndexChanged.connect(self._sync_coal_radios)
-        self.gb29446_process = QComboBox()
+        self.gb29446_process = WheelSafeComboBox()
         self.gb29446_process.currentIndexChanged.connect(self._gb29446_process_changed)
         self.gb29446_process.currentIndexChanged.connect(self._gb29446_inputs_changed)
         self.gb29446_electricity = QLineEdit()
@@ -1398,6 +1400,7 @@ class MainWindow(QMainWindow):
                 item = _item(value)
                 item.setData(Qt.ItemDataRole.UserRole, standard.id)
                 self.standard_table.setItem(row, column, item)
+        self.standard_table.fit_columns()
         self.standard_count_label.setText(f"共 {self.standard_table.rowCount()} 项标准" if self.standard_table.rowCount() else "没有匹配结果")
         self.refresh_standard_detail()
 
@@ -2962,10 +2965,17 @@ class MainWindow(QMainWindow):
                 f"（{OFFICIAL_SOURCE_PLATFORM_HOME}）自行检索该标准。",
             )
             return False
-        if QDesktopServices.openUrl(QUrl(url)) is False:
-            QMessageBox.information(self, "暂时无法打开标准原文", "无法打开已登记的官方页面，请检查网络连接或系统默认浏览器后重试。")
-            return False
-        return True
+        try:
+            with external_browser_environment():
+                requested = bool(QDesktopServices.openUrl(QUrl(url)))
+        except Exception:
+            _LOGGER.exception("官方页面打开请求失败")
+            requested = False
+        if getattr(self, "official_source_dialog", None):
+            self.official_source_dialog.close()
+        self.official_source_dialog = OfficialSourceDialog(url, requested, self)
+        self.official_source_dialog.open()
+        return requested
 
     def open_selected_standard(self) -> None:
         """标准库：打开所选标准的官方来源页面（不再打开本机 PDF）。"""

@@ -35,3 +35,18 @@ QLabel[class="metric"] { font-size: 26px; font-weight: 600; color: #18364F; }
 QLabel[class="muted"] { color: #698198; font-size: 13px; }
 QScrollArea { border: none; }
 """
+
+
+# 显式矢量指示器避免 Windows 主题与全局背景叠加后选中圆点消失。
+from pathlib import Path
+_radio_icons = (Path(__file__).resolve().parents[1] / "resources" / "icons").as_posix()
+APP_STYLE += """
+QRadioButton { background: transparent; spacing: 8px; padding: 4px; border: 1px solid transparent; border-radius: 4px; }
+QRadioButton:focus { border: 1px solid #197CC2; }
+QRadioButton:disabled { color: #698198; }
+QRadioButton::indicator { width: 20px; height: 20px; }
+QRadioButton::indicator:unchecked { image: url("RADIO_ROOT/radio-off.svg"); }
+QRadioButton::indicator:checked { image: url("RADIO_ROOT/radio-on.svg"); }
+QRadioButton::indicator:unchecked:disabled { image: url("RADIO_ROOT/radio-off-disabled.svg"); }
+QRadioButton::indicator:checked:disabled { image: url("RADIO_ROOT/radio-on-disabled.svg"); }
+""".replace("RADIO_ROOT", _radio_icons)
