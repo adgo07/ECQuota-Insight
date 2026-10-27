@@ -1,0 +1,52 @@
+"""青舟本地展示参数；不承载业务规则或跨仓运行时依赖。"""
+
+APP_STYLE = """
+QMainWindow, QWidget { background: #F5F8FC; color: #213A4F; font-family: 'Microsoft YaHei UI', 'Microsoft YaHei'; font-size: 14px; }
+QLabel { background: transparent; }
+QFrame[class="card"] { background: white; border: 1px solid #DAE7F1; border-radius: 10px; }
+QWidget#sidebar { background: qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 #E6F2FC,stop:0.5 #EDF6FD,stop:1 #E6F2FB); }
+QListWidget#navigation { background: transparent; border: none; padding: 8px; }
+QListWidget#navigation::item { height: 46px; padding-left: 12px; margin: 3px 0; border-radius: 9px; }
+QListWidget#navigation::item:selected { background: #D6EBF9; color: #116FAE; border-left: 3px solid #298CCB; }
+QListWidget#navigation::item:disabled { color: #698198; }
+QPushButton { background: white; color: #197CC2; border: 1px solid #DAE7F1; border-radius: 6px; padding: 9px 16px; min-height: 20px; }
+QPushButton:hover { background: #EDF6FD; border-color: #197CC2; }
+QPushButton:pressed, QPushButton:checked { background: #D6EBF9; }
+QPushButton:focus, QLineEdit:focus, QComboBox:focus { border: 2px solid #197CC2; }
+QPushButton[role="primary"] { background: #197CC2; color: white; border-color: #197CC2; }
+QPushButton[role="primary"]:hover { background: #116FAE; }
+QPushButton:disabled { color: #698198; background: #F0F4F8; border-color: #DAE7F1; }
+QPushButton[role="task"] { padding: 0; min-height: 172px; border-radius: 14px; }
+QPushButton[role="task"] QLabel[class="taskTitle"] { font-size: 18px; font-weight: 600; color: #18364F; }
+QPushButton[role="task"] QLabel[class="taskDescription"] { font-size: 13px; color: #698198; }
+QPushButton[role="task"] QLabel:disabled { color: #698198; }
+QPushButton#standardTask { background: #183F64; color: white; padding: 0; border-radius: 14px; }
+QPushButton#standardTask QLabel[class="taskTitle"] { color: white; }
+QPushButton#standardTask QLabel[class="taskDescription"] { color: #C9E0F2; }
+QLineEdit, QComboBox, QDateEdit, QSpinBox { background: white; border: 1px solid #DAE7F1; border-radius: 6px; padding: 8px; min-height: 22px; }
+QLineEdit:read-only { background: #F7FAFD; }
+QTextEdit, QTableWidget { background: white; border: 1px solid #DAE7F1; border-radius: 6px; gridline-color: #E8F0F6; }
+QTableWidget::item { padding: 8px; }
+QTableWidget::item:selected { background: #D6EBF9; color: #18364F; }
+QHeaderView::section { background: #F7FAFD; color: #698198; padding: 10px; border: none; border-bottom: 1px solid #DAE7F1; font-size: 13px; }
+QLabel[class="pageTitle"] { font-size: 24px; font-weight: 600; color: #18364F; }
+QLabel[class="sectionTitle"] { font-size: 16px; font-weight: 600; color: #18364F; }
+QLabel[class="metric"] { font-size: 26px; font-weight: 600; color: #18364F; }
+QLabel[class="muted"] { color: #698198; font-size: 13px; }
+QScrollArea { border: none; }
+"""
+
+
+# 显式矢量指示器避免 Windows 主题与全局背景叠加后选中圆点消失。
+from pathlib import Path
+_radio_icons = (Path(__file__).resolve().parents[1] / "resources" / "icons").as_posix()
+APP_STYLE += """
+QRadioButton { background: transparent; spacing: 8px; padding: 4px; border: 1px solid transparent; border-radius: 4px; }
+QRadioButton:focus { border: 1px solid #197CC2; }
+QRadioButton:disabled { color: #698198; }
+QRadioButton::indicator { width: 20px; height: 20px; }
+QRadioButton::indicator:unchecked { image: url("RADIO_ROOT/radio-off.svg"); }
+QRadioButton::indicator:checked { image: url("RADIO_ROOT/radio-on.svg"); }
+QRadioButton::indicator:unchecked:disabled { image: url("RADIO_ROOT/radio-off-disabled.svg"); }
+QRadioButton::indicator:checked:disabled { image: url("RADIO_ROOT/radio-on-disabled.svg"); }
+""".replace("RADIO_ROOT", _radio_icons)

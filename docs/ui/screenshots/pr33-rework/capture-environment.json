@@ -1,0 +1,119 @@
+{
+  "platform": "offscreen",
+  "python": "3.13.17",
+  "pyside6": "6.10.1",
+  "isolated_data": true,
+  "records": 229,
+  "screens": [
+    {
+      "name": "",
+      "logical_dpi": 96.0,
+      "device_pixel_ratio": 1.0,
+      "geometry": [
+        800,
+        800
+      ],
+      "available": [
+        800,
+        800
+      ]
+    }
+  ],
+  "native_dpi_acceptance": false,
+  "captures": [
+    {
+      "file": "records-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "records-last-page-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "record-result-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "record-inputs-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "settings-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "settings-advanced-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "records-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "record-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "settings-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "home-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "success-result-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "success-result-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "incomplete-list-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "incomplete-detail-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "not-applicable-list-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "not-applicable-detail-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "records-long-names-1440.png",
+      "width": 1440,
+      "height": 900,
+      "fixture_note": "同一隔离工具运行；仅对224号示例保存记录增加长企业名/标准标题，检查实际换行与行高。"
+    }
+  ],
+  "source_head": "93c46e8cfbc4a62ca07bb3b7e2bf791c74703834",
+  "source_dirty": true,
+  "scale_overrides": {
+    "QT_SCALE_FACTOR": null,
+    "QT_SCREEN_SCALE_FACTORS": null,
+    "QT_FONT_DPI": null
+  },
+  "source_dirty_note": "本轮返修源码/测试/工具与source_head一致；截图时待提交的是状态文档及截图证据。"
+}

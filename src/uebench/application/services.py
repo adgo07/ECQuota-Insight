@@ -15,6 +15,7 @@ from uebench.domain.models import (
 )
 
 from .evaluation_support import evaluation_support_label, supports_formal_evaluation
+from .record_query import RecordPage
 
 
 class StandardRepository(Protocol):
@@ -41,6 +42,7 @@ class StandardRepository(Protocol):
 
 
 class EvaluationRepository(Protocol):
+    def query_page(self, *, query: str = "", status: str = "", page: int = 1, page_size: int = 20) -> RecordPage: ...
     def save(
         self,
         request: EvaluationRequest,

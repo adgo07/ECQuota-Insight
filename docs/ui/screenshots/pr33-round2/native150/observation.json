@@ -1,0 +1,130 @@
+{
+  "platform": "windows",
+  "python": "3.13.17",
+  "pyside6": "6.10.1",
+  "isolated_data": true,
+  "records": 225,
+  "screens": [
+    {
+      "name": "\\\\.\\DISPLAY1",
+      "logical_dpi": 96.0,
+      "device_pixel_ratio": 1.5,
+      "geometry": [
+        1280,
+        720
+      ],
+      "available": [
+        1280,
+        672
+      ]
+    }
+  ],
+  "native_dpi_acceptance": false,
+  "captures": [
+    {
+      "file": "keyboard-process.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "e5077f3b990591279e02d05fbb3d0adc441a64cdd476adaf4a6465e78a491f55"
+    },
+    {
+      "file": "radio-coking-return.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "75699cb6ddfa93802d5a95f7663b3795496e3417da39b378430db7db8fcfc47d"
+    },
+    {
+      "file": "radio-coking.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "b346bdfbf46e7e2dd0db643f9f03ee1e59b3f3ff1d4dad38674767feefc3b42e"
+    },
+    {
+      "file": "radio-thermal.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "c0cc8fe9919dac33ed4c178bdc590e7d2a924e46bd1cd9b451bb8a9912459991"
+    },
+    {
+      "file": "records-default.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "db9aa5a437056bbf6d4000c3fc2e805b40920d9faee0aea42c5e9e7ed51bfef5"
+    },
+    {
+      "file": "settings-advanced.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "ef403430458e59999f4c0f331149fc220d3551e50da4d2e10ba87d97dbbb2c96"
+    },
+    {
+      "file": "settings-default.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "1caf12cc21be236db24425c4aabb5778b131e91226147ff50f2d4feaabeb0dc6"
+    },
+    {
+      "file": "standards-default.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "a83f57fce1b2fa20eaa26184a10586c0e1265c3d001edde6a366b6d9fa1db548"
+    },
+    {
+      "file": "wheel-focused-process-stable.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "d09e09a60552465e5cf0e889b5dd9a29e1a36a6d1598cd8d3a2ab9a1edbaccd0"
+    },
+    {
+      "file": "wheel-page-scroll.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "0c07a10de39d20d31a68b485b3c7e203d4bc9a9af57fdf917d10908e43cf6eca"
+    }
+  ],
+  "source_head": "e70da765a63047a413a6076197cc1e8d4df507d2",
+  "source_dirty": true,
+  "scale_overrides": {
+    "QT_SCALE_FACTOR": null,
+    "QT_SCREEN_SCALE_FACTORS": null,
+    "QT_FONT_DPI": null
+  },
+  "native_window_dpi": 144,
+  "window_logical_size": [
+    1256,
+    624
+  ],
+  "implementation_commit": "142524169fa0e53dc8844f28de73652f2e06575c",
+  "provenance_note": "原生图在提交前的e70da765工作树采集（source_dirty=true）；本轮UI代码随后提交1425241。standards-default/records-default已用13px紧凑版覆盖；其余为同轮未再改动的单选/设置/滚轮组件。并非从干净1425241重新启动采集。",
+  "verified": [
+    "原生DPI144/150%，实际客户区1256x624，无Qt缩放环境覆盖",
+    "标准五列、记录七列及操作完整可见，普通记录单行",
+    "炼焦煤切动力煤再切回，圆点可见且互斥",
+    "收起工艺下拉上滚轮滚动页面；聚焦跳汰/k1.26保持，键盘Down有效",
+    "设置及高级标题均位于卡片内"
+  ],
+  "limitations": [
+    "Computer Use图像可能经过逻辑像素缩放，不作像素比对",
+    "原生1180/1440/900未逐一调整，本轮对应尺寸为真实Qt离屏补充",
+    "真实输入法预编辑、125%、跨屏及新便携包/安装器未验证",
+    "本轮未重新验证原生展开弹层；Qt真实QTest弹层鼠标点选及键盘通过",
+    "浏览器视觉核验因URL识别策略停止，未批准任何权限请求"
+  ],
+  "archived_source_sha256": {
+    "src/uebench/ui/main_window.py": "bcf84629b62474696861c76049d35b6b42f68ff34548cb79b3319048b7e334e8",
+    "src/uebench/ui/design_tokens.py": "362482daae65569a6ff7eecbed7b69df1f8320b3536f95830a7d4f26c3c59d76",
+    "src/uebench/ui/record_table.py": "9c60faf3228615df697fc8b33766b1c3fcaa6d4d1dee9cfb50f4880e7c9ae96a",
+    "src/uebench/ui/settings_page.py": "9bbcf213c46d07ffa858755026c21008c4b4383c67dfbf46125809242fb6608d",
+    "src/uebench/ui/wheel_safe_combo.py": "d7db220d2983a630634668e2a9a15ce7d1d82ec8f1ab7de67622b0a407a0cb97"
+  }
+}

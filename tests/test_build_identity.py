@@ -249,7 +249,7 @@ def test_window_diagnostics_report_contains_live_facts_without_private_keys(
             assert clipboard.text() == text
 
         # 诊断信息仅从默认折叠的「设置 → 高级」进入。
-        window.navigation.setCurrentRow(4)
+        window.navigate("settings")
         assert window.settings_page.advanced_toggle.isChecked() is False
         window.settings_page.advanced_toggle.click()
         window.settings_page.view_diagnostics_button.click()
@@ -394,7 +394,7 @@ def test_window_keeps_package_details_advanced_and_blocks_new_evaluations(tmp_pa
         assert "package_id" not in window.home_compatibility_notice.text()
         assert "SHA" not in window.home_compatibility_notice.text()
 
-        window.navigation.setCurrentRow(4)
+        window.navigate("settings")
         assert window.settings_page.advanced_toggle.isChecked() is False
         assert window.settings_page.advanced_content.isHidden()
         assert not hasattr(window, "package_history_table")
@@ -410,12 +410,12 @@ def test_window_keeps_package_details_advanced_and_blocks_new_evaluations(tmp_pa
         # 错配仅暂停新正式评价；历史记录仍可列出并按已保存结果查看。
         from unittest.mock import patch
         from PySide6.QtWidgets import QTextEdit
-        window.navigation.setCurrentRow(3)
+        window.navigate("records")
         assert window.record_table.rowCount() == 1
         window.record_table.selectRow(0)
         with patch("uebench.domain.engine.EvaluationEngine.evaluate", side_effect=AssertionError("history view ran Engine")):
             window.view_selected_record()
-        detail = window.record_detail_dialog.findChild(QTextEdit, "record_detail_content")
+        detail = window.record_detail_page.findChild(QTextEdit, "record_detail_content")
         assert detail is not None
         assert "选煤电力单耗" in detail.toPlainText()
         assert str(historical_result.results[0].actual_value) in detail.toPlainText()
