@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import json
 
-from uebench.domain.models import EvaluationRequest, EvaluationResult, GRADE_LABELS, Grade, RECORD_CORRUPTED_LABEL
+from uebench.domain.models import EvaluationRequest, EvaluationResult, GRADE_LABELS, RECORD_CORRUPTED_LABEL
 from .gb29446 import decode_period_notes, GB29446_STANDARD_ID
 from .reporting import _display_two_places
 
@@ -38,10 +38,6 @@ def saved_record_projection(request_json: str, result_json: str) -> str:
             period = custom if code == "自定义" else code
         first = result.results[0] if result.results else None
         status = GRADE_LABELS[first.grade] if first else "无法判定"
-        if first and result.standard_id == GB29446_STANDARD_ID and first.grade is Grade.NOT_QUALIFIED:
-            status = "未达3级"
-        if first and first.grade in (Grade.INCOMPLETE, Grade.NOT_APPLICABLE):
-            status = "无法判定"
         core = f"{_display_two_places(first.actual_value)} {first.unit}" if first and first.actual_value is not None else "未形成有效结果"
         if len(result.results) > 1:
             status = "分项结果"

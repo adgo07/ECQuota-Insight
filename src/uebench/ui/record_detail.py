@@ -34,6 +34,7 @@ class RecordDetailPage(QWidget):
         back.clicked.connect(self.back_requested)
         body.addWidget(back, 0, Qt.AlignLeft)
         self.title = QLabel("对标记录详情")
+        self.title.setTextFormat(Qt.TextFormat.PlainText)
         self.title.setWordWrap(True)
         self.title.setProperty("class", "pageTitle")
         body.addWidget(self.title)
@@ -108,8 +109,7 @@ class RecordDetailPage(QWidget):
         else:
             inputs.append("保存的规则快照缺少对应产品定义，未从当前规则补充字段名称。")
         if view is not None:
-            basic += [f"{view.actual.label}：{view.actual.value} {view.actual.unit}", f"评价结果：{view.grade.value}",
-                      *(f"{f.label}：{f.value} {f.unit}" for f in view.thresholds), *view.explanation, *view.warnings]
+            grade_basis = [*(f"{f.label}：{f.value} {f.unit}" for f in view.thresholds), *view.explanation, *view.warnings]
             fields = (view.enterprise_type, view.process_type, view.electricity, view.raw_coal, view.factor)
             inputs = [f"{f.label}：{f.value} {f.unit}" for f in fields if f is not None]
             inputs += [*view.explanation, *view.basis, f"{view.scope.label}：{view.scope.value}", *view.warnings]
@@ -117,7 +117,7 @@ class RecordDetailPage(QWidget):
                 inputs.append(view.mapping_adoption)
         else:
             for item in result.results:
-                label = "未达3级" if result.standard_id == GB29446_STANDARD_ID and item.grade is Grade.NOT_QUALIFIED else GRADE_LABELS[item.grade]
+                label = GRADE_LABELS[item.grade]
                 basic += [f"指标：{item.indicator_name}", f"实际值：{item.actual_value if item.actual_value is not None else '未记录'} {item.unit}", f"等级：{label}"]
                 if item.grade is Grade.INCOMPLETE:
                     basic.append("数据不完整，未形成正常等级或符合性结论。")
@@ -132,7 +132,7 @@ class RecordDetailPage(QWidget):
         if view is not None:
             lead = '<table width="100%" cellpadding="8"><tr><td>选煤电力单耗</td><td>评价结果</td></tr><tr>'
             lead += f'<td style="font-size:26px; color:#18364F;">{html.escape(view.actual.value)} {html.escape(view.actual.unit)}</td><td style="font-size:26px; color:#18364F;">{html.escape(view.grade.value)}</td></tr></table>'
-            self.result_content.setHtml(lead + section("基本信息", basic[:5]) + section("等级上限与判级依据", basic[7:]))
+            self.result_content.setHtml(lead + section("基本信息", basic) + section("等级上限与判级依据", grade_basis))
             field_count = sum(f is not None for f in fields)
             self.input_content.setHtml(section("输入数据", inputs[:field_count]) + section("计算与依据", inputs[field_count:]))
         else:

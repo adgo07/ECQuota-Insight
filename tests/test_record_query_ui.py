@@ -7,6 +7,8 @@ import json
 import pytest
 from sqlalchemy import text, event
 from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton, QFileDialog
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from uebench.bootstrap import create_context
 from uebench.domain.models import StandardDefinition, Grade
 from uebench.domain.engine import EvaluationEngine
@@ -152,3 +154,100 @@ def test_saved_incomplete_record_has_real_word_reason(records):
     win.view_record(result.evaluation_id)
     assert not win.record_detail_page.export_button.isEnabled()
     assert "未形成有效电耗等级" in win.record_detail_page.notice.text()
+
+
+@pytest.mark.parametrize("grade,label", [(Grade.INCOMPLETE, "不完整"), (Grade.NOT_APPLICABLE, "不适用")])
+def test_saved_exceptional_status_stays_distinct_and_readonly(records, monkeypatch, grade, label):
+    context, win = records
+    request, result, snapshot = context.application.get_evaluation(f"{0:036}")
+    request.organization_name = "A<b>x</b>B & 特殊企业"
+    result.evaluation_id = "status-fixture"
+    result.results[0].grade = grade
+    result.results[0].actual_value = None
+    context.evaluations.save(request, result, snapshot)
+    raw = tuple(x.model_dump_json() for x in context.application.get_evaluation(result.evaluation_id))
+    monkeypatch.setattr(EvaluationEngine, "evaluate", forbid)
+    monkeypatch.setattr(context.application, "get_standard", forbid)
+    monkeypatch.setattr(context.application, "get_published_standard", forbid)
+    assert context.application.query_evaluations().total == 226
+    page = context.application.query_evaluations(status=label)
+    assert page.total == 1 and page.items[0].status == label
+    other = "不适用" if label == "不完整" else "不完整"
+    assert context.application.query_evaluations(status=other).total == 0
+    win.navigate("records")
+    win.record_status_filter.setCurrentText(label)
+    assert win.record_table.rowCount() == 1
+    assert win.record_table.item(0, 4).text() == label
+    assert "共 1 条" in win.record_count_label.text()
+    win.view_record(result.evaluation_id)
+    assert label in win.record_detail_page.result_content.toPlainText()
+    assert win.record_detail_page.title.textFormat() == Qt.TextFormat.PlainText
+    assert win.record_detail_page.title.text() == request.organization_name
+    assert tuple(x.model_dump_json() for x in context.application.get_evaluation(result.evaluation_id)) == raw
+    assert context.application.count_evaluations() == 226
+
+
+def click_navigation(win, key):
+    item = next(win.navigation.item(i) for i in range(win.navigation.count()) if win.navigation.item(i).data(Qt.UserRole) == key)
+    QApplication.processEvents()
+    QTest.mouseClick(win.navigation.viewport(), Qt.LeftButton, pos=win.navigation.visualItemRect(item).center())
+    QApplication.processEvents()
+
+
+def test_parent_sidebar_mouse_return_context_and_single_navigation(records, monkeypatch):
+    _, win = records
+    win.navigate("records")
+    win.record_search.setText("企业")
+    win._record_filters_changed()
+    win._record_page = 12
+    win.refresh_records()
+    win.record_table.selectRow(2)
+    selected = win._selected_record_id()
+    win.view_selected_record()
+    click_navigation(win, "records")
+    assert win.pages.currentWidget() is win.page_widgets["records"]
+    assert win.record_search.text() == "企业" and win._record_page == 12
+    assert win._selected_record_id() == selected
+    win.navigate("standards")
+    win.standard_table.selectRow(0)
+    win.show_standard_detail()
+    click_navigation(win, "standards")
+    assert win.pages.currentWidget() is win.page_widgets["standards"]
+    calls = []
+    navigate = win.navigate
+    def spy(key):
+        calls.append(key)
+        navigate(key)
+    monkeypatch.setattr(win, "navigate", spy)
+    click_navigation(win, "records")
+    assert calls == ["records"]
+    calls.clear()
+    click_navigation(win, "import")
+    assert calls == []
+    win.navigation.setFocus()
+    win.navigation.setCurrentRow(4)  # 键盘导航仍经过 currentRowChanged。
+    QTest.keyClick(win.navigation, Qt.Key_Up)  # 跳过禁用的导入，进入新建。
+    assert win.pages.currentWidget() is win.page_widgets["evaluation"]
+
+
+def test_record_columns_fit_reference_window_and_wrap_long_names(records):
+    _, win = records
+    win.resize(1440, 900)
+    win.navigate("records")
+    QApplication.processEvents()
+    table = win.record_table
+    table.item(0, 0).setText("企业名称很长需要换行" * 6)
+    table.item(0, 2).setText("GB 29446—2019 选煤电力消耗限额" * 4)
+    table.fit_columns()
+    QApplication.processEvents()
+    assert sum(table.columnWidth(i) for i in range(7)) <= table.viewport().width()
+    assert table.horizontalScrollBar().maximum() == 0
+    assert table.columnWidth(6) >= 88
+    assert table.rowHeight(0) > 60
+    assert table.rowHeight(0) >= table.sizeHintForRow(0)
+    button = table.cellWidget(0, 6)
+    assert table.viewport().rect().contains(button.geometry())
+    win.resize(900, 600)
+    QApplication.processEvents()
+    assert table.horizontalScrollBar().maximum() > 0
+    assert table.columnWidth(6) >= 88

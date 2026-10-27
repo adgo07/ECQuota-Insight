@@ -20,7 +20,71 @@
     }
   ],
   "native_dpi_acceptance": false,
-  "captures": [],
+  "captures": [
+    {
+      "file": "native150/form-bottom.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "782cf028946365b864978c3da5fa00691e75d5ec2985a8b7583bbaaf37b011b6"
+    },
+    {
+      "file": "native150/form.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "cbda0d9afd6cb7a3c845506c62b94b912d6ecbcdb222678fde725626294d249e"
+    },
+    {
+      "file": "native150/home.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "50e009f3c66d7e540c4a0476cb29133e3a14d215b98901eebbfb8e414754aeb0"
+    },
+    {
+      "file": "native150/record-inputs.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "507ca2232c4c096613304bb49a5fc602e0668729474b44c59e3cbb73c1bbbf51"
+    },
+    {
+      "file": "native150/record-result.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "cf9af76b34a2913867027dccbd963015a060e4e9e5d1b6fc6e8881b4e057b74a"
+    },
+    {
+      "file": "native150/records-search.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "688af5dc1b10e7839825198ae54c319a07d20bb339e7c557fe6faf92660006d1"
+    },
+    {
+      "file": "native150/records.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "648e936fc6c05a24287b24fdd4209a52b72620873ad8bafcca6a1d2d8bdccd57"
+    },
+    {
+      "file": "native150/settings-advanced.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "cb99c7a5c8e1393020397f7f4f3759be63a7524514da85dbf635678960ce3d0c"
+    },
+    {
+      "file": "native150/settings.jpg",
+      "format": "JPEG",
+      "width": 1259,
+      "height": 655,
+      "sha256": "3d47f307be0fce4f7869e01716e07b906d58d7c9d4daadb7ce93b1581dcfdbe5"
+    }
+  ],
   "scale_overrides": {
     "QT_SCALE_FACTOR": null,
     "QT_SCREEN_SCALE_FACTORS": null,
@@ -30,5 +94,7 @@
   "window_logical_size": [
     1256,
     624
-  ]
+  ],
+  "capture_source": "历史原生 Windows Computer Use 窗口捕获；仅纠正扩展名并登记既有图像，未重新采集或重编码。",
+  "capture_revision": "ced969a3d50581f95320bcd61ddbbad6f7f74d88 交付中的历史证据；非本轮返修版截图"
 }

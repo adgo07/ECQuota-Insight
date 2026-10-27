@@ -6,6 +6,7 @@ import logging
 import os
 from pathlib import Path
 import platform
+import subprocess
 import sys
 import tempfile
 
@@ -15,6 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--interactive", action="store_true")
+    parser.add_argument("--revision-evidence", action="store_true", help="额外采集返修结果定位及异常状态证据")
     parser.add_argument("--output", type=Path, default=ROOT / "docs/ui/screenshots/phase2")
     args = parser.parse_args()
     if not args.interactive:
@@ -61,6 +63,8 @@ def main():
                     "geometry": [s.geometry().width(),s.geometry().height()], "available": [s.availableGeometry().width(),s.availableGeometry().height()]} for s in app.screens()]
         environment = {"platform": app.platformName(), "python": platform.python_version(), "pyside6": qt_version,
             "isolated_data": True, "records": 225, "screens": screens, "native_dpi_acceptance": False, "captures": captures}
+        environment["source_head"] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+        environment["source_dirty"] = bool(subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT, text=True).strip())
         environment["scale_overrides"] = {name: os.environ.get(name) for name in ("QT_SCALE_FACTOR", "QT_SCREEN_SCALE_FACTORS", "QT_FONT_DPI")}
         if sys.platform == "win32" and args.interactive:
             import ctypes
@@ -98,6 +102,30 @@ def main():
             shot("settings-900")
             win.navigate("home")
             shot("home-900")
+            if args.revision_evidence:
+                from uebench.domain.models import Grade
+                for size in ((1440, 900), (900, 600)):
+                    win.resize(*size)
+                    win.start_formal_evaluation()
+                    win.gb29446_coal_type.setCurrentText("炼焦煤")
+                    win.gb29446_process.setCurrentIndex(win.gb29446_process.findData("重介、浮选联合"))
+                    win.gb29446_electricity.setText("8000000")
+                    win.gb29446_raw_coal.setText("1000000")
+                    win.calculate_button.click()
+                    shot(f"success-result-{size[0]}")
+                for grade, name in ((Grade.INCOMPLETE, "incomplete"), (Grade.NOT_APPLICABLE, "not-applicable")):
+                    saved = result.model_copy(deep=True, update={"evaluation_id": name})
+                    saved.results[0].grade = grade
+                    saved.results[0].actual_value = None
+                    special_request = request.model_copy(deep=True, update={"organization_name": "A<b>x</b>B & 保存的企业名称"})
+                    context.evaluations.save(special_request, saved, standard)
+                    win.resize(1440, 900)
+                    win.navigate("records")
+                    win.record_status_filter.setCurrentText("不完整" if grade is Grade.INCOMPLETE else "不适用")
+                    shot(name + "-list-1440")
+                    win.view_record(name)
+                    shot(name + "-detail-1440")
+                environment["records"] = context.application.count_evaluations()
             environment["captures"] = captures
             (args.output / "capture-environment.json").write_text(json.dumps(environment,ensure_ascii=False,indent=2),encoding="utf-8")
         win.close()

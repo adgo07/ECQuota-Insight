@@ -51,5 +51,17 @@
   "capture_size": {
     "width": 1259,
     "height": 655
-  }
+  },
+  "captures": [
+    "form-bottom.jpg",
+    "form.jpg",
+    "home.jpg",
+    "record-inputs.jpg",
+    "record-result.jpg",
+    "records-search.jpg",
+    "records.jpg",
+    "settings-advanced.jpg",
+    "settings.jpg"
+  ],
+  "format_correction": "9张既有JPEG仅由.png改名.jpg，字节SHA256不变；非返修版采集。"
 }

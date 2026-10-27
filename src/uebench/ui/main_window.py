@@ -15,6 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 from PySide6.QtCore import QDate, Qt, QUrl, QSize, QTimer
 from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QPainter
 from PySide6.QtSvg import QSvgRenderer
+from .record_table import RecordTable
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -458,6 +459,7 @@ class MainWindow(QMainWindow):
         # 第 0 页，首页刷新与就绪检查都由 refresh_all 完成）。
         self.navigation.setCurrentRow(0)
         self.navigation.currentRowChanged.connect(self._page_changed)
+        self.navigation.itemClicked.connect(self._navigation_clicked)
         self.sidebar.hide()
         self.refresh_all()
 
@@ -501,12 +503,12 @@ class MainWindow(QMainWindow):
             self.refresh_settings()
         self.refresh_formal_evaluation_readiness()
 
-    def _page(self, title: str) -> tuple[QWidget, QVBoxLayout]:
+    def _page(self, title: str, label: QLabel | None = None) -> tuple[QWidget, QVBoxLayout]:
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(24, 20, 24, 20)
         layout.setSpacing(14)
-        label = QLabel(title)
+        label = label if label is not None else QLabel(title)
         label.setWordWrap(True)
         label.setProperty("class", "pageTitle")
         layout.addWidget(label)
@@ -659,11 +661,11 @@ class MainWindow(QMainWindow):
         return page
 
     def _build_standard_detail(self) -> QWidget:
-        page, layout = self._page("标准详情")
+        self.standard_detail_title = QLabel("标准详情")
+        page, layout = self._page("标准详情", self.standard_detail_title)
         back = QPushButton("返回标准库")
         back.clicked.connect(lambda: self.navigate("standards"))
         layout.insertWidget(0, back, 0, Qt.AlignmentFlag.AlignLeft)
-        self.standard_detail_title = layout.itemAt(1).widget()
         actions = QHBoxLayout()
         actions.addStretch()
         self.standard_official_status = QLabel(NO_OFFICIAL_SOURCE_LABEL)
@@ -987,7 +989,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.generic_result_section, 1)
 
         self.gb29446_result_section, gb_result_section_layout = self._card()
-        result_heading = QLabel("对标结果")
+        self.gb29446_result_heading = result_heading = QLabel("对标结果")
         result_heading.setProperty("class", "sectionTitle")
         gb_result_section_layout.addWidget(result_heading)
         self.gb29446_result_card = QFrame()
@@ -1102,7 +1104,7 @@ class MainWindow(QMainWindow):
         self.record_search.setPlaceholderText("搜索全部记录的企业、标准或历史业务文本")
         self.record_search.setClearButtonEnabled(True)
         self.record_status_filter = QComboBox()
-        self.record_status_filter.addItems(["全部结果状态", "1级", "2级", "3级", "未达3级", "无法判定", "分项结果", "记录损坏"])
+        self.record_status_filter.addItems(["全部结果状态", "1级", "2级", "3级", "未达3级", "不完整", "不适用", "无法判定", "分项结果", "记录损坏"])
         self.record_search_timer = QTimer(self)
         self.record_search_timer.setSingleShot(True)
         self.record_search_timer.setInterval(200)
@@ -1125,14 +1127,12 @@ class MainWindow(QMainWindow):
         actions.addStretch()
         actions.addWidget(delete)
         layout.addLayout(actions)
-        self.record_table = QTableWidget(0, 7)
+        self.record_table = RecordTable(0, 7)
         self.record_table.setHorizontalHeaderLabels(["企业名称", "统计期", "标准", "核心结果", "结果状态", "评价时间", "操作"])
         self._configure_table(self.record_table)
         self.record_table.setWordWrap(True)
         self.record_table.horizontalHeader().setStretchLastSection(False)
         self.record_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        for column, width in enumerate((170, 140, 290, 170, 110, 195, 85)):
-            self.record_table.setColumnWidth(column, width)
         self.record_table.verticalHeader().setDefaultSectionSize(60)
         self.record_table.itemDoubleClicked.connect(lambda *_: self.view_selected_record())
         self.record_table.itemActivated.connect(lambda *_: self.view_selected_record())
@@ -1191,6 +1191,18 @@ class MainWindow(QMainWindow):
         table.insertRow(row)
         for column, value in enumerate(values):
             table.setItem(row, column, _item(value))
+
+    def _navigation_clicked(self, item: QListWidgetItem) -> None:
+        key = item.data(Qt.ItemDataRole.UserRole)
+        # 行变化已通过 currentRowChanged 导航；仅补当前父入口的重复点击。
+        if item.flags() & Qt.ItemFlag.ItemIsEnabled and self.pages.currentWidget() is not self.page_widgets.get(key):
+            self.navigate(key)
+
+    def _scroll_to_gb29446_result(self) -> None:
+        content = self.evaluation_scroll.widget()
+        content.layout().activate()
+        heading_y = self.gb29446_result_heading.mapTo(content, self.gb29446_result_heading.rect().topLeft()).y()
+        self.evaluation_scroll.verticalScrollBar().setValue(max(0, heading_y - 18))
 
     def _page_changed(self, index: int) -> None:
         if index < 0:
@@ -2336,6 +2348,7 @@ class MainWindow(QMainWindow):
                     "输入数据未通过校验，未生成电耗等级。请查看评价结果中的提示并修正。",
                 )
                 return
+            QTimer.singleShot(0, self._scroll_to_gb29446_result)
             message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "评价完成，已生成评价记录。"
             QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
             return
@@ -2524,6 +2537,7 @@ class MainWindow(QMainWindow):
             self.record_table.setCellWidget(row, 6, button)
             if record.evaluation_id == selected:
                 self.record_table.selectRow(row)
+        self.record_table.fit_columns()
         self.record_table.verticalScrollBar().setValue(scroll)
         pages = max(1, (result.total + result.page_size - 1) // result.page_size)
         self.record_count_label.setText(f"共 {result.total} 条 · 第 {result.page} / {pages} 页" if result.total else "没有匹配记录" if self.record_search.text() or self.record_status_filter.currentIndex() else "暂无对标记录")

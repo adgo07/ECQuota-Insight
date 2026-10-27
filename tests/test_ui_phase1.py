@@ -6,6 +6,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QMessageBox, QTabWidget
 from uebench.bootstrap import create_context
@@ -208,3 +209,26 @@ def test_historical_catalogue_entry_is_reachable_by_status(window):
     window.standard_status_filter.setCurrentText("历史/已替代")
     assert window.standard_table.rowCount() == 1
     assert window.standard_table.item(0, 0).data(Qt.UserRole) == "history-fixture"
+
+
+@pytest.mark.parametrize("size", [(1440, 900), (900, 600)])
+def test_calculation_scrolls_to_heading_and_core_result_only_on_success(window, size):
+    window.resize(*size)
+    fill_and_calculate(window)
+    for _ in range(4):
+        QApplication.processEvents()
+    viewport = window.evaluation_scroll.viewport()
+    for widget in (window.gb29446_result_heading, window.gb29446_result_ed, window.gb29446_result_grade):
+        position = widget.mapTo(viewport, QPoint(0, 0))
+        assert position.y() >= 0
+        assert position.y() + widget.height() <= viewport.height()
+    assert window.context.application.count_evaluations() == 1
+    window.gb29446_electricity.setText("0")
+    assert window.last_result_id is None
+    assert not window.gb29446_view_record.isEnabled()
+    window.calculate_button.click()
+    QApplication.processEvents()
+    position = window.gb29446_electricity.mapTo(viewport, QPoint(0, 0))
+    assert 0 <= position.y() < viewport.height()
+    assert window.gb29446_electricity.hasFocus()
+    assert window.context.application.count_evaluations() == 1
