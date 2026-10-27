@@ -107,7 +107,8 @@ def main() -> int:
     except (SelfCheckError, OSError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    print(report)
+    # stdout 是给 PowerShell 的机器接口：仅发 ASCII，避免双方代码页不同损坏中文路径。
+    print(json.dumps({"report_path": str(report)}, ensure_ascii=True))
     return 0
 
 

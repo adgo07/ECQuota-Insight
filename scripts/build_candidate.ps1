@@ -226,10 +226,10 @@ if (-not (Test-Path -LiteralPath $SelfCheckExe -PathType Leaf)) {
 }
 # Python 只等待自己启动的 EXE，有界超时；独立 TEMP/TMP/数据及报告、日志由工具管理。
 # 避免 Start-Process -Wait 在受限 Windows job 中等待无关进程而停滞。
-$SelfCheckReport = (& $PythonExe (Join-Path $ProjectRoot "tools\run_candidate_self_check.py") `
+$SelfCheckOutput = (& $PythonExe (Join-Path $ProjectRoot "tools\run_candidate_self_check.py") `
     --project-root $ProjectRoot --exe $SelfCheckExe --timeout-seconds 120)
 if ($LASTEXITCODE -ne 0) { throw "打包 EXE 自检失败；报告与日志目录见上述工具输出。" }
-$SelfCheckReport = ([string]$SelfCheckReport).Trim()
+$SelfCheckReport = ([string](($SelfCheckOutput -join [Environment]::NewLine) | ConvertFrom-Json).report_path).Trim()
 if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) {
     throw "打包 EXE 自检未生成报告：$SelfCheckReport"
 }

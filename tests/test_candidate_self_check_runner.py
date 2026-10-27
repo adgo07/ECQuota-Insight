@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -135,3 +136,56 @@ def test_each_attempt_keeps_distinct_evidence(tmp_path):
     second = run_self_check(command, root, timeout_seconds=10)
     assert first != second
     assert first.exists() and second.exists()
+
+
+@pytest.mark.parametrize('shell_name', ['pwsh', 'powershell'])
+@pytest.mark.parametrize('io_encoding', [None, 'cp936'])
+def test_powershell_pipeline_decodes_chinese_report_path_without_utf8_environment(
+    tmp_path, shell_name, io_encoding
+):
+    shell = shutil.which(shell_name)
+    if shell is None:
+        pytest.skip(f'{shell_name} 不可用')
+    root, command = probe(tmp_path, 'success')
+    repo = Path(__file__).resolve().parents[1]
+    # CLI 固定接收 EXE，不接收脚本参数。测试只将子进程命令替换为真实 Python 探针；
+    # main() 的参数解析、报告验证、stdout JSON 协议和 PowerShell 管道均实际执行。
+    shim = root / '进程探针入口.py'
+    shim.write_text(
+        'import sys\n'
+        f'sys.path.insert(0, {str(repo)!r})\n'
+        'import tools.run_candidate_self_check as runner\n'
+        'original = runner.run_self_check\n'
+        'def run_probe(command, project_root, *, timeout_seconds):\n'
+        f'    return original({command!r}, project_root, timeout_seconds=timeout_seconds)\n'
+        'runner.run_self_check = run_probe\n'
+        'raise SystemExit(runner.main())\n',
+        encoding='utf-8',
+    )
+    script = root / '管道集成.ps1'
+    # 与正式脚本相同的 JSON 解码表达式，验证得到的路径可 Test-Path 且报告可读。
+    script.write_text(r'''
+param($PythonExe, $Shim, $ProjectRoot)
+$ErrorActionPreference = 'Stop'
+$SelfCheckOutput = (& $PythonExe $Shim --exe $PythonExe --project-root $ProjectRoot --timeout-seconds 10)
+if ($LASTEXITCODE -ne 0) { throw 'runner failed' }
+if (($SelfCheckOutput -join '') -match '[^\x00-\x7f]') { throw 'stdout must be ASCII' }
+$SelfCheckReport = ([string](($SelfCheckOutput -join [Environment]::NewLine) | ConvertFrom-Json).report_path).Trim()
+if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) { throw 'report path corrupted' }
+$report = Get-Content -LiteralPath $SelfCheckReport -Raw -Encoding UTF8 | ConvertFrom-Json
+if ($report.schema -ne 'uebench.self-check-report' -or $report.overall_status -ne 'passed') { throw 'report unreadable' }
+Write-Output 'PIPELINE_PASS'
+''', encoding='utf-8-sig')
+    environment = os.environ.copy()
+    environment.pop('PYTHONUTF8', None)
+    environment.pop('PYTHONIOENCODING', None)
+    if io_encoding is not None:
+        environment['PYTHONIOENCODING'] = io_encoding
+    result = subprocess.run(
+        [shell, '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File',
+         str(script), PROBE_PYTHON, str(shim), str(root)],
+        env=environment, capture_output=True, timeout=30,
+    )
+    assert result.returncode == 0, repr(result.stderr)
+    assert b'PIPELINE_PASS' in result.stdout
+    assert (evidence(root) / 'report.json').exists()
