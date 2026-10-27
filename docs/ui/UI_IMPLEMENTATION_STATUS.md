@@ -1,6 +1,6 @@
 # UI 实施状态与第二阶段交接
 
-日期：2026-10-27。状态：**两阶段已通过原设计会话独立复核，已获准进入 GitHub 草稿 PR 交付；等待用户最终验收。** 实现证据见第 7 节，独立复核及交付基准见第 8 节，第 2～6 节保留第一阶段历史。
+日期：2026-10-27。状态：**PR #33 用户独立验收提出小范围返修，已完成本地修复，等待原设计会话复验；本轮暂不推送。** 当前返修见第 9 节，第 2～8 节保留原阶段证据。
 
 ## 1 分支、基线与平台 / Contract 预检查
 
@@ -195,7 +195,7 @@ git diff --check
 | 只读详情两页签 | `record-result-1440.png`、`record-inputs-1440.png` |
 | 设置默认 / 高级展开 | `settings-1440.png`、`settings-advanced-1440.png` |
 | 900×600 补充 | `records-900.png`、`record-900.png`、`settings-900.png`、`home-900.png` |
-| 原生 Windows 150% | `native150/home.png`、`records.png`、`records-search.png`、`record-result.png`、`record-inputs.png`、`settings.png`、`settings-advanced.png`、`form.png`、`form-bottom.png`（均在 native150 子目录） |
+| 原生 Windows 150% | `native150/home.jpg`、`records.jpg`、`records-search.jpg`、`record-result.jpg`、`record-inputs.jpg`、`settings.jpg`、`settings-advanced.jpg`、`form.jpg`、`form-bottom.jpg`（均在 native150 子目录） |
 | 环境与限制 | `capture-environment.json`、`native-environment.json`、`native150/observation.json` |
 
 离屏图由真实 Qt 控件、225 条临时隔离保存快照生成；1440×900 与 900×600，DPR 1.0，不作为原生 DPI 通过证据。最终图已检查。
@@ -237,3 +237,44 @@ git diff --check
 交付前实际核对：origin 为 `https://github.com/adgo07/ECQuota-Insight.git`，分支 `ui/phase1-qingzhou`，工作区干净；fetch 后 `origin/main` 仍为 **`cdc89c12b0b7ea6791568838fbb382cb76842002`**，即本轮开工基线，无新增 main 变更需协调。提交本交付文档后，仅正常推送当前开发分支，不强推、不改 main。PR URL、最终精确 head 与该 head 的 CI 结果以本执行会话交付报告及所挂 PR 为准，避免为了回写动态 CI 状态反复改变已验提交。
 
 平台 / Contract 预检查复用第 1 节真实基线：Frozen lock `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，ACTIVE UI 检查基线 `a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`；本次仅文档和 PR 交付，不升级 lock、不改公共语义、软件解释或标准支持状态。现有 PR Gate、Numeric v1 与 N01-A 适用 CI 由 PR 自然触发，未要求发布或 Candidate workflow。等待原设计会话核实 PR/CI 后交用户验收；不合并、不发布、不覆盖安装产品或用户数据。
+
+
+## 9 PR #33 独立验收后的本地返修（2026-10-27）
+
+输入为用户两份独立验收意见，以及设计会话在 `ced969a3d50581f95320bcd61ddbbad6f7f74d88` 的代码与真实 QTest 点击复现确认。沿用现有分支和唯一状态文件，不回写“用户验收通过”。按设计会话确认范围处理六项，暂不推送、更新 PR 或构建可试用包；先交设计会话复验。
+
+**平台 / Contract 预检查：** 本地确认 origin 为 `https://github.com/adgo07/ECQuota-Insight.git`，分支 `ui/phase1-qingzhou`，开工 HEAD `ced969a3d50581f95320bcd61ddbbad6f7f74d88`，工作区干净；fetch 后 main 仍为 `cdc89c12b0b7ea6791568838fbb382cb76842002`。重读现行中央 GUIDE_INDEX 及路由的家族规格、指南 v0.2、验收清单，文件 blob 分别为 `658b3df9569e2956ff7b9060dab0d1bd0fa2bd58`、`0efede55f8b2e7856df778a61f0308fa621226b7`、`532c0edd2ee2349620c77472f8e9227440b29722`、`71c4712a0bdb6ba3bd4153f99eccd031c8dbf134`。Frozen lock 仍为 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture 2.1、Numeric Contract/Profile/Conformance v1 不变。MUST 保留 Decimal 全值判定、历史快照和正式选煤范围；MUST NOT 修改 Calculator、数值、批准映射、Schema、支持状态及软件解释。无新增公共 Contract 冲突或相关 Standard Issue，不需中央修改，本任务不涉及中央公共 Contract。
+
+最终实现提交 **`93c46e8cfbc4a62ca07bb3b7e2bf791c74703834`**，前置修复提交 `27c81549f25f5f5e55803d9cbcedbda53b6b2f9d`；后续仅本节与截图证据。改动如下：
+
+| 验收项 | 修复与保护 |
+|---|---|
+| 保存状态 | `record_query.py` 移除把 INCOMPLETE/NOT_APPLICABLE 改为无法判定的覆盖，沿用既有“不完整”“不适用”；筛选补齐，两种保存状态的列表、计数、筛选和详情一致。空结果仍无法判定，多分项策略不变 |
+| 结果定位 | 正常成功后排队按结果标题定位滚动条，使标题与首屏核心值可见；不对整个高结果块做 ensureWidgetVisible。1440×900 / 900×600 验证一次成功只保存一条，失败仍定位输入错误，修改输入仍失效旧结果。保留成功弹窗 |
+| 侧栏返回 | 补 itemClicked 处理仅在当前页面不是目标父列表时导航，保留 currentRowChanged 键盘逻辑。真实 QTest.mouseClick 覆盖记录/标准详情重复点击、上下文、普通切页单次导航及禁用项 |
+| 企业名标题 | RecordDetailPage.title 明确 PlainText，`A<b>x</b>B & 特殊企业` 原样显示；保存快照逐字节模型序列化前后相同，禁止计算器和当前规则读取后仍可查询与查看 |
+| 表格宽度/行高 | 新轻量 `ui/record_table.py` 对企业、标准列弹性分配，操作列至少 88；1440 无横滚，900 保留横滚。长中文按实际列宽测量完整文字高度，行高随内容增长，避免默认 Qt 末行省略；真实图和尺寸断言复核 |
+| 证据格式 | native150 九张既有 JPEG 仅改名 .jpg，无重编码，SHA256 不变。原生环境清单 `docs/ui/screenshots/phase2/native-environment.json` 已登记九张的真实路径、JPEG 格式、既有尺寸及哈希，observation 同步；保留历史采集环境，不冒充返修图 |
+
+维护性清理仅去掉两处与 GRADE_LABELS 重复的 NOT_QUALIFIED 赋值（冗余赋值，不称不可达代码），用命名 grade_basis 替代历史详情 basic[:5]/basic[7:]，标准详情标题在创建时持有明确引用。未开展第二标准扩展、高级区美化或成功弹窗策略调整。未接触用户数据库、已安装产品或 `UI测试版_ced969a3` 数据。
+
+**测试与日志：** Python 3.13.17 / PySide6 6.10.1，仍使用本项目 `work/venv313`。相关定向组 78 passed（`work/pr33-rework-affected.log`）；长文本高度最终修正后记录查询与第一阶段 UI 23 passed（`work/pr33-rework-final-targeted.log`）；源码门禁 168 passed（`work/pr33-rework-source.log`，此前 167 随新增 UI 模块增加一项源码检查）；编译和 diff 格式检查通过。以上组有重叠，不相加。
+
+最终完整回归命令：
+
+```powershell
+& .\work\venv313\Scripts\python.exe -m pytest -ra --tb=short -p no:cacheprovider --basetemp work/pr33-rework-final-full
+# 1149 passed, 66 skipped, 2 warnings in 303.66s (0:05:03)
+```
+
+最终完整回归 0 失败；66 项跳过仍含未提供 Candidate、旧归档及符号链接环境，两个 warning 仍为重复 ZIP 成员样例与 Windows junction 样例输出线程解码警告，未隐藏。日志 `work/pr33-rework-final-full.log`。前一完整运行 `work/pr33-rework-full.log` 在长文本截图暴露 Qt 默认行高仍省略末行后主动中止，未列为通过；补修、定向复验后才执行上述最终一次完整回归。新增六个有效测试实例覆盖两种保存异常状态、真实侧栏点击、表格宽窄/长文本及两尺寸结果定位；不删保护断言、不改版本要求。当前未推送，旧 head 三项远端 CI 通过不作为本返修提交 CI 证据；复验授权后更新同一 PR 才触发现有 PR Gate/Numeric v1/N01-A，仍不触发发布或 Candidate。
+
+**返修截图：** 绝对目录 `D:\project\能耗限额\ECQuota-Insight\docs\ui\screenshots\pr33-rework`，均为真实 Qt offscreen / DPR 1.0 / Python 3.13.17 的隔离数据。`capture-environment.json` 标记源码精确 head `93c46e8cfbc4a62ca07bb3b7e2bf791c74703834`；source_dirty=true 如实保留，待提交为状态文档与图片证据，源码/测试/工具与该提交一致。225 初始示例，加两次独立成功计算及两种异常保存示例，最终 229 条，不是用户数据。
+
+- `success-result-1440.png`、`success-result-900.png`：成功后实际滚动位置，标题/单耗/等级可见。
+- `records-1440.png`、`records-900.png`：参考宽窗直接使用操作列、窄窗表内横滚；`records-long-names-1440.png` 专用长名称隔离样例，完整换行和增高行可见，fixture 说明登记在清单。
+- `incomplete-list-1440.png`、`incomplete-detail-1440.png`、`not-applicable-list-1440.png`、`not-applicable-detail-1440.png`：状态区分、详情一致及带尖括号/&的原文标题。另保留同工具生成的详情/设置等补充图，均有清单。
+
+这些是新返修版布局证据，已目视检查代表图；`phase2/native150/*.jpg` 是旧交付历史原生图，不是本轮修复后证据。真实输入法预编辑、原生下拉弹层、125%/跨屏及安装版仍未验证，本轮未重做原生 150% 检查，不由离屏图推断通过。PR 当前链接固定旧 head，因此仍保留其原有有效 .png 路径；待复验后推送时同步换为新 head 的 .jpg 和返修截图链接，避免当前生成不存在的远端链接。
+
+本轮等待设计会话独立复验；未推送、未合并、未发布，尚非用户最终验收通过。
