@@ -166,3 +166,54 @@ def test_frozen_browser_environment_is_restored(monkeypatch, tmp_path, raise_ins
         assert raise_inside
     assert os.environ["PATH"] == previous_path
     assert current_directory() == before
+
+
+@pytest.mark.parametrize("width", [1180, 1256, 1440])
+def test_exact_long_name_cell_matches_unclipped_delegate_render(records, width, tmp_path):
+    from PySide6.QtCore import QRect
+    from PySide6.QtGui import QImage, QPainter
+    from PySide6.QtWidgets import QStyleOptionViewItem, QStyle
+    _, win = records
+    win.resize(900, 600)
+    win.navigate("records")
+    QApplication.processEvents()
+    table = win.record_table
+    # 与 records-long-1256.png 完全相同的两个保存展示值。
+    table.item(0, 0).setText("长企业名称换行检查：" + "青舟选煤示例企业" * 6)
+    table.item(0, 2).setText("GB 29446-2019 选煤电力消耗限额长名称检查：" + "保存的标准名称" * 6)
+    table.fit_columns()
+    QApplication.processEvents()
+    # 与截图工具相同：先在900窄窗载入长记录，再扩展到目标宽度。
+    win.resize(width, 760 if width != 1256 else 624)
+    for _ in range(4):
+        QApplication.processEvents()
+    assert table.rowHeight(1) == 44
+    assert table.font().pixelSize() == 13
+    for column in (0, 2):
+        index = table.model().index(0, column)
+        delegate = table.itemDelegateForIndex(index)
+        option = QStyleOptionViewItem()
+        table.initViewItemOption(option)
+        delegate.initStyleOption(option, index)
+        option.state &= ~(QStyle.State_HasFocus | QStyle.State_Selected)
+        # 保留实际垂直居中、内边距和省略行为；不能改成顶对齐后漏掉末行省略。
+        def render(height):
+            image = QImage(table.columnWidth(column), height, QImage.Format_ARGB32)
+            image.fill(Qt.white)
+            option.rect = QRect(0, 0, image.width(), height)
+            painter = QPainter(image)
+            delegate.paint(painter, option, index)
+            painter.end()
+            return image
+        actual = render(table.rowHeight(0))
+        reference = render(table.rowHeight(0) + 400)
+        actual.save(str(tmp_path / f"actual-{width}-{column}.png"))
+        reference.save(str(tmp_path / f"reference-{width}-{column}.png"))
+        def text_ink(image):
+            points = [(x, y) for y in range(image.height()) for x in range(image.width()) if image.pixelColor(x, y) != Qt.white]
+            assert points
+            left, right = min(x for x,y in points), max(x for x,y in points)
+            top, bottom = min(y for x,y in points), max(y for x,y in points)
+            return image.copy(left, top, right-left+1, bottom-top+1)
+        # 去掉纯空白的居中位置差异，完整字形必须与足够高的真实delegate绘制相同。
+        assert text_ink(actual) == text_ink(reference)

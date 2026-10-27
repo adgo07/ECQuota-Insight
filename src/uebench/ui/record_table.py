@@ -1,6 +1,6 @@
 """记录列表按可用宽度分配长文本列；窄窗保留表内横向滚动。"""
 from PySide6.QtCore import Qt, QRect
-from PySide6.QtWidgets import QTableWidget
+from PySide6.QtWidgets import QTableWidget, QStyleOptionViewItem, QStyle
 
 
 class ResponsiveTable(QTableWidget):
@@ -37,15 +37,25 @@ class ResponsiveTable(QTableWidget):
         self.resizeRowsToContents()
         for row in range(self.rowCount()):
             height = max(44, self.rowHeight(row))
-            # Qt 的默认 sizeHint 会省略长中文的末行；按实际列宽测量完整正文。
+            # 仅长文本使用实际delegate字体/文字区域，并留一行安全余量。
+            # 默认sizeHint与整列字体测量会遗漏居中绘制的最后一行；普通行保持44。
             for column in range(self.columnCount()):
                 item = self.item(row, column)
                 if item:
-                    rect = self.fontMetrics().boundingRect(
-                        QRect(0, 0, max(1, widths[column] - 16), 100000),
-                        Qt.TextFlag.TextWordWrap, item.text(),
+                    index = self.model().index(row, column)
+                    option = QStyleOptionViewItem()
+                    self.initViewItemOption(option)
+                    self.itemDelegateForIndex(index).initStyleOption(option, index)
+                    option.rect = QRect(0, 0, widths[column], self.rowHeight(row))
+                    text_rect = self.style().subElementRect(QStyle.SubElement.SE_ItemViewItemText, option, self)
+                    text_width = max(1, min(text_rect.width(), widths[column] - 16))
+                    if option.fontMetrics.horizontalAdvance(item.text()) <= text_width and "\n" not in item.text():
+                        continue
+                    rect = option.fontMetrics.boundingRect(
+                        QRect(0, 0, text_width, 100000), Qt.TextFlag.TextWordWrap, item.text(),
                     )
-                    height = max(height, rect.height() + 16)
+                    padding = max(16, option.rect.height() - text_rect.height())
+                    height = max(height, rect.height() + padding + option.fontMetrics.lineSpacing())
             self.setRowHeight(row, height)
 
 
