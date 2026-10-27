@@ -19,6 +19,8 @@ from uuid import uuid4
 
 from alembic.script import ScriptDirectory
 
+from uebench.application.backup_errors import BackupValidationError, RestoreSafetyError
+
 from .backup_paths import (
     PRE_MIGRATION_PREFIX,
     PRE_PACKAGE_PREFIX,
@@ -54,22 +56,6 @@ logger = logging.getLogger(__name__)
 #: first lets a non-SQLite payload be rejected with a precise Chinese message
 #: instead of a raw ``sqlite3.DatabaseError`` from deep inside the API.
 SQLITE_MAGIC = b"SQLite format 3\x00"
-
-
-class BackupValidationError(ValueError):
-    pass
-
-
-class RestoreSafetyError(BackupValidationError):
-    """恢复操作的安全条件不满足，或切换之后的步骤失败（活库始终受保护）。
-
-    恢复链在覆盖活库**之前**的拒绝（排他条件拿不到、容器/数据库校验不通过）
-    与切换**之后**的失败（初始化、应用数据合并）都会走到这里。两类情况的共同
-    契约是：**活库内容要么完全未改变，要么已自动回滚成恢复前状态**，并带一条
-    能直接显示给用户的中文消息。继承 ``BackupValidationError`` 是为了让既有的
-    ``pytest.raises(BackupValidationError)`` 与 UI 的 ``_friendly_error`` 中文
-    前缀继续成立。
-    """
 
 
 def _sha256(path: Path) -> str:
