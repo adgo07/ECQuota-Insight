@@ -62,16 +62,6 @@
       "height": 600
     },
     {
-      "file": "records-long-1256.png",
-      "width": 1256,
-      "height": 624
-    },
-    {
-      "file": "records-long-1180.png",
-      "width": 1180,
-      "height": 760
-    },
-    {
       "file": "settings-1256.png",
       "width": 1256,
       "height": 624
@@ -103,5 +93,7 @@
     "QT_SCALE_FACTOR": null,
     "QT_SCREEN_SCALE_FACTORS": null,
     "QT_FONT_DPI": null
-  }
+  },
+  "long_text_followup_environment": "long-text-capture-environment.json",
+  "superseded_long_captures_note": "两张旧长名称图已由后续e53ebb5重现，并补1440；其余截图保持本清单1425241来源。"
 }
