@@ -40,7 +40,11 @@
 
 当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = NOT STARTED。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
 
-**2026-10-27 当前交接：**[PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并到 main（`77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`）。统一 UI、固定选煤单页、自动保存快照、记录全库分页与只读两页签详情、设置、紧凑表格及长名称返修已进入源码；官方原文请求后反馈无法确认网页呈现，并可复制地址。用户操作以[用户手册](docs/用户手册.md)为准，实施历史见[UI 状态](docs/ui/UI_IMPLEMENTATION_STATUS.md)。
+**2026-10-27 候选实测后续交接：**`rc-3bfbbeb`（干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2`）完整回归 1183 passed / 66 skipped、Artifact Gate 63 passed，EXE／隔离启动器各 6 项自检通过；设计已独立核三资产哈希、326 载荷、身份及 CRC。C 已在该包实测 Win11 原生 150%、保存重启／快照与 Word、225 条分页／损坏隔离、备份恢复；DOCX 只在 LibreOffice Writer 实开，不称 MS Word／WPS 通过。证据入口集中在[RS05 报告末节](docs/governance/RS05_EXECUTION_REPORT.md)。
+
+C-DEF-001／002 两处提示问题已由审核源码 `96aa3cb0b69e55c069dc692c8def74c39cb75656` 修复；设计反馈独立 66 项与 B 定向 70 项通过。新包尚未构建、C 尚未原生复验，两项保持“源码已修，实包待验”。最终包须纳入本次经审核文档后锁定实际干净 SHA，不预设 SHA，不把旧 `3bfbbeb` 全套移作新源码或新包结论。真实安装／升级／卸载、离线、Win10、其他 DPI／跨屏、真实 IME、MS Word／WPS 等仍缺证。RS05 仍 IN PROGRESS／未发布；本线不推送、合并或发布，不开发水泥，Excel 正式流程延期。以下首轮缺口按此精确版本进度补充。
+
+**2026-10-27 首轮交接：**[PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并到 main（`77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`）。统一 UI、固定选煤单页、自动保存快照、记录全库分页与只读两页签详情、设置、紧凑表格及长名称返修已进入源码；官方原文请求后反馈无法确认网页呈现，并可复制地址。用户操作以[用户手册](docs/用户手册.md)为准，实施历史见[UI 状态](docs/ui/UI_IMPLEMENTATION_STATUS.md)。
 
 源码 UI 已有 Win11 原生 150%／窗口 DPI 144 的隔离观察；下文旧候选“无 Win11／高 DPI 证据”只保留当时设备和版本边界，不是当前环境结论。最终候选安装包与 Win10/11 基本业务链、真实离线、125%／跨屏、真实输入法预编辑、网页实际呈现及 0.1.0 两代安装器覆盖仍待对应实测，详见[RS05 执行报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)。当前构建须纳入经审核文档并记录实际干净源码身份；后续验收线使用独立证据文件，不能将本次文档整理或 UI 合并记为 Gate 通过。第二轮主体全套 1165 passed / 66 skipped / 2 warnings 属 `1425241`；`e53ebb5` 长名称补修仅有已登记定向 25 passed，不冒充新全套。
 

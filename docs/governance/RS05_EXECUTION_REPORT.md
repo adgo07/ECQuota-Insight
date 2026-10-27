@@ -1,6 +1,6 @@
 # ECQ-RS05 执行报告 — Windows V1 Release Candidate
 
-> **当前交付状态更新（2026-10-27）：** PR #33 已合并到 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；源码 UI 已有 Win11 原生 150% 隔离观察。下文早期“无 Win11 环境”、旧候选的 PASS／BLOCKED 和“未合并”等均只描述各自日期及版本，不能直接作为当前环境或最终候选结论。最新状态、缺口和证据边界见本文末节“2026-10-27 PR #33 合并后的交付衔接”。RS05 仍 IN PROGRESS，0.2.0 尚未正式发布。
+> **当前交付状态更新（2026-10-27）：** PR #33 已合并到 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；`rc-3bfbbeb` 已有 Win11 原生 150% 实包业务链证据，两处提示问题已在 `96aa3cb` 源码修复，新包待构建及原生复验。下文早期“无 Win11 环境”、旧候选的 PASS／BLOCKED 和“未合并”等均只描述各自日期及版本，不能直接作为当前环境或最终候选结论。最新状态、缺口和证据边界见本文末节“2026-10-27 rc-3bfbbeb 实包结果与提示修复衔接”。RS05 仍 IN PROGRESS，0.2.0 尚未正式发布。
 
 状态：**`RS05 = IN PROGRESS / RELEASE CANDIDATE`**
 目标版本：**`UEBench 0.2.0`**
@@ -1197,3 +1197,20 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 ### 文档线验证
 
 本次仅改 8 个既有 Markdown 文档；`git diff --check` 通过。默认 Python 3.11 无 pytest，尝试 pytest 命令未能启动；随后以 `runpy.run_path('tests/test_document_hygiene.py')` 直接调用其中全部 6 个无参检查，6/6 通过（控制字符、三份阶段一致性、产品配套状态、手册、仓库指南及 AGENTS 读取顺序）。这是文档一致性验证，不是 Python 3.13 生产回归或候选验收。核对当前 UI 源码及既有截图清单后，未启动桌面程序、构建或修改用户数据。
+
+## 2026-10-27 rc-3bfbbeb 实包结果与提示修复衔接
+
+**平台 / Contract 预检查：** 文档工作树确认干净后，从 `4f9a53d84873a7a0eb14247d19eef1dc029ad89f` 快进至已审核的 `96aa3cb0b69e55c069dc692c8def74c39cb75656`；仅追加三份既有状态文档。Frozen lock 仍为 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture 2.1、Numeric Contract／Profiles／Conformance v1、公式、映射、支持范围和 Schema 不变。本任务不涉及中央公共 Contract；无新增冲突或 Standard Issue，不改变选煤 D01/D02，不需中央修改。MUST 按精确版本区分源码修复、自动测试与实包观察；MUST NOT 将旧包通过项冒充新包验证。
+
+| 版本／证据 | 当前可确认结果与边界 |
+|---|---|
+| `rc-3bfbbeb`，干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2` | B 的 `build/work/candidate-3bfbbeb-20261027/BUILD_DELIVERY.json`：完整回归 1183 passed／66 skipped（0 failed），Artifact Gate 63 passed，冻结 EXE 与中文路径隔离启动器各 6 passed。此全套只属于该源码／候选 |
+| 设计独立资产核对 | `evidence/design-review-rc-3bfbbeb.json`：三资产 SHA256、326 个载荷文件、隔离包载荷同字节、身份及 ZIP CRC 已核；不等于安装／升级／卸载通过 |
+| C 冻结包实测 | `evidence/acceptance/rc-3bfbbeb-中文 独立实测/候选包独立实测报告.md`：Win11 26300、原生 150% 默认主要页面、正式保存／跨进程重启、历史只读及快照保真、225 条搜索分页／损坏隔离、备份恢复与恢复后继续评价已实测。DOCX 仅 LibreOffice Writer 实开；本候选 MS Word／WPS 仍未验 |
+| C-DEF-001／002 | 同目录 `产品提示问题复现.md` 登记损坏备份提示不准、英文确认／提示按钮两项 P3。`96aa3cb0b69e55c069dc692c8def74c39cb75656` 已修复源码；据设计复核反馈，生产／测试 diff 已独立阅读，产品提示／备份迁移安全／架构边界 66 项全通过，B 定向 70 项通过。**新包尚未构建，C 尚未原生复验，两项不关闭为实包 PASS** |
+
+上述证据路径以交付收口目录为根，是本机证据定位，不是跨机器固定仓库路径；C 报告附有自身数据来源、截图与哈希索引。本次文档线读取既有报告，不重复声称亲自执行 C 的桌面验收或设计的测试。
+
+仍保留真实安装／升级／卸载及 0.1.0 两代安装器覆盖、真实离线、Win10、其他 DPI／跨屏、额外原生尺寸、真实 IME、MS Word／WPS 和官方网页实际呈现等缺口。最终包必须纳入本次经审核文档后，再锁定实际干净 SHA 并完成对应构建／续验；本文不预设该 SHA，不把 `3bfbbeb` 全套当作 `96aa3cb` 或新包全套，也不据此声称新源码 CI 已通过。
+
+保持 `RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`；本线不推送、不合并、不发布、不打正式 tag，不改 B 文件或生产代码，不触碰真实数据／旧 UI 测试包。64 定义／48 交付／16 draft、仅选煤正式评价不变，水泥不开发，Excel 正式流程延期。

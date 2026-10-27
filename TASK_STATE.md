@@ -27,7 +27,14 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 - Reference Standard Product Closure = PARTIAL；
 - Numeric v1、数据库 Schema、Frozen Contract 与 platform-lock 保持现有基线；GB29446 业务解释以本次批准映射为准，机器规则身份及交付物按本轮实施验证。
 
-### 2026-10-27 UI 已合并，最终候选与交付验收进行中
+### 2026-10-27 候选实测续更（源码已修提示，新包待验）
+
+- `rc-3bfbbeb`（干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2`）已完成构建：完整回归 1183 passed / 66 skipped、Artifact Gate 63 passed，冻结 EXE 与隔离启动器自检各 6 passed。设计独立核对三资产哈希、326 载荷文件、身份与 ZIP CRC；证据位置见[RS05 报告末节](docs/governance/RS05_EXECUTION_REPORT.md)。不将该全套沿用为后续源码或新包全套。
+- C 在该冻结包上完成 Win11 原生 150% 主要页面、保存重启及快照保真、225 条分页／损坏隔离、备份恢复等实测。DOCX 仅经 LibreOffice Writer 实开，未取得该候选 MS Word／WPS 实开证据。真实安装／升级／卸载、离线、Win10、其他 DPI／跨屏、真实 IME 等缺口继续保留。
+- C-DEF-001 损坏备份失败提示、C-DEF-002 英文按钮已在 `96aa3cb0b69e55c069dc692c8def74c39cb75656` 源码修复；据设计复核反馈，独立 66 项与 B 定向 70 项通过。新包尚未构建、C 尚未原生复验，两项不提前关闭为实包 PASS。最终候选须先纳入本次经审核文档，再锁定实际干净 SHA；当前不预设该 SHA。
+- `RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`；不合并或发布，水泥排除，Excel 正式流程延期。下节首轮文档核对的缺口以本续更及其精确候选边界补充，不抹去历史记录。
+
+### 2026-10-27 UI 已合并（本日首轮文档核对）
 
 - [PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并，文档收口共同起点为 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；不是待合并状态。统一导航、固定选煤标准摘要、单页计算自动保存、只读历史详情、全库检索分页、设置及禁用入口、紧凑表格、长名称完整显示与官方地址请求反馈已进入源码。当前操作见[用户手册](docs/用户手册.md)，实施及历史测试边界见[UI 状态](docs/ui/UI_IMPLEMENTATION_STATUS.md)。
 - 已有 Win11 原生 150%（窗口 DPI 144、无 Qt 缩放环境覆盖）的源码 UI 隔离观察；早期“无 Win11 环境”仅对应 2026-10-20 的旧设备与旧候选。第二轮主体 `1425241` 的完整回归为 1165 passed / 66 skipped / 2 warnings；后续长名称 `e53ebb5` 为定向 25 passed，不能把前者全套冒充后者或合并提交的新全套。
