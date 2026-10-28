@@ -35,15 +35,20 @@ is allowed.
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass
+from types import MappingProxyType
 
 from uebench.domain.models import StandardDefinition
 
 __all__ = [
     "FORMAL_EVALUATION_SUPPORTED_LABEL",
     "FORMAL_EVALUATION_UNSUPPORTED_LABEL",
+    "MappingConfirmation",
     "SUPPORTED_EVALUATION_STANDARD_IDS",
     "evaluation_support_label",
     "filter_formally_evaluable",
+    "mapping_confirmation",
+    "standard_confirmation_message",
     "supports_formal_evaluation",
 ]
 
@@ -57,6 +62,35 @@ SUPPORTED_EVALUATION_STANDARD_IDS: frozenset[str] = frozenset({"gb-29446-2019"})
 #: wording is reviewable in one place and cannot drift between screens.
 FORMAL_EVALUATION_SUPPORTED_LABEL = "已纳入正式评价范围"
 FORMAL_EVALUATION_UNSUPPORTED_LABEL = "尚未纳入正式评价范围"
+
+
+@dataclass(frozen=True)
+class MappingConfirmation:
+    """Approval evidence for a business mapping, separate from software support."""
+
+    confirmed: bool
+    version: str | None = None
+    approved_on: str | None = None
+    source: str | None = None
+
+
+# Only approved mapping evidence belongs here. An absent id is pending review;
+# installed legacy rule data must never be promoted into approval evidence.
+_MAPPING_CONFIRMATIONS = MappingProxyType({
+    "gb-29446-2019": MappingConfirmation(
+        confirmed=True,
+        version="2026-10-18 已批准版",
+        approved_on="2026-10-18",
+        source="standards/mappings/GB29446-2019/标准映射表_2026-10-18_已批准.md",
+    ),
+    "gb-16780-2021": MappingConfirmation(
+        confirmed=True,
+        version="V1.2 已批准版",
+        approved_on="2026-10-13",
+        source="standards/mappings/GB16780-2021/标准映射表_V1.2_修订稿.md",
+    ),
+})
+_PENDING_MAPPING = MappingConfirmation(confirmed=False)
 
 
 def _standard_id_of(value: object) -> str | None:
@@ -88,6 +122,22 @@ def evaluation_support_label(standard_id: str | StandardDefinition) -> str:
     if supports_formal_evaluation(standard_id):
         return FORMAL_EVALUATION_SUPPORTED_LABEL
     return FORMAL_EVALUATION_UNSUPPORTED_LABEL
+
+
+def mapping_confirmation(standard_id: str | StandardDefinition) -> MappingConfirmation:
+    """Return explicit mapping approval evidence, or the pending default."""
+    return _MAPPING_CONFIRMATIONS.get(_standard_id_of(standard_id), _PENDING_MAPPING)
+
+
+def standard_confirmation_message(standard_id: str | StandardDefinition) -> str:
+    """Brief library explanation without changing evaluation capability."""
+    mapping = mapping_confirmation(standard_id)
+    if not mapping.confirmed:
+        return "业务映射待整理确认；旧规则未作为已验收依据。产品/工序、指标、单位及限值明细暂不展示。"
+    mapping_part = f"业务映射已确认（{mapping.version}，{mapping.approved_on}）。"
+    if supports_formal_evaluation(standard_id):
+        return mapping_part + "当前已实现的业务核算能力已通过验收；软件交付与环境验收尚未全部完成。"
+    return mapping_part + "软件接入及验收待完成。产品/工序、指标、单位及限值明细暂不展示。"
 
 
 def filter_formally_evaluable(

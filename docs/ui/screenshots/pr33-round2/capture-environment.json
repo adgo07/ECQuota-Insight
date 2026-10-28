@@ -1,0 +1,99 @@
+{
+  "platform": "offscreen",
+  "python": "3.13.17",
+  "pyside6": "6.10.1",
+  "isolated_data": true,
+  "records": 226,
+  "screens": [
+    {
+      "name": "",
+      "logical_dpi": 96.0,
+      "device_pixel_ratio": 1.0,
+      "geometry": [
+        800,
+        800
+      ],
+      "available": [
+        800,
+        800
+      ]
+    }
+  ],
+  "native_dpi_acceptance": false,
+  "captures": [
+    {
+      "file": "standards-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "records-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "standards-1180.png",
+      "width": 1180,
+      "height": 760
+    },
+    {
+      "file": "records-1180.png",
+      "width": 1180,
+      "height": 760
+    },
+    {
+      "file": "standards-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "records-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "standards-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "records-900.png",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "file": "settings-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "settings-advanced-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "radio-coking-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "radio-thermal-1256.png",
+      "width": 1256,
+      "height": 624
+    },
+    {
+      "file": "radio-coking-return-1256.png",
+      "width": 1256,
+      "height": 624
+    }
+  ],
+  "source_head": "142524169fa0e53dc8844f28de73652f2e06575c",
+  "source_dirty": false,
+  "scale_overrides": {
+    "QT_SCALE_FACTOR": null,
+    "QT_SCREEN_SCALE_FACTORS": null,
+    "QT_FONT_DPI": null
+  },
+  "long_text_followup_environment": "long-text-capture-environment.json",
+  "superseded_long_captures_note": "两张旧长名称图已由后续e53ebb5重现，并补1440；其余截图保持本清单1425241来源。"
+}

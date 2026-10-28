@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-27",
+  "environment": {
+    "platform": "windows",
+    "python": "3.13.17",
+    "pyside6": "6.10.1",
+    "isolated_data": true,
+    "records": 225,
+    "screens": [
+      {
+        "name": "\\\\.\\DISPLAY1",
+        "logical_dpi": 96,
+        "device_pixel_ratio": 1.5,
+        "geometry": [
+          1280,
+          720
+        ],
+        "available": [
+          1280,
+          672
+        ]
+      }
+    ],
+    "native_dpi_acceptance": false,
+    "captures": [],
+    "scale_overrides": {
+      "QT_SCALE_FACTOR": null,
+      "QT_SCREEN_SCALE_FACTORS": null,
+      "QT_FONT_DPI": null
+    },
+    "native_window_dpi": 144,
+    "window_logical_size": [
+      1256,
+      624
+    ]
+  },
+  "verified": [
+    "原生Windows窗口启动，客户区1256×624，系统DPI144/150%，无QT缩放环境覆盖",
+    "首页和业务侧栏切换",
+    "225条隔离记录中输入中文最早，完成全库筛选后共1条",
+    "打开独立只读详情，切换严格两个页签",
+    "设置默认折叠高级，展开后三项诊断动作可见",
+    "表单长名称、单位、焦点框及滚动后计算按钮可达"
+  ],
+  "limitations": [
+    "真实输入法预编辑与跨屏未测，中文输入使用工具Unicode注入",
+    "工艺下拉打开后工具报no monitor found及owned popup目标不匹配；已安全关闭，未宣称下拉视觉/选项提交通过",
+    "未修改系统显示设置，125%未测；900×600为离屏补充",
+    "截图是Computer Use返回的窗口捕获，可能经过工具逻辑像素缩放，不作像素或完整DPI验收"
+  ],
+  "capture_size": {
+    "width": 1259,
+    "height": 655
+  },
+  "captures": [
+    "form-bottom.jpg",
+    "form.jpg",
+    "home.jpg",
+    "record-inputs.jpg",
+    "record-result.jpg",
+    "records-search.jpg",
+    "records.jpg",
+    "settings-advanced.jpg",
+    "settings.jpg"
+  ],
+  "format_correction": "9张既有JPEG仅由.png改名.jpg，字节SHA256不变；非返修版采集。"
+}

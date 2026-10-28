@@ -108,7 +108,7 @@ def test_main_window_starts_with_empty_database(tmp_path: Path) -> None:
     application = QApplication.instance() or QApplication([])
     context = create_context(tmp_path / "appdata")
     window = MainWindow(context)
-    assert window.navigation.count() == 5
+    assert window.navigation.count() == 6
     assert window.home_standard_count.text() == "0/0"
     window.close()
     context.database.dispose()
@@ -132,8 +132,9 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     assert window.pages.currentIndex() == 1
     window.standard_table.selectRow(0)
     window.refresh_standard_detail()
-    assert window.standard_indicator_table.rowCount() == 1
-    assert window.standard_indicator_table.item(0, 1).text() == "单位产品能耗"
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
+    assert "业务映射待整理确认" in window.standard_confirmation_label.text()
     window.close()
     context.database.dispose()
 
@@ -302,10 +303,10 @@ def test_settings_page_hides_package_management_details_by_default(tmp_path: Pat
     context.application.list_package_history = lambda limit=50: [entry]
     window = MainWindow(context)
     assert [window.navigation.item(i).text() for i in range(window.navigation.count())] == [
-        "首页", "标准库", "新建评价", "评价记录", "设置"
+        "首页", "标准库", "新建对标", "表格导入 · 暂未开放", "对标记录", "折标系数库 · 暂未开放"
     ]
     assert window.home_standard_library_version.text() == "2026.10-published.4"
-    window.navigation.setCurrentRow(4)
+    window.navigate("settings")
     page = window.settings_page
     assert page.standard_library_version_value.text() == "2026.10-published.4"
     assert page.advanced_content.isHidden()
@@ -352,12 +353,10 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
         for column in range(window.standard_indicator_table.columnCount())
     ]
     assert "适用条件/说明" not in indicator_headers
+    assert window.standard_indicator_table.rowCount() == 0
+    assert window.standard_indicator_table.isHidden()
     library_text = " ".join(
-        [window.standard_detail_label.text()]
-        + [
-            window.standard_indicator_table.item(0, column).text()
-            for column in range(window.standard_indicator_table.columnCount())
-        ]
+        [window.standard_detail_label.text(), window.standard_confirmation_label.text()]
     )
     assert "requires_independent_review" not in library_text
     assert "需独立复核后使用" not in library_text
@@ -374,7 +373,7 @@ def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path,
     window = MainWindow(context)
     assert not window.eval_date.isVisible()
     assert not window.eval_project.isVisible()
-    assert window.eval_standard.isEditable()
+    assert not window.eval_standard.isEditable()
     assert window.eval_standard_open.text() == "查看标准原文"
     # 下拉框要能完整读出“编号 + 名称”；右侧状态文字只在需要提示时才出现。
     assert window.eval_standard.itemText(0) == f"{standard.number} {standard.title}"

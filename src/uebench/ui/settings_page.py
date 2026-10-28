@@ -3,13 +3,15 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QFormLayout,
-    QGroupBox,
     QHBoxLayout,
     QLabel,
     QPushButton,
     QToolButton,
     QVBoxLayout,
     QWidget,
+    QScrollArea,
+    QFrame,
+    QSizePolicy,
 )
 
 
@@ -31,6 +33,7 @@ class SettingsPage(QWidget):
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         root = QVBoxLayout(self)
         root.setContentsMargins(24, 20, 24, 20)
         root.setSpacing(14)
@@ -38,9 +41,20 @@ class SettingsPage(QWidget):
         title = QLabel("设置")
         title.setProperty("class", "pageTitle")
         root.addWidget(title)
+        outer = root
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        root = QVBoxLayout(content)
+        root.setContentsMargins(0, 0, 8, 0)
+        root.setSpacing(20)
+        scroll.setWidget(content)
+        outer.addWidget(scroll, 1)
 
-        app_group = QGroupBox("应用信息")
-        app_form = QFormLayout(app_group)
+        app_group, app_layout = self._section("应用信息")
+        app_form = QFormLayout()
+        app_layout.addLayout(app_form)
         self.software_version_value = QLabel(software_version)
         self.software_version_value.setObjectName("settingsSoftwareVersion")
         self.standard_library_version_value = QLabel(standard_library_version)
@@ -48,14 +62,15 @@ class SettingsPage(QWidget):
         self.data_directory_value = QLabel(data_directory)
         self.data_directory_value.setObjectName("settingsDataDirectory")
         self.data_directory_value.setWordWrap(True)
+        self.data_directory_value.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.data_directory_value.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         app_form.addRow("软件版本", self.software_version_value)
         app_form.addRow("标准库版本", self.standard_library_version_value)
         app_form.addRow("数据存储位置", self.data_directory_value)
         app_form.addRow(QLabel("标准库随软件版本一起更新，无需单独安装。"))
         root.addWidget(app_group)
 
-        backup_group = QGroupBox("数据与备份")
-        backup_layout = QVBoxLayout(backup_group)
+        backup_group, backup_layout = self._section("数据与备份")
         backup_buttons = QHBoxLayout()
         self.create_backup_button = QPushButton("创建备份")
         self.create_backup_button.setObjectName("settingsCreateBackup")
@@ -81,11 +96,9 @@ class SettingsPage(QWidget):
         self.advanced_toggle.setArrowType(Qt.ArrowType.RightArrow)
         root.addWidget(self.advanced_toggle, 0, Qt.AlignmentFlag.AlignLeft)
 
-        self.advanced_content = QWidget()
+        self.advanced_content, advanced_layout = self._section("诊断与数据位置")
         self.advanced_content.setObjectName("settingsAdvancedContent")
         self.advanced_content.setVisible(False)
-        advanced_layout = QVBoxLayout(self.advanced_content)
-        advanced_layout.setContentsMargins(18, 0, 0, 0)
         self.open_data_directory_button = QPushButton("打开数据目录")
         self.open_data_directory_button.setObjectName("settingsOpenDataDirectory")
         self.open_data_directory_button.clicked.connect(self.open_data_directory_requested)
@@ -104,6 +117,20 @@ class SettingsPage(QWidget):
         root.addWidget(self.advanced_content)
         self.advanced_toggle.toggled.connect(self._set_advanced_visible)
         root.addStretch(1)
+
+
+    @staticmethod
+    def _section(title):
+        card = QFrame()
+        card.setProperty("class", "card")
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(20, 18, 20, 18)
+        layout.setSpacing(14)
+        heading = QLabel(title)
+        heading.setProperty("class", "sectionTitle")
+        heading.setWordWrap(True)
+        layout.addWidget(heading)
+        return card, layout
 
     def set_standard_library_version(self, version: str) -> None:
         self.standard_library_version_value.setText(version)

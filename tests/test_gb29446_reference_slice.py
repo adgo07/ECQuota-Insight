@@ -179,7 +179,7 @@ def test_gb29446_ordinary_evaluation_form_and_result_card(tmp_path: Path, monkey
     assert window.last_result_id is None
     assert window.gb29446_result_ed.text() == "— kW·h/t"
     assert window.gb29446_result_grade.text() == "—"
-    assert window.gb29446_result_message.text() == "尚未计算"
+    assert window.gb29446_result_message.text() == "数据已修改，请重新计算"
     window.calculate_evaluation()
     assert window.gb29446_result_ed.text() == "11.20 kW·h/t"
     assert window.gb29446_result_grade.text() == "未达3级"
@@ -244,7 +244,7 @@ def test_gb29446_clears_result_when_coal_or_process_changes(tmp_path: Path, monk
 
     window.gb29446_coal_type.setCurrentIndex(window.gb29446_coal_type.findText("动力煤"))
     assert window.gb29446_result_grade.text() == "—"
-    assert window.gb29446_result_message.text() == "尚未计算"
+    assert window.gb29446_result_message.text() == "数据已修改，请重新计算"
     assert window.last_result_id is None
 
     window.gb29446_process.setCurrentIndex(window.gb29446_process.findData("干法选煤"))
@@ -333,7 +333,7 @@ def test_gb29446_month_period_is_saved_and_restored(tmp_path: Path, monkeypatch)
         ),
         (
             "0", "100", "必须大于 0",
-            "统计期内选煤电力消耗量 E_d 必须大于 0。", "electricity_consumption",
+            "统计期内选煤电力消耗量 E_d 必须大于 0（软件防误录校验）。", "electricity_consumption",
         ),
     ],
 )
@@ -470,17 +470,15 @@ def test_gb29446_discovery_to_new_evaluation(reference_window):
         "标准名称",
         "标准状态",
         "实施日期",
-        "软件评价支持状态",
-        "官方来源",
+        "软件支持",
     ]
     assert "版本" not in headers and "评价范围" not in headers
-    assert [window.standard_table.item(0, column).text() for column in range(6)] == [
+    assert [window.standard_table.item(0, column).text() for column in range(5)] == [
         standard.number,
         "选煤电力消耗限额",
         "当前有效",
         "2020-07-01",
         FORMAL_EVALUATION_SUPPORTED_LABEL,
-        OFFICIAL_SOURCE_PLATFORM_NAME,
     ]
     window.standard_table.selectRow(0)
     # C2：选中标准后只有一行「适用范围：<scope>」，GB 29446 用 Owner 逐字确认的原文。
@@ -581,13 +579,8 @@ def test_gb29446_source_open_verifies_test_file_hash(tmp_path: Path, monkeypatch
                 for index in range(window.standard_table.rowCount())
                 if window.standard_table.item(index, 0).data(Qt.ItemDataRole.UserRole) == unregistered.id
             )
-            official_column = next(
-                column
-                for column in range(window.standard_table.columnCount())
-                if window.standard_table.horizontalHeaderItem(column).text() == "官方来源"
-            )
             assert official_source_url(unregistered.id) is None
-            assert window.standard_table.item(row, official_column).text() == NO_OFFICIAL_SOURCE_LABEL
+            assert window.standard_table.columnCount() == 5
             window.standard_table.clearSelection()
             window.standard_table.setCurrentCell(-1, -1)
             window.standard_table.selectRow(row)
@@ -720,7 +713,7 @@ def test_gb29446_metadata_change_invalidates_visible_result(reference_window, wi
         control.setText("元数据变更")
     assert window.last_result_id is None
     assert window.gb29446_result_grade.text() == "—"
-    assert window.gb29446_result_message.text() == "尚未计算"
+    assert window.gb29446_result_message.text() == "数据已修改，请重新计算"
 
 
 @pytest.mark.parametrize("coal,process,electricity,expected_grade", [

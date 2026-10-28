@@ -191,6 +191,7 @@ def test_facade_evaluate_refuses_unsupported_installed_standard(context) -> None
     # 拒绝必须是可识别的那一条，不是别的 ValueError 撞上来的。
     assert FORMAL_EVALUATION_UNSUPPORTED_LABEL in str(caught.value)
     assert FORMAL_EVALUATION_SUPPORTED_LABEL not in str(caught.value)
+    assert "仅可预览" not in str(caught.value)
 
     # 5. 拒绝后不得有任何持久化：没有请求行 / 结果行 / 规则快照行，也没有审计记录。
     assert context.application.count_evaluations() == before_count == 0

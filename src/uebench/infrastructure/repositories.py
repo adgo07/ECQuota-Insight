@@ -4,7 +4,8 @@ import json
 import logging
 from datetime import date, datetime, timezone
 
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, func, select, or_
+from uebench.application.record_query import RecordListItem, RecordPage, saved_record_projection
 
 from uebench.domain.models import (
     RECORD_CORRUPTED_LABEL,
@@ -403,6 +404,44 @@ class SqlEvaluationRepository:
             return session.scalar(
                 select(func.count()).select_from(EvaluationRow).where(EvaluationRow.deleted_at.is_(None))
             ) or 0
+
+    def query_page(self, *, query: str = "", status: str = "", page: int = 1, page_size: int = 20) -> RecordPage:
+        """全库 SQL 检索/count；仅分页摘要到 UI，不取规则快照。
+
+        文本检索由 SQLite 扫描保存的请求/结果，不限最近条数。状态筛选需逐行
+        校验请求/结果，时间 O(N)、Python 常驻数据 O(一条载荷 + page_size)。
+        不建立镜像索引/新表，不把全部历史载荷传给 UI，也不调用当前规则。
+        """
+        page_size = max(1, min(int(page_size), 100))
+        with self.database.session() as session:
+            driver = session.connection().connection.driver_connection
+            if not driver.in_transaction:
+                driver.execute("BEGIN")
+            driver.create_function("uebench_saved_summary", 2, saved_record_projection, deterministic=True)
+            projection = func.uebench_saved_summary(EvaluationRow.request_json, EvaluationRow.result_json)
+            conditions = [EvaluationRow.deleted_at.is_(None)]
+            if query.strip():
+                escaped = query.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+                pattern = f"%{escaped}%"
+                conditions.append(or_(*(field.ilike(pattern, escape="\\") for field in (
+                    EvaluationRow.organization_name, EvaluationRow.standard_number,
+                    EvaluationRow.request_json, EvaluationRow.result_json,
+                ))))
+            if status:
+                conditions.append(func.json_extract(projection, "$.status") == status)
+            total = session.scalar(select(func.count()).select_from(EvaluationRow).where(*conditions)) or 0
+            page = max(1, min(int(page), max(1, (total + page_size - 1) // page_size)))
+            statement = select(
+                EvaluationRow.evaluation_id, EvaluationRow.created_at, EvaluationRow.organization_name,
+                EvaluationRow.standard_number, projection.label("summary"),
+            ).where(*conditions).order_by(desc(EvaluationRow.created_at), desc(EvaluationRow.evaluation_id)).offset((page - 1) * page_size).limit(page_size)
+            items = []
+            for row in session.execute(statement):
+                summary = json.loads(row.summary)
+                items.append(RecordListItem(row.evaluation_id, row.created_at,
+                    row.organization_name or "未填写企业名称", f"{row.standard_number} {summary['title']}".strip(),
+                    summary["period"], summary["core"], summary["status"]))
+            return RecordPage(tuple(items), total, page, page_size)
 
     def soft_delete(self, evaluation_id: str) -> bool:
         with self.database.session() as session:

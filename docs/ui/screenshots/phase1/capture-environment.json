@@ -1,0 +1,66 @@
+{
+  "platform": "offscreen",
+  "python": "3.12.14",
+  "pyside6": "6.10.1",
+  "isolated_data": true,
+  "data_lifetime": "临时数据，关闭后删除",
+  "native_dpi_acceptance": false,
+  "dimensions": "Qt 窗口逻辑像素；离屏 devicePixelRatio=1.0",
+  "input": {
+    "electricity": "8000000",
+    "raw_coal": "1000000",
+    "process": "重介、浮选联合"
+  },
+  "captures": [
+    {
+      "file": "home-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "standards-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "detail-coal-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "detail-cement-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "detail-other-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "form-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "result-1440.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "file": "form-1180.png",
+      "width": 1180,
+      "height": 760
+    },
+    {
+      "file": "result-1180.png",
+      "width": 1180,
+      "height": 760
+    },
+    {
+      "file": "home-record-1180.png",
+      "width": 1180,
+      "height": 760
+    }
+  ]
+}

@@ -927,6 +927,8 @@ legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实�
 
 ### 修复的独立复现证据（以真实当前标准包 + 隔离 SQLite + 归档旧包副本）
 
+下列“仅可预览”是 Phase 7 当时异常提示的原样证据，证明范围外调用不能保存正式评价；`preview()` 是不落库的底层能力，不表示当前普通界面开放其他标准的预览入口。现行用户可见范围以当前源码、用户手册与本报告末尾的阶段结果为准。
+
 ```text
 Blocker 1  gb-16780-2021 registry=False
            evaluate() -> ValueError「尚未纳入正式评价范围：该标准不能形成正式评价记录，仅可预览。」
@@ -1098,7 +1100,7 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 原始证据位于本机历史执行环境的 `G:/Python Project/能耗限额/work/rs05-closure-20261020/legacy/`（`payload-test.txt`、`payload-extract.txt`、`old-pyz-modules.json`、`old-library-result.json`、`candidate-self-check-process.json`、`candidate-self-check.json`、`upgrade-compare.json`）及隔离工作树的 `work/rs05-closure-20261020/environment/README.md`；两处均为 Git 忽略目录，不是跨机器固定入口。上述身份、旧源库哈希和升级克隆库哈希已独立复算核对；原始文件不复制进 PR。
 
-## 2026-10-21 验收准备包与唯一下一步（当前）
+## 2026-10-21 验收准备包（当时准备记录）
 
 **计划与平台 / Contract 预检查。**本轮只把 2026-10-20 的部分通过证据整理成小型[机器可核摘要](evidence/RS05_20261020_legacy_upgrade_summary.json)，并准备供隔离 Windows 环境使用的验收包；不重跑旧 GUI／安装器覆盖，不改代码、标准包、锁或构建输入，不重建 `rc-4e43490`。本仓起点为 `origin/main@694ac184d5d71b5f2f5500147a5a79b4690c8514`；`platform-lock.json` 仍锁中央 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，适用 Architecture 2.1、Numeric Contract/Profile/Conformance v1 Frozen 及中央当前 ACTIVE 交付 Policy §5。MUST 保持全值精确比较、历史记录／快照不重算和 Win10/11 基本兼容与高 DPI 主要页面可用的验收要求；MUST NOT 把未测门禁写成通过、把旧 Candidate 改名发布或自动豁免。未发现新增 Frozen 冲突或中央公共语义缺口；现存 D-ECQ-002～006 仍按已登记偏差管理。本轮不涉及中央 Contract 修改；标准问题台账无选煤现行问题，也不改变 D01/D02 或其他软件解释。
 
@@ -1106,4 +1108,61 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 为便于远端审查，包内的[唯一 README、manifest 与只读校验脚本](evidence/rs05-acceptance-kit-20261021/README.md)已复制到仓库 `docs/governance/evidence/rs05-acceptance-kit-20261021/`，本工作树复制后逐项 SHA256 与包内原件一致；其中 [manifest](evidence/rs05-acceptance-kit-20261021/manifest.json) 与 [Verify-Files.ps1](evidence/rs05-acceptance-kit-20261021/Verify-Files.ps1) 也可直接查看。Git 不含三项二进制资产，不能从 clone 还原完整验收包；跨机核验以 ZIP 原件为准。当前 ZIP 仍只在上述本机忽略目录；待有隔离测试机时，由用户选择移动介质或文件传输通道**整体复制该 ZIP**，在目标机任意目录解压，先运行包内脚本并核对清单后再执行 README。此处只给转运方式，尚未跨机交付或完成新环境验收。
 
-**唯一下一步。**有安全隔离 Windows 测试机／独立用户与所需设备时，先核包内清单和三资产，再按 README 分步取得旧 GUI 保存、两代安装器同路径覆盖、历史记录不重算、离线、原生高 DPI 与 Win11 基本链的真实证据；双屏可得时补跨屏检查。每项按[上方剩余门禁矩阵](#剩余门禁矩阵计划状态待填实测结果)单独更新，失败先保全证据，缺设备继续保留阻断／待人工状态，由 Owner 审查放行风险。当前 Win11 仍 `BLOCKED`；高 DPI／跨屏仍 `PENDING-MANUAL`，离线仍 `BLOCKED`，0.1→0.2 安装升级仍 `PARTIAL`。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`；Excel 工作簿暂缓，水泥不启动。
+**当时拟定的下一步。**有安全隔离 Windows 测试机／独立用户与所需设备时，先核包内清单和三资产，再按 README 分步取得旧 GUI 保存、两代安装器同路径覆盖、历史记录不重算、离线、原生高 DPI 与 Win11 基本链的真实证据；双屏可得时补跨屏检查。每项按[上方剩余门禁矩阵](#剩余门禁矩阵计划状态待填实测结果)单独更新，失败先保全证据，缺设备继续保留阻断／待人工状态，由 Owner 审查放行风险。截至 2026-10-21，Win11 为 `BLOCKED`；高 DPI／跨屏仍 `PENDING-MANUAL`，离线仍 `BLOCKED`，0.1→0.2 安装升级仍 `PARTIAL`。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`；Excel 工作簿暂缓，水泥不启动。
+
+> 本节记录 2026-10-21 的准备结果与当时门禁，不作为现行验收状态。现行状态以报告顶部补录及后续较新日期的验收节为准；本验收包未随新候选自动更新。
+
+## 2026-10-23 标准确认状态与稳定启动入口（计划与阶段结果）
+
+本节承接[当前任务](../../TASK_STATE.md)、[映射总索引](../../standards/mappings/INDEX.md)和本报告上述 RS05 交付门禁，只处理本轮已授权的确认状态表达、普通详情限值展示及稳定启动入口。2026-10-20 的部分通过结果仍是历史证据；以下先保留开工时计划，实际结果另见本节末尾，不把未验事项预写为 PASS。
+
+### 平台 / Contract 预检查
+
+| 项目 | 本轮依据及边界 |
+|---|---|
+| 业务仓、中央身份 | 本任务从 `origin/main@694ac184d5d71b5f2f5500147a5a79b4690c8514` 开始；`platform-lock.json` 仍锁中央 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`。中央当前 `GUIDE_INDEX` 路由的 UI v0.2／产品规格／验收清单为 ACTIVE 指南，不升级本仓 Frozen 锁 |
+| 适用 Frozen 与 MUST / MUST NOT | Architecture 2.1、Numeric Contract／Profiles／Conformance v1 保持 Frozen；正式比较继续 Decimal full-value exact，历史结果及快照不重算。正式评价范围仅选煤；文档已批准、机器定义已发布或旧规则可计算，均不得自动放宽范围、冒充验收或在普通详情把未确认限值展示成正式业务结论 |
+| 冲突与中央修改 | 当前未发现新增 Frozen 冲突或 `CENTRAL CONTRACT GAP`；既有 D-ECQ-002～006 仍为已登记偏差。本任务不涉及中央公共 Contract 修改；若实施时发现真实公共语义冲突，再按既有分类治理 |
+| Standard Issue 与软件解释 | 选煤无现行 Standard Issue，D01/D02 和现行批准映射不变；水泥 `ECQ-STD-GB16780-001`／`003` 维持原台账状态。2026-10-23 用户重申确认范围，但未批准新公式、限值或解释，也未完成水泥软件 Stage B/C/D |
+
+### 分工、预定通过条件与构建边界
+
+| 工作 | 预定通过条件 | 开工时状态（结果见下节） |
+|---|---|---|
+| 映射确认记录 | 在既有两个标准入口、总索引和当前交接记录 Owner 日期、依据、范围与未确认事项；不改两份批准映射正文，不新建第二台账，不概括判定所有遗留规则都错 | 治理文字待审；与代码实态分开 |
+| 软件确认状态与普通详情 | 标准库选中详情分别表达映射确认与软件正式评价支持状态；选煤已验能力与水泥 V1.2 已批准但软件未完成不混淆。未经批准映射核对与软件验收的旧限值不作为普通详情的正式限值展示；新建／保存的正式评价范围仍仅选煤，后端拒绝不能被页面绕过。状态由结构化数据投影，不运行时解析 Markdown | 应用、UI 与测试待独立实现和验证 |
+| 稳定启动与交付 | 从确定的干净源码提交构建新 Candidate，分别核安装版与便携版实际入口、启动、数据目录隔离及受影响操作；记录构建 SHA、产物哈希和实测范围。旧 `rc-4e43490` 的通过证据保留，但不能代表此次变更后的新实物 | 实物构建与验收待完成 |
+
+只有代码和随包资源冻结成干净提交后才构建；最终治理结果可另成文档提交，但应与构建源码 SHA 明确区分。交付验收仍须如实保留 Win11、原生高 DPI／跨屏、离线及 0.1.0 真实安装器覆盖等原缺口，不因本轮确认而自动豁免；Excel 工作簿仍暂缓，水泥核算实现不在本任务启动。当前 `RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。
+
+### 本轮阶段结果与仍待实测项
+
+本轮从干净源码 `f6896584ad8fa9c2dd6cbe4e3b1f3fa5b51dbe17` 构建 `rc-f689658`；构建时 `source_dirty=false`。后续治理文档提交仅记录验收，不改变该构建源码和 Candidate 身份。结构化确认登记、标准库详情展示、旧限值隐藏及正式评价范围保护的源码实现已完成；4 个相关测试模块共 59 项定向测试通过，`git diff --check` 通过。该精确源码提交的 [PR Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/39930477994)、[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/39930477924)、[QZC N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/39930477943) 均为 `completed/success`。Candidate 构建 exit 0，full suite、冻结 EXE 隔离自检 6/6 及构建内 Artifact Gate 均通过；构建日志未捕获 full suite 的精确通过项数，本节不推算数字。
+
+| 实物与安装核对 | 2026-10-23 实际证据 |
+|---|---|
+| Candidate 身份 | 本机历史构建路径 `C:/Users/WANGWEI/.codex/worktrees/standard-confirmation-build/能耗限额/dist/candidate-0.2.0-f6896584`；`release-build-info.json` 记录源码 `f6896584ad8fa9c2dd6cbe4e3b1f3fa5b51dbe17`、`source_dirty=false`、标准包 `.5`（48 项／765 条规则，SHA256 `9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5`）、payload tree SHA256 `011891a9b8eb90bc3c7b0213e2aeab896677a89e819011b34fa1260f6f3d40a9` |
+| 产物哈希 | 安装包 `UEBench-Setup-0.2.0-rc-f689658-x64.exe` SHA256 `444b5d4ad8dc530cfe50160e08d508d378a4e87ccdf93ec00e906ce014d6fff0`；便携 ZIP `UEBench-0.2.0-rc-f689658-win-x64.zip` SHA256 `4875029eb6dfbf3cba68f4f638c2ce28ba72b667b82dffd1cf6fbf172c1057e8`，已独立复算与 `SHA256SUMS.txt` 一致；新 EXE 仍未做 Authenticode 代码签名，标准包 Ed25519 内容签名是另一机制 |
+| 持久安装入口 | 真实 `WANGWEI` 用户下 Inno 安装 exit 0，日志记录 `Installation process succeeded` 且无需重启；`C:/Users/WANGWEI/AppData/Local/Programs/UEBench/UEBench.exe` SHA256 `3ecdc25da5a9d0f209d12140827d6e4845bca9283b278c4fc47dc3f81fad49dd`，与 Candidate payload 一致。HKCU 卸载项、开始菜单及重定向桌面快捷方式均指该持久路径；旧临时目录的 `rc-4e43490` EXE 保留，未拿它冒充新安装 |
+| 安装版启动与关闭 | 新已安装 EXE 在进程级隔离数据目录启动，进程属于 `WANGWEI`，取得窗口标题与句柄；本轮测试 PID `24128` 通过 `CloseMainWindow()` 优雅退出，随后进程不存在。隔离数据库创建于本日；默认用户目录仅核文件时间早于本轮，没有启动前哈希，不能声称默认 DB 逐字节未改 |
+
+安装过程曾有一次测试命令参数构造错误（未触发目标安装），修正后上述安装 exit 0；此前尝试通过 Sky／Explorer 自动化进入交互桌面挂起并已中断。这两处是验收操作受阻记录，不推断为产品故障。随后 Sky 能识别已安装 EXE 窗口，但 `get_window_state` 约 123.5 秒挂起并中断，**未取得界面截图或控件树、未点击或输入**。因此标准库选中详情的选煤／水泥／其他标准三态视觉、旧限值隐藏的真实 GUI 呈现，以及选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；源码测试与进程启动不能替代这部分人工验收。本轮亦未从新实物重验 Word GUI／Word／WPS，前轮 `rc-4e43490` 的文档证据仅保留其原身份，不迁移为 `rc-f689658` 的通过结论。
+
+构建原始日志位于上述构建工作树的 `work/build-candidate-f6896584-20261023.log`；持久安装原始日志位于本机历史执行环境 `G:/Python Project/能耗限额/work/standard-confirmation-f689658-install/inno-install.log`。这些绝对路径仅定位本机原始证据，不是跨机器固定入口。当前可确认的是结构化源码／自动测试／Candidate 构建／真实用户持久安装与隔离启动关闭；GUI 视觉和操作链、此前已登记的 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖仍待对应证据或既定治理裁定。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`，不启动水泥实现或 Excel 工作簿。
+
+### 同日 PR #32 审查修正与 `rc-b102e36` 续验
+
+上述 `rc-f689658` 仍是其原提交的历史验收，不代表下述新候选。审查发现随包手册将所有标准写成会展示产品／指标／限值明细，并沿用开发目录的启动路径；本轮修正手册、交付清单及安装说明，明确**只有选煤显示完整明细表**，其他标准仅供标准级目录参考，整张产品/工序、指标、单位及限值明细表不在普通详情展示。安装版从开始菜单或桌面快捷方式启动，便携版解压 ZIP 后运行其中的 `UEBench/UEBench.exe`。同时为确认登记与映射索引增加定向一致性测试，历史 Phase 7 的“仅可预览”原样证据只加当时语境注释。批准映射正文、正式评价 ID、Excel 交付和水泥软件范围均未改变；本节沿用上方平台 / Contract 预检查，Frozen 锁与 Standard Issue 状态未变，无新增中央 Contract 修改。
+
+修正后的干净**构建源码**为 `b102e36a564e5b8874e676e4a1799395d211254b`，不是本报告后续的文档交接提交。4 个相关测试模块 60 项通过，精确源码提交的 [PR Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739735)、[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739805)、[QZC N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/39941739975) 均为 `completed/success`。首次完整测试进程 exit 0；原日志的进度字符计为 1124 passed、62 skipped、1 warning，**不是 pytest 最终汇总行**。随后首次打包因 PowerShell 5.1 的 JSON 原生命令参数传递失败，未产出安装器；改用 PowerShell 7 对同一干净提交以 `-SkipTests` 续建 exit 0，未重复声称全量测试又运行一次。新冻结 EXE 隔离自检 6/6，构建内 Artifact Gate 63 点全部通过。这一中断属于构建执行环境参数问题，未发现源码测试失败。
+
+| 新候选核对 | 2026-10-23 实际结果 |
+|---|---|
+| 构建身份与标准包 | 本机历史构建目录 `C:/Users/WANGWEI/.codex/worktrees/standard-confirmation-rebuild/能耗限额/dist/candidate-0.2.0-b102e36`；`release-build-info.json` 为 `rc-b102e36`、`source_commit=b102e36a564e5b8874e676e4a1799395d211254b`、`source_dirty=false`、标准包 `.5`（48 项／765 条规则、SHA256 `9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5`），payload tree SHA256 `014e2e067aef0a0f2e05bc84d927cc94767523550aaaaaaec0719ccb882b8e3a` |
+| 产物 | 安装包 SHA256 `272d2cb06e215bf78ee8846a365e8a4e64a4f5c494e4e042c1c9488cb83513f4`；便携 ZIP SHA256 `843a354124c83c8749cf0672bc78cc871a790cc01adc29bb316f81dd75ea2e71`，已独立实算核对；候选根目录三份说明与源码逐字节相同，便携 ZIP 本身不含手册文件 |
+| 真实用户持久安装 | `WANGWEI` 用户的 Inno 安装 exit 0，安装日志记录成功且无需重启；已安装 EXE SHA256 `01d0cfe8241258fbd156f880026355681ae5a270f404685515a52a4d59d6dcf9` 与新 Candidate payload 相同。开始菜单和桌面快捷方式指向该持久 EXE；安装目录的手册、交付清单、安装说明三文件与候选根目录各自 SHA256 相同 |
+| 数据与启动 | 已安装 EXE 在独立数据目录自检 exit 0、6/6 通过；另以隔离数据和 `LOCALAPPDATA` 启动真实 `WANGWEI` GUI 进程（测试 PID `49956`，窗口句柄存在），再经 `CloseMainWindow()` 优雅退出。默认真实用户数据库在安装前、安装后和隔离验收后均为 3,887,104 B、SHA256 `094115c0635534ddceee50075ee78d8d4c0e26f385d7aa4760236d67c09cc92b`，时间未变、无 WAL/SHM；不将隔离库冒充默认用户数据 |
+
+本轮没有取得新候选的 GUI 控件树或截图，也没有点击标准库、保存选煤记录或重验 Word/WPS。因此三态文字与明细表隐藏的**真实界面视觉**、选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；C 的源码只读复核、定向测试与实际进程启动不能替代人工界面验收。`rc-f689658` 的旧实物记录也不自动升级为 `rc-b102e36` 的 Word/WPS 证据。当前目标仍受上方 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖缺口约束，`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`。
+
+本机原始构建记录在上述构建工作树的 `work/build-candidate-b102e36-{stdout,stderr}.log` 与 `work/build-candidate-b102e36-retry-{stdout,stderr}.log`；安装日志及自检报告在 `G:/Python Project/能耗限额/work/standard-confirmation-b102e36-install/`。这些是历史执行环境路径，不是跨机器固定入口。最终文档交接提交将与构建源码分开，不能据其 SHA 宣称 Candidate 从该文档提交重建。

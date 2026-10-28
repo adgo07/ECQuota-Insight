@@ -209,6 +209,9 @@ class ApplicationFacade:
     def list_recent_evaluations(self, limit: int = 100) -> list[EvaluationSummary]:
         return self._evaluations.list_recent(limit)
 
+    def query_evaluations(self, *, query: str = "", status: str = "", page: int = 1, page_size: int = 20):
+        return self._evaluations.query_page(query=query, status=status, page=page, page_size=page_size)
+
     def get_evaluation(
         self,
         evaluation_id: str,
