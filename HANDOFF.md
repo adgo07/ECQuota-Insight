@@ -1,6 +1,6 @@
 # HANDOFF — ECQuota 当前交接
 
-更新时间：2026-10-27
+更新时间：2026-10-28
 
 > 本文件是**当前**交接入口，只描述现行权威状态。
 > 历史材料（QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账、旧交付哈希、旧开发机绝对路径）已移至
@@ -39,6 +39,10 @@
 `GB 29446—2019 选煤电力消耗限额`
 
 当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = NOT STARTED。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
+
+**2026-10-28 当前补录：** 实际候选 `rc-69562ee` 的干净构建源码为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`，完整回归 1214 passed / 66 skipped、Artifact Gate 63 passed；设计独立确认该 SHA 三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已存在，仍为草稿、未合并。C 的 Win11 原生 150% 短定向 12 项及设计独立复核通过，C-DEF-001／002 两项 P3 在本机定向范围关闭；保存快照、取消／恢复审计与保护备份已核。本次治理提交不改变实际打包输入、不重打包，不把其提交 SHA 当作被测构建。
+
+证据和可行动的剩余环境条件见[RS05 报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)。旧 `rc-3bfbbeb` 的完整原生验收不平移到新包；本候选未做 Word／WPS／Writer 实开。安装／升级／卸载、可信离线、Win10、其他 DPI／跨屏、真实 IME、MS Word／WPS 与官网实际呈现仍未验。保持 RS05 IN PROGRESS、产品 PARTIAL、0.2.0 未发布；本线仅本地提交、不推送或合并，水泥不开发、Excel 正式流程延后。以下 10-27 记录保留当时边界，其中“新包尚未构建／待原生复验”已由本次定向结果补充。
 
 **2026-10-27 候选实测后续交接：**`rc-3bfbbeb`（干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2`）完整回归 1183 passed / 66 skipped、Artifact Gate 63 passed，EXE／隔离启动器各 6 项自检通过；设计已独立核三资产哈希、326 载荷、身份及 CRC。C 已在该包实测 Win11 原生 150%、保存重启／快照与 Word、225 条分页／损坏隔离、备份恢复；DOCX 只在 LibreOffice Writer 实开，不称 MS Word／WPS 通过。证据入口集中在[RS05 报告末节](docs/governance/RS05_EXECUTION_REPORT.md)。
 
