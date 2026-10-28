@@ -1,6 +1,6 @@
 # HANDOFF — ECQuota 当前交接
 
-更新时间：2026-10-23
+更新时间：2026-10-28
 
 > 本文件是**当前**交接入口，只描述现行权威状态。
 > 历史材料（QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账、旧交付哈希、旧开发机绝对路径）已移至
@@ -39,6 +39,20 @@
 `GB 29446—2019 选煤电力消耗限额`
 
 当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = NOT STARTED。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
+
+**2026-10-28 当前补录：** 实际候选 `rc-69562ee` 的干净构建源码为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`，完整回归 1214 passed / 66 skipped、Artifact Gate 63 passed；设计独立确认该 SHA 三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并；合并不等于正式发布。C 的 Win11 原生 150% 短定向 12 项及设计独立复核通过，C-DEF-001／002 两项 P3 在本机定向范围关闭；保存快照、取消／恢复审计与保护备份已核。本次治理提交不改变实际打包输入、不重打包，不把其提交 SHA 当作被测构建。
+
+证据和可行动的剩余环境条件见[RS05 报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)。旧 `rc-3bfbbeb` 的完整原生验收不平移到新包；本候选未做 Word／WPS／Writer 实开。安装／升级／卸载、可信离线、Win10、其他 DPI／跨屏、真实 IME、MS Word／WPS 与官网实际呈现仍未验。保持 RS05 IN PROGRESS、产品 PARTIAL、0.2.0 未发布；本线按 Owner 授权推进审查与合并，不发布产品，水泥不开发、Excel 正式流程延后。以下 10-27 记录保留当时边界，其中“新包尚未构建／待原生复验”已由本次定向结果补充。
+
+**2026-10-27 候选实测后续交接：**`rc-3bfbbeb`（干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2`）完整回归 1183 passed / 66 skipped、Artifact Gate 63 passed，EXE／隔离启动器各 6 项自检通过；设计已独立核三资产哈希、326 载荷、身份及 CRC。C 已在该包实测 Win11 原生 150%、保存重启／快照与 Word、225 条分页／损坏隔离、备份恢复；DOCX 只在 LibreOffice Writer 实开，不称 MS Word／WPS 通过。证据入口集中在[RS05 报告末节](docs/governance/RS05_EXECUTION_REPORT.md)。
+
+C-DEF-001／002 两处提示问题已由审核源码 `96aa3cb0b69e55c069dc692c8def74c39cb75656` 修复；设计反馈独立 66 项与 B 定向 70 项通过。新包尚未构建、C 尚未原生复验，两项保持“源码已修，实包待验”。最终包须纳入本次经审核文档后锁定实际干净 SHA，不预设 SHA，不把旧 `3bfbbeb` 全套移作新源码或新包结论。真实安装／升级／卸载、离线、Win10、其他 DPI／跨屏、真实 IME、MS Word／WPS 等仍缺证。RS05 仍 IN PROGRESS／未发布；本线不推送、合并或发布，不开发水泥，Excel 正式流程延期。以下首轮缺口按此精确版本进度补充。
+
+**2026-10-27 首轮交接：**[PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并到 main（`77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`）。统一 UI、固定选煤单页、自动保存快照、记录全库分页与只读两页签详情、设置、紧凑表格及长名称返修已进入源码；官方原文请求后反馈无法确认网页呈现，并可复制地址。用户操作以[用户手册](docs/用户手册.md)为准，实施历史见[UI 状态](docs/ui/UI_IMPLEMENTATION_STATUS.md)。
+
+源码 UI 已有 Win11 原生 150%／窗口 DPI 144 的隔离观察；下文旧候选“无 Win11／高 DPI 证据”只保留当时设备和版本边界，不是当前环境结论。最终候选安装包与 Win10/11 基本业务链、真实离线、125%／跨屏、真实输入法预编辑、网页实际呈现及 0.1.0 两代安装器覆盖仍待对应实测，详见[RS05 执行报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)。当前构建须纳入经审核文档并记录实际干净源码身份；后续验收线使用独立证据文件，不能将本次文档整理或 UI 合并记为 Gate 通过。第二轮主体全套 1165 passed / 66 skipped / 2 warnings 属 `1425241`；`e53ebb5` 长名称补修仅有已登记定向 25 passed，不冒充新全套。
+
+后续继续 RS05 候选构建和隔离验收，不发布、不打正式 tag，不自行推送或合并文档分支；RS06 与水泥开发不启动，Excel 正式流程延后。不得改真实数据库、已安装产品或旧 `UI测试版_b1346935`／`e70da765`／`ced969a3` 及其中数据。Frozen lock、公式、批准映射、支持范围与 Schema 不变。以下 2026-10-18～23 段落为已有业务与候选证据，具体通过项不跨版本继承。
 
 **2026-10-18 当前正式业务映射：**Owner 已确认[GB29446 现行批准映射](standards/mappings/GB29446-2019/标准映射表_2026-10-18_已批准.md)为唯一正式业务映射版本，[标准入口](standards/mappings/GB29446-2019/README.md)记录原字节 SHA256。D01 将有效比较后超过 3 级上限的结果称为“未达3级”；D02 为本标准设 $E_d>0$、$m>0$ 的软件防误录边界，非标准明文。旧“超出3级”已在本轮源码展示中同步；不恢复企业建设属性合规填写或符合性主结论。映射正式不等于 RS05 完成或其他标准获正式支持。
 
@@ -129,8 +143,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - 已关闭：不同内容的 Candidate 同名难以区分 —— Candidate 资产名与 CI artifact 名现在携带
   `-rc-<short7>`，并由 `release-build-info.json` / `ACTIVE-CANDIDATE.json` 记录
   `source_commit`（完整 40 位）、`source_dirty=false` 与标准包身份。
-- 仍未关闭（由环境决定）：Windows 验收证据不完整 —— 无 Windows 11 环境、单显示器，
-  无法实测多 DPI 与跨屏拖动（如实记为 BLOCKED / PENDING-MANUAL）。
+- 当时未关闭（旧环境）：无 Windows 11 环境、单显示器，无法实测多 DPI 与跨屏拖动，原记录为 BLOCKED / PENDING-MANUAL。2026-10-27 已有 Win11 源码原生 150% 局部观察；最终候选、125%／跨屏仍待验，按第 4 节当前交接处理。
 
 ## 9. 下一步
 
@@ -139,7 +152,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 - Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
 - 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；
 - 定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及构建源码 exact-head CI 已按对应提交取得证据；后续仅在构建输入改变或实测发现缺陷时按影响复验；
-- 业务 PR #28 已获 Owner 授权并合并；`rc-4e43490` 与 `rc-f689658` 的验收保留为各自历史。当前 PR #32 的构建源码 `b102e36a564e5b8874e676e4a1799395d211254b` 对应 `rc-b102e36`，三项精确提交 CI、构建门禁、修正手册入包、真实用户持久安装及隔离启动有证据；本交接的后续文档提交不改变 Candidate 身份。GUI 三态视觉与选煤操作链未实测；按[RS05 当前交付收口计划与本机结果](docs/governance/RS05_EXECUTION_REPORT.md)继续保留真实安装器覆盖及 Win11／原生系统高 DPI／跨屏／离线缺口。不能用旧阶段便携 ZIP 缺失或“Windows 证据尚未建立”否定已有实测，也不能将未测环境写为通过；不据此正式发布 v0.2.0，不开始 RS06。
+- PR #33 已合并；纳入经审核文档后由干净 source SHA 重建最终候选，按[RS05 最新交付矩阵](docs/governance/RS05_EXECUTION_REPORT.md)核对实物门禁与隔离环境证据。`rc-4e43490`、`rc-f689658` 与 PR #32 的 `rc-b102e36` 均保留各自历史身份，不能代替当前 UI 最终候选。源码 Win11 原生 150% 局部观察不等于最终安装包、真实离线、125%／跨屏或两代安装器覆盖通过。不正式发布 v0.2.0，不开始 RS06。
 
 Reference Standard Product Closure 仍为 PARTIAL。
 
@@ -170,7 +183,7 @@ Reference Standard Product Closure 仍为 PARTIAL。
   标准库中作为目录/参考信息，但**不得**作为正式评价对象，界面显示「尚未纳入正式评价范围」。
   “标准库里有该标准”不等于“软件已正式支持评价”。
 - 0.2.0 **不随软件分发、也不在软件数据目录保存标准原文 PDF**；普通界面提供
-  「查看标准原文」，点击后打开**全国标准信息公共服务平台**上预先登记的官方页面
+  「查看标准原文」，点击后请求浏览器打开**全国标准信息公共服务平台**上预先登记的官方页面
   （不进行运行时搜索或抓取）。未登记官方地址的标准，该入口禁用并提示
   「官方来源地址尚未登记」。
 - 标准定义中仍保留标准编号、原文文件名与 SHA-256 等**追溯元数据**，但不再分发原文文件本身。

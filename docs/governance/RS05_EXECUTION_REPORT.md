@@ -1,5 +1,9 @@
 # ECQ-RS05 执行报告 — Windows V1 Release Candidate
 
+> **2026-10-28 最新补录：** `rc-69562ee` 的 12 项原生短定向复验及设计独立复核通过，两项 P3 在此范围关闭；实际构建源码仍为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`。本次仅治理补录，不重打包；最新证据与剩余环境条件见本文末节。下方 10-27“新包待构建／待复验”为历史状态。PR #34 已获 Owner 授权在最终审查和精确提交 CI 通过后合并，RS05 仍 IN PROGRESS、产品 PARTIAL、0.2.0 未发布。
+
+> **当前交付状态更新（2026-10-27）：** PR #33 已合并到 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；`rc-3bfbbeb` 已有 Win11 原生 150% 实包业务链证据，两处提示问题已在 `96aa3cb` 源码修复，新包待构建及原生复验。下文早期“无 Win11 环境”、旧候选的 PASS／BLOCKED 和“未合并”等均只描述各自日期及版本，不能直接作为当前环境或最终候选结论。最新状态、缺口和证据边界见本文末节“2026-10-27 rc-3bfbbeb 实包结果与提示修复衔接”。RS05 仍 IN PROGRESS，0.2.0 尚未正式发布。
+
 状态：**`RS05 = IN PROGRESS / RELEASE CANDIDATE`**
 目标版本：**`UEBench 0.2.0`**
 本报告不宣布 `RS05 = DONE`，也不宣布 `UEBench 0.2.0 = RELEASED`。
@@ -1166,3 +1170,85 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 本轮没有取得新候选的 GUI 控件树或截图，也没有点击标准库、保存选煤记录或重验 Word/WPS。因此三态文字与明细表隐藏的**真实界面视觉**、选煤最短 GUI 操作链仍为 `PENDING-MANUAL`；C 的源码只读复核、定向测试与实际进程启动不能替代人工界面验收。`rc-f689658` 的旧实物记录也不自动升级为 `rc-b102e36` 的 Word/WPS 证据。当前目标仍受上方 Win11、原生高 DPI／跨屏、可信离线链及 0.1.0 真实安装器覆盖缺口约束，`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`。
 
 本机原始构建记录在上述构建工作树的 `work/build-candidate-b102e36-{stdout,stderr}.log` 与 `work/build-candidate-b102e36-retry-{stdout,stderr}.log`；安装日志及自检报告在 `G:/Python Project/能耗限额/work/standard-confirmation-b102e36-install/`。这些是历史执行环境路径，不是跨机器固定入口。最终文档交接提交将与构建源码分开，不能据其 SHA 宣称 Candidate 从该文档提交重建。
+
+## 2026-10-27 PR #33 合并后的交付衔接
+
+### 平台 / Contract 预检查
+
+| 项目 | 本次文档收口核对 |
+|---|---|
+| 业务仓与源码 | origin 为 `https://github.com/adgo07/ECQuota-Insight.git`；独占文档工作树 `delivery/rs05-docs-20261027`，开工及 fetch 后 `origin/main` 为 `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`，PR #33 已合并 |
+| Frozen 基线 | `platform-lock.json` 保持 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture V2.1、Numeric Contract v1、Profiles v1、Conformance v1 均不变 |
+| ACTIVE 指南 | 已核对中央本地 clone origin；main `a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`，按 GUIDE_INDEX 核读交付 Policy、当前 UI 规格、指南 v0.2 与验收清单；不构成 Frozen 升级 |
+| MUST / MUST NOT | 保留 Decimal 全值比较、保存快照和仅选煤正式范围；不改公式、批准映射、支持注册表、Schema、Frozen lock；不把 UI 合并或源码截图当作最终实物通过 |
+| 冲突与中央修改 | 本任务不涉及中央公共 Contract；未发现新增冲突，不需要中央修改；D-ECQ-002～006 保持原登记状态 |
+| Standard Issue / 软件解释 | 无本轮相关新增问题；D01/D02 与现行批准映射不变；水泥问题 001/003 保持原状态，本轮不开发水泥 |
+
+### 已有结果与证据边界
+
+[PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并。统一导航、固定选煤单页、自动保存快照、全库检索分页和只读两页签详情、紧凑表格与长名称、设置和禁用入口、官方原文请求反馈及复制地址均已进入 main。当前文档据源码核对，操作入口使用“新建对标”“对标记录”；历史记录和 Word 使用保存快照，普通历史页没有重新评价入口。保存后再次主动计算另存一条记录；修改输入使旧结果的当前查看／导出关联失效。具体实施、测试及截图身份集中在[UI 实施状态第 12 节](../ui/UI_IMPLEMENTATION_STATUS.md#12-pr-33-已合并与-rs05-交付衔接2026-10-27)，不复制一份新实施报告。
+
+第二轮主体 `1425241` 的源码完整回归为 1165 passed / 66 skipped / 2 warnings；后续长名称实现 `e53ebb5` 已登记定向 25 passed。二者保持原版本边界，本次文档线没有重跑生产全套，没有取得最终候选的新 Gate、CI 或人工验收，不将旧结果改写为新版本通过。
+
+当前 Win11 环境和原生 150% 源码 UI 观察已由协调会话确认；仓内 `docs/ui/screenshots/pr33-round2/native150/observation.json` 记录窗口 DPI 144、DPR 1.5、无 Qt 缩放环境覆盖、隔离数据及源码脏树／实现提交归属。该清单的 platform 仅为 windows，不单独提供 OS 版本身份；最终候选验收仍须记录系统版本。原清单 `native_dpi_acceptance=false` 保留，因为源码截图和局部交互不等于最终安装包完整高 DPI 验收。2026-10-20 的 Win10 19045／无 Win11 设备结论继续保留为历史，不再描述当前环境。
+
+### 最终候选待验矩阵（仅列待验，不预写通过）
+
+| 项目 | 截至本次文档核对的状态与所需证据 |
+|---|---|
+| 最终构建身份与门禁 | 待构建线纳入经审核文档后，从实际干净 source SHA 构建，记录 Candidate 身份、载荷清单与哈希、Source Gate、Artifact Gate、EXE 自检及对应源码 CI。旧 Candidate／UI 试用包不代替新产物 |
+| Win10/11 安装与核心业务链 | 有历史候选及源码 UI 的分版本证据；最终候选仍待隔离实测启动／关闭、中文路径与企业名、标准库状态、保存／重启读回、Word 导出，并记录实际 OS 与安装包身份 |
+| 原生缩放／跨屏 | 源码原生 150% 已有局部观察；125%、跨屏、其他未覆盖原生尺寸及最终候选主要页面仍待验，不能以 Qt 离屏缩放或截图尺寸替代 |
+| 真实离线 | 待物理断网或等效可审计隔离下实测启动、库、计算保存、历史读回及本地 Word。官方网页本来需要网络，其不可访问不代表本地链失败 |
+| 输入法与原生弹层 | 真实中文输入法预编辑、未重测的原生展开弹层及适用键盘路径待对应实测；既有 QTest 不自动变成人工证据 |
+| 官方网页呈现 | 系统请求反馈／复制地址已实现并有测试及冻结诊断观察；真实网页呈现、原权限弹窗根因仍未核验。沿用既有受限浏览器停止边界，不据请求返回 true 宣称网页已显示 |
+| 0.1.0 → 最终候选升级 | 可信旧载荷库级保真已有历史证据；旧 GUI 保存与两代真实安装器覆盖仍待安全隔离验收。用户安装说明已区分预定路径与已验事实，不承诺兼容所有开发中间数据库 |
+
+构建与验收线使用自己的实际证据文件；本文只承接状态与边界，不预设其结果或最终候选 SHA。文档整理不修改生产代码、构建脚本、版本号、标准数据或治理锁；不操作真实用户数据库、已安装产品及旧 `UI测试版_b1346935`／`e70da765`／`ced969a3` 数据。本轮不发布、不打正式 tag，不自行推送或合并文档分支。
+
+当前保持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。64 项机器定义／48 项交付／16 项原样 draft、仅 GB29446 正式可计算不变；Excel 正式用户流程 DEFERRED，水泥不开发。产品路线仍只有根目录《参考标准开发路线》。
+
+### 文档线验证
+
+本次仅改 8 个既有 Markdown 文档；`git diff --check` 通过。默认 Python 3.11 无 pytest，尝试 pytest 命令未能启动；随后以 `runpy.run_path('tests/test_document_hygiene.py')` 直接调用其中全部 6 个无参检查，6/6 通过（控制字符、三份阶段一致性、产品配套状态、手册、仓库指南及 AGENTS 读取顺序）。这是文档一致性验证，不是 Python 3.13 生产回归或候选验收。核对当前 UI 源码及既有截图清单后，未启动桌面程序、构建或修改用户数据。
+
+## 2026-10-27 rc-3bfbbeb 实包结果与提示修复衔接
+
+**平台 / Contract 预检查：** 文档工作树确认干净后，从 `4f9a53d84873a7a0eb14247d19eef1dc029ad89f` 快进至已审核的 `96aa3cb0b69e55c069dc692c8def74c39cb75656`；仅追加三份既有状态文档。Frozen lock 仍为 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture 2.1、Numeric Contract／Profiles／Conformance v1、公式、映射、支持范围和 Schema 不变。本任务不涉及中央公共 Contract；无新增冲突或 Standard Issue，不改变选煤 D01/D02，不需中央修改。MUST 按精确版本区分源码修复、自动测试与实包观察；MUST NOT 将旧包通过项冒充新包验证。
+
+| 版本／证据 | 当前可确认结果与边界 |
+|---|---|
+| `rc-3bfbbeb`，干净源码 `3bfbbeb148b9724580c51518857c5dbedde01dd2` | B 的 `build/work/candidate-3bfbbeb-20261027/BUILD_DELIVERY.json`：完整回归 1183 passed／66 skipped（0 failed），Artifact Gate 63 passed，冻结 EXE 与中文路径隔离启动器各 6 passed。此全套只属于该源码／候选 |
+| 设计独立资产核对 | `evidence/design-review-rc-3bfbbeb.json`：三资产 SHA256、326 个载荷文件、隔离包载荷同字节、身份及 ZIP CRC 已核；不等于安装／升级／卸载通过 |
+| C 冻结包实测 | `evidence/acceptance/rc-3bfbbeb-中文 独立实测/候选包独立实测报告.md`：Win11 26300、原生 150% 默认主要页面、正式保存／跨进程重启、历史只读及快照保真、225 条搜索分页／损坏隔离、备份恢复与恢复后继续评价已实测。DOCX 仅 LibreOffice Writer 实开；本候选 MS Word／WPS 仍未验 |
+| C-DEF-001／002 | 同目录 `产品提示问题复现.md` 登记损坏备份提示不准、英文确认／提示按钮两项 P3。`96aa3cb0b69e55c069dc692c8def74c39cb75656` 已修复源码；据设计复核反馈，生产／测试 diff 已独立阅读，产品提示／备份迁移安全／架构边界 66 项全通过，B 定向 70 项通过。**新包尚未构建，C 尚未原生复验，两项不关闭为实包 PASS** |
+
+上述证据路径以交付收口目录为根，是本机证据定位，不是跨机器固定仓库路径；C 报告附有自身数据来源、截图与哈希索引。本次文档线读取既有报告，不重复声称亲自执行 C 的桌面验收或设计的测试。
+
+仍保留真实安装／升级／卸载及 0.1.0 两代安装器覆盖、真实离线、Win10、其他 DPI／跨屏、额外原生尺寸、真实 IME、MS Word／WPS 和官方网页实际呈现等缺口。最终包必须纳入本次经审核文档后，再锁定实际干净 SHA 并完成对应构建／续验；本文不预设该 SHA，不把 `3bfbbeb` 全套当作 `96aa3cb` 或新包全套，也不据此声称新源码 CI 已通过。
+
+保持 `RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`；本线不推送、不合并、不发布、不打正式 tag，不改 B 文件或生产代码，不触碰真实数据／旧 UI 测试包。64 定义／48 交付／16 draft、仅选煤正式评价不变，水泥不开发，Excel 正式流程延期。
+
+## 2026-10-28 rc-69562ee 定向复验与治理验收补录
+
+**平台 / Contract 预检查：** 文档工作树起点确认干净且为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`；仅补录 TASK_STATE、HANDOFF 与本报告，不改生产代码、实际打包输入或证据原件，不重打包。Frozen lock 保持 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture 2.1、Numeric Contract／Profiles／Conformance v1、公式、Mapping、Schema、正式范围均不变。本任务不涉及中央公共 Contract；无新增冲突或 Standard Issue、不改软件解释、不需中央修改。MUST 绑定精确实物身份与定向范围，MUST NOT 把旧包全矩阵或治理提交当作新实物验收。
+
+实际候选为 `rc-69562ee`，干净构建源码 **`69562eed5d072b9a1a1a77ab6a71f63ea0196788`**。B 的 `build/work/candidate-69562ee-20261027/BUILD_DELIVERY.json` 记录完整回归 **1214 passed／66 skipped／0 failed**、Artifact Gate **63 passed**，EXE／隔离启动器各 6 项自检通过。据设计独立确认，该精确 SHA 的三项适用 CI 全部 success；[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并。本次治理补录提交不是新构建身份，不触发重打包。
+
+C 原生 **12 项短定向复验 PASS**，范围为 Win11 原生 150% 的计算错误／成功中文按钮、仅存一条、历史及 Word 快照短冒烟、备份成功、恢复与删除 Enter／Esc／关闭默认取消、坏备份提示与数据保真、确认软删除、有效恢复及保护备份、重启保真、导出错误中文按钮。C-DEF-001（坏备份建议不准）、C-DEF-002（英文按钮）经设计独立复核后在此定向范围关闭。受控导出故障注入仅限合成记录且已撤销；最终唯一记录 ID 及 request／result／rule snapshot 三份 JSON 与基线逐字相同，326 个原载荷一致，正常关闭后无本候选进程残留。
+
+证据以交付收口目录为根：
+
+- `evidence/acceptance/rc-69562ee-定向复验-20261028/定向复验报告.md`、同目录 `C_TARGETED_RETEST_RESULT.json`：原生动作、截图索引、注入撤销与最终数据核对。
+- `evidence/design-review-rc-69562ee-targeted.json`：设计已读报告／JSON，目视坏备份、默认取消删除及导出错误三张原生截图，直接只读核对合成数据库与基线、取消／恢复审计、保护备份 CRC 及哈希，结论 `PASS_TARGETED_DESIGN_REVIEW`。
+
+本次文档线读取上述文件，不冒称重复执行 C 或设计的验收。`rc-3bfbbeb` 的 225 条分页、完整原生页面及 LibreOffice Writer 实开仍只属于旧包，不平移为 `rc-69562ee` 全矩阵通过。本候选 Word 仅验证导出、DOCX XML 和快照保真，未在 Word／WPS／Writer 实开；官网实际网页呈现也未验。C 的机器汇总 pending 为空仅指这 12 项定向用例结束，不表示以下环境门禁闭合。
+
+| 剩余未验项 | 可行动的环境条件与下一步 |
+|---|---|
+| 安装／覆盖升级／卸载及 0.1.0 两代安装器 | 取得可丢弃且与宿主安装登记、用户数据隔离的 Windows 验收环境及可信旧安装器；先记录环境／安装包身份，再验证旧 GUI 保存、真实安装器覆盖、同版本覆盖及卸载保留数据。新目录或库级迁移不替代安装隔离 |
+| 可信离线 | 取得物理断网或等效可审计隔离条件，在该候选上记录隔离状态并实测启动、标准库、计算保存、重启历史及本地 Word 导出；不以静态代码、自检或在线运行代替 |
+| Win10／其他 DPI／跨屏／真实 IME | 取得 Win10 验收环境、可安全调整的原生系统 DPI（含 125%）及双屏；按实际档位核主要页面／窗口恢复和跨屏。另用真实中文输入法完成预编辑、确认及取消，不能用 Unicode 填入代替 |
+| 文档查看器与官方网页 | 取得 Microsoft Word／WPS 环境，实开该候选导出的 DOCX 核内容与排版；在能可靠识别当前 URL 的获准浏览器环境核官网实际呈现。请求返回成功、复制地址或旧包 Writer 实开均不替代这些结论 |
+
+继续保持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。PR #34 仅按 Owner 本轮授权和精确提交 CI 结果合并；不发布或打正式 tag，不触碰真实数据／已安装产品／旧试用包；64 定义／48 交付／16 draft、仅选煤正式可计算不变，水泥排除，Excel 正式流程延后。此补录只更新治理证据，不要求为补录本身重新构建候选。
