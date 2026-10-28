@@ -143,6 +143,8 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 Reference Standard Product Closure 仍为 PARTIAL。
 
+**2026-10-21 历史验收准备包：**[当时的验收包记录](docs/governance/RS05_EXECUTION_REPORT.md#2026-10-21-验收准备包当时准备记录)和[库级升级小型证据摘要](docs/governance/evidence/RS05_20261020_legacy_upgrade_summary.json)保留原日期、资产身份与未测边界；后续实包状态以本报告较新日期补录和上方当前交接为准。准备包三份可审文本不代表二进制资产已跨机交付。
+
 ## 10. 历史材料索引
 
 以下均为**历史证据**，默认不必通读；仅在需要追溯历史结论时按需读取。

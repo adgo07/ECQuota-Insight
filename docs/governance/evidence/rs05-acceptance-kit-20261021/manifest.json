@@ -1,0 +1,39 @@
+{
+  "schema": "ecquota.rs05.acceptance-kit.v1",
+  "created_date": "2026-10-21",
+  "purpose": "隔离环境复验UEBench 0.1.0旧版GUI与0.2.0 rc-4e43490真实安装覆盖；本包仅供验收，不是正式0.2.0发布",
+  "repository": "https://github.com/adgo07/ECQuota-Insight.git",
+  "files": [
+    {
+      "path": "assets/UEBench-Setup-0.1.0-x64.exe",
+      "size_bytes": 127023093,
+      "sha256": "234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911",
+      "role": "previous_formal_installer",
+      "product_version": "0.1.0",
+      "source_commit": null,
+      "candidate_id": null,
+      "identity_evidence": "docs/governance/RS05_EXECUTION_REPORT.md §6.3; docs/history/legacy/HANDOFF_LEGACY_2026-09.md"
+    },
+    {
+      "path": "assets/UEBench-Setup-0.2.0-rc-4e43490-x64.exe",
+      "size_bytes": 49409187,
+      "sha256": "01845f1f04a0908af632f655e7c883af8c0b664d72b29fbbc02d895333e8621f",
+      "role": "current_candidate_installer",
+      "product_version": "0.2.0",
+      "source_commit": "4e4349068bb56fa500d20cfab98ef6640e63605c",
+      "candidate_id": "rc-4e43490",
+      "release_status": "candidate_not_published"
+    },
+    {
+      "path": "assets/UEBench-0.2.0-rc-4e43490-win-x64.zip",
+      "size_bytes": 72358923,
+      "sha256": "6b4bddfe39bad099695577049ba21d750a80b9a04c86acf93d9d7a398127eb45",
+      "role": "current_candidate_portable",
+      "product_version": "0.2.0",
+      "source_commit": "4e4349068bb56fa500d20cfab98ef6640e63605c",
+      "candidate_id": "rc-4e43490",
+      "release_status": "candidate_not_published"
+    }
+  ],
+  "scope_note": "清单仅核文件身份；旧GUI保存、真实安装器覆盖、历史结果保真均须在独立测试环境实际验收。"
+}
