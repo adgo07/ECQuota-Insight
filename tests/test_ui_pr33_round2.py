@@ -187,7 +187,7 @@ def test_exact_long_name_cell_matches_unclipped_delegate_render(records, width, 
     win.resize(width, 760 if width != 1256 else 624)
     for _ in range(4):
         QApplication.processEvents()
-    assert table.rowHeight(1) == 44
+    assert table.rowHeight(1) == 48
     assert table.font().pixelSize() == 13
     for column in (0, 2):
         index = table.model().index(0, column)

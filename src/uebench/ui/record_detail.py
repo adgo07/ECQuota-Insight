@@ -1,7 +1,9 @@
 """独立历史只读页：仅消费保存的三件快照及报告视图。"""
 import html
 import re
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QSize
+from PySide6.QtGui import QIcon
+from pathlib import Path
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QTabWidget, QTextEdit
 from uebench.application.gb29446 import decode_period_notes, GB29446_STANDARD_ID
 from uebench.application.reporting import gb29446_business_labels, render_gb29446_warning
@@ -18,7 +20,10 @@ def section(title, lines):
     return f'<h3 style="color:#18364F; font-size:16px; margin-top:22px;">{title}</h3><p style="line-height:160%;">{rich_lines(lines)}</p>'
 
 
-class RecordDetailPage(QWidget):
+from .responsive_page import ResponsivePage
+
+
+class RecordDetailPage(ResponsivePage):
     back_requested = Signal()
     export_requested = Signal(str)
     source_requested = Signal(str)
@@ -31,6 +36,8 @@ class RecordDetailPage(QWidget):
         body = QVBoxLayout(self)
         body.setContentsMargins(24, 20, 24, 20)
         back = QPushButton("返回对标记录")
+        back.setIcon(QIcon(str(Path(__file__).resolve().parents[1] / "resources/icons/back.svg")))
+        back.setIconSize(QSize(18, 18))
         back.clicked.connect(self.back_requested)
         body.addWidget(back, 0, Qt.AlignLeft)
         self.title = QLabel("对标记录详情")

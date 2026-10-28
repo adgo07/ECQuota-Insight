@@ -20,6 +20,11 @@ ROOT = Path(__file__).resolve().parents[1]
 @pytest.fixture
 def records(tmp_path, monkeypatch):
     app = QApplication.instance() or QApplication([])
+    # 离屏平台默认只有 800×800；代表桌面宽度测试显式给定工作区，
+    # 窗口约束本身另以大小屏、负坐标和掉屏用例验证。
+    from PySide6.QtGui import QScreen
+    from PySide6.QtCore import QRect
+    monkeypatch.setattr(QScreen, "availableGeometry", lambda self: QRect(0, 0, 1920, 1080))
     for name in ("warning", "critical", "information"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
     context = create_context(tmp_path / "records")
