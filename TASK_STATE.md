@@ -29,9 +29,9 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ### 2026-10-28 rc-69562ee 定向复验与治理补录
 
-- 实际构建仍为干净源码 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`、候选 `rc-69562ee`：完整回归 1214 passed / 66 skipped，Artifact Gate 63 passed；据设计独立确认，该精确提交三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 为草稿、未合并。
+- 实际构建仍为干净源码 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`、候选 `rc-69562ee`：完整回归 1214 passed / 66 skipped，Artifact Gate 63 passed；据设计独立确认，该精确提交三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并；合并不等于正式发布。
 - C 已完成该包 Win11 原生 150% 的 12 项短定向复验；设计已独立核阅报告、三张关键原生图、合成数据库原快照及保护备份 CRC／哈希。C-DEF-001／002 两项 P3 在此定向范围关闭。旧 `rc-3bfbbeb` 完整原生证据保持其原版本，不能平移为本候选全矩阵通过；本候选 DOCX 只有导出及 XML／快照短冒烟，未实开 Word／WPS／Writer。
-- 本次只补录治理证据，不改生产或实际打包输入，不重打包。剩余可执行条件见[RS05 报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)：可丢弃安装隔离环境、可审计断网条件、Win10／其他 DPI／双屏、真实 IME，以及 Word／WPS 和官方网页呈现实测。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`；草稿 PR 不自行合并，水泥排除、Excel 正式流程延后。下节“新包待验”为 10-27 当时状态。
+- 本次只补录治理证据，不改生产或实际打包输入，不重打包。剩余可执行条件见[RS05 报告最新节](docs/governance/RS05_EXECUTION_REPORT.md)：可丢弃安装隔离环境、可审计断网条件、Win10／其他 DPI／双屏、真实 IME，以及 Word／WPS 和官方网页呈现实测。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`；PR #34 按本轮 Owner 授权审查合并，不发布产品；水泥排除、Excel 正式流程延后。下节“新包待验”为 10-27 当时状态。
 
 ### 2026-10-27 候选实测续更（源码已修提示，新包待验）
 

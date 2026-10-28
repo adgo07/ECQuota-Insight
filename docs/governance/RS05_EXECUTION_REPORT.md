@@ -1,6 +1,6 @@
 # ECQ-RS05 执行报告 — Windows V1 Release Candidate
 
-> **2026-10-28 最新补录：** `rc-69562ee` 的 12 项原生短定向复验及设计独立复核通过，两项 P3 在此范围关闭；实际构建源码仍为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`。本次仅治理补录，不重打包；最新证据与剩余环境条件见本文末节。下方 10-27“新包待构建／待复验”为历史状态。PR #34 仍为未合并草稿，RS05 IN PROGRESS、产品 PARTIAL、0.2.0 未发布。
+> **2026-10-28 最新补录：** `rc-69562ee` 的 12 项原生短定向复验及设计独立复核通过，两项 P3 在此范围关闭；实际构建源码仍为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`。本次仅治理补录，不重打包；最新证据与剩余环境条件见本文末节。下方 10-27“新包待构建／待复验”为历史状态。PR #34 已获 Owner 授权在最终审查和精确提交 CI 通过后合并，RS05 仍 IN PROGRESS、产品 PARTIAL、0.2.0 未发布。
 
 > **当前交付状态更新（2026-10-27）：** PR #33 已合并到 main `77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`；`rc-3bfbbeb` 已有 Win11 原生 150% 实包业务链证据，两处提示问题已在 `96aa3cb` 源码修复，新包待构建及原生复验。下文早期“无 Win11 环境”、旧候选的 PASS／BLOCKED 和“未合并”等均只描述各自日期及版本，不能直接作为当前环境或最终候选结论。最新状态、缺口和证据边界见本文末节“2026-10-27 rc-3bfbbeb 实包结果与提示修复衔接”。RS05 仍 IN PROGRESS，0.2.0 尚未正式发布。
 
@@ -1104,6 +1104,18 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 原始证据位于本机历史执行环境的 `G:/Python Project/能耗限额/work/rs05-closure-20261020/legacy/`（`payload-test.txt`、`payload-extract.txt`、`old-pyz-modules.json`、`old-library-result.json`、`candidate-self-check-process.json`、`candidate-self-check.json`、`upgrade-compare.json`）及隔离工作树的 `work/rs05-closure-20261020/environment/README.md`；两处均为 Git 忽略目录，不是跨机器固定入口。上述身份、旧源库哈希和升级克隆库哈希已独立复算核对；原始文件不复制进 PR。
 
+## 2026-10-21 验收准备包（当时准备记录）
+
+**计划与平台 / Contract 预检查。**本轮只把 2026-10-20 的部分通过证据整理成小型[机器可核摘要](evidence/RS05_20261020_legacy_upgrade_summary.json)，并准备供隔离 Windows 环境使用的验收包；不重跑旧 GUI／安装器覆盖，不改代码、标准包、锁或构建输入，不重建 `rc-4e43490`。本仓起点为 `origin/main@694ac184d5d71b5f2f5500147a5a79b4690c8514`；`platform-lock.json` 仍锁中央 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，适用 Architecture 2.1、Numeric Contract/Profile/Conformance v1 Frozen 及中央当前 ACTIVE 交付 Policy §5。MUST 保持全值精确比较、历史记录／快照不重算和 Win10/11 基本兼容与高 DPI 主要页面可用的验收要求；MUST NOT 把未测门禁写成通过、把旧 Candidate 改名发布或自动豁免。未发现新增 Frozen 冲突或中央公共语义缺口；现存 D-ECQ-002～006 仍按已登记偏差管理。本轮不涉及中央 Contract 修改；标准问题台账无选煤现行问题，也不改变 D01/D02 或其他软件解释。
+
+**本日执行结果，仅为整理与校验。**本机忽略目录中的 `rs05-acceptance-kit-20261021.zip` 由可信 0.1 正式安装器、`rc-4e43490` 安装器及便携 ZIP 三资产，加单一手工步骤 README、`manifest.json`、`SHA256SUMS.txt`、只读 `Verify-Files.ps1` 组成。ZIP 为 248,802,961 B，SHA256 `88074c5e58d2ce0472a55e4b8f67411eb66b847865db379e77e10494010093ab`；7 成员 CRC 检查通过，独立解压后从不同工作目录运行校验脚本 3/3 通过，缺资产和错哈希负例均退出 1。`manifest.json` SHA256 为 `ea265a32d23ffc08f6fa1962169347b5fb8368c5d65ea82d227a0d3b7a93381a`；README SHA256 为 `e73d369057e8b8291e77ffb122cdeafce9543f540786055ab1ef5cdc1f4043e1`。包的本机历史路径是 `G:/Python Project/能耗限额/work/rs05-acceptance-kit-20261021.zip`，**不是跨机器固定入口或正式发布资产**。摘要保留旧记录三个 JSON 升级前后 SHA、自检 6/6、原证据文件 SHA 与未测边界；原始数据库和 2026-10-20 库级结果没有装入验收包。今天没有新增产品运行、旧 GUI 保存、安装器覆盖、离线或其他桌面环境实测。
+
+为便于远端审查，包内的[唯一 README、manifest 与只读校验脚本](evidence/rs05-acceptance-kit-20261021/README.md)已复制到仓库 `docs/governance/evidence/rs05-acceptance-kit-20261021/`，本工作树复制后逐项 SHA256 与包内原件一致；其中 [manifest](evidence/rs05-acceptance-kit-20261021/manifest.json) 与 [Verify-Files.ps1](evidence/rs05-acceptance-kit-20261021/Verify-Files.ps1) 也可直接查看。Git 不含三项二进制资产，不能从 clone 还原完整验收包；跨机核验以 ZIP 原件为准。当前 ZIP 仍只在上述本机忽略目录；待有隔离测试机时，由用户选择移动介质或文件传输通道**整体复制该 ZIP**，在目标机任意目录解压，先运行包内脚本并核对清单后再执行 README。此处只给转运方式，尚未跨机交付或完成新环境验收。
+
+**当时拟定的下一步。**有安全隔离 Windows 测试机／独立用户与所需设备时，先核包内清单和三资产，再按 README 分步取得旧 GUI 保存、两代安装器同路径覆盖、历史记录不重算、离线、原生高 DPI 与 Win11 基本链的真实证据；双屏可得时补跨屏检查。每项按[上方剩余门禁矩阵](#剩余门禁矩阵计划状态待填实测结果)单独更新，失败先保全证据，缺设备继续保留阻断／待人工状态，由 Owner 审查放行风险。截至 2026-10-21，Win11 为 `BLOCKED`；高 DPI／跨屏仍 `PENDING-MANUAL`，离线仍 `BLOCKED`，0.1→0.2 安装升级仍 `PARTIAL`。`RS05=IN PROGRESS`、产品闭环 `PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`；Excel 工作簿暂缓，水泥不启动。
+
+> 本节记录 2026-10-21 的准备结果与当时门禁，不作为现行验收状态。现行状态以报告顶部补录及后续较新日期的验收节为准；本验收包未随新候选自动更新。
+
 ## 2026-10-23 标准确认状态与稳定启动入口（计划与阶段结果）
 
 本节承接[当前任务](../../TASK_STATE.md)、[映射总索引](../../standards/mappings/INDEX.md)和本报告上述 RS05 交付门禁，只处理本轮已授权的确认状态表达、普通详情限值展示及稳定启动入口。2026-10-20 的部分通过结果仍是历史证据；以下先保留开工时计划，实际结果另见本节末尾，不把未验事项预写为 PASS。
@@ -1221,7 +1233,7 @@ Win11 实机、多显示器跨屏拖动、DPI、断网与安装后载荷人工�
 
 **平台 / Contract 预检查：** 文档工作树起点确认干净且为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`；仅补录 TASK_STATE、HANDOFF 与本报告，不改生产代码、实际打包输入或证据原件，不重打包。Frozen lock 保持 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture 2.1、Numeric Contract／Profiles／Conformance v1、公式、Mapping、Schema、正式范围均不变。本任务不涉及中央公共 Contract；无新增冲突或 Standard Issue、不改软件解释、不需中央修改。MUST 绑定精确实物身份与定向范围，MUST NOT 把旧包全矩阵或治理提交当作新实物验收。
 
-实际候选为 `rc-69562ee`，干净构建源码 **`69562eed5d072b9a1a1a77ab6a71f63ea0196788`**。B 的 `build/work/candidate-69562ee-20261027/BUILD_DELIVERY.json` 记录完整回归 **1214 passed／66 skipped／0 failed**、Artifact Gate **63 passed**，EXE／隔离启动器各 6 项自检通过。据设计独立确认，该精确 SHA 的三项适用 CI 全部 success；[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已存在，仍为草稿、未合并。本次治理补录提交不是新构建身份，不触发重打包。
+实际候选为 `rc-69562ee`，干净构建源码 **`69562eed5d072b9a1a1a77ab6a71f63ea0196788`**。B 的 `build/work/candidate-69562ee-20261027/BUILD_DELIVERY.json` 记录完整回归 **1214 passed／66 skipped／0 failed**、Artifact Gate **63 passed**，EXE／隔离启动器各 6 项自检通过。据设计独立确认，该精确 SHA 的三项适用 CI 全部 success；[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并。本次治理补录提交不是新构建身份，不触发重打包。
 
 C 原生 **12 项短定向复验 PASS**，范围为 Win11 原生 150% 的计算错误／成功中文按钮、仅存一条、历史及 Word 快照短冒烟、备份成功、恢复与删除 Enter／Esc／关闭默认取消、坏备份提示与数据保真、确认软删除、有效恢复及保护备份、重启保真、导出错误中文按钮。C-DEF-001（坏备份建议不准）、C-DEF-002（英文按钮）经设计独立复核后在此定向范围关闭。受控导出故障注入仅限合成记录且已撤销；最终唯一记录 ID 及 request／result／rule snapshot 三份 JSON 与基线逐字相同，326 个原载荷一致，正常关闭后无本候选进程残留。
 
@@ -1239,4 +1251,4 @@ C 原生 **12 项短定向复验 PASS**，范围为 Win11 原生 150% 的计算�
 | Win10／其他 DPI／跨屏／真实 IME | 取得 Win10 验收环境、可安全调整的原生系统 DPI（含 125%）及双屏；按实际档位核主要页面／窗口恢复和跨屏。另用真实中文输入法完成预编辑、确认及取消，不能用 Unicode 填入代替 |
 | 文档查看器与官方网页 | 取得 Microsoft Word／WPS 环境，实开该候选导出的 DOCX 核内容与排版；在能可靠识别当前 URL 的获准浏览器环境核官网实际呈现。请求返回成功、复制地址或旧包 Writer 实开均不替代这些结论 |
 
-继续保持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。不自行推送、合并、发布或打正式 tag，不触碰真实数据／已安装产品／旧试用包；64 定义／48 交付／16 draft、仅选煤正式可计算不变，水泥排除，Excel 正式流程延后。此补录只更新治理证据，不要求为补录本身重新构建候选。
+继续保持 `RS05=IN PROGRESS`、`Reference Standard Product Closure=PARTIAL`、`0.2.0=NOT RELEASED`、`RS06=NOT STARTED`。PR #34 仅按 Owner 本轮授权和精确提交 CI 结果合并；不发布或打正式 tag，不触碰真实数据／已安装产品／旧试用包；64 定义／48 交付／16 draft、仅选煤正式可计算不变，水泥排除，Excel 正式流程延后。此补录只更新治理证据，不要求为补录本身重新构建候选。
