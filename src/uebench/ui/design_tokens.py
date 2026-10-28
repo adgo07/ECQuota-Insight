@@ -75,6 +75,10 @@ QScrollArea { border: none; }
 from pathlib import Path
 _radio_icons = (Path(__file__).resolve().parents[1] / "resources" / "icons").as_posix()
 APP_STYLE += """
+QComboBox { padding-right: 36px; }
+QComboBox::drop-down { subcontrol-origin: padding; subcontrol-position: top right; width: 28px; border: none; background: transparent; }
+QComboBox::down-arrow { image: url("RADIO_ROOT/chevron-down.svg"); width: 18px; height: 18px; }
+QComboBox::down-arrow:disabled { image: url("RADIO_ROOT/chevron-down-disabled.svg"); }
 QRadioButton { background: transparent; spacing: 8px; padding: 4px; border: 1px solid transparent; border-radius: 4px; }
 QRadioButton:focus { border: 1px solid #197CC2; }
 QRadioButton:disabled { color: #698198; }

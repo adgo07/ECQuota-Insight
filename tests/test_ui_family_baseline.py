@@ -82,6 +82,26 @@ def test_controls_keep_40_dip_and_focus_does_not_change_size(window):
     assert window.gb29446_electricity.text() == text
     window.gb29446_electricity.clear()
     assert window.gb29446_electricity.text() == ""
+    combo = window.gb29446_period
+    combo.setFocus()
+    previous = combo.currentIndex()
+    QTest.keyClick(combo, Qt.Key.Key_Down)
+    assert combo.currentIndex() != previous
+    combo.showPopup()
+    app.processEvents()
+    index = combo.model().index(2, 0)
+    QTest.mouseClick(combo.view().viewport(), Qt.MouseButton.LeftButton, pos=combo.view().visualRect(index).center())
+    assert combo.currentIndex() == 2 and combo.height() == 40
+    image = combo.grab().toImage()
+    # 箭头位于右留白的中心区域，不把外框或业务文字当成可见箭头。
+    ink = sum(image.pixelColor(x, y).lightness() < 220
+              for x in range(image.width() - 26, image.width() - 8)
+              for y in range(14, 26))
+    assert ink > 8
+    combo.setEnabled(False)
+    QTest.keyClick(combo, Qt.Key.Key_Down)
+    assert combo.currentIndex() == 2 and combo.height() == 40
+    combo.setEnabled(True)
     assert window.navigation.visualItemRect(window.navigation.item(1)).height() == 46
     assert window.findChild(QPushButton, "sidebarSettings").height() == 46
     window.navigate("record_detail")
