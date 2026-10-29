@@ -1,0 +1,61 @@
+{
+  "candidate": {
+    "schema": "ecq.active-candidate.v1",
+    "status": "ACTIVE",
+    "candidate_id": "rc-a89b2c1",
+    "build_channel": "candidate",
+    "release_tag": null,
+    "product_version": "0.2.0",
+    "source_commit": "a89b2c166214451bf6f6692099548979a4953483",
+    "source_dirty": false,
+    "standard_package_id": "gb16780-r2-from-2026.10-published.5",
+    "standard_data_version": "2026.10-published.6",
+    "standard_package_sha256": "d5ff370d3728ad3dda2589ed72bc9c693425208084ed96d45ad1d036c91afa51",
+    "payload_tree_sha256": "5895f61c747ae56e95f7f34f38f88d24679d0f8586b12f59ba9eb169898f0a64",
+    "assembled_at_utc": "2026-10-29T10:38:47Z"
+  },
+  "assets": [
+    {
+      "path": "dist\\UEBench\\UEBench.exe",
+      "bytes": 12071870,
+      "sha256": "7dccbabdeb839aef1d8ea35552e528c471b3f8f3040afe8b0e4a7bae7f2c61b5"
+    },
+    {
+      "path": "dist\\candidate-0.2.0\\UEBench-0.2.0-rc-a89b2c1-win-x64.zip",
+      "bytes": 72626664,
+      "sha256": "66a4b8d5ee20745414de8c61b18fc4aa1100e2b8d778bc5a69ae5a12a1fcf7ee"
+    },
+    {
+      "path": "dist\\candidate-0.2.0\\UEBench-source-0.2.0-rc-a89b2c1.zip",
+      "bytes": 9595960,
+      "sha256": "40d925f338d600006ededef2438d3ae94dd3b2b186877230d22f60cde9fe8aca"
+    },
+    {
+      "path": "dist\\candidate-0.2.0\\UEBench-Setup-0.2.0-rc-a89b2c1-x64.exe",
+      "bytes": 49679197,
+      "sha256": "8be190b243610d4dba4202b276a2c68d51d59c01aaeff2eceeed4bb7e9dbac14"
+    }
+  ],
+  "artifact_gate": {
+    "status": "passed",
+    "tests": 63
+  },
+  "frozen_self_check": {
+    "status": "passed",
+    "checks": 6
+  },
+  "frozen_cement_smoke": {
+    "status": "passed",
+    "records": 5,
+    "separate_readonly_process": true
+  },
+  "installation_performed": false,
+  "visual_acceptance": "pending",
+  "native_attempt": {
+    "process_id": 25296,
+    "window_enumeration": "unavailable",
+    "ui_interaction": "pending",
+    "word_visual": "pending",
+    "window_kept_for_user": true
+  }
+}

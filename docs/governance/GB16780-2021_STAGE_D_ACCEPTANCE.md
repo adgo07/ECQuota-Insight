@@ -48,7 +48,7 @@ Owner授权继续Stage D；[Stage B §9.2](../GB16780-2021_StageB_软件接入�
 
 ## 本轮证据
 
-候选代码、定向测试与构建正在执行；原生视觉、实际Office排版和安装均不能据此宣布通过。后续在本节记录精确源码、产物及独立验收，不跨版本套用旧选煤Candidate结论。
+以下保留各执行阶段真实结果；最终实包结论见下方rc-a89b2c1节。原生视觉、实际Office排版和安装均不能据源码或程序化证据宣布通过，不跨版本套用旧选煤Candidate结论。
 
 候选激活首轮定向66项，65通过、1项新测试因错误导入另一测试模块失败（测试辅助导入错误，未触发业务断言）。修为本测试自带原始DETAIL请求后，新6项全部通过、0skip（15.193秒），含真实Application签包对账/水泥保存、UI导航、默认入口拒绝以及本机真实Windows junction拒绝。其他61项默认范围、水泥展示、架构与Source Gate在首轮通过。证据为隔离clone的`tmp/staged-targeted-1.log/xml`与`tmp/staged-targeted-2.log/xml`。未因入口修改重跑无关本地全套；原Stage C精确head的远端CI与本轮新head的CI分开记录。
 
@@ -65,3 +65,33 @@ Owner授权继续Stage D；[Stage B §9.2](../GB16780-2021_StageB_软件接入�
 新增探针后最终定向14项全部通过，0失败/0错误/0skip，16.800秒：`tmp/staged-smoke-final.log/xml`。其中只读探针对故意改变的输入JSON拒绝并保持数据库原字节；`python -O`下失败守卫仍执行；真实Windows junction拒绝通过。旧61项定向和本轮14项各按实际执行记录，不冒称本地完整回归重跑。
 
 独立只读复审确认当前候选隔离、默认选煤范围、Application/UI同实例许可、FormalRelease拒绝、smoke独立常量及只读快照关联链无阻断项；该审查没有运行测试，不作自动或原生通过证据。候选代码将按此状态锁定干净构建提交。
+
+
+## rc-a89b2c1实际构建与冻结实包验证
+
+干净构建源码为`a89b2c166214451bf6f6692099548979a4953483`、`source_dirty=false`；版本`0.2.0`开发候选，候选`rc-a89b2c1`，本轮不发布。按既有`build_candidate.ps1 -SkipTests`执行，未跳过版本/清单/来源门禁、冻结EXE自检或Artifact Gate；构建exit0。Inno编译成功（64.500秒），**安装器没有执行**。
+
+配套包`.6`/水泥r2，package_id=`gb16780-r2-from-2026.10-published.5`，SHA256`d5ff370d3728ad3dda2589ed72bc9c693425208084ed96d45ad1d036c91afa51`。payload339文件、162835047字节，树SHA256`5895f61c747ae56e95f7f34f38f88d24679d0f8586b12f59ba9eb169898f0a64`。EXE既有冻结自检6/6，Artifact Gate63/63均通过；它们不是水泥原生界面通过的替代证据。
+
+| 实物（本次隔离clone相对路径） | 字节 | SHA256 |
+|---|---:|---|
+| `dist/UEBench/UEBench.exe` | 12071870 | `7dccbabdeb839aef1d8ea35552e528c471b3f8f3040afe8b0e4a7bae7f2c61b5` |
+| `dist/candidate-0.2.0/UEBench-0.2.0-rc-a89b2c1-win-x64.zip` | 72626664 | `66a4b8d5ee20745414de8c61b18fc4aa1100e2b8d778bc5a69ae5a12a1fcf7ee` |
+| `dist/candidate-0.2.0/UEBench-Setup-0.2.0-rc-a89b2c1-x64.exe` | 49679197 | `8be190b243610d4dba4202b276a2c68d51d59c01aaeff2eceeed4bb7e9dbac14` |
+| `dist/candidate-0.2.0/UEBench-source-0.2.0-rc-a89b2c1.zip` | 9595960 | `40d925f338d600006ededef2438d3ae94dd3b2b186877230d22f60cde9fe8aca` |
+
+对**实际便携ZIP重新解包出的EXE**运行`--data-dir <新验收根> --acceptance-smoke`，exit0，`frozen=true`，嵌入源码/候选/.6身份均相符：四模式与双修正5记录/5 Word、部分预览拒存/拒Word通过；第二独立同EXE进程23636→13048以SQLite只读重开三份原JSON、规则关联hash及保存快照投影全部通过，不重算。原始输出在本次clone的`tmp/staged-frozen-smoke-rc-a89b2c1/smoke-f8002de0b9514960bdd0764b360909b4/`，含5份`水泥-*.docx`。Word标准标题/适用指标/海拔必要说明程序检查通过；**分页和真实Office视觉仍未验**。
+
+可审证据：[构建身份与资产](evidence/GB16780_STAGE_D_rc-a89b2c1_artifacts.json)、[冻结自检](evidence/GB16780_STAGE_D_rc-a89b2c1_self_check.json)、[冻结水泥smoke](evidence/GB16780_STAGE_D_rc-a89b2c1_frozen_smoke.json)。构建日志为本次clone的`tmp/staged-build.log`；这些本地路径仅用于追溯当次环境，不是跨机器固定入口。
+
+原生启动方式：从本候选便携payload运行`UEBench.exe --data-dir <新的空验收目录>`；标题明确“水泥Stage D验收候选 · rc-a89b2c1”。不直接双击同AppId安装器，不把旧安装版与新`.6`分开混用。本节为a89b2c1的实物证据；后续仅补报告的提交不自动变成构建输入，不需因治理补录重打包。
+
+
+## 原生目标尝试与当前出口
+
+指定Astra验收者已用独立目录启动本次候选EXE，进程PID25296；工具无法枚举对应应用窗口，未取得可验证的窗口句柄，未完成视觉/交互验收。候选进程按Owner交接保留供用户查看，不将“进程存在”记为四模式UI链通过。此前Word截图capture超时及点击geometry不可用；不据工具失败断言没有Office，也不把程序化DOCX检查当作Word分页通过。
+
+当前分别为：**候选构建/Artifact Gate/冻结基础自检/冻结水泥计算-保存-只读快照-Word生成PASS；原生UI交互/Word视觉与分页/安装升级卸载待验。**安装器仅构建，未运行，未覆盖用户安装或真实数据。Stage D未完成，水泥仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布，Excel新工作簿延期。PR36保持草稿，不自动合并/发布。
+
+
+候选源码a89b2c1远端CI查询时：[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839532)与[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839519)已success；[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839552)仍in_progress，不记成全套成功。后续仅文档/evidence补录的head与该构建源码分开识别；新head若CI仍运行按真实状态交接，不为等待重复跑本地完整套件。最后文档卫生6项通过，`tmp/staged-doc-final.xml`；本次未改打包输入或重建实物。

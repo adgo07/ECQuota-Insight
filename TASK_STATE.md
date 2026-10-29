@@ -1,5 +1,10 @@
 # TASK_STATE
 
+## 2026-10-29 水泥Stage D候选交接
+
+已从干净源码`a89b2c166214451bf6f6692099548979a4953483`构建`rc-a89b2c1`完整候选（配套.6/r2）：Artifact Gate63/63、冻结基础自检6/6及便携ZIP解包同EXE水泥四模式/双修正5记录5 Word、独立只读进程核三JSON与规则hash均通过。原生进程PID25296已在独立目录启动，但工具无法枚举窗口，UI交互、Word视觉/分页与安装升级卸载待验；安装器未执行。完整身份、资产hash、独立矩阵与证据见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。治理补录提交不是构建输入，不因此重打包。水泥仍IMPLEMENTED、尚未SUPPORTED；正常正式范围仅选煤，RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布；不合并发布，Excel新工作簿延期。
+
+
 ## 2026-10-29 水泥Stage D隔离候选（当前推进）
 
 Owner授权继续Stage D。功能分支以专用显式入口构建隔离候选，将相同实例许可传入Application与既有UI，常规入口及正式评价清单仍仅选煤。强制指定隔离目录并拒真实用户目录、未标识数据及内部重解析点；不覆盖用户安装，不执行现有同AppId安装器，不自动合并或发布。精确候选身份、独立手算矩阵与待验边界见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。当前仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布、Excel新工作簿延期。
