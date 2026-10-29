@@ -9,6 +9,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING
 from uuid import uuid4
+from zipfile import BadZipFile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ from .record_table import RecordTable, StandardTable, HomeRecentTable
 from .wheel_safe_combo import WheelSafeComboBox
 from .official_source_dialog import OfficialSourceDialog
 from .external_browser import external_browser_environment
+from .message_box_text import install_chinese_message_box_buttons
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -59,6 +61,7 @@ if TYPE_CHECKING:
     from uebench.bootstrap import AppContext
 
 from uebench import __version__
+from uebench.application.backup_errors import BackupValidationError, RestoreSafetyError
 from uebench.application.build_identity import (
     DiagnosticsFacts,
     load_build_identity,
@@ -250,6 +253,22 @@ def _backup_failure_message(exc: Exception) -> str:
     return "创建备份失败：无法写入所选位置，请检查磁盘空间与文件权限，或更换保存位置后重试。"
 
 
+def _restore_failure_message(exc: Exception) -> str:
+    """恢复专用提示；不把未知后置错误说成原数据未变，技术详情只记日志。"""
+    if isinstance(exc, RestoreSafetyError):
+        # 既有后端消息区分未切换、已回滚与回滚失败，保留实际保护状态和处理建议。
+        return str(exc)
+    if isinstance(exc, (BackupValidationError, BadZipFile)):
+        return "所选备份无效、已损坏或与当前版本不兼容。请选择有效的 UEBench 备份（.uebackup），或重新复制备份文件后重试。"
+    if isinstance(exc, PermissionError):
+        return "恢复备份失败：无法访问备份文件或数据目录。请检查读取和写入权限、关闭占用文件的程序，或将备份复制到可访问的位置后重试。"
+    if isinstance(exc, (FileNotFoundError, IsADirectoryError, NotADirectoryError)):
+        return "恢复备份失败：文件或目录路径不可用。请确认备份文件仍然存在，重新选择有效文件，并检查数据目录后重试。"
+    if isinstance(exc, OSError):
+        return "恢复备份失败：无法读写备份文件或数据目录。请检查文件路径、磁盘空间和访问权限后重试。"
+    return "恢复未完成。请先核对当前记录状态，并保留恢复前的自动备份；如仍无法正常使用，请联系支持人员。"
+
+
 # ---------------------------------------------------------------------------
 # GB 29446 规则兼容性（FAIL-FAST）
 # ---------------------------------------------------------------------------
@@ -381,6 +400,7 @@ def standard_scope_line(standard_id: str | None) -> str:
 class MainWindow(QMainWindow):
     def __init__(self, context: AppContext) -> None:
         super().__init__()
+        install_chinese_message_box_buttons()
         self.context = context
         self.current_standard: StandardDefinition | None = None
         self.last_result_id: str | None = None
@@ -2859,7 +2879,8 @@ class MainWindow(QMainWindow):
             else:
                 QMessageBox.information(self, "恢复完成", "数据已恢复。")
         except Exception as exc:
-            QMessageBox.critical(self, "恢复失败", _friendly_error(exc, "恢复备份"))
+            _LOGGER.exception("恢复备份失败：%s", path)
+            QMessageBox.critical(self, "恢复失败", _restore_failure_message(exc))
 
     # ------------------------------------------------------------------
     # 关于 / 诊断信息（只读）

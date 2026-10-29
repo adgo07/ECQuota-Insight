@@ -1,0 +1,57 @@
+{
+  "schema": "ecquota.rs05.legacy-upgrade-evidence-summary.v1",
+  "observed_date": "2026-10-20",
+  "summary_prepared_date": "2026-10-21",
+  "repository": "https://github.com/adgo07/ECQuota-Insight.git",
+  "candidate_source_commit": "4e4349068bb56fa500d20cfab98ef6640e63605c",
+  "candidate_id": "rc-4e43490",
+  "outcome": "partial_database_compatibility_passed",
+  "scope": "正式 0.1 安装载荷初始化旧数据库；从其 PYZ 提取的旧业务模块在副本保存一条 r1 记录；当前候选真实 EXE 升级另一副本并保留该记录。未测试旧 GUI 保存或安装器覆盖。",
+  "not_tested": ["old_0_1_gui_save", "old_to_new_installer_same_path_cover_upgrade", "windows_11_desktop", "native_high_dpi", "multi_monitor", "auditable_offline_business_chain"],
+  "identities": {
+    "old_formal_installer_sha256": "234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911",
+    "old_extracted_exe_sha256": "cf4c9da1e65d635d174a68c4783ea3703caaf8f3b11598637e40a67a75251218",
+    "candidate_portable_zip_sha256": "6b4bddfe39bad099695577049ba21d750a80b9a04c86acf93d9d7a398127eb45",
+    "candidate_exe_sha256": "9b11064deb403096723e9293e889b1af156c960d8d60eeb7c081238e73af28fa",
+    "standard_package_sha256": "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
+  },
+  "old_record": {
+    "evaluation_id": "a60474e1-4856-4022-95b6-f38370374f45",
+    "rule_revision": 1,
+    "actual_value": "7.0",
+    "grade": "LEVEL_2",
+    "evaluation_id_and_deleted_at_unchanged": true,
+    "json_field_sha256_before_after": {
+      "request_json": ["a033c4f77f2bf282bdfd5d42eed974a4e0df4d27a10fc0ae34eda8d970846ce7", "a033c4f77f2bf282bdfd5d42eed974a4e0df4d27a10fc0ae34eda8d970846ce7"],
+      "result_json": ["318deb80a8624bc522a5e5bf7ec7d8208b81514381f0bf6119fafe096dda56b5", "318deb80a8624bc522a5e5bf7ec7d8208b81514381f0bf6119fafe096dda56b5"],
+      "rule_snapshot_json": ["38e76c7faaee3f3c0ec610d4e6266cb053f43dbe8f2598100491ba1f610e2232", "38e76c7faaee3f3c0ec610d4e6266cb053f43dbe8f2598100491ba1f610e2232"]
+    }
+  },
+  "database_counts": {
+    "before": {"evaluations": 1, "standard_version_rows": 48, "packages": 1},
+    "after": {"evaluations": 5, "standard_version_rows": 49, "packages": 2},
+    "explanation": "新增四条评价是自检记录；49 条标准版本行保留选煤 r1 与 r3，随包标准仍为 48 项。"
+  },
+  "candidate_self_check": {"exit_code": 0, "overall_status": "passed", "passed_count": 6, "failed_count": 0, "excel_note": "仅为后台导入链安全自检，本轮未交付 Excel 工作簿。"},
+  "source_evidence": {
+    "location_hint": "历史本机 checkout 的 work/rs05-closure-20261020/legacy/ 忽略目录；原始证据未装入验收包。",
+    "upgrade-compare.json_sha256": "484de16c8fb61e92d5329a093a750266da273b334412e78cde8eb92033ec80ca",
+    "candidate-self-check.json_sha256": "e3a4901fad7c2b799016fe208513f4cbbe9be4b0f87ac53ffdc18635cb64c01c",
+    "candidate-self-check-process.json_sha256": "ef1fa7201e3f09b322f4be3e87093e0ffe981468feafc61dfb6a7636e35a9488",
+    "final-identity-check.json_sha256": "7fe787cf50f5c404da5a9c41000d3cffae555eb3eaa3a8cddf691b35b1d8e697"
+  },
+  "acceptance_kit": {
+    "prepared_date": "2026-10-21",
+    "zip_name": "rs05-acceptance-kit-20261021.zip",
+    "zip_size_bytes": 248802961,
+    "zip_sha256": "88074c5e58d2ce0472a55e4b8f67411eb66b847865db379e77e10494010093ab",
+    "manifest_sha256": "ea265a32d23ffc08f6fa1962169347b5fb8368c5d65ea82d227a0d3b7a93381a",
+    "readme_sha256": "e73d369057e8b8291e77ffb122cdeafce9543f540786055ab1ef5cdc1f4043e1",
+    "verify_script_sha256": "2180f9026d8d3074761f65f9d5d4c400e9cbf72852c74366d802689516b7d082",
+    "asset_count": 3,
+    "zip_member_count": 7,
+    "zip_crc_check": "passed",
+    "asset_manifest_check": "3_of_3_passed",
+    "note": "本包只为后续人工验收做准备；不含旧数据库或此前库级验证结果。"
+  }
+}

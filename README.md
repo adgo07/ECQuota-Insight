@@ -22,6 +22,7 @@
 - **源码权威是 Git exact commit / release tag**；正式 Candidate 只有 `scripts/build_candidate.ps1` 一个构建入口（含严格全量测试与 Artifact Gate），普通 PR 不再触发完整候选构建。见 [仓库使用说明](docs/仓库使用说明.md)。
 - 普通用户无需管理标准包；标准库随完整软件版本配套更新。Excel Adapter 技术能力保留，Excel 正式用户流程暂缓开放。
 - **RS05 当前阶段为 Product Simplification & Standard Library Pairing（IN PROGRESS）；不把旧 EXE / 安装包冒充为当前源码 Candidate，也不据此发布 0.2.0。**
+- 2026-10-27 [PR #33](https://github.com/adgo07/ECQuota-Insight/pull/33) 已按用户验收授权合并（`77665b87c9f1ff77c24d26fa5ffbd057c1d12cee`）：统一导航、选煤单页自动保存、历史只读分页详情、紧凑列表及官方地址请求反馈已进入 main。源码 UI 已有 Win11 原生 150% 证据；最终候选安装包、真实离线、125%／跨屏等仍待验证。当前操作见[用户手册](docs/用户手册.md)，证据与交付缺口见[RS05 执行报告](docs/governance/RS05_EXECUTION_REPORT.md)。UI 合并不等于产品发布。
 
 ### 上一正式发布物 / Previous Release
 
@@ -60,14 +61,14 @@ python -m venv .venv
 
 ## 当前交付范围
 
-- 标准库随软件版本配套（当前 48 项标准、765 条规则，含 1 项历史标准）；开发基线为 `standards/development/scope-63`，`standards/development/scope-65` 仅作历史对照，禁止作为发布入口。
+- 唯一可编辑机器定义源为 `data/definitions/`（64 项，含 16 项原样 `draft`）；`data/delivery-scope.json` 选择随软件配套的 48 项标准、765 条规则（含 1 项历史标准）。`standards/development/scope-63` 和 `scope-65` 均只作只读历史快照，不是发布输入。
 - **正式评价范围只有 GB 29446—2019《选煤电力消耗限额》**；其余标准仍可在标准库中作为目录/参考信息查看，界面显示「尚未纳入正式评价范围」——“标准库里有该标准”不等于“软件已正式支持评价”。
 - 标准原文不随软件分发、也不保存在软件数据目录；普通界面通过已登记的官方网页查看。
 - 普通用户不安装、不导入、不扫描也不维护标准包；标准规则确认表为 `LEGACY_REFERENCE_ONLY`，不作为发布正确性依据。
 
 ## 常用命令
 
-- 规则确认与发布：`python tools/publish_confirmed_rules.py --help`（未加 `--apply` 时只校验不修改）。
+- 历史规则确认表只读校验：`python tools/publish_confirmed_rules.py --help`；旧 `--apply` 写入口已退出，不作为现行发布方式。
 - 隔离草案复核：`python tools/review_confirmed_rules.py --help`。
 - 运行测试：`python -m pytest -q -p no:cacheprovider --basetemp <可写临时目录>`。
 

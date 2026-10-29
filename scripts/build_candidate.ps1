@@ -220,52 +220,27 @@ if (-not (Test-Path -LiteralPath $PayloadDir -PathType Container)) {
 # Run the packaged executable self-check before assembling either channel.
 # This validates the frozen EXE with its bundled key and standard library,
 # using an isolated database instead of the developer's user data.
-$SelfCheckRoot = Join-Path (Join-Path $ProjectRoot "work") ("candidate-self-check-" + [guid]::NewGuid().ToString("N"))
-$SelfCheckPrefix = [IO.Path]::GetFullPath((Join-Path $ProjectRoot "work")) + [IO.Path]::DirectorySeparatorChar
-$SelfCheckRoot = [IO.Path]::GetFullPath($SelfCheckRoot)
-if (-not $SelfCheckRoot.StartsWith($SelfCheckPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "自检目录不在项目 work 目录下：$SelfCheckRoot"
+$SelfCheckExe = Join-Path $PayloadDir "UEBench.exe"
+if (-not (Test-Path -LiteralPath $SelfCheckExe -PathType Leaf)) {
+    throw "Candidate payload 缺少 UEBench.exe：$SelfCheckExe"
 }
-New-Item -ItemType Directory -Path $SelfCheckRoot -Force | Out-Null
-try {
-    $SelfCheckExe = Join-Path $PayloadDir "UEBench.exe"
-    $SelfCheckData = Join-Path $SelfCheckRoot "data"
-    $SelfCheckReport = Join-Path $SelfCheckRoot "report.json"
-    if (-not (Test-Path -LiteralPath $SelfCheckExe -PathType Leaf)) {
-        throw "Candidate payload 缺少 UEBench.exe：$SelfCheckExe"
-    }
-    # UEBench.exe is a windowed (console=False) executable. PowerShell's direct
-    # call operator returns before GUI-subsystem processes finish, which can
-    # make the report check race the self-check. Start-Process -Wait gives us
-    # the actual process exit code after the report has been written.
-    $SelfCheckArguments = @(
-        "--self-check",
-        "--data-dir",
-        ('"{0}"' -f $SelfCheckData),
-        "--output",
-        ('"{0}"' -f $SelfCheckReport)
-    )
-    $SelfCheckProcess = Start-Process -FilePath $SelfCheckExe -ArgumentList $SelfCheckArguments -Wait -PassThru -WindowStyle Hidden
-    if ($SelfCheckProcess.ExitCode -ne 0) {
-        throw "打包 EXE 自检失败，退出码：$($SelfCheckProcess.ExitCode)"
-    }
-    if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) {
-        throw "打包 EXE 自检未生成报告：$SelfCheckReport"
-    }
-    $SelfCheck = Get-Content -LiteralPath $SelfCheckReport -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($SelfCheck.schema -ne "uebench.self-check-report" -or
-        $SelfCheck.overall_status -ne "passed" -or
-        $SelfCheck.frozen -ne $true -or
-        @($SelfCheck.failed_checks).Count -ne 0) {
-        throw "打包 EXE 自检报告未通过：$($SelfCheck.overall_status)，失败项：$($SelfCheck.failed_checks -join ',')"
-    }
-    Write-Host "打包 EXE 自检通过：$(@($SelfCheck.checks).Count) 项；隔离目录 $SelfCheckRoot"
+# Python 只等待自己启动的 EXE，有界超时；独立 TEMP/TMP/数据及报告、日志由工具管理。
+# 避免 Start-Process -Wait 在受限 Windows job 中等待无关进程而停滞。
+$SelfCheckOutput = (& $PythonExe (Join-Path $ProjectRoot "tools\run_candidate_self_check.py") `
+    --project-root $ProjectRoot --exe $SelfCheckExe --timeout-seconds 120)
+if ($LASTEXITCODE -ne 0) { throw "打包 EXE 自检失败；报告与日志目录见上述工具输出。" }
+$SelfCheckReport = ([string](($SelfCheckOutput -join [Environment]::NewLine) | ConvertFrom-Json).report_path).Trim()
+if (-not (Test-Path -LiteralPath $SelfCheckReport -PathType Leaf)) {
+    throw "打包 EXE 自检未生成报告：$SelfCheckReport"
 }
-finally {
-    if (Test-Path -LiteralPath $SelfCheckRoot) {
-        Remove-Item -LiteralPath $SelfCheckRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
+$SelfCheck = Get-Content -LiteralPath $SelfCheckReport -Raw -Encoding UTF8 | ConvertFrom-Json
+if ($SelfCheck.schema -ne "uebench.self-check-report" -or
+    $SelfCheck.overall_status -ne "passed" -or
+    $SelfCheck.frozen -ne $true -or
+    @($SelfCheck.failed_checks).Count -ne 0) {
+    throw "打包 EXE 自检报告未通过：$($SelfCheck.overall_status)，失败项：$($SelfCheck.failed_checks -join ',')"
 }
+Write-Host "打包 EXE 自检通过：$(@($SelfCheck.checks).Count) 项；保留证据 $SelfCheckReport"
 
 # ECQ-RS05 §11: the embedded build identity must exist in the payload BEFORE the
 # payload manifest is generated, so the manifest covers and hashes it.  One

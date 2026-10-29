@@ -690,10 +690,13 @@ def test_build_scripts_refuse_a_dirty_tree_and_pass_the_identity() -> None:
 def test_windowed_candidate_self_check_waits_for_report_process() -> None:
     candidate = (ROOT / "scripts" / "build_candidate.ps1").read_text(encoding="utf-8")
     evidence = (ROOT / "tools" / "windows_acceptance_evidence.ps1").read_text(encoding="utf-8")
-    for text in (candidate, evidence):
-        assert "Start-Process -FilePath $SelfCheckExe" in text
-        assert "-Wait -PassThru -WindowStyle Hidden" in text
-    assert "$SelfCheckProcess.ExitCode" in candidate
+    # 候选改用有界 Python 子进程；实际等待、超时和隔离由进程测试验证。
+    assert 'tools\\run_candidate_self_check.py' in candidate
+    assert '--timeout-seconds 120' in candidate
+    assert 'if ($LASTEXITCODE -ne 0)' in candidate
+    assert "Start-Process -FilePath $SelfCheckExe" not in candidate
+    assert "Start-Process -FilePath $SelfCheckExe" in evidence
+    assert "-Wait -PassThru -WindowStyle Hidden" in evidence
     assert "$selfCheckProcess.ExitCode" in evidence
 
 def test_build_scripts_pass_the_candidate_suffix_to_iscc() -> None:
