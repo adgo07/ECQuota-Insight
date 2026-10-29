@@ -262,3 +262,7 @@ Source/Artifact Gate + RS04 Golden + self-check + Numeric v1 + N01-A + Generic E
 legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实产品链人工验证。
 **注意**：`dist/release` 仍是用旧包构建的 Candidate，新增"无 PDF"断言对它必然失败，
 必须重建后才转绿（不得以删断言或 skip 掩盖）。
+
+## 2026-10-29 剩余验收续记
+
+文档head f571bac三项远端CI均success，构建仍rc-a89b2c1/a89b2c1。UI/Word工具阻塞；真实原安装器在独立sandbox SID、专属目录静默尝试一次，因HKCU注册权限错误退出4并自动回滚，未提升重试；安装/卸载不记通过、旧→新覆盖未试。前置快照未完成即启动的执行偏差及事后证据边界如实记于[Stage D报告](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)，不能声明完整前后数据保真。Stage D未完成、水泥IMPLEMENTED尚未SUPPORTED；RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布，PR36草稿，不自动合并发布，Excel延期。

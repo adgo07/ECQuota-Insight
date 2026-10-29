@@ -206,3 +206,7 @@ Reference Standard Product Closure 仍为 PARTIAL。
   「官方来源地址尚未登记」。
 - 标准定义中仍保留标准编号、原文文件名与 SHA-256 等**追溯元数据**，但不再分发原文文件本身。
 - 评价记录的时间按**操作系统本地时区**显示，精确到秒（数据库仍以 UTC 存储）。
+
+## 2026-10-29 剩余验收续记
+
+文档head f571bac三项远端CI均success，构建仍rc-a89b2c1/a89b2c1。UI/Word工具阻塞；真实原安装器在独立sandbox SID、专属目录静默尝试一次，因HKCU注册权限错误退出4并自动回滚，未提升重试；安装/卸载不记通过、旧→新覆盖未试。前置快照未完成即启动的执行偏差及事后证据边界如实记于[Stage D报告](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)，不能声明完整前后数据保真。Stage D未完成、水泥IMPLEMENTED尚未SUPPORTED；RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布，PR36草稿，不自动合并发布，Excel延期。

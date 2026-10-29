@@ -91,7 +91,23 @@ Owner授权继续Stage D；[Stage B §9.2](../GB16780-2021_StageB_软件接入�
 
 指定Astra验收者已用独立目录启动本次候选EXE，进程PID25296；工具无法枚举对应应用窗口，未取得可验证的窗口句柄，未完成视觉/交互验收。候选进程按Owner交接保留供用户查看，不将“进程存在”记为四模式UI链通过。此前Word截图capture超时及点击geometry不可用；不据工具失败断言没有Office，也不把程序化DOCX检查当作Word分页通过。
 
-当前分别为：**候选构建/Artifact Gate/冻结基础自检/冻结水泥计算-保存-只读快照-Word生成PASS；原生UI交互/Word视觉与分页/安装升级卸载待验。**安装器仅构建，未运行，未覆盖用户安装或真实数据。Stage D未完成，水泥仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布，Excel新工作簿延期。PR36保持草稿，不自动合并/发布。
+此前阶段状态（现行见下节“最终CI与剩余验收续记”）：**候选构建/Artifact Gate/冻结基础自检/冻结水泥计算-保存-只读快照-Word生成PASS；原生UI交互/Word视觉与分页/安装升级卸载待验。**安装器仅构建，未运行，未覆盖用户安装或真实数据。Stage D未完成，水泥仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布，Excel新工作簿延期。PR36保持草稿，不自动合并/发布。
 
 
-候选源码a89b2c1远端CI查询时：[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839532)与[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839519)已success；[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839552)仍in_progress，不记成全套成功。后续仅文档/evidence补录的head与该构建源码分开识别；新head若CI仍运行按真实状态交接，不为等待重复跑本地完整套件。最后文档卫生6项通过，`tmp/staged-doc-final.xml`；本次未改打包输入或重建实物。
+此前阶段CI状态（现行见下节“最终CI与剩余验收续记”）：候选源码a89b2c1远端CI查询时：[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839532)与[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839519)已success；[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839552)仍in_progress，不记成全套成功。后续仅文档/evidence补录的head与该构建源码分开识别；新head若CI仍运行按真实状态交接，不为等待重复跑本地完整套件。最后文档卫生6项通过，`tmp/staged-doc-final.xml`；本次未改打包输入或重建实物。
+
+## 2026-10-29 最终CI与剩余验收续记
+
+最终文档提交`f571bac10d9b66750e1a7069debe024a210385d4`三项远端CI均success：[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053518)、[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053529)、[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053623)。此为父验收者独立查询的精确head状态；实际构建仍是a89b2c1，不为补报告重打包或重复本地全套。本节补录后的head需单独核CI。
+
+原生UI/Word仍因窗口枚举、截图及操作工具失败而待验，不能把冻结smoke或程序化DOCX检查当成视觉/分页通过。
+
+Owner授权继续安装验收后，先静态审查新版真实安装器对应脚本：固定同产品AppId、lowest、载荷删除/写入限于{app}、静默不启动、/NOICONS禁用快捷方式。真实用户已有安装和数据库，普通sandbox账户虽SID独立，其环境变量及KnownFolder仍指真实用户目录，因此不使用默认目录。仅在本次clone/tmp新建专属验收根，保存原ACL并临时授权已核sandbox SID该根Modify；全祖先无reparse，未修改上层或Shell Folders。
+
+实际只用sandbox SID执行原hash安装器一次，显式/DIR、/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /NOICONS及进程专用TEMP/TMP。安装退出4，Inno记录创建该sandbox HKCU卸载项时RegCreateKeyEx错误5（拒绝访问），随后自动回滚成功；隔离app目录及卸载项不存在。没有提升身份重试，没有启动应用，没有执行独立卸载或旧→新覆盖。专属根ACL已恢复，证据保留：[结构化记录](evidence/GB16780_STAGE_D_rc-a89b2c1_installer_attempt.json)、[日志摘录](evidence/GB16780_STAGE_D_rc-a89b2c1_installer_excerpt.log)。这是环境权限下失败并回滚，不能记为安装/卸载通过，也没有证据归因为产品缺陷。
+
+**执行前置条件偏差：**前置只读快照将PowerShell注册Provider对象直接序列化，触发过深遍历，未完成落盘；执行者在其仍运行时启动了安装器，违反已审的“完成前置快照后再执行”条件。随后停止该只读进程。仅取得事后真实用户卸载注册项、EXE存在及当前hash、329文件当前hash，不能补成完整前后保真比较，不能声明用户全部数据未变。真实用户0.2.0注册仍指原安装目录；具体当前EXE hash见结构化记录，不将无可信前值的项写成已保真。
+
+旧正式0.1.0安装器实算SHA256为`234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911`，127023093字节，与历史登记相符；未能把该编译安装器与精确历史脚本完整绑定，未执行。旧→新覆盖、旧应用数据升级、安装/升级/卸载正式验收继续待验。
+
+本轮不再扩大测试环境或重试安装。Stage D未完成，水泥IMPLEMENTED、尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布；PR36仍草稿，不自动合并/发布，Excel新工作簿延期。平台/Contract预检查沿本报告首节，Frozen lock及标准解释不变。
