@@ -7,6 +7,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QTabWidget, QTextEdit
 from uebench.application.gb29446 import decode_period_notes, GB29446_STANDARD_ID
 from uebench.application.reporting import gb29446_business_labels, render_gb29446_warning
+from uebench.application.cement_reporting import CementReportView
 from uebench.application.official_sources import official_source_url, NO_OFFICIAL_SOURCE_LABEL
 from uebench.domain.models import GRADE_LABELS, Grade
 from .presentation import format_local_date, format_local_datetime
@@ -96,6 +97,20 @@ class RecordDetailPage(ResponsivePage):
         self.source_button.setToolTip(source or NO_OFFICIAL_SOURCE_LABEL)
         if not source:
             self.notice.setText(self.notice.text() + " " + NO_OFFICIAL_SOURCE_LABEL + "。")
+        if isinstance(view, CementReportView):
+            basic = [f"{field.label}：{field.value}" for field in view.information]
+            result_lines = []
+            for item in view.indicators:
+                result_lines.append(f"{item.label}：{item.actual} {item.unit}，{item.grade}")
+                result_lines.append("；".join(f"{field.label} {field.value} {field.unit}" for field in item.thresholds))
+            self.result_content.setHtml(section("基本信息", basic) + section("评价结果", result_lines)
+                + section("评价范围与说明", [view.scope_note, *view.disclosures]))
+            self.input_content.setHtml(section("输入数据", [f"{field.label}：{field.value} {field.unit}" for field in view.inputs])
+                + section("计算依据", [*(f"{field.label}：{field.value} {field.unit}" for field in view.calculations), *view.basis]))
+            self.tabs.setCurrentIndex(0)
+            for text in (self.result_content, self.input_content):
+                text.verticalScrollBar().setValue(0)
+            return
         period = "未记录"
         if (request.notes or "").startswith("核算周期："):
             code, custom, _ = decode_period_notes(request.notes)

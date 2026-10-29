@@ -33,6 +33,9 @@ param(
 # `tests/test_release_artifacts.py` can then verify via UEBENCH_ARTIFACT_DIR.
 $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+if ($FormalRelease -and ((Get-Content -LiteralPath (Join-Path $ProjectRoot "uebench.spec") -Raw) -match "run_stage_d_cement.py")) {
+    throw "水泥 Stage D 专用候选入口不得用于正式发布。"
+}
 
 function Resolve-PythonExecutable {
     param([string]$Explicit, [string]$Root)

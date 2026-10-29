@@ -268,6 +268,9 @@ class EvaluationEngine:
         *,
         allow_pre_effective: bool = False,
     ) -> EvaluationResult:
+        if standard.id == "gb-16780-2021" and standard.rule_revision >= 2:
+            from .gb16780 import Gb16780Calculator
+            return Gb16780Calculator(self).evaluate(standard, request, allow_pre_effective=allow_pre_effective)
         # The project Profile owns authoritative finite-precision arithmetic.
         # A caller's ambient Decimal context must not change a governed result.
         with localcontext(self.numeric_profile.decimal_context()):

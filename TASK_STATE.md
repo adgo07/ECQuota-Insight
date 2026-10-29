@@ -1,6 +1,24 @@
 # TASK_STATE
 
-更新时间：2026-10-28
+## 2026-10-29 水泥Stage D候选交接
+
+已从干净源码`a89b2c166214451bf6f6692099548979a4953483`构建`rc-a89b2c1`完整候选（配套.6/r2）：Artifact Gate63/63、冻结基础自检6/6及便携ZIP解包同EXE水泥四模式/双修正5记录5 Word、独立只读进程核三JSON与规则hash均通过。原生进程PID25296已在独立目录启动，但工具无法枚举窗口，UI交互、Word视觉/分页与安装升级卸载待验；安装器未执行。完整身份、资产hash、独立矩阵与证据见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。治理补录提交不是构建输入，不因此重打包。水泥仍IMPLEMENTED、尚未SUPPORTED；正常正式范围仅选煤，RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布；不合并发布，Excel新工作簿延期。
+
+
+## 2026-10-29 水泥Stage D隔离候选（当前推进）
+
+Owner授权继续Stage D。功能分支以专用显式入口构建隔离候选，将相同实例许可传入Application与既有UI，常规入口及正式评价清单仍仅选煤。强制指定隔离目录并拒真实用户目录、未标识数据及内部重解析点；不覆盖用户安装，不执行现有同AppId安装器，不自动合并或发布。精确候选身份、独立手算矩阵与待验边界见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。当前仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布、Excel新工作簿延期。
+
+## 2026-10-29 水泥Stage C源码实施（当前任务补充）
+
+Owner已批准[水泥Stage B设计](docs/GB16780-2021_StageB_软件接入设计.md)修正并授权Stage C实现及隔离验证，取代下文历史任务中“本轮不开发水泥”的限制。唯一业务依据仍为V1.2冻结映射；软件源码状态为 `IMPLEMENTED`；Stage C验证见实施报告，Stage D尚未完成，不称 `SUPPORTED`。生产正式评价白名单仍仅选煤；后续验收与审查前不自动合并、发布或开放水泥。RS05保持IN PROGRESS、产品闭环PARTIAL、0.2.0未发布；Excel新工作簿延期。
+
+源码配套签名规则库已同步为 `.6`（48项/765条，水泥r2）；这是规则库一致性更新，不是水泥EXE/Candidate或旧安装升级。原生验收因工具应用批准超时保持待验，未merge/release。详细证据见[实施报告](docs/governance/GB16780-2021_STAGE_C_EXECUTION_REPORT.md)。
+
+实施从已fetch核对的 `origin/main@b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`（PR35）开始；Frozen lock不升级，历史结果不重算。先核DSL能力与规则差异，固定公式和阈值进入唯一Rule及共用Engine，UI/Word精炼。分摊保存原始输入、公式、Decimal28派生值和残差；普通有限精度残差不阻保存，业务边界不明才阻断依赖结果。
+
+
+更新时间：2026-10-29
 
 ## 当前产品目标
 
@@ -244,3 +262,7 @@ Source/Artifact Gate + RS04 Golden + self-check + Numeric v1 + N01-A + Generic E
 legacy upgrade + literal full suite、exact-head CI、本机 Win10 最短真实产品链人工验证。
 **注意**：`dist/release` 仍是用旧包构建的 Candidate，新增"无 PDF"断言对它必然失败，
 必须重建后才转绿（不得以删断言或 skip 掩盖）。
+
+## 2026-10-29 剩余验收续记
+
+文档head f571bac三项远端CI均success，构建仍rc-a89b2c1/a89b2c1。UI/Word工具阻塞；真实原安装器在独立sandbox SID、专属目录静默尝试一次，因HKCU注册权限错误退出4并自动回滚，未提升重试；安装/卸载不记通过、旧→新覆盖未试。前置快照未完成即启动的执行偏差及事后证据边界如实记于[Stage D报告](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)，不能声明完整前后数据保真。Stage D未完成、水泥IMPLEMENTED尚未SUPPORTED；RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布，PR36草稿，不自动合并发布，Excel延期。

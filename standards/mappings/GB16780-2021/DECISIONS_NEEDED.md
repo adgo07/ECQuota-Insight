@@ -4,6 +4,10 @@
 
 本文件是决策索引而非第二套标准问题台账。真正的标准原文疑似问题仅登记于仓库根目录 [STANDARD_ISSUES_REGISTER.md](../../../STANDARD_ISSUES_REGISTER.md)，稳定编号为 **001 和 003**。另外两项软件取舍不登记标准问题编号。
 
+## 2026-10-29 软件实施授权补充
+
+Owner已批准Stage B设计修正并授权Stage C，详见[设计](../../../docs/GB16780-2021_StageB_软件接入设计.md)及[实施记录](../../../docs/governance/GB16780-2021_STAGE_C_EXECUTION_REPORT.md)。本文件下述业务决定及冻结V1.2不改；“Rule尚未修改”等文字记载Stage A时点，当前代码实现与验证状态以实施记录为准。未完成Stage D前不宣称正式支持；本次不改变Issue001/003状态或官方确认程度。
+
 ## 已确认的业务口径
 
 | ID | 内容 | 用户决定 | 依据性质 | 关联 |

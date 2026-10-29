@@ -50,6 +50,71 @@ class StandardPackageError(ValueError):
     pass
 
 
+def _definition_source_errors(definition: StandardDefinition) -> list[str]:
+    """Validate primary provenance plus the one frozen cement technical reference.
+
+    This exception identifies V1.2's verified 2019 draft byte source, not a
+    general permission to attach sources from another standard or a new role.
+    It changes neither the signed payload nor the stored rule snapshot.
+    """
+    errors: list[str] = []
+    cement_r2 = definition.id == "gb-16780-2021" and definition.rule_revision >= 2
+    cement_primary = (
+        "GB 16780-2021", "01.GB 16780-2021水泥单位产品能源消耗限额.pdf",
+        "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c",
+    )
+    cement_identity_matches = (
+        definition.number == cement_primary[0] and definition.version == "2021"
+        and definition.source_file == cement_primary[1]
+        and definition.source_sha256.lower() == cement_primary[2]
+    )
+    if cement_r2 and not cement_identity_matches:
+        errors.append("GB 16780—2021 r2主来源身份与冻结映射不一致")
+    auxiliary_indicators = {
+        "cement.comprehensive_energy", "clinker.comprehensive", "clinker.coal", "clinker.electricity",
+    }
+    for product in definition.products:
+        for indicator in product.indicators:
+            prefix = f"标准 {definition.number}/{indicator.id}"
+            if not indicator.source_references:
+                errors.append(f"{prefix} 缺少原文依据")
+            primary_seen = False
+            auxiliary_count = 0
+            for reference in indicator.source_references:
+                matches_primary = (
+                    reference.standard_number == definition.number
+                    and reference.source_file == definition.source_file
+                    and reference.source_sha256.lower() == definition.source_sha256.lower()
+                )
+                if matches_primary:
+                    primary_seen = not cement_r2 or cement_identity_matches
+                    continue
+                allowed_auxiliary = (
+                    cement_r2 and cement_identity_matches and indicator.id in auxiliary_indicators
+                    and reference.standard_number == "2019征求意见稿（技术参考，非现行标准）"
+                    and reference.source_file == "201908301101185798.pdf"
+                    and reference.source_sha256 == "efcdd6195a8c0de0bb4b6767aa10b0f2bfa6e3395943245e9eb0a16983c8b329"
+                    and reference.page == 12
+                    and reference.clause == "附录C.1(C.1)、C.2(C.3)"
+                    and reference.table is None
+                    and reference.note == "V1.2用户采纳源端分项扣除；w_fc中文定义为用户扩展；不采用(C.7)。"
+                )
+                if allowed_auxiliary:
+                    auxiliary_count += 1
+                    if auxiliary_count > 1:
+                        errors.append(f"{prefix} 重复登记2019技术参考来源")
+                    continue
+                if reference.standard_number != definition.number:
+                    errors.append(f"{prefix} 的来源标准号不一致：{reference.standard_number}")
+                if reference.source_file != definition.source_file:
+                    errors.append(f"{prefix} 的来源文件不一致：{reference.source_file}")
+                if reference.source_sha256.lower() != definition.source_sha256.lower():
+                    errors.append(f"{prefix} 的来源哈希不一致：{reference.source_file}")
+            if cement_r2 and not primary_seen:
+                errors.append(f"{prefix} 缺少2021正式标准主来源")
+    return errors
+
+
 class PackageFile(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -606,26 +671,7 @@ class StandardPackageService:
                     if item.kind == "definition":
                         definition = StandardDefinition.model_validate_json(data)
                         definitions.append(definition)
-                        for product in definition.products:
-                            for indicator in product.indicators:
-                                if not indicator.source_references:
-                                    errors.append(f"标准 {definition.number}/{indicator.id} 缺少原文依据")
-                                for reference in indicator.source_references:
-                                    if reference.standard_number != definition.number:
-                                        errors.append(
-                                            f"标准 {definition.number}/{indicator.id} 的来源标准号不一致："
-                                            f"{reference.standard_number}"
-                                        )
-                                    if reference.source_file != definition.source_file:
-                                        errors.append(
-                                            f"标准 {definition.number}/{indicator.id} 的来源文件不一致："
-                                            f"{reference.source_file}"
-                                        )
-                                    if reference.source_sha256.lower() != definition.source_sha256.lower():
-                                        errors.append(
-                                            f"标准 {definition.number}/{indicator.id} 的来源哈希不一致："
-                                            f"{reference.source_file}"
-                                        )
+                        errors.extend(_definition_source_errors(definition))
                         if definition.publication_status is not PublicationStatus.PUBLISHED:
                             errors.append(
                                 f"标准 {definition.number} 的规则状态为 {definition.publication_status.value}，"
