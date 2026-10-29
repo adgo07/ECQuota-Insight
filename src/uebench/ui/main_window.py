@@ -14,9 +14,12 @@ from zipfile import BadZipFile
 _LOGGER = logging.getLogger(__name__)
 
 from PySide6.QtCore import QDate, Qt, QUrl, QSize, QTimer
-from PySide6.QtGui import QDesktopServices, QIcon, QPixmap, QPainter
-from PySide6.QtSvg import QSvgRenderer
-from .record_table import RecordTable, StandardTable
+from PySide6.QtGui import QDesktopServices, QIcon, QColor
+from .brand import BrandLabel
+from .window_placement import WindowPlacement
+from .responsive_page import ResponsivePage
+from .message_box import ChineseMessageButtons
+from .record_table import RecordTable, StandardTable, HomeRecentTable
 from .wheel_safe_combo import WheelSafeComboBox
 from .official_source_dialog import OfficialSourceDialog
 from .external_browser import external_browser_environment
@@ -408,14 +411,9 @@ class MainWindow(QMainWindow):
         self._records_loaded = False
         self._records_dirty = True
         self.setWindowTitle("单位产品能耗限额评价软件")
-        # Leave room for the ten-column energy table on ordinary 1366x768 and
-        # 1920x1080 screens.  Users can still resize the window smaller.
-        self.resize(1440, 900)
-        self.setMinimumSize(900, 600)
-        if QApplication.platformName() != "offscreen" and self.screen() is not None:
-            available = self.screen().availableGeometry()
-            self.setMinimumSize(min(900, max(640, available.width() - 32)), min(600, max(420, available.height() - 64)))
-            self.resize(min(1440, available.width() - 24), min(900, available.height() - 48))
+        self._placement = WindowPlacement(self, context.paths.root)
+        self._message_buttons = ChineseMessageButtons(self)
+        self._settings_from_home = False
         self.setStyleSheet(APP_STYLE)
 
         central = QWidget()
@@ -427,7 +425,7 @@ class MainWindow(QMainWindow):
         self.sidebar.setFixedWidth(242)
         side_layout = QVBoxLayout(self.sidebar)
         side_layout.setContentsMargins(8, 24, 8, 18)
-        side_layout.addWidget(self._brand(194))
+        side_layout.addWidget(self._brand(180), 0, Qt.AlignmentFlag.AlignHCenter)
         brand_caption = QLabel("单位产品能耗限额\n评价软件")
         brand_caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
         side_layout.addWidget(brand_caption)
@@ -437,11 +435,20 @@ class MainWindow(QMainWindow):
         self.pages = QStackedWidget()
         side_layout.addWidget(self.navigation, 1)
         settings = QPushButton("设置")
+        settings.setObjectName("sidebarSettings")
         settings.setIcon(self._icon("settings"))
+        settings.setIconSize(QSize(18, 18))
         settings.clicked.connect(lambda: self.navigate("settings"))
         side_layout.addWidget(settings)
         layout.addWidget(self.sidebar)
-        layout.addWidget(self.pages, 1)
+        content_host = QWidget()
+        content_layout = QHBoxLayout(content_host)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.addStretch()
+        self.pages.setMaximumWidth(1536)
+        content_layout.addWidget(self.pages, 1)
+        content_layout.addStretch()
+        layout.addWidget(content_host, 1)
         self.setCentralWidget(central)
 
         page_builders = [
@@ -474,6 +481,7 @@ class MainWindow(QMainWindow):
             item = QListWidgetItem(self._icon(icon_name), title)
             item.setData(Qt.ItemDataRole.UserRole, key)
             if not enabled:
+                item.setToolTip("当前暂未开放")
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled & ~Qt.ItemFlag.ItemIsSelectable)
             self.navigation.addItem(item)
         # 先把首页设为当前项再连信号：否则 setCurrentRow(0) 会立刻触发一次
@@ -489,27 +497,29 @@ class MainWindow(QMainWindow):
     @staticmethod
     def _icon(name: str, color: str = "#197CC2") -> QIcon:
         source = Path(__file__).resolve().parents[1] / "resources" / "icons" / f"{name}.svg"
-        renderer = QSvgRenderer(source.read_bytes().replace(b"#FFFFFF", color.encode("ascii")))
-        pixmap = QPixmap(36, 36)
-        pixmap.fill(Qt.GlobalColor.transparent)
-        painter = QPainter(pixmap)
-        renderer.render(painter)
-        painter.end()
-        return QIcon(pixmap)
+        return QIcon(str(source.with_stem(source.stem + "-white") if color == "#FFFFFF" else source))
 
     @staticmethod
-    def _brand(width: int) -> QLabel:
-        label = QLabel()
-        pixmap = QPixmap(str(Path(__file__).resolve().parents[1] / "resources" / "branding" / "qingzhou_logo.png"))
-        label.setPixmap(pixmap.scaledToWidth(width, Qt.TransformationMode.SmoothTransformation))
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        return label
+    def _brand(width: int = 180) -> QLabel:
+        return BrandLabel()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._placement.shown()
+
+    def closeEvent(self, event):
+        self._placement.save()
+        super().closeEvent(event)
 
     def navigate(self, key: str) -> None:
         if key not in self.page_widgets:
             return
+        if key == "settings":
+            if self.pages.currentWidget() is not self.page_widgets["settings"]:
+                self._settings_from_home = self.pages.currentWidget() is self.page_widgets["home"]
         self.pages.setCurrentWidget(self.page_widgets[key])
-        self.sidebar.setVisible(key != "home")
+        self.sidebar.setVisible(key != "home" and not (key == "settings" and self._settings_from_home))
+        self.settings_page.home_button.setVisible(key == "settings" and self._settings_from_home)
         context_key = "standards" if key == "standard_detail" else "records" if key == "record_detail" else key
         self.navigation.blockSignals(True)
         self.navigation.setCurrentRow(-1)
@@ -527,9 +537,9 @@ class MainWindow(QMainWindow):
         self.refresh_formal_evaluation_readiness()
 
     def _page(self, title: str, label: QLabel | None = None) -> tuple[QWidget, QVBoxLayout]:
-        page = QWidget()
+        page = ResponsivePage()
         layout = QVBoxLayout(page)
-        layout.setContentsMargins(24, 20, 24, 20)
+        layout.setContentsMargins(24, 22, 24, 22)
         layout.setSpacing(14)
         label = label if label is not None else QLabel(title)
         label.setWordWrap(True)
@@ -560,13 +570,15 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(36, 30, 36, 28)
         layout.setSpacing(26)
         header = QHBoxLayout()
-        header.addWidget(self._brand(220))
+        header.addWidget(self._brand(180))
         title = QLabel("单位产品能耗限额评价软件")
         title.setWordWrap(True)
         title.setStyleSheet("font-size: 30px; font-weight: 800; color: #18364F;")
         header.addWidget(title, 1)
         settings = QPushButton("设置")
+        settings.setObjectName("homeSettings")
         settings.setIcon(self._icon("settings"))
+        settings.setIconSize(QSize(18, 18))
         settings.clicked.connect(lambda: self.navigate("settings"))
         header.addWidget(settings)
         layout.addLayout(header)
@@ -590,6 +602,8 @@ class MainWindow(QMainWindow):
         ):
             button = TaskCard(title, description, self._icon(icon_name, "#FFFFFF" if key == "standards" else "#197CC2"), emphasized=key == "standards")
             button.setEnabled(enabled)
+            if not enabled:
+                button.setToolTip("当前暂未开放")
             if key == "standards":
                 button.setObjectName("standardTask")
             if key == "evaluation":
@@ -619,14 +633,13 @@ class MainWindow(QMainWindow):
         self.home_retry.hide()
         row.addWidget(self.home_retry)
         card_layout.addLayout(row)
-        self.home_recent = QTableWidget(0, 6)
+        self.home_recent = HomeRecentTable(0, 6)
         self.home_recent.setHorizontalHeaderLabels(["企业名称", "统计期", "标准", "核心结果", "评价时间", "操作"])
         self._configure_table(self.home_recent)
         self.home_recent.horizontalHeader().setStretchLastSection(False)
-        self.home_recent.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.home_recent.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
-        self.home_recent.setColumnWidth(5, 92)
-        self.home_recent.verticalHeader().setDefaultSectionSize(52)
+        self.home_recent.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.home_recent.setWordWrap(True)
+        self.home_recent.verticalHeader().setDefaultSectionSize(48)
         self.home_recent.itemDoubleClicked.connect(lambda *_: self._open_home_record())
         card_layout.addWidget(self.home_recent)
         self.home_recent_notice = QLabel("暂无对标记录")
@@ -676,7 +689,7 @@ class MainWindow(QMainWindow):
         self.standard_table.setWordWrap(True)
         self.standard_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         self.standard_table.horizontalHeader().setStretchLastSection(False)
-        self.standard_table.verticalHeader().setDefaultSectionSize(58)
+        self.standard_table.verticalHeader().setDefaultSectionSize(48)
         layout.addWidget(self.standard_table, 1)
         self.standard_count_label = QLabel("")
         layout.addWidget(self.standard_count_label)
@@ -686,6 +699,8 @@ class MainWindow(QMainWindow):
         self.standard_detail_title = QLabel("标准详情")
         page, layout = self._page("标准详情", self.standard_detail_title)
         back = QPushButton("返回标准库")
+        back.setIcon(self._icon("back"))
+        back.setIconSize(QSize(18, 18))
         back.clicked.connect(lambda: self.navigate("standards"))
         layout.insertWidget(0, back, 0, Qt.AlignmentFlag.AlignLeft)
         actions = QHBoxLayout()
@@ -769,7 +784,7 @@ class MainWindow(QMainWindow):
         self.evaluation_readiness_notice = QLabel("")
         self.evaluation_readiness_notice.setObjectName("evaluationReadinessNotice")
         self.evaluation_readiness_notice.setWordWrap(True)
-        self.evaluation_readiness_notice.setStyleSheet("color: #b42318; font-weight: bold;")
+        self.evaluation_readiness_notice.setStyleSheet("color: #B9484A; font-weight: bold;")
         self.evaluation_readiness_notice.setVisible(False)
         page_layout.addWidget(self.evaluation_readiness_notice)
         scroll = QScrollArea()
@@ -933,7 +948,7 @@ class MainWindow(QMainWindow):
         self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
         self.gb29446_incompatibility_message.setWordWrap(True)
-        self.gb29446_incompatibility_message.setStyleSheet("color: #b42318; font-weight: bold;")
+        self.gb29446_incompatibility_message.setStyleSheet("color: #B9484A; font-weight: bold;")
         self.gb29446_incompatibility_message.setVisible(False)
         form_layout.addWidget(self.gb29446_incompatibility_message)
         layout.addWidget(form_card)
@@ -957,7 +972,7 @@ class MainWindow(QMainWindow):
         self.input_tabs.setMinimumHeight(360)
         for table in (self.eval_inputs, self.energy_table, self.production_table):
             table.setMinimumHeight(300)
-            table.verticalHeader().setDefaultSectionSize(28)
+            table.verticalHeader().setDefaultSectionSize(48)
         input_hint = QLabel(
             "下方参数由所选标准和产品/工序自动生成。可直接点击“值”列输入；选择明细方式时，"
             "再填写能源明细和产量与分摊。"
@@ -1138,7 +1153,11 @@ class MainWindow(QMainWindow):
         view = QPushButton("查看")
         view.clicked.connect(self.view_selected_record)
         delete = QPushButton("删除选中记录")
-        delete.setStyleSheet("color: #B42318;")
+        delete.setProperty("role", "danger")
+        self.record_view_button = view
+        self.record_delete_button = delete
+        view.setEnabled(False)
+        delete.setEnabled(False)
         delete.clicked.connect(self.delete_selected_record)
         controls.addWidget(self.record_search, 1)
         controls.addWidget(self.record_status_filter)
@@ -1155,9 +1174,10 @@ class MainWindow(QMainWindow):
         self.record_table.setWordWrap(True)
         self.record_table.horizontalHeader().setStretchLastSection(False)
         self.record_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        self.record_table.verticalHeader().setDefaultSectionSize(60)
+        self.record_table.verticalHeader().setDefaultSectionSize(48)
         self.record_table.itemDoubleClicked.connect(lambda *_: self.view_selected_record())
         self.record_table.itemActivated.connect(lambda *_: self.view_selected_record())
+        self.record_table.itemSelectionChanged.connect(self._sync_record_actions)
         layout.addWidget(self.record_table, 1)
         foot = QHBoxLayout()
         self.record_count_label = QLabel("")
@@ -1187,6 +1207,7 @@ class MainWindow(QMainWindow):
             data_directory=str(self.context.paths.root),
             parent=self,
         )
+        self.settings_page.home_button.clicked.connect(lambda: self.navigate("home"))
         self.settings_page.create_backup_requested.connect(self.create_backup)
         self.settings_page.restore_backup_requested.connect(self.restore_backup)
         self.settings_page.open_data_directory_requested.connect(
@@ -1201,7 +1222,7 @@ class MainWindow(QMainWindow):
         table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         table.verticalHeader().setVisible(False)
-        table.verticalHeader().setDefaultSectionSize(44)
+        table.verticalHeader().setDefaultSectionSize(48)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         table.horizontalHeader().setStretchLastSection(True)
         if not editable:
@@ -1365,7 +1386,7 @@ class MainWindow(QMainWindow):
             view_button = QPushButton("查看")
             view_button.clicked.connect(lambda _=False, rid=record.evaluation_id: self._open_home_record(rid))
             self.home_recent.setCellWidget(row, 5, view_button)
-        self.home_recent.setFixedHeight(self.home_recent.horizontalHeader().sizeHint().height() + max(1, len(records)) * 52 + 4)
+        self.home_recent.fit_columns()
 
     def refresh_standards(self) -> None:
         try:
@@ -1512,7 +1533,11 @@ class MainWindow(QMainWindow):
                             requirement_basis.append(f"{values[0]}：{line}")
         self.standard_requirements_basis.setText("\n".join(dict.fromkeys(requirement_basis)))
         self.standard_requirements_basis.setVisible(bool(requirement_basis))
-        self.standard_indicator_table.setFixedHeight(self.standard_indicator_table.horizontalHeader().sizeHint().height() + self.standard_indicator_table.rowCount() * 44 + 4)
+        self.standard_indicator_table.setFixedHeight(
+            self.standard_indicator_table.horizontalHeader().sizeHint().height()
+            + sum(self.standard_indicator_table.rowHeight(row) for row in range(self.standard_indicator_table.rowCount()))
+            + 4
+        )
         self.refresh_formal_evaluation_readiness()
 
     def _selection_mode(self) -> StandardSelectionMode:
@@ -2517,7 +2542,7 @@ class MainWindow(QMainWindow):
         self.gb29446_result_ed.setText(f"{view.actual.value} {view.actual.unit}")
         self.gb29446_metrics.show()
         self.gb29446_result_grade.setText(view.grade.value)
-        self.gb29446_result_grade.setStyleSheet("color: #956420;" if item.grade is Grade.NOT_QUALIFIED else "color: #18364F;")
+        self.gb29446_result_grade.setStyleSheet("color: #956420;" if item.grade is Grade.NOT_QUALIFIED else "color: #168268;")
         self.gb29446_result_message.setText("已生成对标记录。重新计算将生成新记录。" if self.last_result_id else "预览结果")
         self.gb29446_explanation.setText(_rich_text("\n".join((*view.explanation, *view.warnings))))
         self.gb29446_explanation.show()
@@ -2554,6 +2579,8 @@ class MainWindow(QMainWindow):
                 cell = _item(value, align_right=column == 3)
                 cell.setToolTip(str(value))
                 cell.setData(Qt.ItemDataRole.UserRole, record.evaluation_id)
+                if column == 4:
+                    cell.setForeground(QColor("#168268" if record.status in {"1级", "2级", "3级"} else "#956420" if record.status in {"未达3级", "不完整"} else "#B9484A" if record.status in {"记录损坏", "无法判定"} else "#526A7D"))
                 self.record_table.setItem(row, column, cell)
             button = QPushButton("查看")
             button.clicked.connect(lambda _=False, rid=record.evaluation_id: self.view_record(rid))
@@ -2561,6 +2588,7 @@ class MainWindow(QMainWindow):
             if record.evaluation_id == selected:
                 self.record_table.selectRow(row)
         self.record_table.fit_columns()
+        self._sync_record_actions()
         self.record_table.verticalScrollBar().setValue(scroll)
         pages = max(1, (result.total + result.page_size - 1) // result.page_size)
         self.record_count_label.setText(f"共 {result.total} 条 · 第 {result.page} / {pages} 页" if result.total else "没有匹配记录" if self.record_search.text() or self.record_status_filter.currentIndex() else "暂无对标记录")
@@ -2579,6 +2607,11 @@ class MainWindow(QMainWindow):
         self._records_dirty = True
         if self.pages.currentWidget() is self.page_widgets["records"]:
             self.refresh_records()
+
+    def _sync_record_actions(self):
+        selected = bool(self.record_table.selectedItems()) and self._selected_record_id() is not None
+        self.record_view_button.setEnabled(selected)
+        self.record_delete_button.setEnabled(selected)
 
     def _selected_record_id(self) -> str | None:
         row = self.record_table.currentRow()

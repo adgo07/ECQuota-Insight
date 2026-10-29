@@ -20,6 +20,11 @@ ROOT = Path(__file__).resolve().parents[1]
 @pytest.fixture
 def records(tmp_path, monkeypatch):
     app = QApplication.instance() or QApplication([])
+    # 离屏平台默认只有 800×800；代表桌面宽度测试显式给定工作区，
+    # 窗口约束本身另以大小屏、负坐标和掉屏用例验证。
+    from PySide6.QtGui import QScreen
+    from PySide6.QtCore import QRect
+    monkeypatch.setattr(QScreen, "availableGeometry", lambda self: QRect(0, 0, 1920, 1080))
     for name in ("warning", "critical", "information"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
     context = create_context(tmp_path / "records")
@@ -82,6 +87,10 @@ def test_page_return_context_direct_id_and_two_tabs(records, monkeypatch):
     assert [detail.tabs.tabText(i) for i in range(detail.tabs.count())] == ["基本信息与结果", "输入数据与计算依据"]
     assert detail.result_content.isReadOnly() and detail.input_content.isReadOnly()
     assert "2级" in detail.result_content.toPlainText()
+    saved_time = before[1].evaluated_at
+    expected_time = saved_time.astimezone().strftime("%Y-%m-%d %H:%M:%S")
+    assert f"评价时间：{expected_time}" in detail.result_content.toPlainText()
+    assert saved_time.isoformat() not in detail.result_content.toPlainText()
     assert "8000000" in detail.input_content.toPlainText()
     detail.back_requested.emit()
     assert win._record_page == 12 and win._selected_record_id() == selected

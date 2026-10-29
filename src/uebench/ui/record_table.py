@@ -36,9 +36,9 @@ class ResponsiveTable(QTableWidget):
                 self.setColumnWidth(column, width)
         self.resizeRowsToContents()
         for row in range(self.rowCount()):
-            height = max(44, self.rowHeight(row))
+            height = max(48, self.rowHeight(row))
             # 仅长文本使用实际delegate字体/文字区域，并留一行安全余量。
-            # 默认sizeHint与整列字体测量会遗漏居中绘制的最后一行；普通行保持44。
+            # 默认sizeHint与整列字体测量会遗漏居中绘制的最后一行；普通行保持48。
             for column in range(self.columnCount()):
                 item = self.item(row, column)
                 if item:
@@ -60,10 +60,22 @@ class ResponsiveTable(QTableWidget):
 
 
 class RecordTable(ResponsiveTable):
-    minimum_widths = (125, 96, 230, 94, 72, 160, 88)
+    minimum_widths = (102, 96, 230, 94, 72, 160, 88)
     width_weights = (2, 0, 6, 0, 0, 0, 0)
 
 
 class StandardTable(ResponsiveTable):
     minimum_widths = (125, 320, 120, 92, 165)
     width_weights = (1, 7, 1, 1, 3)
+
+
+class HomeRecentTable(ResponsiveTable):
+    minimum_widths = (110, 96, 130, 180, 160, 88)
+    width_weights = (3, 1, 0, 3, 0, 0)
+
+    def fit_columns(self):
+        super().fit_columns()
+        if self.columnCount() != len(self.minimum_widths):
+            return
+        scroll = self.horizontalScrollBar().sizeHint().height() if sum(self.columnWidth(i) for i in range(self.columnCount())) > self.viewport().width() else 0
+        self.setFixedHeight(self.horizontalHeader().sizeHint().height() + sum(self.rowHeight(i) for i in range(self.rowCount())) + scroll + 4)

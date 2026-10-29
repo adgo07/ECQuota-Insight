@@ -1,6 +1,19 @@
 """键盘可操作的任务卡；标题与说明独立排版，业务动作仍由调用方接线。"""
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QRect
+from PySide6.QtGui import QPainter, QIcon
 from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget, QGridLayout
+
+
+class IconLabel(QLabel):
+    def __init__(self, icon):
+        super().__init__()
+        self.icon = icon
+        self.setFixedSize(24, 24)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        self.icon.paint(painter, QRect(0, 0, 24, 24), Qt.AlignmentFlag.AlignCenter,
+                        QIcon.Mode.Normal if self.isEnabled() else QIcon.Mode.Disabled)
 
 
 class TaskCard(QPushButton):
@@ -14,8 +27,7 @@ class TaskCard(QPushButton):
         body = QVBoxLayout(self)
         body.setContentsMargins(22, 22, 22, 22)
         body.setSpacing(10)
-        image = QLabel()
-        image.setPixmap(icon.pixmap(24, 24))
+        image = IconLabel(icon)
         heading = QLabel(title)
         heading.setProperty("class", "taskTitle")
         detail = QLabel(description)

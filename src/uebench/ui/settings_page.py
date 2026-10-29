@@ -15,7 +15,10 @@ from PySide6.QtWidgets import (
 )
 
 
-class SettingsPage(QWidget):
+from .responsive_page import ResponsivePage
+
+
+class SettingsPage(ResponsivePage):
     """Small user-facing settings surface; package lifecycle stays automatic."""
 
     create_backup_requested = Signal()
@@ -38,6 +41,9 @@ class SettingsPage(QWidget):
         root.setContentsMargins(24, 20, 24, 20)
         root.setSpacing(14)
 
+        self.home_button = QPushButton("返回首页")
+        root.addWidget(self.home_button, 0, Qt.AlignmentFlag.AlignLeft)
+        self.home_button.hide()
         title = QLabel("设置")
         title.setProperty("class", "pageTitle")
         root.addWidget(title)

@@ -30,6 +30,11 @@ def configure_application_font(application: "QApplication") -> None:  # noqa: F8
     """使用系统中文字体配置 Qt 应用字体（仅在桌面路径调用）。"""
     from PySide6.QtGui import QFont, QFontDatabase
 
+    available = set(QFontDatabase.families())
+    for family in ("Microsoft YaHei UI", "Microsoft YaHei"):
+        if family in available:
+            application.setFont(QFont(family, 10))
+            return
     candidates = [
         Path("C:/Windows/Fonts/msyh.ttc"),
         Path("C:/Windows/Fonts/simhei.ttf"),
