@@ -18,12 +18,16 @@ class ChineseMessageButtons(QObject):
 
 
 def localize_buttons(box):
-    for code, label in (
+    labels = [
         (QMessageBox.StandardButton.Ok, "确定"),
-        (QMessageBox.StandardButton.Yes, "删除记录" if box.windowTitle() == "确认删除" else "恢复并替换" if box.windowTitle() == "确认恢复" else "继续"),
-        (QMessageBox.StandardButton.No, "取消"),
+        (QMessageBox.StandardButton.No, "取消(&N)"),
         (QMessageBox.StandardButton.Cancel, "取消"),
-    ):
+    ]
+    action = {"确认删除": "删除记录(&Y)", "确认恢复": "恢复并替换(&Y)"}.get(box.windowTitle())
+    if action:
+        labels.append((QMessageBox.StandardButton.Yes, action))
+    # 未登记的 Yes 操作沿用应用译器，不能静默发明“继续”动作。
+    for code, label in labels:
         button = box.button(code)
         if button:
             button.setText(label)

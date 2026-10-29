@@ -34,7 +34,7 @@ QPushButton[role="primary"]:pressed { background: #0A507F; border-color: #0A507F
 QPushButton[role="primary"]:focus { border-color: #18364F; }
 QPushButton[role="secondary"]:focus, QPushButton[role="light"]:focus, QPushButton[role="danger"]:focus { border-color: #197CC2; }
 QPushButton:disabled, QToolButton:disabled, QPushButton[role="primary"]:disabled, QPushButton[role="secondary"]:disabled, QPushButton[role="light"]:disabled, QPushButton[role="danger"]:disabled { color: #698198; background: #F0F4F8; border-color: #DAE7F1; }
-QPushButton[role="task"] { padding: 0; min-height: 172px; max-height: 16777215px; border-radius: 14px; }
+QPushButton[role="task"] { padding: 0; min-height: 172px; max-height: 9999px; border-radius: 14px; }
 QPushButton[role="task"] QLabel[class="taskTitle"] { font-size: 18px; font-weight: 600; color: #18364F; }
 QPushButton[role="task"] QLabel[class="taskDescription"] { font-size: 13px; color: #526A7D; }
 QPushButton[role="task"] QLabel:disabled { color: #698198; }

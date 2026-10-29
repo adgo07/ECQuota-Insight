@@ -35,6 +35,9 @@ def interact_with_modal(callback, errors):
         box = QApplication.activeModalWidget()
         try:
             assert isinstance(box, QMessageBox)
+            box.activateWindow()
+            box.windowHandle().requestActivate()
+            assert QTest.qWaitForWindowActive(box, 1000)
             callback(box)
             def watchdog():
                 try:
@@ -156,7 +159,7 @@ def test_bad_backup_real_ui_shows_actionable_error_and_preserves_all_record_byte
     def confirm(box):
         assert box.windowTitle() == "确认恢复"
         assert box.defaultButton() is box.button(QMessageBox.StandardButton.No)
-        assert box.button(QMessageBox.StandardButton.Yes).text() == "确认(&Y)"
+        assert box.button(QMessageBox.StandardButton.Yes).text() == "恢复并替换(&Y)"
         interact_with_modal(dismiss_error, errors)
         QTest.mouseClick(box.button(QMessageBox.StandardButton.Yes), Qt.MouseButton.LeftButton)
     def dismiss_error(box):
@@ -200,7 +203,7 @@ def test_delete_confirmation_keeps_cancel_and_soft_delete_semantics(window_conte
     def respond(box):
         assert box.windowTitle() == "确认删除"
         assert box.defaultButton() is box.button(QMessageBox.StandardButton.No)
-        assert box.button(QMessageBox.StandardButton.Yes).text() == "确认(&Y)"
+        assert box.button(QMessageBox.StandardButton.Yes).text() == "删除记录(&Y)"
         assert box.button(QMessageBox.StandardButton.No).text() == "取消(&N)"
         if action == "return": QTest.keyClick(box, Qt.Key.Key_Return)
         elif action == "escape": QTest.keyClick(box, Qt.Key.Key_Escape)

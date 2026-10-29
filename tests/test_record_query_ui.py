@@ -87,6 +87,10 @@ def test_page_return_context_direct_id_and_two_tabs(records, monkeypatch):
     assert [detail.tabs.tabText(i) for i in range(detail.tabs.count())] == ["基本信息与结果", "输入数据与计算依据"]
     assert detail.result_content.isReadOnly() and detail.input_content.isReadOnly()
     assert "2级" in detail.result_content.toPlainText()
+    saved_time = before[1].evaluated_at
+    expected_time = saved_time.astimezone().strftime("%Y-%m-%d %H:%M:%S")
+    assert f"评价时间：{expected_time}" in detail.result_content.toPlainText()
+    assert saved_time.isoformat() not in detail.result_content.toPlainText()
     assert "8000000" in detail.input_content.toPlainText()
     detail.back_requested.emit()
     assert win._record_page == 12 and win._selected_record_id() == selected

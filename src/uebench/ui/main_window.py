@@ -1533,7 +1533,11 @@ class MainWindow(QMainWindow):
                             requirement_basis.append(f"{values[0]}：{line}")
         self.standard_requirements_basis.setText("\n".join(dict.fromkeys(requirement_basis)))
         self.standard_requirements_basis.setVisible(bool(requirement_basis))
-        self.standard_indicator_table.setFixedHeight(self.standard_indicator_table.horizontalHeader().sizeHint().height() + self.standard_indicator_table.rowCount() * 44 + 4)
+        self.standard_indicator_table.setFixedHeight(
+            self.standard_indicator_table.horizontalHeader().sizeHint().height()
+            + sum(self.standard_indicator_table.rowHeight(row) for row in range(self.standard_indicator_table.rowCount()))
+            + 4
+        )
         self.refresh_formal_evaluation_readiness()
 
     def _selection_mode(self) -> StandardSelectionMode:

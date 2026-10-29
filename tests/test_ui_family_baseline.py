@@ -66,6 +66,36 @@ def test_settings_keeps_entry_context(window):
     assert window.settings_page.home_button.isHidden()
 
 
+def test_standard_requirement_table_does_not_clip_last_row(window):
+    window.navigate("standards")
+    row = next(row for row in range(window.standard_table.rowCount())
+               if window.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole) == "gb-29446-2019")
+    window.standard_table.selectRow(row)
+    window.show_standard_detail()
+    QApplication.processEvents()
+    table = window.standard_indicator_table
+    assert table.rowCount() == 2
+    rows_height = sum(table.rowHeight(row) for row in range(table.rowCount()))
+    assert table.viewport().height() >= rows_height
+    assert table.viewport().rect().contains(table.visualItemRect(table.item(table.rowCount() - 1, 0)))
+
+
+def test_task_card_polish_has_no_oversized_maximum_warning(window):
+    from PySide6.QtCore import qInstallMessageHandler
+    from uebench.ui.design_tokens import APP_STYLE
+    messages = []
+    previous = qInstallMessageHandler(lambda kind, context, message: messages.append(message))
+    try:
+        window.setStyleSheet("")
+        window.setStyleSheet(APP_STYLE)
+        QApplication.processEvents()
+        assert not any("setMaximumSize" in message for message in messages)
+        for card in window.home_task_buttons.values():
+            assert card.height() >= 172
+    finally:
+        qInstallMessageHandler(previous)
+
+
 def test_controls_keep_40_dip_and_focus_does_not_change_size(window):
     window.start_formal_evaluation()
     app = QApplication.instance()
@@ -171,7 +201,7 @@ def test_home_recent_rows_grow_for_long_chinese(window):
     assert table.height() >= table.horizontalHeader().height() + table.rowHeight(0)
 
 
-@pytest.mark.parametrize("title,action", [("确认删除", "删除记录"), ("确认恢复", "恢复并替换")])
+@pytest.mark.parametrize("title,action", [("确认删除", "删除记录(&Y)"), ("确认恢复", "恢复并替换(&Y)")])
 def test_chinese_confirmation_preserves_safe_default(title, action):
     app = QApplication.instance() or QApplication([])
     box = QMessageBox()
@@ -180,5 +210,5 @@ def test_chinese_confirmation_preserves_safe_default(title, action):
     box.setDefaultButton(QMessageBox.No)
     localize_buttons(box)
     assert box.button(QMessageBox.Yes).text() == action
-    assert box.button(QMessageBox.No).text() == "取消"
+    assert box.button(QMessageBox.No).text() == "取消(&N)"
     assert box.standardButton(box.defaultButton()) == QMessageBox.No
