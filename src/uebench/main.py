@@ -184,7 +184,9 @@ def run_self_check_command(data_dir: Path, output: Path | None) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _run_desktop_application() -> int:
+def _run_desktop_application(*, root: Path | None = None,
+                             evaluation_standard_ids: frozenset[str] | None = None,
+                             candidate_title: str | None = None) -> int:
     from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import QApplication
 
@@ -200,7 +202,8 @@ def _run_desktop_application() -> int:
         application.setWindowIcon(QIcon(str(bundled_icon)))
     configure_application_font(application)
     resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
-    context = create_context(public_key_path=resource_key)
+    context = create_context(root, public_key_path=resource_key,
+                             formal_standard_ids=evaluation_standard_ids)
     try:
         try:
             reconcile_standard_package(context)
@@ -208,7 +211,9 @@ def _run_desktop_application() -> int:
             # 对账失败绝不能阻止界面启动：standards 安装已由 install 自行回滚，
             # 存量数据保持可用（旧行为同样是记录日志后继续启动）。
             logging.getLogger(__name__).exception("内置标准包对账失败")
-        window = create_main_window(context)
+        window = create_main_window(context, evaluation_standard_ids=evaluation_standard_ids)
+        if candidate_title:
+            window.setWindowTitle(candidate_title)
         window.show()
         return application.exec()
     finally:

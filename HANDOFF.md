@@ -1,5 +1,9 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-10-29 水泥Stage D隔离候选（当前推进）
+
+Owner授权继续Stage D。功能分支以专用显式入口构建隔离候选，将相同实例许可传入Application与既有UI，常规入口及正式评价清单仍仅选煤。强制指定隔离目录并拒真实用户目录、未标识数据及内部重解析点；不覆盖用户安装，不执行现有同AppId安装器，不自动合并或发布。精确候选身份、独立手算矩阵与待验边界见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。当前仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布、Excel新工作簿延期。
+
 ## 2026-10-29 水泥Stage C源码实施（当前任务补充）
 
 Owner已批准[水泥Stage B设计](docs/GB16780-2021_StageB_软件接入设计.md)修正并授权Stage C实现及隔离验证，取代下文历史任务中“本轮不开发水泥”的限制。唯一业务依据仍为V1.2冻结映射；软件源码状态为 `IMPLEMENTED`；Stage C验证见实施报告，Stage D尚未完成，不称 `SUPPORTED`。生产正式评价白名单仍仅选煤；后续验收与审查前不自动合并、发布或开放水泥。RS05保持IN PROGRESS、产品闭环PARTIAL、0.2.0未发布；Excel新工作簿延期。

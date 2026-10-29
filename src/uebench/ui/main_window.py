@@ -399,10 +399,11 @@ def standard_scope_line(standard_id: str | None) -> str:
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, context: AppContext) -> None:
+    def __init__(self, context: AppContext, *, evaluation_standard_ids: frozenset[str] | None = None) -> None:
         super().__init__()
         install_chinese_message_box_buttons()
         self.context = context
+        self._evaluation_standard_ids = evaluation_standard_ids
         self.current_standard: StandardDefinition | None = None
         self.last_result_id: str | None = None
         #: 当前加载的 GB 29446 规则是否满足正式 r2 结构；非 GB29446 标准恒为 True。
@@ -1304,7 +1305,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, "standard_evaluate_button"):
             standard_id = self._selected_library_standard_id()
             self.standard_evaluate_button.setEnabled(
-                message is None and supports_formal_evaluation(standard_id)
+                message is None and self._supports_evaluation(standard_id)
             )
         if hasattr(self, "calculate_button"):
             has_evaluable_standard = (
@@ -1347,12 +1348,14 @@ class MainWindow(QMainWindow):
         scoped_standards = [item for item in all_standards if item.lifecycle_status is not LifecycleStatus.OBSOLETE]
         self.home_standard_count.setText(f"{len(standards)}/{len(scoped_standards)}")
         # 「可正式评价」只由正式评价范围注册表决定，与标准文档是否已发布无关。
-        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        evaluable = self._evaluable_standards(self.context.application.list_library_standards())
         self.home_formal_scope_count.setText(f"{len(evaluable)} 项")
         if evaluable:
             scope_names = "、".join(f"{item.number} {item.title}" for item in evaluable)
             self.home_scope_label.setText(
                 f"正式评价范围：{scope_names}。软件只对已纳入正式评价范围的标准给出正式评价结论。"
+                if self._evaluation_standard_ids is None
+                else f"隔离验收范围：{scope_names}。水泥Stage D待完成，尚未正式支持。"
             )
             self.home_start_evaluation.setEnabled(True)
         else:
@@ -1442,7 +1445,7 @@ class MainWindow(QMainWindow):
                 standard.title,
                 status,
                 format_local_date(standard.effective_date),
-                evaluation_support_label(standard),
+                self._support_label(standard),
             ]
             for column, value in enumerate(values):
                 item = _item(value)
@@ -1488,12 +1491,14 @@ class MainWindow(QMainWindow):
         self.standard_metadata.setText(f"标准编号：{standard.number}\n标准名称：{standard.title}\n标准状态：{state}\n实施日期：{format_local_date(standard.effective_date)}")
         self.standard_requirements_notice.setText(
             "选煤电力单耗三级上限如下。统计范围：" + _gb29446_statistics_scope_text()
-            if supports_formal_evaluation(standard.id)
+            if standard.id == "gb-29446-2019" and self._supports_evaluation(standard.id)
+            else "水泥Stage D隔离验收候选；各模式适用指标、修正及有效阈值在评价页查看。"
+            if standard.id == "gb-16780-2021" and self._supports_evaluation(standard.id)
             else "软件接入及验收尚未完成，暂不展示未经确认的限值明细。"
         )
         # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
         self.standard_detail_label.setText(standard_scope_line(standard.id))
-        self.standard_confirmation_label.setText(standard_confirmation_message(standard.id))
+        self.standard_confirmation_label.setText(self._confirmation_message(standard.id))
         official_url = official_source_url(standard.id)
         self.standard_official_button.setEnabled(official_url is not None)
         self.standard_official_button.setToolTip(official_url or NO_OFFICIAL_SOURCE_LABEL)
@@ -1501,13 +1506,14 @@ class MainWindow(QMainWindow):
             OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL
         )
         # 未纳入正式评价范围的标准不提供可执行的评价入口。
-        supported = supports_formal_evaluation(standard.id)
+        supported = self._supports_evaluation(standard.id)
         # 旧规则可能尚未按批准映射重新验收；清空后只为正式支持的标准重建限值。
         # 切换标准时不会把上一条标准的旧限值留在隐藏表格中。
-        self.standard_indicator_table.setVisible(supported)
+        self.standard_indicator_table.setVisible(supported and standard.id == "gb-29446-2019")
         self.standard_evaluate_button.setEnabled(supported)
         self.standard_evaluate_button.setToolTip(
-            "用该标准发起正式评价。"
+            ("用该标准发起隔离验收。" if self._evaluation_standard_ids is not None
+             else "用该标准发起正式评价。")
             if supported
             else f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能发起正式评价。"
         )
@@ -1518,7 +1524,7 @@ class MainWindow(QMainWindow):
             return expression.value if expression.op == "constant" else "公式/条件"
 
         requirement_basis = []
-        if supported:
+        if supported and standard.id == "gb-29446-2019":
             for product in standard.products:
                 for indicator in product.indicators:
                     base = indicator.base_thresholds or indicator.thresholds
@@ -1547,6 +1553,26 @@ class MainWindow(QMainWindow):
         )
         self.refresh_formal_evaluation_readiness()
 
+    def _supports_evaluation(self, value) -> bool:
+        if self._evaluation_standard_ids is None:
+            return supports_formal_evaluation(value)
+        return (value if isinstance(value, str) else getattr(value, "id", None)) in self._evaluation_standard_ids
+
+    def _evaluable_standards(self, standards):
+        return [standard for standard in standards if self._supports_evaluation(standard)]
+
+    def _support_label(self, value) -> str:
+        standard_id = value if isinstance(value, str) else getattr(value, "id", None)
+        if self._evaluation_standard_ids is not None and standard_id == "gb-16780-2021":
+            return "Stage D验收候选，尚未正式支持"
+        return evaluation_support_label(value)
+
+    def _confirmation_message(self, value) -> str:
+        standard_id = value if isinstance(value, str) else getattr(value, "id", None)
+        if self._evaluation_standard_ids is not None and standard_id == "gb-16780-2021":
+            return "业务映射V1.2已批准；当前仅为隔离验收候选，Stage D待完成，尚未正式支持。"
+        return standard_confirmation_message(value)
+
     def _selection_mode(self) -> StandardSelectionMode:
         """新建评价固定使用**当前正式可评价**标准（ECQ-RS05 M2 §四）。
 
@@ -1563,15 +1589,17 @@ class MainWindow(QMainWindow):
     def _formally_evaluable_standards(self) -> list[StandardDefinition]:
         """当前选择方式下**可以正式评价**的标准（正式评价范围注册表决定）。"""
 
-        return filter_formally_evaluable(self._standards_for_selection())
+        return self._evaluable_standards(self._standards_for_selection())
 
     def _formal_scope_hint(self) -> str:
         """用于说明“为什么只有这些标准可选”的中文提示（来自注册表，不写死编号）。"""
 
-        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        evaluable = self._evaluable_standards(self.context.application.list_library_standards())
         if not evaluable:
             return "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
         names = "、".join(f"{item.number} {item.title}" for item in evaluable)
+        if self._evaluation_standard_ids is not None:
+            return f"隔离验收范围：{names}；水泥尚未正式支持。"
         return f"本版本正式评价范围：{names}。"
 
     def refresh_standard_combo(self) -> None:
@@ -1849,7 +1877,7 @@ class MainWindow(QMainWindow):
             status.setText(OFFICIAL_SOURCE_PLATFORM_NAME if url else NO_OFFICIAL_SOURCE_LABEL)
         support = getattr(self, "eval_support_label", None)
         if support is not None:
-            support.setText(evaluation_support_label(standard_id) if standard_id else "—")
+            support.setText(self._support_label(standard_id) if standard_id else "—")
 
     @staticmethod
     def _gb29446_factor_map(product) -> dict[str, Decimal]:
@@ -2696,7 +2724,7 @@ class MainWindow(QMainWindow):
             # 因此这里只更新页面上的状态文字：同一件事不说两遍，也不从加载函数里弹框。
             if self._library_standard(request.standard_id) is None:
                 QMessageBox.warning(self, "标准不可用", "该评价使用的标准未安装，无法基于此记录重新评价。")
-            elif not supports_formal_evaluation(request.standard_id):
+            elif not self._supports_evaluation(request.standard_id):
                 self.eval_standard_status.setText(
                     f"该标准{FORMAL_EVALUATION_UNSUPPORTED_LABEL}，不能重新发起正式评价；原记录仍可查看。"
                 )
@@ -2799,7 +2827,7 @@ class MainWindow(QMainWindow):
             return
         request, _result, snapshot = loaded
         # 未纳入正式评价范围的标准不能通过“基于此记录重新评价”绕开正式评价范围。
-        if not supports_formal_evaluation(request.standard_id):
+        if not self._supports_evaluation(request.standard_id):
             QMessageBox.warning(
                 self,
                 FORMAL_EVALUATION_UNSUPPORTED_LABEL,
@@ -3075,7 +3103,7 @@ class MainWindow(QMainWindow):
     def start_formal_evaluation(self) -> None:
         """首页「开始正式评价」：进入新建评价并选中正式评价范围内的标准。"""
 
-        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        evaluable = self._evaluable_standards(self.context.application.list_library_standards())
         if not evaluable:
             QMessageBox.information(
                 self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
@@ -3098,7 +3126,7 @@ class MainWindow(QMainWindow):
         返回 ``True`` 表示已经带着该标准进入「新建评价」页面。
         """
 
-        if not supports_formal_evaluation(standard_id):
+        if not self._supports_evaluation(standard_id):
             QMessageBox.information(
                 self,
                 FORMAL_EVALUATION_UNSUPPORTED_LABEL,
@@ -3124,5 +3152,5 @@ class MainWindow(QMainWindow):
         return True
 
 
-def create_main_window(context: AppContext) -> MainWindow:
-    return MainWindow(context)
+def create_main_window(context: AppContext, *, evaluation_standard_ids: frozenset[str] | None = None) -> MainWindow:
+    return MainWindow(context, evaluation_standard_ids=evaluation_standard_ids)
