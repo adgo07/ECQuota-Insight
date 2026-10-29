@@ -110,6 +110,7 @@ from uebench.domain.models import (
     parse_decimal,
 )
 from uebench.application.reporting import PERIOD_LABEL, STATISTICS_SCOPE, build_report_view, gb29446_business_labels, render_gb29446_warning
+from uebench.ui.cement_panel import CementEvaluationPanel
 from uebench.ui.presentation import format_local_date, format_local_datetime
 from uebench.ui.settings_page import SettingsPage
 from uebench.ui.design_tokens import APP_STYLE
@@ -944,6 +945,11 @@ class MainWindow(QMainWindow):
         self.eval_standard.hide()
         form_layout.addWidget(self.generic_form_container)
         form_layout.addWidget(self.gb29446_form_container)
+        self.cement_panel = CementEvaluationPanel(self.context.application)
+        self.cement_panel.saved.connect(self._cement_record_saved)
+        self.cement_panel.export_requested.connect(self.export_word_record)
+        form_layout.addWidget(self.cement_panel)
+        self.cement_panel.hide()
         # 规则数据不完整/版本不兼容时的显式中文提示；正常 r2 规则下始终隐藏。
         self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
@@ -1314,7 +1320,8 @@ class MainWindow(QMainWindow):
         busy = getattr(self, "_calculating", False)
         saved = self.last_result_id is not None and self._is_gb29446()
         role = "secondary" if saved else "primary"
-        self.calculate_button.setText("正在计算…" if busy else "重新计算并生成新记录" if saved else "计算并判级")
+        cement = self.current_standard is not None and self.current_standard.id == "gb-16780-2021"
+        self.calculate_button.setText("正在计算…" if busy else "计算并保存" if cement else "重新计算并生成新记录" if saved else "计算并判级")
         if self.calculate_button.property("role") != role:
             self.calculate_button.setProperty("role", role)
             self.calculate_button.style().unpolish(self.calculate_button)
@@ -1816,10 +1823,14 @@ class MainWindow(QMainWindow):
 
     def _set_evaluation_view(self) -> None:
         is_gb29446 = self._is_gb29446()
-        self.generic_form_container.setVisible(not is_gb29446)
+        is_cement = self.current_standard is not None and self.current_standard.id == "gb-16780-2021"
+        self.cement_panel.setVisible(is_cement)
+        if is_cement:
+            self.cement_panel.set_standard(self.current_standard)
+        self.generic_form_container.setVisible(not is_gb29446 and not is_cement)
         self.gb29446_form_container.setVisible(is_gb29446)
-        self.input_controls_container.setVisible(not is_gb29446)
-        self.generic_result_section.setVisible(not is_gb29446)
+        self.input_controls_container.setVisible(not is_gb29446 and not is_cement)
+        self.generic_result_section.setVisible(not is_gb29446 and not is_cement)
         self.gb29446_result_section.setVisible(is_gb29446)
         self.gb29446_explanation_section.hide()
         self.gb29446_basis_section.hide()
@@ -2007,6 +2018,11 @@ class MainWindow(QMainWindow):
         else:
             self._refresh_input_table()
         self.refresh_formal_evaluation_readiness()
+
+    def _cement_record_saved(self, evaluation_id: str) -> None:
+        self.last_result_id = evaluation_id
+        self.mark_records_dirty()
+        self.refresh_home()
 
     def _product_changed(self) -> None:
         self._refresh_input_table()
@@ -2315,6 +2331,9 @@ class MainWindow(QMainWindow):
             self.refresh_formal_evaluation_readiness()
 
     def _calculate_evaluation(self, request: EvaluationRequest | None) -> None:
+        if request is None and self.current_standard is not None and self.current_standard.id == "gb-16780-2021":
+            self.cement_panel.calculate_and_save()
+            return
         is_gb29446 = self._is_gb29446() if request is None else request.standard_id == GB29446_STANDARD_ID
         if is_gb29446:
             self._clear_gb29446_result()
@@ -2640,7 +2659,7 @@ class MainWindow(QMainWindow):
             else:
                 view = None
                 reason = "该标准尚未开放 Word 报告。"
-                if loaded[1].standard_id == GB29446_STANDARD_ID:
+                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"}:
                     try:
                         view = self.context.application.get_report_view(evaluation_id)
                         reason = ""

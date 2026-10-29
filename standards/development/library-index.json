@@ -22,12 +22,12 @@
       "title": "水泥单位产品能源消耗限额",
       "version": "2021",
       "standard_family_id": "GB 16780",
-      "rule_revision": 1,
+      "rule_revision": 2,
       "publication_status": "published",
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-16780-2021.json",
-      "definition_sha256": "fe6c8e091a982a60286a8241f54565706f485cb4ffb9559b3acf6e59e98ed9f6"
+      "definition_sha256": "8e7ab3ca3da824c8cc1814bace6e4e540a2c51cca9f9c25cd2967afbfc193038"
     },
     {
       "number": "GB 21252-2023",

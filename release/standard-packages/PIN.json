@@ -1,16 +1,16 @@
 {
   "schema": "ecq.standard-package-pin.v1",
   "file": "initial-standard-package-published.uebench",
-  "size": 132966,
-  "sha256": "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5",
-  "data_version": "2026.10-published.5",
-  "package_id": "gb29446-r3-from-2026.10-published.4",
+  "size": 134262,
+  "sha256": "d5ff370d3728ad3dda2589ed72bc9c693425208084ed96d45ad1d036c91afa51",
+  "data_version": "2026.10-published.6",
+  "package_id": "gb16780-r2-from-2026.10-published.5",
   "package_mode": "full",
   "source_policy": "provenance-only",
   "source_policy_note": "本包不包含任何 sources/* 成员：0.2.0 起产品不分发、不存储、不打开标准原文 PDF，安装该包不会向用户数据目录写入任何 PDF。标准来源仍以 StandardDefinition 的 source_file / source_sha256 及各指标的 source_references 完整保留。旧包（含 sources/*）仍可正常 preview()/install()。",
   "standard_count": 48,
   "rule_count": 765,
-  "issued_at": "2026-10-18T09:10:18.983657Z",
+  "issued_at": "2026-10-29T04:20:54.550179Z",
   "minimum_app_version": "0.2.0",
   "signature": {
     "algorithm": "ed25519",
@@ -22,15 +22,15 @@
   "parent_baseline": {
     "status": "SUPERSEDED / REFERENCE ONLY",
     "file": "initial-standard-package-published.uebench",
-    "sha256": "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff",
-    "size": 132837,
-    "package_id": "gb29446-r2-provenance-only-from-2026.10-published.3",
-    "data_version": "2026.10-published.4",
+    "sha256": "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5",
+    "size": 132966,
+    "package_id": "gb29446-r3-from-2026.10-published.4",
+    "data_version": "2026.10-published.5",
     "source_policy": "provenance-only",
-    "archive_relative_path": "上一Git提交 a230f806ec4fcfd384a25bb7bea239a9c38623f3 的 release/standard-packages/initial-standard-package-published.uebench",
-    "archive_pointer": "Git历史与本次替换构建报告",
+    "archive_pointer": "Git父基线 b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e 的同路径标准包",
     "shipped_with_release": false,
-    "note": "r3的直接父包为已签名且无原文PDF的r2固定包；本次只替换GB29446定义成员，其他47项定义及corrections逐字节不变。"
+    "note": "本次只替换水泥r1为r2；其余47项定义和corrections原字节不变。",
+    "archive_relative_path": "tests/fixtures/standard-packages/2026.10-published.5.uebench"
   },
   "ancestor_baseline": {
     "status": "REFERENCE ONLY",
@@ -68,19 +68,27 @@
     "not_used": "整个过程未读取、未使用 统一标准规则确认表.xlsx（LEGACY_REFERENCE_ONLY），未从该表重建任何规则。"
   },
   "current_revision_resolution": {
-    "decision": "2026-10-18选煤现行批准映射采用；Excel工作簿本轮不交付",
-    "summary": "以已签名2026.10-published.4无原文完整包为父基线，仅将GB29446定义由r2替换为r3。正式计算公式、12项k、6个等级阈值及比较语义不变；其他47项定义与corrections逐字节不变，包内无sources/*成员。",
-    "tool": "tools/build_gb29446_package_revision.py",
-    "parent_package_id": "gb29446-r2-provenance-only-from-2026.10-published.3",
-    "parent_data_version": "2026.10-published.4",
-    "removed_members": ["definitions/gb-29446-2019-2019-r2.json"],
-    "added_members": ["definitions/gb-29446-2019-2019-r3.json"],
-    "changed_members": [],
-    "standard_count": 48,
-    "rule_count": 765,
-    "unchanged_member_count": 48,
-    "source_member_count": 0,
-    "definition_semantics_check": "48项随包定义与data/definitions按StandardDefinition模型逐项一致；旧包序列化默认字段差异不作为业务差异。"
+    "decision": "2026-10-29 Owner批准水泥Stage C实现后，同步唯一机器定义源与签名规则库派生产物",
+    "summary": "以2026.10-published.5为父，仅替换GB16780定义r1→r2并Ed25519重签，48项/765条，无标准原文；正式评价白名单仍仅GB29446，不表示水泥SUPPORTED、Stage D通过、EXE Candidate或正式发布。",
+    "tool": "tools/build_gb29446_package_revision.py --target-standard-id gb-16780-2021",
+    "target_standard_id": "gb-16780-2021",
+    "target_rule_revision": 2,
+    "removed_members": [
+      "definitions/gb-16780-2021-2021.json"
+    ],
+    "added_members": [
+      "definitions/gb-16780-2021-2021-r2.json"
+    ],
+    "changed_content_members": [],
+    "changed_structural_members": [
+      "manifest.json",
+      "signature.ed25519"
+    ],
+    "unchanged_definition_count": 47,
+    "unchanged_corrections": true,
+    "formal_evaluation_standard_ids": [
+      "gb-29446-2019"
+    ]
   },
   "revision_gap_resolution": {
     "decision": "ECQ-RS05 方案 B（由项目负责人批准，历史记录）",
@@ -96,11 +104,12 @@
     "not_used": "整个过程未读取、未使用 统一标准规则确认表.xlsx（LEGACY_REFERENCE_ONLY），未从该表重建任何规则。"
   },
   "notes": [
+    "2026.10-published.6仅为规则库派生产物同步；正式评价范围仍只有选煤，水泥软件尚未正式支持。",
     "PackageManifest.validate_lineage 禁止 package_mode='full' 携带 parent_package_id，因此父基线关系无法写入完整包的 manifest，改由本文件记录。",
     "source_policy 是 PackageManifest 的自述字段：缺省（旧包）= embedded（随包分发 sources/*），provenance-only = 不随包分发标准原文。旧包因此完全向后兼容。",
-    "minimum_app_version 保持 0.2.0；本轮r3修改采用身份及业务展示词，不改正式计算。",
-    "data_version 采用 YYYY.MM-channel.revision 约定：2026.10-published.5 排在 2026.10-published.4 之后。",
-    "2026.10-published.5 是唯一现行正式打包输入；2026.10-published.4 在Git父提交及只读测试fixture中保留为历史证据，不进入产品payload。"
+    "minimum_app_version 保持 0.2.0；历史选煤r3修改采用身份及业务展示词，不改正式计算。",
+    "历史.5沿用 YYYY.MM-channel.revision 约定：2026.10-published.5 排在 2026.10-published.4 之后。",
+    "2026.10-published.6 是唯一现行正式打包输入；2026.10-published.4 在Git父提交及只读测试fixture中保留为历史证据，不进入产品payload。"
   ],
   "cleanup_policy": {
     "decided_by": "项目负责人",
@@ -112,5 +121,43 @@
       "归档资产一律不删除。",
       "无论新旧，标准包都不得把标准原文 PDF 写入用户数据目录。"
     ]
+  },
+  "previous_parent_baseline": {
+    "status": "SUPERSEDED / REFERENCE ONLY",
+    "file": "initial-standard-package-published.uebench",
+    "sha256": "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff",
+    "size": 132837,
+    "package_id": "gb29446-r2-provenance-only-from-2026.10-published.3",
+    "data_version": "2026.10-published.4",
+    "source_policy": "provenance-only",
+    "archive_relative_path": "tests/fixtures/standard-packages/2026.10-published.4.uebench",
+    "archive_pointer": "Git历史与本次替换构建报告",
+    "shipped_with_release": false,
+    "note": "r3的直接父包为已签名且无原文PDF的r2固定包；本次只替换GB29446定义成员，其他47项定义及corrections逐字节不变。"
+  },
+  "previous_revision_resolution": {
+    "decision": "2026-10-18选煤现行批准映射采用；Excel工作簿本轮不交付",
+    "summary": "以已签名2026.10-published.4无原文完整包为父基线，仅将GB29446定义由r2替换为r3。正式计算公式、12项k、6个等级阈值及比较语义不变；其他47项定义与corrections逐字节不变，包内无sources/*成员。",
+    "tool": "tools/build_gb29446_package_revision.py",
+    "parent_package_id": "gb29446-r2-provenance-only-from-2026.10-published.3",
+    "parent_data_version": "2026.10-published.4",
+    "removed_members": [
+      "definitions/gb-29446-2019-2019-r2.json"
+    ],
+    "added_members": [
+      "definitions/gb-29446-2019-2019-r3.json"
+    ],
+    "changed_members": [],
+    "standard_count": 48,
+    "rule_count": 765,
+    "unchanged_member_count": 48,
+    "source_member_count": 0,
+    "definition_semantics_check": "48项随包定义与data/definitions按StandardDefinition模型逐项一致；旧包序列化默认字段差异不作为业务差异。"
+  },
+  "compatibility_boundary": {
+    "distribution": "source-derived-input-only; no standalone delivery to old installations",
+    "minimum_app_version_note": "0.2.0仍为本仓未发布开发版本；该粗粒度字段不能区分历史0.2.0 Candidate，不代表其兼容r2节点。须配套含水泥r2解析模型的完整软件，后续正式发布再锁真实版本。",
+    "legacy_source_probe": "b538ac6旧StandardDefinition拒绝cement_calculation_nodes（extra_forbidden）；不是旧EXE实测",
+    "old_install_upgrade_performed": false
   }
 }

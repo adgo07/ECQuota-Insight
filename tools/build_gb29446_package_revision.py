@@ -81,6 +81,7 @@ from uebench.infrastructure.packages import (  # noqa: E402
     _sha256_bytes,  # noqa: PLC2701
 )
 
+# 默认目标保持选煤；显式目标必须在父包存在且与源定义ID一致。
 TARGET_STANDARD_ID = "gb-29446-2019"
 GHOST_MEMBER = "signature.ed25519"
 
@@ -198,6 +199,7 @@ def build_revision_package(
     minimum_app_version: str,
     package_id: str | None = None,
     issued_at: datetime | None = None,
+    target_standard_id: str = TARGET_STANDARD_ID,
 ) -> dict:
     parent = parent.resolve()
     output = output.resolve()
@@ -212,8 +214,8 @@ def build_revision_package(
     definition = StandardDefinition.model_validate_json(
         Path(definition_path).read_text(encoding="utf-8")
     )
-    if definition.id != TARGET_STANDARD_ID:
-        raise SystemExit(f"待替换定义不是 {TARGET_STANDARD_ID}：{definition.id}")
+    if definition.id != target_standard_id:
+        raise SystemExit(f"待替换定义不是 {target_standard_id}：{definition.id}")
 
     # Locate the parent's member for this standard by parsing, never by name guess.
     removed: list[str] = []
@@ -223,12 +225,12 @@ def build_revision_package(
         if entry.kind != "definition":
             continue
         candidate = StandardDefinition.model_validate_json(members[entry.path])
-        if candidate.id == TARGET_STANDARD_ID:
+        if candidate.id == target_standard_id:
             removed.append(entry.path)
             parent_definition = candidate
     if len(removed) != 1:
         raise SystemExit(
-            f"父基线中 {TARGET_STANDARD_ID} 的定义成员数应为 1，实际 {len(removed)}：{removed}"
+            f"父基线中 {target_standard_id} 的定义成员数应为 1，实际 {len(removed)}：{removed}"
         )
     if parent_definition is None or definition.rule_revision <= parent_definition.rule_revision:
         raise SystemExit("替换定义的 rule_revision 必须高于父基线")
@@ -275,7 +277,7 @@ def build_revision_package(
         )
 
     new_manifest = PackageManifest(
-        package_id=package_id or f"gb29446-r{definition.rule_revision}-from-{parent_manifest.data_version}",
+        package_id=package_id or f"{'gb29446' if target_standard_id == TARGET_STANDARD_ID else target_standard_id}-r{definition.rule_revision}-from-{parent_manifest.data_version}",
         data_version=data_version,
         issued_at=issued_at or datetime.now(timezone.utc),
         minimum_app_version=minimum_app_version,
@@ -307,7 +309,9 @@ def build_revision_package(
         "rule_count": rule_count,
         "replaced_definition_member": removed,
         "added_definition_member": new_definition_member,
-        "gb29446_rule_revision": definition.rule_revision,
+        "target_standard_id": target_standard_id,
+        "target_rule_revision": definition.rule_revision,
+        "gb29446_rule_revision": definition.rule_revision if target_standard_id == TARGET_STANDARD_ID else None,
         "unchanged_member_count": len(kept) - 1,  # exclude the new definition
     }
 
@@ -562,8 +566,8 @@ def verify_source_free_package(
     }
 
 
-def verify_revision_package(parent: Path, candidate: Path) -> dict:
-    """Assert the candidate differs from the parent ONLY for GB 29446."""
+def verify_revision_package(parent: Path, candidate: Path, *, target_standard_id: str = TARGET_STANDARD_ID) -> dict:
+    """仅允许显式目标标准定义变化；默认目标仍为 GB 29446。"""
     parent_manifest_bytes, parent_members = _read_package(parent)
     parent_manifest = PackageManifest.model_validate_json(parent_manifest_bytes)
     candidate_manifest_bytes, candidate_members = _read_package(candidate)
@@ -572,42 +576,42 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
     problems: list[str] = []
     removed, added, changed = _diff_members(parent_members, candidate_members)
 
-    def is_gb29446_definition(name: str) -> bool:
+    def is_target_definition(name: str) -> bool:
         if not name.startswith("definitions/"):
             return False
         try:
             return StandardDefinition.model_validate_json(
                 candidate_members.get(name) or parent_members[name]
-            ).id == TARGET_STANDARD_ID
+            ).id == target_standard_id
         except Exception:
             return False
 
-    # Every removed member must be the old GB29446 definition; every added member
+    # Every removed member must be the old target definition; every added member
     # must be the new one; nothing else may differ.
     for name in removed:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员被删除：{name}")
     for name in added:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员被新增：{name}")
     for name in changed:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员内容被改变：{name}")
 
     gb_old = None
     for name in removed:
         parsed = StandardDefinition.model_validate_json(parent_members[name])
-        if parsed.id == TARGET_STANDARD_ID:
+        if parsed.id == target_standard_id:
             gb_old = parsed
     gb_new = None
     for name in added:
         parsed = StandardDefinition.model_validate_json(candidate_members[name])
-        if parsed.id == TARGET_STANDARD_ID:
+        if parsed.id == target_standard_id:
             gb_new = parsed
     if gb_new is None:
-        problems.append("候选包中没有新的 GB29446 定义成员")
+        problems.append("候选包中没有新的目标标准定义成员")
     elif gb_old is None or gb_new.rule_revision <= gb_old.rule_revision:
-        problems.append("新 GB29446 规则修订必须高于父基线")
+        problems.append("新目标标准规则修订必须高于父基线")
 
     if candidate_manifest.standard_count != parent_manifest.standard_count:
         problems.append(
@@ -633,7 +637,9 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
         "candidate_standard_count": candidate_manifest.standard_count,
         "parent_rule_count": parent_manifest.rule_count,
         "candidate_rule_count": candidate_manifest.rule_count,
-        "gb29446_rule_revision": None if gb_new is None else gb_new.rule_revision,
+        "target_standard_id": target_standard_id,
+        "target_rule_revision": None if gb_new is None else gb_new.rule_revision,
+        "gb29446_rule_revision": gb_new.rule_revision if gb_new is not None and target_standard_id == TARGET_STANDARD_ID else None,
     }
 
 
@@ -650,8 +656,9 @@ def main(argv: list[str] | None = None) -> int:
         "--definition",
         type=Path,
         default=None,
-        help="替换用的 GB29446 定义（--drop-sources 时不需要）",
+        help="替换用的目标标准定义（--drop-sources 时不需要）",
     )
+    parser.add_argument("--target-standard-id", default=TARGET_STANDARD_ID, help="仅可替换父包已有且与源定义ID一致的标准；默认GB29446")
     parser.add_argument("--private-key", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--data-version", required=True)
@@ -676,7 +683,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.verify_only and args.definition is not None:
         raise SystemExit(
             "--verify-only 不接受 --definition；"
-            "复核去原文包请用 --drop-sources --verify-only，复核 GB29446 替换不要带 --definition"
+            "复核去原文包请用 --drop-sources --verify-only，复核目标标准替换不要带 --definition"
         )
     if args.drop_sources:
         if args.definition is not None:
@@ -706,7 +713,7 @@ def main(argv: list[str] | None = None) -> int:
                     "生成结果未通过同源校验：\n  " + "\n  ".join(verification["problems"])
                 )
     elif args.verify_only:
-        report = verify_revision_package(args.parent, args.output)
+        report = verify_revision_package(args.parent, args.output, target_standard_id=args.target_standard_id)
     else:
         if args.definition is None:
             raise SystemExit("默认模式必须提供 --definition（或用 --drop-sources）")
@@ -719,8 +726,9 @@ def main(argv: list[str] | None = None) -> int:
             minimum_app_version=args.minimum_app_version,
             package_id=args.package_id,
             issued_at=issued_at,
+            target_standard_id=args.target_standard_id,
         )
-        report = {**build, **{"verification": verify_revision_package(args.parent, args.output)}}
+        report = {**build, **{"verification": verify_revision_package(args.parent, args.output, target_standard_id=args.target_standard_id)}}
         if not report["verification"]["valid"]:
             raise SystemExit(
                 "生成结果未通过同源校验：\n  " + "\n  ".join(report["verification"]["problems"])

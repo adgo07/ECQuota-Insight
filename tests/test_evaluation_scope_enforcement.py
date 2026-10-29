@@ -62,12 +62,13 @@ PUBLISHED_PACKAGE = (
 UNSUPPORTED_ID = "gb-16780-2021"
 UNSUPPORTED_PRODUCT_ID = "cement"
 UNSUPPORTED_INPUTS = {
-    "actual.cement_comprehensive_energy": ("75", "kgce/t"),
-    "cement.clinker_ratio_pct": ("75", "%"),
-    "site.altitude_m": ("1000", "m"),
-    "site.pressure_pa": ("90000", "Pa"),
+    "production_mode": ("grinding_station", None),
+    "evaluation_period": ("2026年9月", None),
+    "production_line_id": ("粉磨站生产线", None),
+    "cement_production_t": ("1000", "t"),
+    "grinding_electricity_kwh": ("23000", "kW·h"),
 }
-UNSUPPORTED_EXPECTED_ACTUAL = Decimal("75")
+UNSUPPORTED_EXPECTED_ACTUAL = Decimal("23")
 
 #: 范围内唯一标准。Direct 输入 2.0 kW·h/t 落在动力煤 1 级。
 SUPPORTED_ID = "gb-29446-2019"
@@ -86,12 +87,13 @@ EVALUATION_DATE = date(2026, 9, 26)
 # --------------------------------------------------------------------------------------
 
 
-def _request(standard_id: str, product_id: str, inputs: dict[str, tuple[str, str | None]]) -> EvaluationRequest:
+def _request(standard_id: str, product_id: str, inputs: dict[str, tuple[str, str | None]],
+             input_mode: InputMode = InputMode.DIRECT) -> EvaluationRequest:
     return EvaluationRequest(
         evaluation_date=EVALUATION_DATE,
         standard_id=standard_id,
         product_id=product_id,
-        input_mode=InputMode.DIRECT,
+        input_mode=input_mode,
         inputs={
             key: (InputValue(value=value, unit=unit) if unit else InputValue(value=value))
             for key, (value, unit) in inputs.items()
@@ -100,7 +102,7 @@ def _request(standard_id: str, product_id: str, inputs: dict[str, tuple[str, str
 
 
 def unsupported_request() -> EvaluationRequest:
-    return _request(UNSUPPORTED_ID, UNSUPPORTED_PRODUCT_ID, UNSUPPORTED_INPUTS)
+    return _request(UNSUPPORTED_ID, UNSUPPORTED_PRODUCT_ID, UNSUPPORTED_INPUTS, InputMode.DETAIL)
 
 
 def supported_request() -> EvaluationRequest:
@@ -233,7 +235,7 @@ def test_every_installed_standard_outside_the_registry_is_refused(context) -> No
             continue
         with pytest.raises(ValueError) as caught:
             context.application.evaluate(
-                _request(definition.id, UNSUPPORTED_PRODUCT_ID, UNSUPPORTED_INPUTS)
+                _request(definition.id, UNSUPPORTED_PRODUCT_ID, UNSUPPORTED_INPUTS, InputMode.DETAIL)
             )
         assert FORMAL_EVALUATION_UNSUPPORTED_LABEL in str(caught.value), definition.id
         refused.append(definition.id)
@@ -273,9 +275,14 @@ def test_preview_still_calculates_out_of_scope_standard_and_writes_nothing(conte
 
     preview = context.application.preview_evaluation(unsupported_request())
 
-    # 不是一个空壳：它真的算出了 1 级，所以“拒绝”确实只针对正式记录。
-    assert len(preview.results) == 1
-    outcome = preview.results[0]
+    # 原始23000 kW·h / 1000 t = 23 kW·h/t，粉磨站独立工段指标真实算出1级。
+    # 其余四项明确不适用，而非用零值制造完整的水泥/熟料评价。
+    assert preview.rule_revision >= 2
+    assert len(preview.results) == 5
+    applicable = [item for item in preview.results if item.grade is not Grade.NOT_APPLICABLE]
+    assert len(applicable) == 1
+    outcome = applicable[0]
+    assert outcome.indicator_id == "cement-preparation.electricity"
     assert outcome.grade is Grade.LEVEL_1
     assert outcome.actual_value == UNSUPPORTED_EXPECTED_ACTUAL
     assert preview.standard_id == UNSUPPORTED_ID
@@ -379,8 +386,14 @@ request = EvaluationRequest(
     evaluation_date=date(2026, 9, 26),
     standard_id="gb-16780-2021",
     product_id="cement",
-    input_mode=InputMode.DIRECT,
-    inputs={"actual.cement_comprehensive_energy": InputValue(value="75", unit="kgce/t")},
+    input_mode=InputMode.DETAIL,
+    inputs={
+        "production_mode": InputValue(value="grinding_station"),
+        "evaluation_period": InputValue(value="2026年9月"),
+        "production_line_id": InputValue(value="粉磨站生产线"),
+        "cement_production_t": InputValue(value="1000", unit="t"),
+        "grinding_electricity_kwh": InputValue(value="23000", unit="kW·h"),
+    },
 )
 try:
     context.application.evaluate(request)
