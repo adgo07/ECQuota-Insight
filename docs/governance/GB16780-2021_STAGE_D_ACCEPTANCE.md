@@ -210,3 +210,5 @@ Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owne
 - 新增展示与导出门禁只在返工源码中，旧EXE不含这些修正。本轮不覆盖旧候选、不发布或合并；原生操作、Word视觉分页、安装升级卸载及完整Stage D仍待独立验收。
 
 后续干净提交构建：普通候选运行`powershell -File scripts/build_candidate.ps1`；水泥隔离候选显式添加`-StageDCement`，运行仍须`--data-dir`。独立PyInstaller构建对应选用`uebench.spec`或`uebench-stage-d.spec`，不得把水泥专用spec用于正式发布。
+
+补充：`522e4c3`首轮完整CI发现1项关联失败：定义已LF，而同源目录预览资源仍按CRLF检出，`test_preview_catalogue_is_derived_from_definition`的逐字节断言不通过。现将`src/uebench/resources/catalogue/*.json`同步固定为LF，不放宽原字节断言、不改JSON内容。交付范围与开发清单8项复验通过：[JUnit](evidence/GB16780_PR36_REWORK_lf_closure.xml)、[终端日志](evidence/GB16780_PR36_REWORK_lf_closure.log)。最终提交完整CI仍以PR中的精确SHA记录为准。

@@ -1,2 +1,3 @@
 # 开发清单核对定义原字节哈希；跨平台检出统一 LF。
 data/definitions/*.json text eol=lf
+src/uebench/resources/catalogue/*.json text eol=lf
