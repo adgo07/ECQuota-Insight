@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-03",
+  "candidate_id": "rc-a89b2c1",
+  "source_commit": "a89b2c166214451bf6f6692099548979a4953483",
+  "status": "PARTIAL_NOT_ACCEPTED",
+  "source_targeted": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "71",
+    "time": "68.265",
+    "timestamp": "2026-11-03T21:04:18.227641+08:00",
+    "hostname": "DESKTOP-35VQUAK"
+  },
+  "independent_boundaries": {
+    "total": 45,
+    "passed": 45
+  },
+  "frozen_smoke": {
+    "status": "passed",
+    "frozen": true,
+    "records": 5,
+    "readback": {
+      "status": "passed",
+      "process_id": 14120,
+      "read_only": true,
+      "recalculation": false,
+      "records": 5
+    },
+    "partial_save_and_word_rejected": true
+  },
+  "native_ui": "BLOCKED_TOOL_CAPTURE_AND_INPUT",
+  "word_visual": "OPEN",
+  "installation_upgrade_uninstall": "NOT_RUN",
+  "errors": [
+    "FrameArrived timed out: timed out waiting on channel",
+    "window capture timed out: timed out waiting on channel",
+    "coordinate input geometry is unavailable",
+    "LibreOffice soffice.exe was not found on PATH"
+  ],
+  "evidence_root_current_environment": "G:\\Python Project\\能耗限额\\work\\cement-acceptance-20261103",
+  "evidence": [
+    {
+      "path": "targeted.xml",
+      "sha256": "f2e5714aa31c31e820fd9dd0e1125e0cb2f73fa83b26f9582bcd6d4aa3924742"
+    },
+    {
+      "path": "targeted-complete-env.xml",
+      "sha256": "6f5b579a801fe3c4fe5553992a47b2893fc0b12201486ff677077be4ff00e510"
+    },
+    {
+      "path": "independent_boundaries.py",
+      "sha256": "abee85196161b5487f58f8452e4bf8f06ce260ff08633e2f78db1b29f3b7c506"
+    },
+    {
+      "path": "independent-boundaries.json",
+      "sha256": "5e157d8ed7cceabd024cba36719aad3c47d3ce95c9a4e954738730d9feab1489"
+    },
+    {
+      "path": "independent-boundaries-harness-missing-units.json",
+      "sha256": "44b15d29df52f380b7688c708044b79ed2fca63377b2d045ee0c31279ba8d075"
+    },
+    {
+      "path": "frozen-smoke\\smoke-eae4203a4a274891ae10e4e17d87af56\\acceptance-smoke.json",
+      "sha256": "f824f4182fef1466580aa8ca2d27f83fc970fa9c2a6c9e68549a138820cc8a4d"
+    },
+    {
+      "path": "frozen-smoke\\smoke-eae4203a4a274891ae10e4e17d87af56\\smoke-readback.json",
+      "sha256": "d5e138df186c0d48b2a59aaf51c578f6d36ff51ad250fe4b00161b8b016fe7ae"
+    }
+  ]
+}

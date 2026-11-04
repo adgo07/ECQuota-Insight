@@ -1,5 +1,9 @@
 # TASK_STATE
 
+## 2026-11-04 自动验收收口与Owner独立验收
+
+Owner授权暂缓受桌面工具阻塞的原生UI、Word目视和安装生命周期项目，先完成源码审查、自动验证并提交PR，随后由Owner独立验收。本轮继续使用PR #36，不创建重复PR；验收证据与待验步骤统一见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。新增独立45点边界回归，生产输入保持候选`rc-a89b2c1`的源码身份；实际实包未因测试/文档补录重建。水泥仍IMPLEMENTED，正式范围仍仅选煤，Stage D未放行；RS05 IN PROGRESS、0.2.0未发布。
+
 ## 2026-10-29 水泥Stage D候选交接
 
 已从干净源码`a89b2c166214451bf6f6692099548979a4953483`构建`rc-a89b2c1`完整候选（配套.6/r2）：Artifact Gate63/63、冻结基础自检6/6及便携ZIP解包同EXE水泥四模式/双修正5记录5 Word、独立只读进程核三JSON与规则hash均通过。原生进程PID25296已在独立目录启动，但工具无法枚举窗口，UI交互、Word视觉/分页与安装升级卸载待验；安装器未执行。完整身份、资产hash、独立矩阵与证据见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。治理补录提交不是构建输入，不因此重打包。水泥仍IMPLEMENTED、尚未SUPPORTED；正常正式范围仅选煤，RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布；不合并发布，Excel新工作簿延期。

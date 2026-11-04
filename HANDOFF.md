@@ -1,5 +1,9 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-11-04 提交Owner独立验收
+
+Owner已授权先完成可执行的自动验收并提交PR，再自行独立验收。沿用PR #36，集中证据与操作矩阵见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。本轮增加独立45点边界测试及验收证据，不修改生产代码；被测实包仍为`rc-a89b2c1`。原生四模式操作、Word目视分页及隔离安装/升级/卸载留给后续独立验收；暂缓不等于豁免。水泥IMPLEMENTED、Stage D未放行、0.2.0未发布。
+
 ## 2026-10-29 水泥Stage D候选交接
 
 已从干净源码`a89b2c166214451bf6f6692099548979a4953483`构建`rc-a89b2c1`完整候选（配套.6/r2）：Artifact Gate63/63、冻结基础自检6/6及便携ZIP解包同EXE水泥四模式/双修正5记录5 Word、独立只读进程核三JSON与规则hash均通过。原生进程PID25296已在独立目录启动，但工具无法枚举窗口，UI交互、Word视觉/分页与安装升级卸载待验；安装器未执行。完整身份、资产hash、独立矩阵与证据见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。治理补录提交不是构建输入，不因此重打包。水泥仍IMPLEMENTED、尚未SUPPORTED；正常正式范围仅选煤，RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布；不合并发布，Excel新工作簿延期。
