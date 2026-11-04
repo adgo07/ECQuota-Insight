@@ -1445,6 +1445,8 @@ class WorkbookExportService:
         if loaded is None:
             raise LookupError("评价记录不存在")
         request, result, standard = loaded
+        if "gb-16780-2021" in {request.standard_id, result.standard_id, standard.id}:
+            raise ValueError("水泥多指标 Excel 报告尚未实现，请使用 Word 报告。")
         workbook = Workbook()
         workbook.remove(workbook.active)
         for name in EXPORT_SHEETS:

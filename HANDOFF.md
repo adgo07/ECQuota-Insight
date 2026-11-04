@@ -1,5 +1,10 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-11-04 PR36独立审查返工
+
+Owner独立复核后要求最小返工。已确认源码包漏入口、默认spec误指Stage D，以及展示/导出/证据/状态/换行问题，逐项处理见[Stage D返工记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。PR #36已为待审查（非草稿），不自动合并或发布。普通构建恢复正常入口；水泥专用构建须显式`-StageDCement`。旧`rc-a89b2c1`及其源码ZIP保留原字节，旧源码ZIP缺入口属已知缺陷；新代码与旧实物须分别验收，不能平移通过结论。水泥仍IMPLEMENTED、Stage D未放行，正式范围仅选煤。
+
+
 ## 2026-11-04 提交Owner独立验收
 
 Owner已授权先完成可执行的自动验收并提交PR，再自行独立验收。沿用PR #36，集中证据与操作矩阵见[Stage D记录](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)。本轮增加独立45点边界测试及验收证据，不修改生产代码；被测实包仍为`rc-a89b2c1`。原生四模式操作、Word目视分页及隔离安装/升级/卸载留给后续独立验收；暂缓不等于豁免。水泥IMPLEMENTED、Stage D未放行、0.2.0未发布。
@@ -22,7 +27,7 @@ Owner已批准[水泥Stage B设计](docs/GB16780-2021_StageB_软件接入设计.
 实施从已fetch核对的 `origin/main@b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`（PR35）开始；Frozen lock不升级，历史结果不重算。先核DSL能力与规则差异，固定公式和阈值进入唯一Rule及共用Engine，UI/Word精炼。分摊保存原始输入、公式、Decimal28派生值和残差；普通有限精度残差不阻保存，业务边界不明才阻断依赖结果。
 
 
-更新时间：2026-10-28
+更新时间：2026-11-04
 
 > 本文件是**当前**交接入口，只描述现行权威状态。
 > 历史材料（QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账、旧交付哈希、旧开发机绝对路径）已移至
@@ -213,4 +218,4 @@ Reference Standard Product Closure 仍为 PARTIAL。
 
 ## 2026-10-29 剩余验收续记
 
-文档head f571bac三项远端CI均success，构建仍rc-a89b2c1/a89b2c1。UI/Word工具阻塞；真实原安装器在独立sandbox SID、专属目录静默尝试一次，因HKCU注册权限错误退出4并自动回滚，未提升重试；安装/卸载不记通过、旧→新覆盖未试。前置快照未完成即启动的执行偏差及事后证据边界如实记于[Stage D报告](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)，不能声明完整前后数据保真。Stage D未完成、水泥IMPLEMENTED尚未SUPPORTED；RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布，PR36草稿，不自动合并发布，Excel延期。
+文档head f571bac三项远端CI均success，构建仍rc-a89b2c1/a89b2c1。UI/Word工具阻塞；真实原安装器在独立sandbox SID、专属目录静默尝试一次，因HKCU注册权限错误退出4并自动回滚，未提升重试；安装/卸载不记通过、旧→新覆盖未试。前置快照未完成即启动的执行偏差及事后证据边界如实记于[Stage D报告](docs/governance/GB16780-2021_STAGE_D_ACCEPTANCE.md)，不能声明完整前后数据保真。Stage D未完成、水泥IMPLEMENTED尚未SUPPORTED；RS05 IN PROGRESS/产品PARTIAL/0.2.0未发布，当时PR36为草稿；2026-11-04已转待审查，仍不自动合并发布，Excel延期。

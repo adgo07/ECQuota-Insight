@@ -160,8 +160,8 @@ Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owne
 
 ### 自动验证与证据
 
-- 新增`tests/test_gb16780_independent_boundaries.py`：45 passed，26.95秒；[JUnit](evidence/GB16780_STAGE_D_20261104_boundaries.xml)。独立预期为冻结映射常量，不调用被测Calculator生成期望；后续完整CI自动收集执行。
-- 对实际`dist/candidate-0.2.0`显式设置`UEBENCH_ARTIFACT_DIR`：Artifact Gate 63 passed，69.02秒；[JUnit](evidence/GB16780_STAGE_D_20261104_artifacts.xml)。真实资产读取，不是空目录跳过。
+- 新增`tests/test_gb16780_independent_boundaries.py`：45 passed；[JUnit](evidence/GB16780_STAGE_D_20261104_boundaries.xml)的suite time为5.673秒，原终端pytest汇总为26.95秒。两种记录的耗时口径不混用。独立预期为冻结映射常量，不调用被测Calculator生成期望；45点仅覆盖K=1、g=75，组合修正另由V1.2与smoke用例覆盖。
+- 对实际`dist/candidate-0.2.0`显式设置`UEBENCH_ARTIFACT_DIR`：Artifact Gate 63 passed；[JUnit](evidence/GB16780_STAGE_D_20261104_artifacts.xml)的suite time为48.651秒，原终端pytest汇总为69.02秒。真实资产读取，不是空目录跳过。两份JUnit起始时间接近，不能解读为顺序执行；旧XML保留原样。
 - 11月3日71项定向回归[JUnit](evidence/GB16780_STAGE_D_20261103_targeted.xml)、独立45点[逐例结果](evidence/GB16780_STAGE_D_20261103_boundaries.json)和[冻结实包结果](evidence/GB16780_STAGE_D_20261103_frozen_smoke.json)一并纳入PR，可脱离本机阅读。
 - 01fd6f9的Pull Request Gate、Numeric v1、N01-A三项远端CI已核success。a89b2c1的Numeric/N01-A为success，原完整PR Gate已因后续推送cancelled，不能说该提交三项均成功。
 - 本轮完整回归已另行启动；最终提交的三项CI和本机完整套件结果由[PR #36](https://github.com/adgo07/ECQuota-Insight/pull/36)记录实际源码SHA及运行链接。补录提交不代表重建候选，不将旧CI平移为新提交通过。
@@ -180,3 +180,33 @@ Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owne
 6. 安装、旧→新覆盖、同版本覆盖和卸载保留数据另在可丢弃隔离Windows环境验收；界面/Word通过不自动代表安装生命周期通过。
 
 以上待验项由Owner接续，水泥继续IMPLEMENTED；完整Stage D放行前不修改主线正式支持范围，不发布0.2.0。
+
+
+## 2026-11-04 PR36独立审查返工
+
+### 平台 / Contract 预检查
+
+返工起点`59e5bca11b7c4d2a6eaecdc88b9893303db9c433`；origin核实为本仓，fetch后`origin/main=b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`。Frozen锁仍为`ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture 2.1、Numeric v1/Profile/Conformance不变。当前中央指南按已核origin的`origin/main@a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`导航读取交付规则、UI v0.2、家族规格A-12及适用验收清单。MUST保持正式范围仅选煤、保存快照展示、显示值不回流判级；MUST NOT改变冻结Mapping、Numeric语义或旧候选字节。相关Standard Issue为001/003，无新标准问题；本次不改变既有软件解释，不修改中央Contract。发现均为本地交付/展示/门禁或文档缺陷，不是CENTRAL CONTRACT GAP；未发现新增Frozen冲突。
+
+### 逐项核对与处理
+
+| 问题 | 核实及最小处理 |
+|---|---|
+| M-1 | 成立，且公开审查意见确实存在。源码ZIP补入专用入口及两种spec，入口缺失即失败。实际解包执行两种spec至Analysis边界，检查脚本、运行时hook和资源输入均存在；同时补入此前遗漏的固定标准包构建输入。从解包源码实跑水泥smoke和独立进程读回通过。 |
+| M-2 | 成立。普通`uebench.spec`恢复`run_uebench.py`；`uebench-stage-d.spec`显式选择隔离入口，共用其余配置。构建脚本新增`-StageDCement`，与`-FormalRelease`互斥，普通Candidate/正式构建不再静默切换入口。专用默认输出为`dist/candidate-stage-d-<版本>`，与普通Candidate分开。 |
+| L-1 | 耗时引用口径确实未说明；已分别列明原终端pytest汇总与JUnit suite time。原始XML不改写。接近的起始时间本身不构成证据错误，也不应被写成串行耗时。本轮定向验证同时保存日志与JUnit，避免再混用。 |
+| L-2 | 成立。更新TASK_STATE/HANDOFF日期和当前返工入口；尾部草稿描述标明历史时点，当前PR为非草稿待审查。禁止自动合并发布的约束仍有效。 |
+| L-3 | 缺字段成立。V1.2第24节标题为“推荐输出结果字段”，并非新增判级公式；已在UI/Word共用快照投影补“熟料配比百分点差”，单位为百分点。仅从保存输入展示g−75，不重算历史指标，不改Rule或Calculator。 |
+| L-4 | 成立。定义文件通过`.gitattributes`固定LF，清单重建为LF原字节哈希，保留原字节校验语义。64项定义与返工前Git blob逐字节相同，无业务改动；解包后的LF源码清单校验通过。 |
+| L-5 | 两处缺口成立。增加真实主窗口“计算并保存”按钮到水泥面板的信号路由测试；通用Excel导出在创建工作簿、写文件和审计前拒绝水泥记录，提示使用Word，既有文件保持不变。未实现新版Excel工作簿。 |
+
+### 返工验证及交付边界
+
+- 定向测试：67 passed，0 failed；终端汇总118.97秒。[原始JUnit](evidence/GB16780_PR36_REWORK_targeted.xml)、[原始终端日志](evidence/GB16780_PR36_REWORK_targeted.log)。覆盖源码包、两种spec、正式/Stage D互斥守卫、主按钮路由、Word字段、Excel拒绝与既有导出/损坏记录、开发清单和Source Gate。
+- 首轮43 passed/1 failed来自旧Source Gate将“必需文件集合”等同于“治理文件集合”；已改为治理文件必须包含于完整清单，随后上述67项通过。未放宽治理文件缺失检查。
+- 从生成ZIP解包源码执行`run_stage_d_cement.py --acceptance-smoke`及子进程`--acceptance-readback`通过；[结果JSON](evidence/GB16780_PR36_REWORK_source_smoke.json)。这是返工源码工作树验证，非旧冻结EXE验证，不能平移为新EXE/安装器通过。
+- 最终提交精确SHA、完整CI及修复源码ZIP哈希在[PR #36](https://github.com/adgo07/ECQuota-Insight/pull/36)记录，旧CI不平移为新提交通过。
+- 旧`rc-a89b2c1`及其源码ZIP保留原字节；旧源码ZIP确有入口缺失。旧63项Artifact Gate通过没有覆盖这项缺陷，不能用它证明旧源码包可重建。本轮新增源码包门禁用于后续构建。
+- 新增展示与导出门禁只在返工源码中，旧EXE不含这些修正。本轮不覆盖旧候选、不发布或合并；原生操作、Word视觉分页、安装升级卸载及完整Stage D仍待独立验收。
+
+后续干净提交构建：普通候选运行`powershell -File scripts/build_candidate.ps1`；水泥隔离候选显式添加`-StageDCement`，运行仍须`--data-dir`。独立PyInstaller构建对应选用`uebench.spec`或`uebench-stage-d.spec`，不得把水泥专用spec用于正式发布。

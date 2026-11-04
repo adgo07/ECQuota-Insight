@@ -85,6 +85,12 @@ def test_candidate_ui_and_application_share_scope_while_default_refuses(tmp_path
         assert window.cement_panel.isHidden() is False
         assert "尚未正式支持" in window._support_label("gb-16780-2021")
         assert window._supports_evaluation("gb-21252-2023") is False
+        # 驱动真实主按钮信号，防止主窗口路由绕过水泥面板。
+        calculate = Mock()
+        monkeypatch.setattr(window.cement_panel, "calculate_and_save", calculate)
+        assert window.calculate_button.isEnabled()
+        window.calculate_button.click()
+        calculate.assert_called_once_with()
         result = context.application.evaluate(grinding_request())
         assert context.evaluations.get(result.evaluation_id) is not None
         default = create_context(tmp_path / "default", public_key_path=root / "src/uebench/resources/update_public_key.pem")
@@ -155,3 +161,17 @@ def test_probe_checks_survive_optimized_python():
         'from uebench.stage_d_smoke import require; require(False, "optimized guard")'], capture_output=True)
     assert outcome.returncode != 0
     assert b'optimized guard' in outcome.stderr
+
+
+def test_formal_build_refuses_explicit_stage_d_before_any_build():
+    import subprocess
+    import shutil
+    shell = shutil.which("pwsh") or shutil.which("powershell")
+    if not shell:
+        pytest.skip("没有PowerShell，无法执行构建参数守卫")
+    root = Path(__file__).resolve().parents[1]
+    outcome = subprocess.run([shell, "-NoProfile", "-File", str(root / "scripts/build_candidate.ps1"),
+                              "-FormalRelease", "-StageDCement"], capture_output=True, timeout=30)
+    assert outcome.returncode != 0
+    assert b"PyInstaller" not in outcome.stdout
+    assert b"Stage D" in outcome.stderr

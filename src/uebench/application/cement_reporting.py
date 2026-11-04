@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 
 from uebench.application.reporting import (ReportField, _local_datetime_text, _saved_snapshot_hash,
                                          _display_two_places, _display_implies_different_grade)
@@ -167,6 +167,19 @@ def build_cement_report_view(request: EvaluationRequest, result: EvaluationResul
             if allocation.source_note:
                 raw.append(ReportField(f"allocation.{index}.source", "分摊来源", allocation.source_note))
     calculations = []
+    # 仅从保存输入投影百分点差，不重算指标，也不反馈正式判级。
+    supplied_ratio = request.inputs.get("clinker_ratio_percent")
+    if mode in {"integrated", "partial_purchased"} and supplied_ratio is not None:
+        try:
+            ratio = Decimal(str(supplied_ratio.value))
+            if ratio.is_finite() and 0 <= ratio <= 100:
+                with localcontext() as context:
+                    context.prec = 28
+                    context.rounding = ROUND_HALF_EVEN
+                    delta = ratio - Decimal("75")
+                calculations.append(ReportField("clinker_ratio_delta", "熟料配比百分点差", plain(delta), "百分点"))
+        except (ArithmeticError, ValueError):
+            pass  # 部分预览仍由原有校验显示无效输入。
     seen = set()
     nodes = {node.key: node for node in snapshot.cement_calculation_nodes}
     for item in result.results:

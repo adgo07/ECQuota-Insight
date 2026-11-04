@@ -27,7 +27,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-16780-2021.json",
-      "definition_sha256": "8e7ab3ca3da824c8cc1814bace6e4e540a2c51cca9f9c25cd2967afbfc193038"
+      "definition_sha256": "8ed72b5868e22d6aee9b49bf4cb7cfeaee18054e092eb92863c09c9a7d854447"
     },
     {
       "number": "GB 21252-2023",
@@ -40,7 +40,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21252-2023.json",
-      "definition_sha256": "2360f0f9261ad6793b779d983a18ba64c6c1dc4bf04720ba2226f7a541fb8836"
+      "definition_sha256": "c75fae2cce36331285c404c96399caae9e2a50a04f6e0a6b774180fb858f6877"
     },
     {
       "number": "GB 21256-2025",
@@ -53,7 +53,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21256-2025.json",
-      "definition_sha256": "c82de2bdd463edf2609389eb0f71a3af9f3434a08e92942c1067110bb9540833"
+      "definition_sha256": "c4281a2eecd6bfd9e720cfb94f98bcc0024a32e671380a24b437799d9c509e06"
     },
     {
       "number": "GB 21257-2024",
@@ -66,7 +66,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21257-2024.json",
-      "definition_sha256": "31cc2fb4b55fea789321096a6b7c0b310cd69abb0d1d08d3657666c25c5b3478"
+      "definition_sha256": "29de399dd928f2629c2f3d70fa771ea009cdf71821bf02c02b21b392e55b78f7"
     },
     {
       "number": "GB 21258-2024",
@@ -79,7 +79,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21258-2024.json",
-      "definition_sha256": "f92ecfc6780da57f0fe140558774211046c9c922ede6b73dfd70a1708b55d87a"
+      "definition_sha256": "3622adea9dee4c7bd03eaf73bfefb53f2dc45437ceaf399b4f01891fdfb51aef"
     },
     {
       "number": "GB 21340-2019",
@@ -92,7 +92,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21340-2019.json",
-      "definition_sha256": "29e6c56c595c46a19a4d022d2bbb4b57bbf043c671502a36026f1851bfe91639"
+      "definition_sha256": "19aadc8911bc32597a713fbea8c30d38b002e58b123b36289f3921ab4884df14"
     },
     {
       "number": "GB 21341-2022",
@@ -105,7 +105,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21341-2022.json",
-      "definition_sha256": "542f94ee76580503d33b2eef99639a0d9fc48e0d7e536acef53b70bddf5fe128"
+      "definition_sha256": "e01bb8e15fa59facb3ef791b2f1d82f02c94d57ebabcce323594719b59f6c692"
     },
     {
       "number": "GB 21342-2025",
@@ -118,7 +118,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21342-2025.json",
-      "definition_sha256": "b12f3c930b795419ee9ec0a4ea5e970c0c475be0a90e8ff6af7ac247fc221457"
+      "definition_sha256": "86fc0d801f5873cd21624449b93e2173617cd273397dd997e170e171ecaec7e8"
     },
     {
       "number": "GB 21343-2023",
@@ -131,7 +131,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21343-2023.json",
-      "definition_sha256": "b2387010d0d170460227086b87a6c43d62ef19588f93a757ee8d7634b8256cd5"
+      "definition_sha256": "efed7bdb850f438ce5e73a6fb8a9682d2b7e4e055448c07c778218dcd68d7ae5"
     },
     {
       "number": "GB 21344-2023",
@@ -144,7 +144,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21344-2023.json",
-      "definition_sha256": "7b80979429b7ef269a3aa6155ce55a271fed48ade5d0e242a0a825f6322af9cd"
+      "definition_sha256": "559872bceba4651b20359f27e40004e3cda9aa175a29f94c5b77bafe835df39f"
     },
     {
       "number": "GB 21345-2024",
@@ -157,7 +157,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-21345-2024.json",
-      "definition_sha256": "e6aed60b6cc33ef8b4b783ddfa9902e537870145587f02ce0418984d283a1cf3"
+      "definition_sha256": "f75176cde90aea03cfcf34291ea4156561236e25ca6c5041c9c2290af75aede0"
     },
     {
       "number": "GB 21346-2022",
@@ -170,7 +170,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21346-2022.json",
-      "definition_sha256": "9762646c392c734ece6a4d336c873fe907d5df897e95d7693345e7f07e65015e"
+      "definition_sha256": "f2cfe1eb1128524f7bc1018da18a2751c7b0eeb58698201567fbaac207e3691a"
     },
     {
       "number": "GB 21347-2023",
@@ -183,7 +183,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21347-2023.json",
-      "definition_sha256": "c8ee5ca48b31f32f13ce156f6f6625672f145bd09dc7dec590713879ec859f8c"
+      "definition_sha256": "d5392dff0e21fd889ec618e2edbf371d594a0eca70d0cc574db49ff7bc1eb936"
     },
     {
       "number": "GB 21350-2023",
@@ -196,7 +196,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21350-2023.json",
-      "definition_sha256": "8a8340b06cfb4890665183a4460d9fa6547869f332498c8082b3c273399b3cb8"
+      "definition_sha256": "b379ffdc71e5f8596b0c9105b5ab54ef0bbd75045322346b813a17b3684af7b4"
     },
     {
       "number": "GB 21351-2023",
@@ -209,7 +209,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21351-2023.json",
-      "definition_sha256": "ba82eb207bea6a9a2623e4fe84d041c9738df7b49275046c1941151112daa0a2"
+      "definition_sha256": "947fd1a3e0d24b87ddc8254dc3dbfe28c2df38f21291321867ba77413d1cbd59"
     },
     {
       "number": "GB 21370-2017",
@@ -222,7 +222,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21370-2017.json",
-      "definition_sha256": "80a72dc6fccddfc3e3afe8afed86ddf79a9ab264e4a1d93d36077dbbf67afb31"
+      "definition_sha256": "e3d73d6cecec21d6fb64bc15d04182d634e2bb94ff8269f8170909b31236bbe7"
     },
     {
       "number": "GB 25323-2023",
@@ -235,7 +235,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-25323-2023.json",
-      "definition_sha256": "626fd53f7195ab3b61dcc47acc65ee70ed812a36d713e14b1df0b8baa68dd689"
+      "definition_sha256": "e79fc0eb7257cf89ed5a58cb3aa19802be8006c38258e197f9a63b45d48b3bdf"
     },
     {
       "number": "GB 25324-2022",
@@ -248,7 +248,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-25324-2022.json",
-      "definition_sha256": "8203989467a969f1e4bf10e3aaa65418ab120375ee9b5083e47716b761225922"
+      "definition_sha256": "ba1f9eb1591d90934199a5e1af5e9eba13b6086130e85c84016f34abde820946"
     },
     {
       "number": "GB 29140-2024",
@@ -261,7 +261,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29140-2024.json",
-      "definition_sha256": "21977c066fc2a0373c00f445627588a8de2bd1ffb55404bf39d7b39b2aeb6828"
+      "definition_sha256": "aa2481eec68784abf4e0131bd6b081cfff9768ae9d230987546350708f6da745"
     },
     {
       "number": "GB 29141-2012",
@@ -274,7 +274,7 @@
       "lifecycle_status": "obsolete",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29141-2012.json",
-      "definition_sha256": "2a13ec5c30bc87cc1cfa3d7883fad401cc8d5dbf4206b0dc46ecacca0692e629"
+      "definition_sha256": "6dd12bc11d6d57d2c7f796fbfb5f72721daa514abd720bf0b88be2cbe189ca96"
     },
     {
       "number": "GB 29141-2024",
@@ -287,7 +287,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29141-2024.json",
-      "definition_sha256": "46c38f2b915b0cb185c3772eab7921bcf0d986303f072dfc1993b36adff0f583"
+      "definition_sha256": "3756c69dffc142fd72fa81bc82397d4c174e483230cfbf5de8bfd78755c32afd"
     },
     {
       "number": "GB 29145-2023",
@@ -300,7 +300,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-29145-2023.json",
-      "definition_sha256": "6fc173a978735da31d04d20d34bdf197ec1494a3456d59d70d87d4dc7eadd3cd"
+      "definition_sha256": "b53b1e7447132263ed583d20e1685125bffda0145debe5be34da7dc8a6383983"
     },
     {
       "number": "GB 29435-2025",
@@ -313,7 +313,7 @@
       "lifecycle_status": "future",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29435-2025.json",
-      "definition_sha256": "946c220a46fbb6b105ffbee12d1264a0d51ca2bcf6f436105729ec8a36bba5fb"
+      "definition_sha256": "482e9a2800d22510a0ece962c8a874637edb2a40b22a1bded23f6064eddf6432"
     },
     {
       "number": "GB 29436-2023",
@@ -326,7 +326,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29436-2023.json",
-      "definition_sha256": "545339a0ab197e423f757160b2a14817ebd523ecd88594532807eb3558815cfe"
+      "definition_sha256": "6aafd6543320782a1e1c825293bd6dc1ad64a8d0db11f23c23d3b479e7a6d5de"
     },
     {
       "number": "GB 29438-2012",
@@ -339,7 +339,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29438-2012.json",
-      "definition_sha256": "bd3c9d9a04177b96cfcb95bca42abd035c944288e1652468d8ea1107c44595b4"
+      "definition_sha256": "f198a50c984de6bbce979ac1e654bc3fce5fe722aca3fcbd08d6527531929c97"
     },
     {
       "number": "GB 29445-2025",
@@ -352,7 +352,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29445-2025.json",
-      "definition_sha256": "cfff5f92d2689f5ca922c1db7361d1eb22d7aedde1bf1910f2167012f432d814"
+      "definition_sha256": "02d2681fac101c73fcdf745283fe30e9472a5a7f097a13ffb1ea7a578baa7282"
     },
     {
       "number": "GB 29446-2019",
@@ -365,7 +365,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29446-2019.json",
-      "definition_sha256": "824e35ff8899834091ee47925f73ef9e98f987ec9578fbb43d3732e14d280a73"
+      "definition_sha256": "cdb0f661ffd2b39da5f4a039a859891b782f68cf9905776b03b52062f88054df"
     },
     {
       "number": "GB 29447-2026",
@@ -378,7 +378,7 @@
       "lifecycle_status": "future",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29447-2026.json",
-      "definition_sha256": "1649a99416b84e63ac8bc1254b296f378aee5f71318d0ead0dab66ca409ac7c4"
+      "definition_sha256": "fb172e9440fd56195f26da55812ac90a54aed539668308cf7831c07ed2625ab3"
     },
     {
       "number": "GB 29448-2022",
@@ -391,7 +391,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29448-2022.json",
-      "definition_sha256": "366e55d5ec30e1a90ef4912375553628136fbb15fd975d9808c3d7904aedee31"
+      "definition_sha256": "a00ee9dc0c246b7db0cecc82694e503700f59ff83cabe4b07eceb1bfa8025891"
     },
     {
       "number": "GB 29449-2024",
@@ -404,7 +404,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29449-2024.json",
-      "definition_sha256": "f843a859405c9909b955d9d3e1e4b8542b893f7fe8a05c1bcc2b704ded315364"
+      "definition_sha256": "772fe9ddbc1a24bbb048777fe80d941e2eae24aa9811fb6daf1cc981a759502a"
     },
     {
       "number": "GB 29450-2012",
@@ -417,7 +417,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-29450-2012.json",
-      "definition_sha256": "fe2ad1504d8a4cf90393ac48914798bf8908de3a44a80bc13cf3fec6d3b7d1c3"
+      "definition_sha256": "66626ba026f90ad057393383e6758c0dc95bccaee2746cfb4cafcda9be4b3e63"
     },
     {
       "number": "GB 29995-2024",
@@ -430,7 +430,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-29995-2024.json",
-      "definition_sha256": "4e98cceafee0d768494663dbfdeeda73ec1ab33de03ddbfc5319e38edaf4e079"
+      "definition_sha256": "1ba98db27c604661ce447cb7866b09a86d9cc9a6eae1f857c41eaa12fb2e7b4a"
     },
     {
       "number": "GB 30180-2024",
@@ -443,7 +443,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-30180-2024.json",
-      "definition_sha256": "5e6f01c15299035dcbcd84e2c0566b8d355e3755945ef21d5621e6575abe0819"
+      "definition_sha256": "e848a1d00acca613104792b33dd7828d8f2a6087fac415487309e10dca6e5cc2"
     },
     {
       "number": "GB 30182-2013",
@@ -456,7 +456,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-30182-2013.json",
-      "definition_sha256": "d20a1e5caefe2294864e40015dc643861877f84781debc774f04ce2b4d8e21a8"
+      "definition_sha256": "ba2132df6cfdd9e897796e969c8f2b92d2521da52b3ca2ddaa53c4a91a294ca4"
     },
     {
       "number": "GB 30183-2013",
@@ -469,7 +469,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-30183-2013.json",
-      "definition_sha256": "28683f4e2fefeb0f21eb267af80356f5c30c444f6c9c3d2611c92dffafe8ac5b"
+      "definition_sha256": "469d19d016deca8ceb477476f21af408a77435bb6547a71976ae879611690aef"
     },
     {
       "number": "GB 30184-2013",
@@ -482,7 +482,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-30184-2013.json",
-      "definition_sha256": "5bb4d03a65453c1d2ab0122e88d9044538ffc9b225871ca8b7124fa2fa316db1"
+      "definition_sha256": "3fd458bbadad83338a65e0b43bd9112a03d00d70daa252255b8a153cc1917f24"
     },
     {
       "number": "GB 30185-2025",
@@ -495,7 +495,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-30185-2025.json",
-      "definition_sha256": "95625e417e591ad62800c8f43eb351c34084a9cfd858470172450ba7bb0d7913"
+      "definition_sha256": "2342304efb80d38b4111ad73fa211eae25d7f6572184196d15d858ca66b66133"
     },
     {
       "number": "GB 30251-2024",
@@ -508,7 +508,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-30251-2024.json",
-      "definition_sha256": "719f875512d1b588d6508ac8753b7e6eafcd461266d55091008ba487ba492796"
+      "definition_sha256": "dbb9b5d0359732b72ff34ac069dc9081ffe69b931073d2caba6553841e8e04de"
     },
     {
       "number": "GB 30526-2019",
@@ -521,7 +521,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-30526-2019.json",
-      "definition_sha256": "09ecb6066830f97c9d948b706bd1cd8248af998a8bbf20e36420dd55fbf968ab"
+      "definition_sha256": "7fe69f85a97f7f3c5d047cd1e95a984a8adb301e63bd7ed895de8f831e2b74e6"
     },
     {
       "number": "GB 30530-2024",
@@ -534,7 +534,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-30530-2024.json",
-      "definition_sha256": "04d3edad1e06962e45d6062df27da5c582ce25c72bd0c20e89e9edacaccb266f"
+      "definition_sha256": "5feb96deb356780fbcbbb2ed72213f47d347fc3773f121b611e610e2fcd65491"
     },
     {
       "number": "GB 31335-2024",
@@ -547,7 +547,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-31335-2024.json",
-      "definition_sha256": "0e9a6d77e89daec6cc82c4d4787f26210a041bf5b077bd78ec58a3bd985b5fc0"
+      "definition_sha256": "607ebb626b095e0d1bded32ad835dad1f71a9679746b1057db49736b93e90d5b"
     },
     {
       "number": "GB 31823-2021",
@@ -560,7 +560,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-31823-2021.json",
-      "definition_sha256": "ca08a7d2954f0dcfb279ee82c5e19f409872568b49b57a5facf08ab6bc78dc01"
+      "definition_sha256": "ea1e1f9aa2007689d20d7f697af42cd1402f0c25d075d3a9b0cfa995cae22b27"
     },
     {
       "number": "GB 31825-2024",
@@ -573,7 +573,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-31825-2024.json",
-      "definition_sha256": "73dab1f7bd13a4160f1b71c5622cd715b0adaa193ccac4f7c6f16f55a7cfd888"
+      "definition_sha256": "d5022819aef01b7b46f984520c19c4dace9652fd474ae36009e67741ba92bbdf"
     },
     {
       "number": "GB 31830-2024",
@@ -586,7 +586,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-31830-2024.json",
-      "definition_sha256": "3823761f25bce195cdc3301b8d06a95f4effac7511dbe61cb75f50db192103ce"
+      "definition_sha256": "0ca3f47fb1dda0fdbbd111adf75fd90a3d5282ab4def2cc3a1feb92a2071c61c"
     },
     {
       "number": "GB 32032-2024",
@@ -599,7 +599,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-32032-2024.json",
-      "definition_sha256": "768af6dcff0a2d7d5b3c8e7a32434adb9edf7a5422ab36cf7737e1e0d6b8ff89"
+      "definition_sha256": "ca3d3bfed13d181b0dc7ee9069eb44e37d97daafcf23b5f9d14707cccbe826e9"
     },
     {
       "number": "GB 32044-2015",
@@ -612,7 +612,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-32044-2015.json",
-      "definition_sha256": "6d1d0bbfcfc5009ec55fd39c4da98932abb37b426dc77f12d05b4073dece4e96"
+      "definition_sha256": "ae3b1bad64e25bade8aab2c65e08bad8ece0687cf04eb704983bb4a2e29ede98"
     },
     {
       "number": "GB 32047-2025",
@@ -625,7 +625,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-32047-2025.json",
-      "definition_sha256": "8807e5c7c7a40b3963b48b5399bbfb88acd1a8cfc77d743e48be7811f4274d86"
+      "definition_sha256": "fc833377ad9a272a67175786a5ed2245ace8ee322d7d7df97acfa87ae10caaf5"
     },
     {
       "number": "GB 32051-2024",
@@ -638,7 +638,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-32051-2024.json",
-      "definition_sha256": "9bb4f451ca0783e6648baf33dd20f210e499aede122aa12061525d64defdc03d"
+      "definition_sha256": "ae889d4733fd08690e83f8d127d6d194aa858285fa1d83a26390e7a427dfa343"
     },
     {
       "number": "GB 33654-2017",
@@ -651,7 +651,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-33654-2017.json",
-      "definition_sha256": "d87ce4e9176b6f2e8736b29705ef8bbc5c55336faac70c93cf6024931c55eed1"
+      "definition_sha256": "e8d925411214a025587643c8f224b8d0013064007a83602199a17b109dbf008b"
     },
     {
       "number": "GB 36887-2018",
@@ -664,7 +664,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-36887-2018.json",
-      "definition_sha256": "228fcd17c59e554d1a874bb999220fee01fcc16610cb604cf6033af5953fa0ef"
+      "definition_sha256": "f028b143ad9deee20161adcb5f23b5ec6f55dcaa987b240c6ac0be962ed311bc"
     },
     {
       "number": "GB 36888-2018",
@@ -677,7 +677,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-36888-2018.json",
-      "definition_sha256": "ea77661356afb9edb1d9eed2f9eecc069c7cc665c2d06ad327ef35df44775a38"
+      "definition_sha256": "4b9fe4853e346502fce196fda6c9e79d025de04eafbb966f180176a144a50466"
     },
     {
       "number": "GB 36889-2025",
@@ -690,7 +690,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-36889-2025.json",
-      "definition_sha256": "b20caf404244f77874a1e667075bbd1240474423046812c9c6a4b8f1b6b6c0f6"
+      "definition_sha256": "ebf6a8c2237a7c8fffa66de4c9db08b5794ff8a7cebb7a49873dcd0c4493e8d1"
     },
     {
       "number": "GB 36890-2018",
@@ -703,7 +703,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-36890-2018.json",
-      "definition_sha256": "f09edd918f40d7d6d8ac65df60ada1e9590f9bfbb4d0d443c0816d958dc6f491"
+      "definition_sha256": "5174840f3eaffe3cfda414fff75893031c1453a7a0cb91b35379bb6fc7ce19fe"
     },
     {
       "number": "GB 36891-2018",
@@ -716,7 +716,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-36891-2018.json",
-      "definition_sha256": "ac22406eeb129cb85b7b6bf7df086fc68b62588c824dec3fc6268b0dbe6b7c68"
+      "definition_sha256": "8223799d055f6fb61c9280422cc79e8e1169e74f1a34e692ae87cc6dc3294eed"
     },
     {
       "number": "GB 36892-2018",
@@ -729,7 +729,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-36892-2018.json",
-      "definition_sha256": "62dd91df0560710bf6c88ddfca348c5ac4c3cd6889f948f9cbd37753bf7e71d2"
+      "definition_sha256": "e4fb0e80c9b1ff444ebea42fd353e725e9bef8d4b86273147d7a1842089d859c"
     },
     {
       "number": "GB 38263-2019",
@@ -742,7 +742,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-38263-2019.json",
-      "definition_sha256": "e252b867dc97cc75f46e4750ab869f246bec0a4893a33bcb90ff4e20cf81d436"
+      "definition_sha256": "bbc6432759547563f9b3496239fc184f24ddc2c2ef298252688175fd48a289f0"
     },
     {
       "number": "GB 40877-2021",
@@ -755,7 +755,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-40877-2021.json",
-      "definition_sha256": "d493d4f939738d597bc6f35b45623d9165b960bd668fdd3eaf1a76567526ac3d"
+      "definition_sha256": "60ef550723d32c218f166b34de14994f7972df97d70c1edfe85dcd0b992a339e"
     },
     {
       "number": "GB 40878-2021",
@@ -768,7 +768,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-40878-2021.json",
-      "definition_sha256": "b0b9c77f335f966fa469233ece4de274859d09cc3445698897366c955cfd65c1"
+      "definition_sha256": "bb862046e27cdcdfcd4a5bbb97c7b75e8f35a61458a913e858ebf55e68d73da2"
     },
     {
       "number": "GB 45246-2025",
@@ -781,7 +781,7 @@
       "lifecycle_status": "active",
       "scope": "draft",
       "definition_path": "data/definitions/gb-45246-2025.json",
-      "definition_sha256": "7c6cb735979e3b5522de944b3cded350a29a8001c692e1ebe71b8cd171c9f3e8"
+      "definition_sha256": "e2ebbb0d4f7c91134413ad63d25d6162fbf140b059f3b8c93658da330550c2f9"
     },
     {
       "number": "GB 45247-2025",
@@ -794,7 +794,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-45247-2025.json",
-      "definition_sha256": "a380f36c6fe16a834e4cc8e570d7ec56b0def7f8eb273da3bba4301f447d8224"
+      "definition_sha256": "92d2c1d7078fde848869ca466485c1a5936b73b022f29935f59fcd188869fcf2"
     },
     {
       "number": "GB 45549-2025",
@@ -807,7 +807,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-45549-2025.json",
-      "definition_sha256": "cc9f71a765ea86197dbf12e9f18a97b6df7a3be184f8bee9b2ca92444f6609e0"
+      "definition_sha256": "663e82dd43734672ed42f8848a2524fbb7577f095e9e2c6903ad56515da66090"
     },
     {
       "number": "GB 46029-2025",
@@ -820,7 +820,7 @@
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-46029-2025.json",
-      "definition_sha256": "6c2758a87835f7ecca9ddcd4a435ca0c070f0306949c044f4daa1f4f9ec6c5bd"
+      "definition_sha256": "64338496d4bef046b111358bbe924a4844710ec019eef7a82ae74b5475a3430f"
     },
     {
       "number": "GB 47834-2026",
@@ -833,7 +833,7 @@
       "lifecycle_status": "future",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-47834-2026.json",
-      "definition_sha256": "100c93fc9a3900178904aa62ba2a20e0522e05383a8de2be395ec1b787d7a7a5"
+      "definition_sha256": "06b88a82c7a05c15b89eb9b792430b55d3853511524f0f365638e1ae1473f47f"
     },
     {
       "number": "GB 47835-2026",
@@ -846,7 +846,7 @@
       "lifecycle_status": "future",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-47835-2026.json",
-      "definition_sha256": "0a4e68bfdcd90adf471d915724f899a0aca22cc350b0c508829db3f539a0cb6b"
+      "definition_sha256": "73ff7a8393d46f9f38e8b972c97a6f81918fe685f0ad3e6b70280ed3c73654a0"
     }
   ]
 }

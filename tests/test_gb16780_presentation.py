@@ -202,7 +202,7 @@ def test_untriggered_correction_has_no_ordinary_technical_disclosure(standard):
     assert result.model_dump(mode="json") == saved_before
 
 
-def test_actual_corrections_show_short_business_text_and_keep_full_detail(standard):
+def test_actual_corrections_show_short_business_text_and_keep_full_detail(standard, tmp_path):
     app = QApplication.instance() or QApplication([])
     request = integrated_request(altitude="1600", ratio="80")
     request.inputs[DEDUCTION_KEYS[0]] = InputValue(value="1", unit="tce")
@@ -222,5 +222,27 @@ def test_actual_corrections_show_short_business_text_and_keep_full_detail(standa
     assert "2019" not in page.result_content.toPlainText()
     assert ALTITUDE_DISCLOSURE in page.result_content.toPlainText()
     assert all(text in page.input_content.toPlainText() for text in technical)
+    delta = next(field for field in view.calculations if field.key == "clinker_ratio_delta")
+    assert (delta.value, delta.unit) == ("5", "百分点")
+    assert "熟料配比百分点差：5 百分点" in page.input_content.toPlainText()
+    from docx import Document
+    document = Document(WordReportWriter().write(view, tmp_path / "修正报告.docx"))
+    text = "\n".join([p.text for p in document.paragraphs] + [c.text for t in document.tables for r in t.rows for c in r.cells])
+    assert "熟料配比百分点差" in text and "百分点" in text
     page.close()
     app.processEvents()
+
+
+def test_cement_excel_export_refuses_before_file_or_audit(standard, tmp_path):
+    from uebench.infrastructure.excel import WorkbookExportService
+    request = grinding_request()
+    result = Gb16780Calculator().evaluate(standard, request)
+    repository = Mock()
+    repository.get.return_value = (request, result, standard)
+    audit = Mock()
+    path = tmp_path / "report.xlsx"
+    path.write_bytes(b"existing user file")
+    with pytest.raises(ValueError, match="水泥多指标 Excel 报告尚未实现"):
+        WorkbookExportService(repository, audit).export(result.evaluation_id, path)
+    assert path.read_bytes() == b"existing user file"
+    assert audit.mock_calls == []
