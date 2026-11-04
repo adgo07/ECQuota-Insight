@@ -156,7 +156,7 @@ Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owne
 - 多线分摊保留原量、比例、派生值与残差；保存后展示/Word取历史快照，不重新调用当前规则核算。
 - 正常入口仍只支持选煤；水泥候选要求显式隔离目录，UI/Application使用同一实例许可，正式构建拒候选入口。配套.6规则包不能单独导入旧安装版。
 
-本轮仅加入独立边界测试与证据/文档。`git diff a89b2c1 -- src data release scripts uebench.spec run_stage_d_cement.py`为空，候选生产输入与实物构建提交一致；没有因补录重打包。
+本轮仅调整测试、证据和文档。`git diff a89b2c1 -- src data release scripts uebench.spec run_stage_d_cement.py`为空，候选生产输入与实物构建提交一致；没有因补录重打包。
 
 ### 自动验证与证据
 
@@ -167,6 +167,8 @@ Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owne
 - 本轮完整回归已另行启动；最终提交的三项CI和本机完整套件结果由[PR #36](https://github.com/adgo07/ECQuota-Insight/pull/36)记录实际源码SHA及运行链接。补录提交不代表重建候选，不将旧CI平移为新提交通过。
 
 ### Owner最短验收路径
+
+补充回归发现历史归档升级测试仍固定期待49条修订；当前包同时升级选煤和水泥，实际保留50条。已将测试改为核对新旧签名包中标准ID/修订身份的完整并集及数量，防止覆盖、遗漏或多装；标准包对账模块32项通过，见[JUnit](evidence/GB16780_STAGE_D_20261104_reconciliation.xml)。这是本地测试预期缺陷，不改变业务实现、冻结映射或标准解释。首次本机全量还受未安装项目的子进程导入失败、执行中创建提交导致缓存HEAD变化影响；两组各2项分别复验通过。原始日志保留，不将其记为首次全量通过。最终固定提交完整结果见PR。
 
 本机可运行最外层checkout下`work/cement-acceptance-20261103/启动水泥独立验收.cmd`；它启动已核验便携载荷并使用该目录的`owner-acceptance`隔离数据。跨机器使用原便携ZIP解包后，运行`UEBench.exe --data-dir "<新的空验收目录>"`。本轮不要求在宿主运行同AppId安装器。
 
