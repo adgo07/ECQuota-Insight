@@ -24,7 +24,7 @@ datas = [
 ]
 
 a = Analysis(
-    [str(project_root / "run_uebench.py")],
+    [str(project_root / globals().get("UEBENCH_ENTRY_SCRIPT", "run_uebench.py"))],
     pathex=[str(project_root / "src")],
     binaries=binaries,
     datas=datas,

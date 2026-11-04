@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator, model_serializer
 
 
 class Grade(StrEnum):
@@ -363,6 +363,50 @@ class ProductDefinition(StrictModel):
     indicators: list[IndicatorDefinition]
 
 
+class CementCalculationNode(StrictModel):
+    """GB16780 r2 local dependency graph; not a public execution schema."""
+
+    key: str = Field(pattern=r"^[a-z][a-z0-9_]*$")
+    label: str
+    unit: str | None = None
+    formula: Expression
+    source: str | None = None
+
+
+class CementFuelLine(StrictModel):
+    line_id: str
+    name: str
+    amount_kg: Scalar
+    low_heat_kj_per_kg: Scalar
+    source_note: str | None = None
+
+    @field_validator("amount_kg", "low_heat_kj_per_kg", mode="before")
+    @classmethod
+    def reject_float(cls, value: Any) -> Any:
+        return _reject_float(value)
+
+
+class CementSharedAllocation(StrictModel):
+    allocation_id: str
+    product: Literal["clinker", "cement"]
+    target_input_key: str
+    target_line_id: str
+    original_amount: Scalar
+    unit: str
+    line_production_t: dict[str, Scalar]
+    source_note: str | None = None
+
+    @field_validator("original_amount", "line_production_t", mode="before")
+    @classmethod
+    def reject_float(cls, value: Any) -> Any:
+        return _reject_float(value)
+
+
+class CementDetails(StrictModel):
+    fuel_lines: list[CementFuelLine] = Field(default_factory=list)
+    shared_allocations: list[CementSharedAllocation] = Field(default_factory=list)
+
+
 class StandardDefinition(StrictModel):
     schema_version: Literal["1.0"] = "1.0"
     id: str
@@ -383,6 +427,14 @@ class StandardDefinition(StrictModel):
     obsolete_date: date | None = None
     replaced_by: list[str] = Field(default_factory=list)
     supersedes: list[str] = Field(default_factory=list)
+    cement_calculation_nodes: list[CementCalculationNode] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_cement_nodes(self, handler):
+        payload = handler(self)
+        if not self.cement_calculation_nodes:
+            payload.pop("cement_calculation_nodes", None)
+        return payload
     @property
     def family_id(self) -> str:
         """Return the stable family identifier, deriving it for legacy JSON."""
@@ -443,6 +495,14 @@ class EvaluationRequest(StrictModel):
     organization_name: str | None = None
     project_name: str | None = None
     notes: str | None = None
+    cement_details: CementDetails | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_cement_details(self, handler):
+        payload = handler(self)
+        if self.cement_details is None:
+            payload.pop("cement_details", None)
+        return payload
 
 
 class CalculationStep(StrictModel):

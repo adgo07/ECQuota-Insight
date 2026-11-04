@@ -1,0 +1,214 @@
+# GB 16780—2021 Stage D 候选与验收记录
+
+日期：2026-10-29。状态：**验收进行中；IMPLEMENTED，尚未SUPPORTED，未发布**。
+
+## 平台 / Contract 预检查
+
+- 业务仓已实际核为`https://github.com/adgo07/ECQuota-Insight.git`，独立clone分支`codex/gb16780-v12-stage-c`，本轮起点`b52eea62fb5c50c948596f4e1000b1b13e873a85`；已fetch，默认main，`origin/main=b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`。实际构建提交及资产哈希另记，不能用文档提交冒充被测源码。
+- `platform-lock.json`锁中央`ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture2.1、Numeric Contract/Profile/Conformance v1 Frozen；Decimal28、ROUND_HALF_EVEN、全值比较，不引入隐式修约/epsilon，不让显示值回流比较，不重算历史。
+- 中央origin已实际核证并fetch；当前已合并`main@a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`，按其GUIDE_INDEX读取标准开发、产品交付、UI指南v0.2/产品规格/适用验收清单；不升级Frozen锁。
+- Standard Issue：是，`ECQ-STD-GB16780-001`与`003`；沿用冻结V1.2及批准软件解释，不新增或改写业务解释。当前未发现需要中央Contract修改的事实；既有REGISTERED DEVIATION保持。本任务不修改中央公共Contract。
+
+## 候选专用激活
+
+Owner授权继续Stage D；[Stage B §9.2](../GB16780-2021_StageB_软件接入设计.md)允许独立、可审候选激活。`run_stage_d_cement.py`是本分支spec显式采用的候选入口；正常`run_uebench.py`、正式registry及`data/delivery-scope.json`仍仅选煤。候选将同一个实例scope传入真实Application和原MainWindow，复用初始化、签包对账、Calculator、保存与Word；不使用隐藏环境开关、不另造算法。
+
+候选必须显式`--data-dir`，resolve/junction解析及Windows大小写规范化后拒默认用户目录及其祖先/后代，拒已配置且有数据的用户目录，拒非空未标识目录。候选标记绑定实际resolved目录。运行时`candidate-runtime.json`记录精确构建身份、规则包及实际隔离目录；标题与水泥支持说明明确“Stage D验收候选，尚未正式支持”。同一隔离目录允许重启读回，不允许把现有真实用户数据直接交给候选。
+
+版本仍为未发布的`0.2.0`开发版本；资产用`rc-<cleanSHA前7位>`及内嵌完整SHA区分。配套`.6`/水泥r2，旧0.2.0解析器不兼容，不能单独向旧安装版导入`.6`。`-FormalRelease`拒绝此候选spec。现有安装器沿用产品AppId，**只构建不执行**；安装/升级/卸载仍待安全环境验收。Excel新版工作簿不在本轮范围。RS05仍IN PROGRESS、产品PARTIAL、RS06未完成。
+
+## 独立输入与预期矩阵
+
+以下由独立验收者依据冻结V1.2与Stage B手算复核，**不是从Calculator输出回填**。Numeric均按全值。统计期填“2025年”，生产线“A”，同一期同线；基础A海拔1500m，Q_BM/燃料热值均29307.6kJ/kgce（燃料热值单位kJ/kg）。
+
+| A原始字段 | 数值/单位 |
+|---|---|
+| 生产模式 | 自产熟料并生产水泥 |
+| 自产熟料产量；水泥产量；本期水泥耗用熟料 | 1000t；1000t；750t |
+| 熟料配比 | 75%（输入75） |
+| 燃煤量；低位热值 | 100000kg；29307.6kJ/kg |
+| 余热发电量；余热自用电量 | 12000；2000kW·h（净10000） |
+| 熟料生产电量 | 50000kW·h |
+| 协同处置燃料；替代燃料扣除 | 各1tce |
+| 协同处置用电；替代燃料用电扣除 | 各1000kW·h |
+| 水泥粉磨包装；混合材制备；石膏制备；辅助电量 | 20000；1000；1000；2000kW·h |
+| 水泥制备燃料；制备工段电量 | 1000kgce；23000kW·h |
+
+| 情形 | 独立预期及保存边界 |
+|---|---|
+| 自产A | e_sh=96.771/2级；W_sh=48/1级；E_sh=102.6702/2级；W_s=60中间量；E_s=80.95225/2级；W_sg=23/1级；五项完整可保存/Word |
+| 部分外购A | 同五实际值/等级；式8必须用e_sh，错用E_sh会得85.37665，应为80.95225 |
+| 仅熟料 | 只保留熟料链：煤96.771/2级、电48/1级、综合102.6702/2级；水泥及工段不适用，三项完整可保存 |
+| 全外购粉磨 | 只填P_s=1000t/w_sg=23000kW·h，工段23/1级，其余不适用；一项完整可保存 |
+| B：A只删w_sg | 其余四项完整，工段不完整；只部分预览；Application拒正式保存，Word不可用 |
+| A双修正 | 海拔1600m、P_H=81060Pa、g=80；K=1.0102；水泥阈85.50/92.75/100.9588（错顺序101.0200），实际85.7908/2级；熟料3级综合118.1934、煤110.1118、电61.6222；工段34不变 |
+| A四扣除均空白 | 煤98.771/2级、电50/2级、熟料综合104.916/2级、W_s=61.5、水泥综合82.6366/2级、工段23/1级；显式0同数值但原输入空白状态必须可区分 |
+
+45点边界：每个三级上限T取T−0.01/T/T+0.01，用原始量产生指标，不直接填单位能耗。K=1、g=75、P_sh/P_s=1000t、余热/扣除均零；煤与熟料综合分别以燃料kg=1000x、电量0产生x，熟料电以w_sh=1000x、燃料0产生x；水泥综合以e_h=1000x、其他燃料与水泥电项0产生x；工段以w_sg=1000x产生x。阈依次煤94/100/109、熟料综合100/107/117、熟料电48/57/61、水泥综合80/87/94、工段26/29/34。按≤比较及“未达3级”共同软件标签验收。
+
+## 本轮证据
+
+以下保留各执行阶段真实结果；最终实包结论见下方rc-a89b2c1节。原生视觉、实际Office排版和安装均不能据源码或程序化证据宣布通过，不跨版本套用旧选煤Candidate结论。
+
+候选激活首轮定向66项，65通过、1项新测试因错误导入另一测试模块失败（测试辅助导入错误，未触发业务断言）。修为本测试自带原始DETAIL请求后，新6项全部通过、0skip（15.193秒），含真实Application签包对账/水泥保存、UI导航、默认入口拒绝以及本机真实Windows junction拒绝。其他61项默认范围、水泥展示、架构与Source Gate在首轮通过。证据为隔离clone的`tmp/staged-targeted-1.log/xml`与`tmp/staged-targeted-2.log/xml`。未因入口修改重跑无关本地全套；原Stage C精确head的远端CI与本轮新head的CI分开记录。
+
+版本一致性、开发清单（64源/16草稿）与签包范围校验（48随包/1正式）通过。已真实调用build_candidate.ps1的FormalRelease路径，按预期在构建前拒绝专用候选入口；未创建正式产物。构建复用现有流程并跳过重复全套，保留冻结EXE自检与Artifact Gate；干净SHA与实物结果后续补录。
+
+## 候选专用程序化验收工具
+
+`--acceptance-smoke`仅由候选入口提供。每次在已标识验收目录下新建UUID子目录，不覆盖已有GUI或上次验收记录；用真实签包对账、Application、Calculator、Repository与Word接口运行独立A四模式及双修正5条完整记录。预期常量来自上方独立复核。部分预览必须拒正式保存和Word。Word从已保存快照生成，程序检查标准身份、适用指标及必要海拔说明，不替代分页/视觉验收。
+
+首进程记录输入、结果、规则三份原JSON各自SHA256，再结束其数据库连接。第二独立同入口进程`--acceptance-readback`使用SQLite`mode=ro`/`query_only`只读重开，逐字节核hash，并以保存模型投影报告；不构造Calculator、不进行标准包对账、不重算。验收检查全部显式异常，不依赖会被PyInstaller optimize=1删除的assert。输出`acceptance-smoke.json`与`smoke-readback.json`保留进程身份、实包身份、5条记录、Word路径/哈希和“视觉未验/安装未验”。
+
+源码探针已真实通过：`tmp/staged-source-smoke/smoke-f1e5b59bf0d145b3be9996e9b0228599/acceptance-smoke.json`，首进程5708、独立只读进程19864，5记录/5 Word/部分预览拒绝通过；`frozen=false`且源码未嵌入build identity，不计作冻结EXE证据。冻结实包仍须另跑同探针，记录精确干净提交。
+
+新增探针后最终定向14项全部通过，0失败/0错误/0skip，16.800秒：`tmp/staged-smoke-final.log/xml`。其中只读探针对故意改变的输入JSON拒绝并保持数据库原字节；`python -O`下失败守卫仍执行；真实Windows junction拒绝通过。旧61项定向和本轮14项各按实际执行记录，不冒称本地完整回归重跑。
+
+独立只读复审确认当前候选隔离、默认选煤范围、Application/UI同实例许可、FormalRelease拒绝、smoke独立常量及只读快照关联链无阻断项；该审查没有运行测试，不作自动或原生通过证据。候选代码将按此状态锁定干净构建提交。
+
+
+## rc-a89b2c1实际构建与冻结实包验证
+
+干净构建源码为`a89b2c166214451bf6f6692099548979a4953483`、`source_dirty=false`；版本`0.2.0`开发候选，候选`rc-a89b2c1`，本轮不发布。按既有`build_candidate.ps1 -SkipTests`执行，未跳过版本/清单/来源门禁、冻结EXE自检或Artifact Gate；构建exit0。Inno编译成功（64.500秒），**安装器没有执行**。
+
+配套包`.6`/水泥r2，package_id=`gb16780-r2-from-2026.10-published.5`，SHA256`d5ff370d3728ad3dda2589ed72bc9c693425208084ed96d45ad1d036c91afa51`。payload339文件、162835047字节，树SHA256`5895f61c747ae56e95f7f34f38f88d24679d0f8586b12f59ba9eb169898f0a64`。EXE既有冻结自检6/6，Artifact Gate63/63均通过；它们不是水泥原生界面通过的替代证据。
+
+| 实物（本次隔离clone相对路径） | 字节 | SHA256 |
+|---|---:|---|
+| `dist/UEBench/UEBench.exe` | 12071870 | `7dccbabdeb839aef1d8ea35552e528c471b3f8f3040afe8b0e4a7bae7f2c61b5` |
+| `dist/candidate-0.2.0/UEBench-0.2.0-rc-a89b2c1-win-x64.zip` | 72626664 | `66a4b8d5ee20745414de8c61b18fc4aa1100e2b8d778bc5a69ae5a12a1fcf7ee` |
+| `dist/candidate-0.2.0/UEBench-Setup-0.2.0-rc-a89b2c1-x64.exe` | 49679197 | `8be190b243610d4dba4202b276a2c68d51d59c01aaeff2eceeed4bb7e9dbac14` |
+| `dist/candidate-0.2.0/UEBench-source-0.2.0-rc-a89b2c1.zip` | 9595960 | `40d925f338d600006ededef2438d3ae94dd3b2b186877230d22f60cde9fe8aca` |
+
+对**实际便携ZIP重新解包出的EXE**运行`--data-dir <新验收根> --acceptance-smoke`，exit0，`frozen=true`，嵌入源码/候选/.6身份均相符：四模式与双修正5记录/5 Word、部分预览拒存/拒Word通过；第二独立同EXE进程23636→13048以SQLite只读重开三份原JSON、规则关联hash及保存快照投影全部通过，不重算。原始输出在本次clone的`tmp/staged-frozen-smoke-rc-a89b2c1/smoke-f8002de0b9514960bdd0764b360909b4/`，含5份`水泥-*.docx`。Word标准标题/适用指标/海拔必要说明程序检查通过；**分页和真实Office视觉仍未验**。
+
+可审证据：[构建身份与资产](evidence/GB16780_STAGE_D_rc-a89b2c1_artifacts.json)、[冻结自检](evidence/GB16780_STAGE_D_rc-a89b2c1_self_check.json)、[冻结水泥smoke](evidence/GB16780_STAGE_D_rc-a89b2c1_frozen_smoke.json)。构建日志为本次clone的`tmp/staged-build.log`；这些本地路径仅用于追溯当次环境，不是跨机器固定入口。
+
+原生启动方式：从本候选便携payload运行`UEBench.exe --data-dir <新的空验收目录>`；标题明确“水泥Stage D验收候选 · rc-a89b2c1”。不直接双击同AppId安装器，不把旧安装版与新`.6`分开混用。本节为a89b2c1的实物证据；后续仅补报告的提交不自动变成构建输入，不需因治理补录重打包。
+
+
+## 原生目标尝试与当前出口
+
+指定Astra验收者已用独立目录启动本次候选EXE，进程PID25296；工具无法枚举对应应用窗口，未取得可验证的窗口句柄，未完成视觉/交互验收。候选进程按Owner交接保留供用户查看，不将“进程存在”记为四模式UI链通过。此前Word截图capture超时及点击geometry不可用；不据工具失败断言没有Office，也不把程序化DOCX检查当作Word分页通过。
+
+此前阶段状态（现行见下节“最终CI与剩余验收续记”）：**候选构建/Artifact Gate/冻结基础自检/冻结水泥计算-保存-只读快照-Word生成PASS；原生UI交互/Word视觉与分页/安装升级卸载待验。**安装器仅构建，未运行，未覆盖用户安装或真实数据。Stage D未完成，水泥仍IMPLEMENTED，尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布，Excel新工作簿延期。PR36保持草稿，不自动合并/发布。
+
+
+此前阶段CI状态（现行见下节“最终CI与剩余验收续记”）：候选源码a89b2c1远端CI查询时：[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839532)与[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839519)已success；[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40858839552)仍in_progress，不记成全套成功。后续仅文档/evidence补录的head与该构建源码分开识别；新head若CI仍运行按真实状态交接，不为等待重复跑本地完整套件。最后文档卫生6项通过，`tmp/staged-doc-final.xml`；本次未改打包输入或重建实物。
+
+## 2026-10-29 最终CI与剩余验收续记
+
+最终文档提交`f571bac10d9b66750e1a7069debe024a210385d4`三项远端CI均success：[Pull Request Gate](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053518)、[Numeric v1](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053529)、[N01-A](https://github.com/adgo07/ECQuota-Insight/actions/runs/40860053623)。此为父验收者独立查询的精确head状态；实际构建仍是a89b2c1，不为补报告重打包或重复本地全套。本节补录后的head需单独核CI。
+
+原生UI/Word仍因窗口枚举、截图及操作工具失败而待验，不能把冻结smoke或程序化DOCX检查当成视觉/分页通过。
+
+Owner授权继续安装验收后，先静态审查新版真实安装器对应脚本：固定同产品AppId、lowest、载荷删除/写入限于{app}、静默不启动、/NOICONS禁用快捷方式。真实用户已有安装和数据库，普通sandbox账户虽SID独立，其环境变量及KnownFolder仍指真实用户目录，因此不使用默认目录。仅在本次clone/tmp新建专属验收根，保存原ACL并临时授权已核sandbox SID该根Modify；全祖先无reparse，未修改上层或Shell Folders。
+
+实际只用sandbox SID执行原hash安装器一次，显式/DIR、/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /NOICONS及进程专用TEMP/TMP。安装退出4，Inno记录创建该sandbox HKCU卸载项时RegCreateKeyEx错误5（拒绝访问），随后自动回滚成功；隔离app目录及卸载项不存在。没有提升身份重试，没有启动应用，没有执行独立卸载或旧→新覆盖。专属根ACL已恢复，证据保留：[结构化记录](evidence/GB16780_STAGE_D_rc-a89b2c1_installer_attempt.json)、[日志摘录](evidence/GB16780_STAGE_D_rc-a89b2c1_installer_excerpt.log)。这是环境权限下失败并回滚，不能记为安装/卸载通过，也没有证据归因为产品缺陷。
+
+**执行前置条件偏差：**前置只读快照将PowerShell注册Provider对象直接序列化，触发过深遍历，未完成落盘；执行者在其仍运行时启动了安装器，违反已审的“完成前置快照后再执行”条件。随后停止该只读进程。仅取得事后真实用户卸载注册项、EXE存在及当前hash、329文件当前hash，不能补成完整前后保真比较，不能声明用户全部数据未变。真实用户0.2.0注册仍指原安装目录；具体当前EXE hash见结构化记录，不将无可信前值的项写成已保真。
+
+旧正式0.1.0安装器实算SHA256为`234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96819a98ae248a911`，127023093字节，与历史登记相符；未能把该编译安装器与精确历史脚本完整绑定，未执行。旧→新覆盖、旧应用数据升级、安装/升级/卸载正式验收继续待验。
+
+本轮不再扩大测试环境或重试安装。Stage D未完成，水泥IMPLEMENTED、尚未SUPPORTED；RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布；PR36仍草稿，不自动合并/发布，Excel新工作簿延期。平台/Contract预检查沿本报告首节，Frozen lock及标准解释不变。
+
+## 2026-11-03 独立复验及续验阻塞
+
+结论：计算、快照与程序化报告验证通过；原生交互、文档视觉及安装生命周期仍待验，Stage D不能宣布通过。未修改生产代码、冻结映射或正式支持清单，未合并发布。
+
+### 平台 / Contract 预检查
+
+- 已核业务仓origin为`https://github.com/adgo07/ECQuota-Insight.git`；候选所在独立clone为`01fd6f9c5062080556e10437674ed93cec2250ac`，补录前tracked工作树干净。实际被测实物仍为`rc-a89b2c1`，构建源码`a89b2c166214451bf6f6692099548979a4953483`；源码定向测试从该提交独立导出，不使用本机旧工作分支。
+- 已fetch业务仓，默认`main`，远端`b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`。中央clone已核origin并fetch；ACTIVE指南读取`a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`的标准开发、产品交付、UI v0.2、产品家族规格及验收清单。
+- Frozen锁继续为`ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Architecture2.1、Numeric Contract/Profile/Conformance v1不变。MUST保持Decimal28、全值比较、快照追溯；MUST NOT以显示值回流、隐式修约或当前规则重算历史。Standard Issue为001/003，沿用V1.2批准解释，无新增标准问题或中央Contract修改需要。本任务不改变既有软件解释。
+- 本机注册表显示Windows 10 Pro 22H2、build19045.6466；不沿用此前Win11环境结论。
+
+### 本轮实际执行
+
+| 检查 | 结果与范围 |
+|---|---|
+| 实物身份 | 原便携ZIP SHA256=`66a4b8d5ee20745414de8c61b18fc4aa1100e2b8d778bc5a69ae5a12a1fcf7ee`，原EXE SHA256=`7dccbabdeb839aef1d8ea35552e528c471b3f8f3040afe8b0e4a7bae7f2c61b5`，均与登记相同；ZIP重新解包到本次目录 |
+| 冻结实包 | 新隔离目录运行`--acceptance-smoke`，exit0、frozen=true；四模式与双修正共5记录/5份DOCX通过，部分结果拒保存/拒Word通过；第二独立进程只读核三JSON及规则关联，5记录通过、不重算 |
+| 源码定向回归 | `test_gb16780_v12.py`、`test_gb16780_presentation.py`、`test_stage_d_candidate.py`、Numeric v1 conformance，共71通过，0失败/0跳过，JUnit耗时68.265秒；不是完整回归重跑 |
+| 独立45点边界 | 新编验收脚本不导入候选测试辅助函数；依据冻结映射表1/2/3常量，从原始用量构造五指标的各三级T−0.01/T/T+0.01，45/45值与等级精确一致。此为源码计算证据，不冒充EXE新增45点入口 |
+| 原生窗口 | 本次解包EXE在全新`gui`目录启动，标题确认rc-a89b2c1；工具可枚举窗口并读取首页可访问性树，但截图重复超时，点击报`coordinate input geometry is unavailable`；未完成四模式真实录入/保存链 |
+| Word | 实包DOCX生成及XML/快照检查通过；render_docx.py报`LibreOffice soffice.exe was not found on PATH`。Microsoft Word可启动，但未取得候选文档实际页面/分页证据；不计视觉通过 |
+| 安装生命周期 | 本轮未执行安装、覆盖升级或卸载。未取得可丢弃安装隔离环境；同AppId宿主已有产品，不能以新的文件夹替代安装隔离，历史失败不改写为通过 |
+
+失败与纠正保留：首次源码测试用本仓旧venv，因缺少`python-docx`产生1项环境失败；改用候选原构建venv后71项全部通过。独立边界脚本首轮漏填Canonical单位，45项正确返回INCOMPLETE；补齐验收输入单位后45项通过，未改生产代码或业务预期。首次结果保留，不将验收脚本错误登记为产品缺陷。
+
+用户曾按Escape停止Computer Use，后明确要求继续；续验重新绑定窗口并按工具规则重试，仍分别报`FrameArrived timed out: timed out waiting on channel`及`window capture timed out: timed out waiting on channel`。按工具恢复规则停止继续盲目输入。不能据此认定产品界面有缺陷，也不能记作原生验收通过。
+
+证据汇总：[本轮机器记录](evidence/GB16780_STAGE_D_20261103_independent.json)。完整JUnit、45点逐例结果、脚本、实包JSON及DOCX保存在本次工作环境的`work/cement-acceptance-20261103/`；该目录相对于最外层本地checkout，不是跨机器固定地址。报告补录不产生新构建身份。
+
+后续出口：恢复可截图和输入的桌面控制，实测四模式、局部预览、完整保存/重启及报告导出；实开五份报告检查分页和内容；取得可丢弃Windows环境完成真实安装/升级/卸载。此前水泥状态继续`IMPLEMENTED`、Stage D待验、RS05 IN PROGRESS、产品PARTIAL、0.2.0未发布。
+
+## 2026-11-04 源码审查及Owner验收交接
+
+Owner授权暂缓卡住的桌面项目，完成自动验收后提交PR，由Owner独立验收。本轮沿用PR #36。平台/Contract预检查继承上节：开工提交仍为01fd6f9，已重新核origin、fetch和默认main；Frozen锁、映射、Standard Issue 001/003及既有解释均不变，无需中央Contract修改。
+
+### 源码审查结论
+
+审查固定公式JSON、专属协调器、Application保存边界、共用分摊、快照报告、候选入口及构建限制，未发现本轮需要修改生产代码的阻断问题：
+
+- 五项指标适用性与四种模式一致；燃料/电量分项扣除进入源端，余热按净发电量处理，熟料自产产量和水泥耗用熟料保持独立；式（8）使用煤耗，海拔/配比顺序符合已批准解释。
+- 权威计算进入Profile拥有的Decimal上下文；输入单位、非有限值、非正分母及超额扣除受校验；部分正确指标可预览，任一适用指标不完整时Application拒正式保存。
+- 多线分摊保留原量、比例、派生值与残差；保存后展示/Word取历史快照，不重新调用当前规则核算。
+- 正常入口仍只支持选煤；水泥候选要求显式隔离目录，UI/Application使用同一实例许可，正式构建拒候选入口。配套.6规则包不能单独导入旧安装版。
+
+本轮仅调整测试、证据和文档。`git diff a89b2c1 -- src data release scripts uebench.spec run_stage_d_cement.py`为空，候选生产输入与实物构建提交一致；没有因补录重打包。
+
+### 自动验证与证据
+
+- 新增`tests/test_gb16780_independent_boundaries.py`：45 passed；[JUnit](evidence/GB16780_STAGE_D_20261104_boundaries.xml)的suite time为5.673秒，原终端pytest汇总为26.95秒。两种记录的耗时口径不混用。独立预期为冻结映射常量，不调用被测Calculator生成期望；45点仅覆盖K=1、g=75，组合修正另由V1.2与smoke用例覆盖。
+- 对实际`dist/candidate-0.2.0`显式设置`UEBENCH_ARTIFACT_DIR`：Artifact Gate 63 passed；[JUnit](evidence/GB16780_STAGE_D_20261104_artifacts.xml)的suite time为48.651秒，原终端pytest汇总为69.02秒。真实资产读取，不是空目录跳过。两份JUnit起始时间接近，不能解读为顺序执行；旧XML保留原样。
+- 11月3日71项定向回归[JUnit](evidence/GB16780_STAGE_D_20261103_targeted.xml)、独立45点[逐例结果](evidence/GB16780_STAGE_D_20261103_boundaries.json)和[冻结实包结果](evidence/GB16780_STAGE_D_20261103_frozen_smoke.json)一并纳入PR，可脱离本机阅读。
+- 01fd6f9的Pull Request Gate、Numeric v1、N01-A三项远端CI已核success。a89b2c1的Numeric/N01-A为success，原完整PR Gate已因后续推送cancelled，不能说该提交三项均成功。
+- 本轮完整回归已另行启动；最终提交的三项CI和本机完整套件结果由[PR #36](https://github.com/adgo07/ECQuota-Insight/pull/36)记录实际源码SHA及运行链接。补录提交不代表重建候选，不将旧CI平移为新提交通过。
+
+### Owner最短验收路径
+
+补充回归发现历史归档升级测试仍固定期待49条修订；当前包同时升级选煤和水泥，实际保留50条。已将测试改为核对新旧签名包中标准ID/修订身份的完整并集及数量，防止覆盖、遗漏或多装；标准包对账模块32项通过，见[JUnit](evidence/GB16780_STAGE_D_20261104_reconciliation.xml)。这是本地测试预期缺陷，不改变业务实现、冻结映射或标准解释。首次本机全量还受未安装项目的子进程导入失败、执行中创建提交导致缓存HEAD变化影响；两组各2项分别复验通过。原始日志保留，不将其记为首次全量通过。最终固定提交完整结果见PR。
+
+本机可运行最外层checkout下`work/cement-acceptance-20261103/启动水泥独立验收.cmd`；它启动已核验便携载荷并使用该目录的`owner-acceptance`隔离数据。跨机器使用原便携ZIP解包后，运行`UEBench.exe --data-dir "<新的空验收目录>"`。本轮不要求在宿主运行同AppId安装器。
+
+1. 从标准库选择水泥并进入对标，按本文“独立输入与预期矩阵”录入A；五项结果分别核对，保存后重启查看原记录、导出Word。
+2. 切换部分外购、仅熟料、全部外购粉磨站；分别核对5/3/1项适用结果及模式切换清除不适用输入。部分外购水泥综合能耗应为80.95225。
+3. A删除制备工段电量，只允许部分预览，不新增正式记录、不允许正式Word导出；补齐后保存新记录。四项扣除空白及显式零应计算一致，输入状态仍可区分。
+4. 海拔1600m、气压81060Pa、配比80%，核水泥综合能耗85.7908、阈值85.50/92.75/100.9588及必要软件解释。表3阈值仍26/29/34。
+5. 在Word/WPS实开各模式与双修正报告，检查指标/单位/等级、表格分页、中文和说明，核对与保存快照一致；记录实际Office版本、候选身份及发现的问题。
+6. 安装、旧→新覆盖、同版本覆盖和卸载保留数据另在可丢弃隔离Windows环境验收；界面/Word通过不自动代表安装生命周期通过。
+
+以上待验项由Owner接续，水泥继续IMPLEMENTED；完整Stage D放行前不修改主线正式支持范围，不发布0.2.0。
+
+
+## 2026-11-04 PR36独立审查返工
+
+### 平台 / Contract 预检查
+
+返工起点`59e5bca11b7c4d2a6eaecdc88b9893303db9c433`；origin核实为本仓，fetch后`origin/main=b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`。Frozen锁仍为`ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture 2.1、Numeric v1/Profile/Conformance不变。当前中央指南按已核origin的`origin/main@a389ac1de63c4f331f3b04e5e7b7a17ef02ed111`导航读取交付规则、UI v0.2、家族规格A-12及适用验收清单。MUST保持正式范围仅选煤、保存快照展示、显示值不回流判级；MUST NOT改变冻结Mapping、Numeric语义或旧候选字节。相关Standard Issue为001/003，无新标准问题；本次不改变既有软件解释，不修改中央Contract。发现均为本地交付/展示/门禁或文档缺陷，不是CENTRAL CONTRACT GAP；未发现新增Frozen冲突。
+
+### 逐项核对与处理
+
+| 问题 | 核实及最小处理 |
+|---|---|
+| M-1 | 成立，且公开审查意见确实存在。源码ZIP补入专用入口及两种spec，入口缺失即失败。实际解包执行两种spec至Analysis边界，检查脚本、运行时hook和资源输入均存在；同时补入此前遗漏的固定标准包构建输入。从解包源码实跑水泥smoke和独立进程读回通过。 |
+| M-2 | 成立。普通`uebench.spec`恢复`run_uebench.py`；`uebench-stage-d.spec`显式选择隔离入口，共用其余配置。构建脚本新增`-StageDCement`，与`-FormalRelease`互斥，普通Candidate/正式构建不再静默切换入口。专用默认输出为`dist/candidate-stage-d-<版本>`，与普通Candidate分开。 |
+| L-1 | 耗时引用口径确实未说明；已分别列明原终端pytest汇总与JUnit suite time。原始XML不改写。接近的起始时间本身不构成证据错误，也不应被写成串行耗时。本轮定向验证同时保存日志与JUnit，避免再混用。 |
+| L-2 | 成立。更新TASK_STATE/HANDOFF日期和当前返工入口；尾部草稿描述标明历史时点，当前PR为非草稿待审查。禁止自动合并发布的约束仍有效。 |
+| L-3 | 缺字段成立。V1.2第24节标题为“推荐输出结果字段”，并非新增判级公式；已在UI/Word共用快照投影补“熟料配比百分点差”，单位为百分点。仅从保存输入展示g−75，不重算历史指标，不改Rule或Calculator。 |
+| L-4 | 成立。定义文件通过`.gitattributes`固定LF，清单重建为LF原字节哈希，保留原字节校验语义。64项定义与返工前Git blob逐字节相同，无业务改动；解包后的LF源码清单校验通过。 |
+| L-5 | 两处缺口成立。增加真实主窗口“计算并保存”按钮到水泥面板的信号路由测试；通用Excel导出在创建工作簿、写文件和审计前拒绝水泥记录，提示使用Word，既有文件保持不变。未实现新版Excel工作簿。 |
+
+### 返工验证及交付边界
+
+- 定向测试：67 passed，0 failed；终端汇总118.97秒。[原始JUnit](evidence/GB16780_PR36_REWORK_targeted.xml)、[原始终端日志](evidence/GB16780_PR36_REWORK_targeted.log)。覆盖源码包、两种spec、正式/Stage D互斥守卫、主按钮路由、Word字段、Excel拒绝与既有导出/损坏记录、开发清单和Source Gate。
+- 首轮43 passed/1 failed来自旧Source Gate将“必需文件集合”等同于“治理文件集合”；已改为治理文件必须包含于完整清单，随后上述67项通过。未放宽治理文件缺失检查。
+- 从生成ZIP解包源码执行`run_stage_d_cement.py --acceptance-smoke`及子进程`--acceptance-readback`通过；[结果JSON](evidence/GB16780_PR36_REWORK_source_smoke.json)。这是返工源码工作树验证，非旧冻结EXE验证，不能平移为新EXE/安装器通过。
+- 最终提交精确SHA、完整CI及修复源码ZIP哈希在[PR #36](https://github.com/adgo07/ECQuota-Insight/pull/36)记录，旧CI不平移为新提交通过。
+- 旧`rc-a89b2c1`及其源码ZIP保留原字节；旧源码ZIP确有入口缺失。旧63项Artifact Gate通过没有覆盖这项缺陷，不能用它证明旧源码包可重建。本轮新增源码包门禁用于后续构建。
+- 新增展示与导出门禁只在返工源码中，旧EXE不含这些修正。本轮不覆盖旧候选、不发布或合并；原生操作、Word视觉分页、安装升级卸载及完整Stage D仍待独立验收。
+
+后续干净提交构建：普通候选运行`powershell -File scripts/build_candidate.ps1`；水泥隔离候选显式添加`-StageDCement`，运行仍须`--data-dir`。独立PyInstaller构建对应选用`uebench.spec`或`uebench-stage-d.spec`，不得把水泥专用spec用于正式发布。
+
+补充：`522e4c3`首轮完整CI发现1项关联失败：定义已LF，而同源目录预览资源仍按CRLF检出，`test_preview_catalogue_is_derived_from_definition`的逐字节断言不通过。现将`src/uebench/resources/catalogue/*.json`同步固定为LF，不放宽原字节断言、不改JSON内容。交付范围与开发清单8项复验通过：[JUnit](evidence/GB16780_PR36_REWORK_lf_closure.xml)、[终端日志](evidence/GB16780_PR36_REWORK_lf_closure.log)。最终提交完整CI仍以PR中的精确SHA记录为准。

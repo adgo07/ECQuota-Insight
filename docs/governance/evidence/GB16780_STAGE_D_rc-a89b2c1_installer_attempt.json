@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-29",
+  "candidate": "rc-a89b2c1",
+  "installer_sha256": "8be190b243610d4dba4202b276a2c68d51d59c01aaeff2eceeed4bb7e9dbac14",
+  "execution_identity": "DESKTOP-35VQUAK\\CodexSandboxOffline",
+  "sid": "S-1-5-21-111415516-4255458987-2767654392-1003",
+  "install_exit": 4,
+  "failure": "HKCU uninstall RegCreateKeyEx error 5 access denied",
+  "automatic_rollback": "Inno log: Uninstallation process succeeded",
+  "isolated_app_absent": true,
+  "sandbox_uninstall_key_absent": true,
+  "pre_snapshot_complete": false,
+  "before_after_preservation_verified": false,
+  "precondition_violation": "Started installer before pre-snapshot serialization completed; snapshot then stopped without durable before evidence",
+  "real_user_after_registry": {
+    "DisplayName": "单位产品能耗对标软件",
+    "DisplayVersion": "0.2.0",
+    "InstallLocation": "C:\\Users\\WANGWEI\\AppData\\Local\\Programs\\UEBench\\",
+    "UninstallString": "\"C:\\Users\\WANGWEI\\AppData\\Local\\Programs\\UEBench\\unins000.exe\""
+  },
+  "real_user_after_exe": {
+    "path": "C:\\Users\\WANGWEI\\AppData\\Local\\Programs\\UEBench\\UEBench.exe",
+    "length": 11985044,
+    "sha256": "01D0CFE8241258FBD156F880026355681AE5A270F404685515A52A4D59D6DCF9"
+  },
+  "real_user_after_file_count": 329,
+  "acl_restored": true,
+  "upgrade_attempted": false,
+  "application_started": false,
+  "install_log_sha256": "F10690274C4D040582C03053929D52B2BD18C6A5D88839577F8B057401049A1A",
+  "raw_log_location": "tmp/staged-installer-20261029-isolated/install.log"
+}

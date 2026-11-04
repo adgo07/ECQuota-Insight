@@ -32,6 +32,7 @@ from .ports import (
     WordReportPort,
 )
 from .reporting import ReportView, build_report_view
+from .cement_reporting import CementReportView, build_cement_report_view
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
 from .package_reconciliation import PackageReconciliationService, ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
@@ -218,11 +219,17 @@ class ApplicationFacade:
     ) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None:
         return self._evaluations.get(evaluation_id)
 
-    def get_report_view(self, evaluation_id: str) -> ReportView:
+    def get_report_view(self, evaluation_id: str) -> ReportView | CementReportView:
         loaded = self._evaluations.get(evaluation_id)
         if loaded is None:
             raise LookupError("评价记录已删除或不存在。")
+        if loaded[0].standard_id == "gb-16780-2021":
+            return build_cement_report_view(*loaded)
         return build_report_view(*loaded)
+
+    def evaluate_or_preview(self, request: EvaluationRequest) -> tuple[EvaluationResult, bool]:
+        """水泥适用指标完整即保存，否则仅返回部分预览。"""
+        return self._evaluation.evaluate_or_preview(request)
 
     def export_word_report(self, evaluation_id: str, path: Path) -> Path:
         if self._word_report_writer is None:

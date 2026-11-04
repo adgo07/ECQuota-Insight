@@ -14,8 +14,9 @@ History, compressed:
 
 The signed 2026.10-published.4 fixture is the exact package from Git commit
 ``a230f806ec4fcfd384a25bb7bea239a9c38623f3`` (SHA256 below). It is
-reference-only test evidence, never an installer or release input. The current
-2026.10-published.5 package changes only the GB29446 r2 definition to r3.
+reference-only test evidence, never an installer or release input. Historical
+2026.10-published.5 changed only GB29446 r2 to r3; it is now a signed reference
+fixture. Current .6 changes only GB16780 r1 to r2, without expanding formal scope.
 """
 
 from __future__ import annotations
@@ -31,6 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = ROOT / "release" / "standard-packages"
 PINNED = PACKAGE_DIR / "initial-standard-package-published.uebench"
 REVISION_PARENT = ROOT / "tests" / "fixtures" / "standard-packages" / "2026.10-published.4.uebench"
+CURRENT_REVISION_PARENT = ROOT / "tests" / "fixtures" / "standard-packages" / "2026.10-published.5.uebench"
 #: 直接父基线（含 sources/*）已移出仓库（SUPERSEDED，项目外只读归档）；这里取得的是**副本**。
 try:  # 测试目录既可能是普通目录，也可能被当作包
     from _legacy_assets import session_source_bearing_predecessor
@@ -43,7 +45,8 @@ PIN = PACKAGE_DIR / "PIN.json"
 GHOST = "signature.ed25519"
 STRUCTURAL = {"manifest.json", GHOST}
 TARGET = "gb-29446-2019"
-PINNED_SHA256 = "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
+PINNED_SHA256 = "d5ff370d3728ad3dda2589ed72bc9c693425208084ed96d45ad1d036c91afa51"
+CURRENT_REVISION_PARENT_SHA256 = "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
 REVISION_PARENT_SHA256 = "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff"
 PARENT_SHA256 = "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0"
 
@@ -226,8 +229,8 @@ def _parent_or_skip() -> Path:
 
 def test_revision_parent_is_the_signed_git_baseline() -> None:
     record = pin()
-    assert sha256_of(REVISION_PARENT) == record["parent_baseline"]["sha256"] == REVISION_PARENT_SHA256
-    assert REVISION_PARENT.stat().st_size == record["parent_baseline"]["size"]
+    assert sha256_of(REVISION_PARENT) == record["previous_parent_baseline"]["sha256"] == REVISION_PARENT_SHA256
+    assert REVISION_PARENT.stat().st_size == record["previous_parent_baseline"]["size"]
     assert read_manifest(REVISION_PARENT)["data_version"] == "2026.10-published.4"
 
 
@@ -293,10 +296,10 @@ def test_only_sources_were_removed_from_the_parent_baseline() -> None:
     assert pinned_manifest["package_id"] != parent_manifest["package_id"]
 
 
-def test_current_revision_changes_only_gb29446_definition() -> None:
+def test_historical_point_five_changes_only_gb29446_definition() -> None:
     """The signed r3 package keeps the other 47 definitions byte-identical."""
     parent_defs = definitions_of(REVISION_PARENT)
-    current_defs = definitions_of(PINNED)
+    current_defs = definitions_of(CURRENT_REVISION_PARENT)
     parent_target = [key for key in parent_defs if key[0] == TARGET]
     current_target = [key for key in current_defs if key[0] == TARGET]
     assert len(parent_defs) == len(current_defs) == 48
@@ -307,13 +310,13 @@ def test_current_revision_changes_only_gb29446_definition() -> None:
     for key in set(parent_defs) - {parent_target[0]}:
         assert parent_defs[key] == current_defs[key], key
     parent_members = content_members(REVISION_PARENT)
-    current_members = content_members(PINNED)
+    current_members = content_members(CURRENT_REVISION_PARENT)
     assert set(parent_members) - set(current_members) == {parent_defs[parent_target[0]][0]}
     assert set(current_members) - set(parent_members) == {current_defs[current_target[0]][0]}
     for name in set(parent_members) & set(current_members):
         assert parent_members[name] == current_members[name], name
-    assert read_manifest(PINNED)["source_policy"] == "provenance-only"
-    assert read_manifest(PINNED)["data_version"] == "2026.10-published.5"
+    assert read_manifest(CURRENT_REVISION_PARENT)["source_policy"] == "provenance-only"
+    assert read_manifest(CURRENT_REVISION_PARENT)["data_version"] == "2026.10-published.5"
 
 
 def test_pinned_data_version_sorts_after_the_retired_one() -> None:
@@ -352,3 +355,30 @@ def test_pin_records_the_approval_constraints() -> None:
     assert history["removed_members"] == ["definitions/gb-29446-2019-2019.json"]
     assert history["added_members"] == ["definitions/gb-29446-2019-2019-r2.json"]
     assert history["changed_members"] == []
+
+
+def test_current_revision_changes_only_gb16780_definition() -> None:
+    """.5→.6只同步水泥r2定义；保留旧选煤历史证明和其余47定义原字节。"""
+    assert sha256_of(CURRENT_REVISION_PARENT) == CURRENT_REVISION_PARENT_SHA256
+    record = pin()
+    assert record["parent_baseline"]["sha256"] == CURRENT_REVISION_PARENT_SHA256
+    parent_defs = definitions_of(CURRENT_REVISION_PARENT)
+    current_defs = definitions_of(PINNED)
+    old_key = next(key for key in parent_defs if key[0] == "gb-16780-2021")
+    new_key = next(key for key in current_defs if key[0] == "gb-16780-2021")
+    assert old_key[2] == 1 and new_key[2] == 2
+    assert len(parent_defs) == len(current_defs) == 48
+    assert set(parent_defs) - {old_key} == set(current_defs) - {new_key}
+    for key in set(parent_defs) - {old_key}:
+        assert parent_defs[key] == current_defs[key], key
+    parent_members = content_members(CURRENT_REVISION_PARENT)
+    current_members = content_members(PINNED)
+    assert set(parent_members) - set(current_members) == {parent_defs[old_key][0]}
+    assert set(current_members) - set(parent_members) == {current_defs[new_key][0]}
+    for name in set(parent_members) & set(current_members):
+        assert parent_members[name] == current_members[name], name
+    assert read_manifest(PINNED)["data_version"] == "2026.10-published.6"
+    assert read_manifest(PINNED)["rule_count"] == read_manifest(CURRENT_REVISION_PARENT)["rule_count"] == 765
+    assert record["current_revision_resolution"]["formal_evaluation_standard_ids"] == ["gb-29446-2019"]
+    assert record["compatibility_boundary"]["old_install_upgrade_performed"] is False
+    assert "extra_forbidden" in record["compatibility_boundary"]["legacy_source_probe"]

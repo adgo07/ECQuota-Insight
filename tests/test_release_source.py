@@ -405,8 +405,8 @@ def test_pinned_package_public_key_is_the_pin_verifying_key(pin: dict[str, Any])
 def test_source_zip_includes_the_mandated_governance_files(tmp_path: Path) -> None:
     from tools.build_source_zip import MANDATORY_ROOT_FILES, build_source_zip
 
-    assert set(MANDATED_GOVERNANCE_FILES) == set(MANDATORY_ROOT_FILES), (
-        "Source Gate 与 tools/build_source_zip.py 的强制治理文件清单不一致"
+    assert set(MANDATED_GOVERNANCE_FILES) <= set(MANDATORY_ROOT_FILES), (
+        "源码包强制清单不得缺少治理文件；还应包含构建入口"
     )
     output = tmp_path / "source.zip"
     build_source_zip(output)

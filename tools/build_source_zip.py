@@ -12,7 +12,7 @@ except ModuleNotFoundError:  # pragma: no cover - package-import style
     from tools.release_version import artifact_names, project_version
 
 
-INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development", "standards/mappings"]
+INCLUDE_ROOTS = ["src", "tests", "tools", "scripts", "packaging", "migrations", "data", "docs", "standards/development", "standards/mappings", "release/standard-packages"]
 
 #: Root-level files shipped in the source package.  ECQ-RS05 additionally
 #: requires the governance/state documents so a source recipient can reproduce
@@ -23,7 +23,10 @@ ROOT_FILES = [
     "requirements.txt",
     "requirements.lock",
     "run_uebench.py",
+    "run_stage_d_cement.py",
     "uebench.spec",
+    "uebench-stage-d.spec",
+    ".gitattributes",
     "alembic.ini",
     ".gitignore",
     # Governance / state documents (ECQ-RS05 §18).
@@ -37,9 +40,13 @@ ROOT_FILES = [
 ]
 
 #: Subset of ROOT_FILES whose absence must fail the build rather than be
-#: silently skipped (these are the ECQ-RS05 §18 governance documents).
+#: silently skipped (governance documents and both build entry points).
 MANDATORY_ROOT_FILES = frozenset(
     {
+        "run_uebench.py",
+        "run_stage_d_cement.py",
+        "uebench.spec",
+        "uebench-stage-d.spec",
         "AGENTS.md",
         "platform-lock.json",
         "PLATFORM_BASELINE.md",

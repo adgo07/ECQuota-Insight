@@ -1248,7 +1248,18 @@ def test_archived_legacy_package_upgrades_to_pinned_package(context, tmp_path: P
         if item.id == GB29446
     )
     assert revisions == [1, current_revision], "升级必须新增现行修订而不是替换 r1"
-    assert len(context.application.list_all_standards()) == 49
+    # 旧包和现行包可能有多个标准升版（当前包括选煤、水泥）。
+    # 核对包内修订身份的并集，既防止覆盖历史，也防止遗漏或多装。
+    expected_identities = set()
+    for package in (OLD_PACKAGE, CURRENT_PACKAGE):
+        with zipfile.ZipFile(package) as archive:
+            for name in archive.namelist():
+                if name.startswith("definitions/") and name.endswith(".json"):
+                    definition = json.loads(archive.read(name))
+                    expected_identities.add((definition["id"], definition["rule_revision"]))
+    installed = context.application.list_all_standards()
+    assert {(item.id, item.rule_revision) for item in installed} == expected_identities
+    assert len(installed) == len(expected_identities)
     assert len(context.application.list_package_history(5)) == 2
 
 

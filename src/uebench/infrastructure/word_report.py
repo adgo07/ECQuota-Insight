@@ -8,16 +8,17 @@ import tempfile
 from pathlib import Path
 
 from uebench.application.reporting import ReportField, ReportView
+from uebench.application.cement_reporting import CementReportView
 
 
 def _add_subscript(paragraph, text: str) -> None:
     """把 E_d / e_d 写成真正的 Word 下标，而非靠 HTML 解释。"""
-    for part in re.split(r"([Ee]_d)", text):
+    for part in re.split(r"([EeWwPpQ]_[A-Za-z0-9]+)", text):
         if not part:
             continue
-        if part in {"E_d", "e_d"}:
+        if re.fullmatch(r"[EeWwPpQ]_[A-Za-z0-9]+", part):
             paragraph.add_run(part[0])
-            suffix = paragraph.add_run("d")
+            suffix = paragraph.add_run(part.split("_", 1)[1])
             suffix.font.subscript = True
         else:
             paragraph.add_run(part)
@@ -35,7 +36,9 @@ def _row(table, field: ReportField) -> None:
 class WordReportWriter:
     """创建文件时先写同目录临时文件，成功后原子替换目标。"""
 
-    def write(self, view: ReportView, path: Path) -> Path:
+    def write(self, view: ReportView | CementReportView, path: Path) -> Path:
+        if isinstance(view, CementReportView):
+            return self._write_cement(view, path)
         from docx import Document
         from docx.enum.table import WD_TABLE_ALIGNMENT
         from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -119,6 +122,69 @@ class WordReportWriter:
         document.add_paragraph(view.mapping_adoption)
 
         temporary: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(prefix=f".{path.stem}-", suffix=".docx", dir=path.parent, delete=False) as handle:
+                temporary = Path(handle.name)
+            document.save(temporary)
+            os.replace(temporary, path)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+        return path
+
+    def _write_cement(self, view: CementReportView, path: Path) -> Path:
+        from docx import Document
+        from docx.shared import Cm, Pt, RGBColor
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+        if not view.complete:
+            raise ValueError("部分计算预览不能导出正式 Word 报告。")
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        document = Document()
+        section = document.sections[0]
+        section.page_width, section.page_height = Cm(21), Cm(29.7)
+        section.top_margin = section.bottom_margin = Cm(1.7)
+        section.left_margin = section.right_margin = Cm(1.8)
+        for name, size in (("Normal", 9), ("Title", 15), ("Heading 1", 11)):
+            style = document.styles[name]
+            style.font.name = "Microsoft YaHei"
+            style.font.size = Pt(size)
+            style.font.color.rgb = RGBColor(0, 0, 0)
+            style._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), "Microsoft YaHei")
+            style.paragraph_format.space_after = Pt(4)
+        title = document.add_paragraph(view.title, "Title")
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        document.add_paragraph("；".join(f"{f.label}：{f.value}" for f in view.information))
+        table = document.add_table(rows=1, cols=6)
+        table.style = "Table Grid"
+        for cell, label in zip(table.rows[0].cells, ("指标", "实际值", "等级", "1级上限", "2级上限", "3级上限")):
+            cell.text = label
+        header = OxmlElement("w:tblHeader")
+        table.rows[0]._tr.get_or_add_trPr().append(header)
+        for item in view.indicators:
+            thresholds = {field.key: field.value for field in item.thresholds}
+            values = (item.label + f"（{item.unit}）", item.actual, item.grade,
+                      *(thresholds.get(key, "—") for key in ("LEVEL_1", "LEVEL_2", "LEVEL_3")))
+            for cell, value in zip(table.add_row().cells, values):
+                cell.text = value
+        document.add_paragraph(view.scope_note)
+        for line in view.disclosures:
+            document.add_paragraph(line)
+        document.add_heading("输入数据与计算依据", level=1)
+        raw = document.add_table(rows=0, cols=2)
+        raw.style = "Table Grid"
+        for field in view.inputs:
+            _row(raw, field)
+        if view.calculations:
+            document.add_heading("计算依据", level=1)
+            for field in view.calculations:
+                document.add_paragraph(f"{field.label}：{field.value} {field.unit}".strip())
+        for line in view.basis:
+            document.add_paragraph(line)
+        temporary = None
         try:
             with tempfile.NamedTemporaryFile(prefix=f".{path.stem}-", suffix=".docx", dir=path.parent, delete=False) as handle:
                 temporary = Path(handle.name)

@@ -94,11 +94,15 @@ class EvaluationService:
         evaluations: EvaluationRepository,
         engine: EvaluationEngine | None = None,
         formal_evaluation_block: Callable[[], str | None] | None = None,
+        formal_standard_ids: frozenset[str] | None = None,
     ) -> None:
         self.standards = standards
         self.evaluations = evaluations
         self.engine = engine or EvaluationEngine(ECQUOTA_DECIMAL_FULL_VALUE_V1)
         self._formal_evaluation_block = formal_evaluation_block
+        # Instance-only permission for isolated candidate acceptance. Production
+        # construction keeps the registry; no user setting changes this scope.
+        self._formal_standard_ids = formal_standard_ids
 
     def _resolve_standard(self, request: EvaluationRequest) -> StandardDefinition:
         standard = self.standards.get_for_evaluation(
@@ -159,7 +163,9 @@ class EvaluationService:
         readiness_message = self.formal_evaluation_block_message()
         if readiness_message:
             raise ValueError(readiness_message)
-        if not supports_formal_evaluation(request.standard_id):
+        permitted = (request.standard_id in self._formal_standard_ids if self._formal_standard_ids is not None
+                     else supports_formal_evaluation(request.standard_id))
+        if not permitted:
             raise ValueError(
                 f"{evaluation_support_label(request.standard_id)}：本版本不能用该标准形成正式评价记录。"
             )
@@ -167,5 +173,21 @@ class EvaluationService:
             raise ValueError("尚未实施标准只能预览，不能形成正式判定或保存评价记录。")
         standard = self._resolve_standard(request)
         result = self._calculate(request, standard)
+        if standard.id == "gb-16780-2021":
+            from uebench.domain.gb16780 import is_complete
+            if standard.rule_revision < 2:
+                raise ValueError("旧水泥规则仅作历史快照，不可形成新正式评价。")
+            if not is_complete(result):
+                raise ValueError("部分计算预览：存在适用指标未完整判级或评价信息不完整，未保存正式评价。")
         self.evaluations.save(request, result, standard)
         return result
+
+    def evaluate_or_preview(self, request: EvaluationRequest) -> tuple[EvaluationResult, bool]:
+        """UI convenience: incomplete cement stays a preview; complete uses all formal guards."""
+        result = self.preview(request)
+        if request.standard_id == "gb-16780-2021":
+            from uebench.domain.gb16780 import is_complete
+            if not is_complete(result):
+                return result, False
+        # Do not accept a caller-supplied result at the save boundary.
+        return self.evaluate(request), True

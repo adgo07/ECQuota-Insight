@@ -1,0 +1,458 @@
+{
+  "source": "a89b2c166214451bf6f6692099548979a4953483",
+  "oracle": "Frozen V1.2 tables 1/2/3, raw quantities, independent expected constants",
+  "total": 45,
+  "passed": 45,
+  "cases": [
+    {
+      "indicator": "clinker.coal",
+      "threshold": "94",
+      "delta": "-0.01",
+      "expected_value": "93.99",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "93.9900",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "94",
+      "delta": "0",
+      "expected_value": "94",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "94.0000",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "94",
+      "delta": "0.01",
+      "expected_value": "94.01",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "94.0100",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "100",
+      "delta": "-0.01",
+      "expected_value": "99.99",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "99.9900",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "100",
+      "delta": "0",
+      "expected_value": "100",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "100.0000",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "100",
+      "delta": "0.01",
+      "expected_value": "100.01",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "100.0100",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "109",
+      "delta": "-0.01",
+      "expected_value": "108.99",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "108.9900",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "109",
+      "delta": "0",
+      "expected_value": "109",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "109.0000",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.coal",
+      "threshold": "109",
+      "delta": "0.01",
+      "expected_value": "109.01",
+      "expected_grade": "NOT_QUALIFIED",
+      "actual_value": "109.0100",
+      "actual_grade": "NOT_QUALIFIED",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "100",
+      "delta": "-0.01",
+      "expected_value": "99.99",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "99.9900",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "100",
+      "delta": "0",
+      "expected_value": "100",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "100.0000",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "100",
+      "delta": "0.01",
+      "expected_value": "100.01",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "100.0100",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "107",
+      "delta": "-0.01",
+      "expected_value": "106.99",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "106.9900",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "107",
+      "delta": "0",
+      "expected_value": "107",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "107.0000",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "107",
+      "delta": "0.01",
+      "expected_value": "107.01",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "107.0100",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "117",
+      "delta": "-0.01",
+      "expected_value": "116.99",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "116.9900",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "117",
+      "delta": "0",
+      "expected_value": "117",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "117.0000",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.comprehensive",
+      "threshold": "117",
+      "delta": "0.01",
+      "expected_value": "117.01",
+      "expected_grade": "NOT_QUALIFIED",
+      "actual_value": "117.0100",
+      "actual_grade": "NOT_QUALIFIED",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "48",
+      "delta": "-0.01",
+      "expected_value": "47.99",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "47.99",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "48",
+      "delta": "0",
+      "expected_value": "48",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "48",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "48",
+      "delta": "0.01",
+      "expected_value": "48.01",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "48.01",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "57",
+      "delta": "-0.01",
+      "expected_value": "56.99",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "56.99",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "57",
+      "delta": "0",
+      "expected_value": "57",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "57",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "57",
+      "delta": "0.01",
+      "expected_value": "57.01",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "57.01",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "61",
+      "delta": "-0.01",
+      "expected_value": "60.99",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "60.99",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "61",
+      "delta": "0",
+      "expected_value": "61",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "61",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "clinker.electricity",
+      "threshold": "61",
+      "delta": "0.01",
+      "expected_value": "61.01",
+      "expected_grade": "NOT_QUALIFIED",
+      "actual_value": "61.01",
+      "actual_grade": "NOT_QUALIFIED",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "80",
+      "delta": "-0.01",
+      "expected_value": "79.99",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "79.990000",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "80",
+      "delta": "0",
+      "expected_value": "80",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "80.000000",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "80",
+      "delta": "0.01",
+      "expected_value": "80.01",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "80.010000",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "87",
+      "delta": "-0.01",
+      "expected_value": "86.99",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "86.990000",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "87",
+      "delta": "0",
+      "expected_value": "87",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "87.000000",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "87",
+      "delta": "0.01",
+      "expected_value": "87.01",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "87.010000",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "94",
+      "delta": "-0.01",
+      "expected_value": "93.99",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "93.990000",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "94",
+      "delta": "0",
+      "expected_value": "94",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "94.000000",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement.comprehensive_energy",
+      "threshold": "94",
+      "delta": "0.01",
+      "expected_value": "94.01",
+      "expected_grade": "NOT_QUALIFIED",
+      "actual_value": "94.010000",
+      "actual_grade": "NOT_QUALIFIED",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "26",
+      "delta": "-0.01",
+      "expected_value": "25.99",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "25.99",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "26",
+      "delta": "0",
+      "expected_value": "26",
+      "expected_grade": "LEVEL_1",
+      "actual_value": "26",
+      "actual_grade": "LEVEL_1",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "26",
+      "delta": "0.01",
+      "expected_value": "26.01",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "26.01",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "29",
+      "delta": "-0.01",
+      "expected_value": "28.99",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "28.99",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "29",
+      "delta": "0",
+      "expected_value": "29",
+      "expected_grade": "LEVEL_2",
+      "actual_value": "29",
+      "actual_grade": "LEVEL_2",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "29",
+      "delta": "0.01",
+      "expected_value": "29.01",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "29.01",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "34",
+      "delta": "-0.01",
+      "expected_value": "33.99",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "33.99",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "34",
+      "delta": "0",
+      "expected_value": "34",
+      "expected_grade": "LEVEL_3",
+      "actual_value": "34",
+      "actual_grade": "LEVEL_3",
+      "passed": true
+    },
+    {
+      "indicator": "cement-preparation.electricity",
+      "threshold": "34",
+      "delta": "0.01",
+      "expected_value": "34.01",
+      "expected_grade": "NOT_QUALIFIED",
+      "actual_value": "34.01",
+      "actual_grade": "NOT_QUALIFIED",
+      "passed": true
+    }
+  ]
+}

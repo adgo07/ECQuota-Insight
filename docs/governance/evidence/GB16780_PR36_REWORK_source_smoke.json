@@ -1,0 +1,176 @@
+{
+  "status": "passed",
+  "frozen": false,
+  "process_id": 31604,
+  "data_directory": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969",
+  "build_identity": {
+    "purpose": "水泥Stage D验收候选，尚未正式支持",
+    "source_commit": "未知（未嵌入构建身份）",
+    "candidate_id": "未知（未嵌入构建身份）",
+    "standard_package_id": "未知（未嵌入构建身份）",
+    "standard_data_version": "未知（未嵌入构建身份）",
+    "data_directory": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance",
+    "evaluation_standard_ids": [
+      "gb-16780-2021",
+      "gb-29446-2019"
+    ]
+  },
+  "records": [
+    {
+      "mode": "integrated",
+      "dual": false,
+      "evaluation_id": "fe66403a-c252-4975-8468-e3809af9b21c",
+      "snapshot_digests": [
+        "e03844dec5f85059d9f5ab7e90a7d802b2ac784b16c84d8458d8817af526b0b1",
+        "50832c7a13b56dafe98d440119a293b903ec458df84ae9e1d2b66c4afa091ddf",
+        "e6129b261df66e547b9c0ccdcd73ed10f24f3d4ef97d11d98f8e19c38dfac3d0"
+      ],
+      "actual": {
+        "cement.comprehensive_energy": {
+          "actual": "80.952250",
+          "grade": "LEVEL_2"
+        },
+        "clinker.comprehensive": {
+          "actual": "102.6702",
+          "grade": "LEVEL_2"
+        },
+        "clinker.coal": {
+          "actual": "96.7710",
+          "grade": "LEVEL_2"
+        },
+        "clinker.electricity": {
+          "actual": "48",
+          "grade": "LEVEL_1"
+        },
+        "cement-preparation.electricity": {
+          "actual": "23",
+          "grade": "LEVEL_1"
+        }
+      },
+      "word_path": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969\\水泥-integrated.docx",
+      "word_sha256": "e8a71c2e48e60184992745b592513524d04010b73e2be1b7bc05f705e4714428"
+    },
+    {
+      "mode": "partial_purchased",
+      "dual": false,
+      "evaluation_id": "aeeaf7d7-f1a6-476f-b000-a11a27ef31b3",
+      "snapshot_digests": [
+        "298be8425ce6c7bcdecfd2f4949d6c00a5e8657fb2ed23a631aef2d91ad7b074",
+        "048cbacee53cb43c64a7a00e7f55c1f779c7e7635c3202ddc001805e5a2a5962",
+        "e6129b261df66e547b9c0ccdcd73ed10f24f3d4ef97d11d98f8e19c38dfac3d0"
+      ],
+      "actual": {
+        "cement.comprehensive_energy": {
+          "actual": "80.952250",
+          "grade": "LEVEL_2"
+        },
+        "clinker.comprehensive": {
+          "actual": "102.6702",
+          "grade": "LEVEL_2"
+        },
+        "clinker.coal": {
+          "actual": "96.7710",
+          "grade": "LEVEL_2"
+        },
+        "clinker.electricity": {
+          "actual": "48",
+          "grade": "LEVEL_1"
+        },
+        "cement-preparation.electricity": {
+          "actual": "23",
+          "grade": "LEVEL_1"
+        }
+      },
+      "word_path": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969\\水泥-partial_purchased.docx",
+      "word_sha256": "2fa33498c28c6349975fe74049cc9e189709859cceb268296c9ace4c6a068a5a"
+    },
+    {
+      "mode": "clinker_only",
+      "dual": false,
+      "evaluation_id": "fab7174c-4b7b-4501-aa47-2bfc016f0ffc",
+      "snapshot_digests": [
+        "4b25053967e6590292e80b2a3d6c49fdf013d736fb003fbba6d58370b52ee86c",
+        "4af2b39397105ce9ae0b20f9ec294fe88ff2cd6b06cc47bf9bdc9c6f66b030b3",
+        "e6129b261df66e547b9c0ccdcd73ed10f24f3d4ef97d11d98f8e19c38dfac3d0"
+      ],
+      "actual": {
+        "clinker.comprehensive": {
+          "actual": "102.6702",
+          "grade": "LEVEL_2"
+        },
+        "clinker.coal": {
+          "actual": "96.7710",
+          "grade": "LEVEL_2"
+        },
+        "clinker.electricity": {
+          "actual": "48",
+          "grade": "LEVEL_1"
+        }
+      },
+      "word_path": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969\\水泥-clinker_only.docx",
+      "word_sha256": "fa667abb20c9ea3b12c3c018c2f9f158c6684980cc526a9d3a60b42c27eb857e"
+    },
+    {
+      "mode": "grinding_station",
+      "dual": false,
+      "evaluation_id": "67caac44-8c61-4b01-bc8b-9b267331677b",
+      "snapshot_digests": [
+        "17d1e3ebeb07b1c8e3905b32113baedc16ea092fcf3a3c72c476cfdd9c32d0b4",
+        "f0607e36367bf6c9fd37c1a37ce85cd964d2e5e03a1e469018de55996b9af64b",
+        "e6129b261df66e547b9c0ccdcd73ed10f24f3d4ef97d11d98f8e19c38dfac3d0"
+      ],
+      "actual": {
+        "cement-preparation.electricity": {
+          "actual": "23",
+          "grade": "LEVEL_1"
+        }
+      },
+      "word_path": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969\\水泥-grinding_station.docx",
+      "word_sha256": "95bbf9146dcc8ba3e9b7da02715c2b895618a032856b916bd0d75872f22621f9"
+    },
+    {
+      "mode": "integrated",
+      "dual": true,
+      "evaluation_id": "050173dc-4523-4b1d-a10b-daf2b7fb7cf1",
+      "snapshot_digests": [
+        "6ee62d2cda9db90435da9d98c3e5d6fb5fd0465a967b012804a2a4bd2f4d0279",
+        "f74d216493df03e8f99a57c04d5b21f983f95711013e8c2fcf2d68e2cb94e108",
+        "e6129b261df66e547b9c0ccdcd73ed10f24f3d4ef97d11d98f8e19c38dfac3d0"
+      ],
+      "actual": {
+        "cement.comprehensive_energy": {
+          "actual": "85.79080",
+          "grade": "LEVEL_2"
+        },
+        "clinker.comprehensive": {
+          "actual": "102.6702",
+          "grade": "LEVEL_2"
+        },
+        "clinker.coal": {
+          "actual": "96.7710",
+          "grade": "LEVEL_2"
+        },
+        "clinker.electricity": {
+          "actual": "48",
+          "grade": "LEVEL_1"
+        },
+        "cement-preparation.electricity": {
+          "actual": "23",
+          "grade": "LEVEL_1"
+        }
+      },
+      "word_path": "G:\\Python Project\\能耗限额\\work\\rs05-pr34-closure-20261029\\tmp\\pr36-rework-source\\acceptance\\smoke-f293bbffc1b845c8879feeb2df2ea969\\水泥-integrated-双修正.docx",
+      "word_sha256": "999a9d309e557ead262b22a6c35f5cb93955641f713de5ce6245f0f514865ae6"
+    }
+  ],
+  "visual_acceptance": "未验",
+  "installation_acceptance": "未验",
+  "partial_save_and_word_rejected": true,
+  "readback": {
+    "status": "passed",
+    "process_id": 48320,
+    "read_only": true,
+    "recalculation": false,
+    "records": 5
+  }
+}

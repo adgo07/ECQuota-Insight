@@ -25,7 +25,30 @@ def test_every_scope_standard_has_at_least_one_source_backed_rule() -> None:
         for product in definition.products:
             for indicator in product.indicators:
                 assert indicator.source_references
-                assert all(reference.standard_number == definition.number for reference in indicator.source_references)
+                if definition.id == "gb-16780-2021" and definition.rule_revision >= 2:
+                    # Only this approved mapping adds a specifically verified
+                    # historical technical reference. It is not a current norm.
+                    formal = [reference for reference in indicator.source_references
+                              if reference.standard_number == definition.number]
+                    auxiliary = [reference for reference in indicator.source_references
+                                 if reference.standard_number != definition.number]
+                    assert formal
+                    assert all(reference.source_file == "01.GB 16780-2021水泥单位产品能源消耗限额.pdf"
+                               and reference.source_sha256 == "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c"
+                               for reference in formal)
+                    if indicator.id == "cement-preparation.electricity":
+                        assert auxiliary == []
+                    else:
+                        assert len(auxiliary) == 1
+                        reference = auxiliary[0]
+                        assert reference.standard_number == "2019征求意见稿（技术参考，非现行标准）"
+                        assert reference.source_file == "201908301101185798.pdf"
+                        assert reference.source_sha256 == "efcdd6195a8c0de0bb4b6767aa10b0f2bfa6e3395943245e9eb0a16983c8b329"
+                        assert reference.page == 12
+                        assert reference.clause == "附录C.1(C.1)、C.2(C.3)"
+                        assert reference.note == "V1.2用户采纳源端分项扣除；w_fc中文定义为用户扩展；不采用(C.7)。"
+                else:
+                    assert all(reference.standard_number == definition.number for reference in indicator.source_references)
                 assert all(reference.page >= 1 for reference in indicator.source_references)
                 assert any((indicator.thresholds.level_1, indicator.thresholds.level_2, indicator.thresholds.level_3))
                 # Some source tables intentionally use “—” for a missing grade;
@@ -75,7 +98,7 @@ def test_scope_manifest_and_catalog_remain_exact() -> None:
     assert {row["number"] for row in catalog["standards"]} == set(scope["standards"])
 
 
-def test_every_published_indicator_runs_in_direct_entry_smoke() -> None:
+def test_every_published_indicator_runs_in_its_supported_input_mode_smoke() -> None:
     report = check_published_rules(Path("data/definitions"))
     assert report["total_indicators"] == 753
     assert report["incomplete"] == []

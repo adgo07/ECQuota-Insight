@@ -44,6 +44,7 @@ def create_context(
     *,
     enforce_standard_library_readiness: bool | None = None,
     bundled_package_directory: Path | None = None,
+    formal_standard_ids: frozenset[str] | None = None,
 ) -> AppContext:
     paths = AppPaths.from_root(root) if root is not None else AppPaths.default()
     paths.ensure()
@@ -86,6 +87,7 @@ def create_context(
     evaluation_service = EvaluationService(
         standards,
         evaluations,
+        formal_standard_ids=formal_standard_ids,
         formal_evaluation_block=(
             reconciliation_service.formal_evaluation_block_message if enforce_readiness else None
         ),

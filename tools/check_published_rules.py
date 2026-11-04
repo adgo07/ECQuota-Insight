@@ -1,9 +1,10 @@
-"""Run a deterministic direct-entry smoke check for every published rule.
+"""Run a deterministic smoke check for every published rule.
 
 This is an acceptance aid rather than a replacement for source-based boundary
 tests.  It fills declared inputs with conservative values, probes each rule at
 its first constant threshold when possible, and reports indicators that remain
 incomplete because their source-specific conditions need a real case.
+GB16780 r2 uses its approved DETAIL-only raw-input path, including boundaries.
 """
 
 from __future__ import annotations
@@ -17,6 +18,8 @@ from pathlib import Path
 
 from uebench.domain.engine import EvaluationEngine
 from uebench.domain.models import (
+    CementDetails,
+    CementFuelLine,
     ComparisonDirection,
     DataType,
     EvaluationRequest,
@@ -75,6 +78,44 @@ def _expected_grade(actual: Decimal, limits: dict[str, Decimal], direction: Comp
     return Grade.NOT_QUALIFIED
 
 
+def _cement_detail_probe(standard, indicator_id: str, actual: Decimal) -> EvaluationRequest:
+    """Raw one-tonne smoke case; never submit a computed indicator value.
+
+    With heat value equal to the governed standard-coal heat, fuel mass x
+    yields x kgce/t at P_sh=1. Zero clinker electricity keeps E_sh=e_sh.
+    Separately, e_h=x at P_s=1 yields E_s=x with all other terms zero.
+    """
+    raw = {
+        "production_mode": ("integrated", None), "evaluation_period": ("规则烟测", None),
+        "production_line_id": ("规则烟测生产线", None), "altitude_m": ("0", "m"),
+        "clinker_ratio_percent": ("75", "%"), "clinker_production_t": ("1", "t"),
+        "clinker_consumption_t": ("0", "t"), "cement_production_t": ("1", "t"),
+        "clinker_electricity_kwh": ("0", "kW·h"), "waste_heat_generation_kwh": ("0", "kW·h"),
+        "waste_heat_self_use_kwh": ("0", "kW·h"), "cement_grinding_packaging_kwh": ("0", "kW·h"),
+        "admixture_preparation_kwh": ("0", "kW·h"), "gypsum_preparation_kwh": ("0", "kW·h"),
+        "auxiliary_electricity_kwh": ("0", "kW·h"), "cement_fuel_kgce": ("0", "kgce"),
+        "grinding_electricity_kwh": ("0", "kW·h"),
+    }
+    inputs = {key: InputValue(value=value, unit=unit) for key, (value, unit) in raw.items()}
+    fuel_mass = Decimal("0")
+    if indicator_id in ("clinker.coal", "clinker.comprehensive"):
+        fuel_mass = actual
+    else:
+        raw_key = {
+            "cement.comprehensive_energy": "cement_fuel_kgce",
+            "clinker.electricity": "clinker_electricity_kwh",
+            "cement-preparation.electricity": "grinding_electricity_kwh",
+        }[indicator_id]
+        inputs[raw_key].value = actual
+    return EvaluationRequest(
+        evaluation_date=max(standard.effective_date, date.today()), standard_id=standard.id,
+        product_id="cement", input_mode=InputMode.DETAIL, inputs=inputs,
+        cement_details=CementDetails(fuel_lines=[CementFuelLine(
+            line_id="smoke-fuel", name="烟测燃料", amount_kg=fuel_mass, low_heat_kj_per_kg="29307.6",
+        )]),
+    )
+
+
 def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) -> dict:
     engine = EvaluationEngine()
     scope_numbers = None
@@ -93,21 +134,25 @@ def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) 
         for product in standard.products:
             for indicator in product.indicators:
                 total += 1
+                cement_detail = standard.id == "gb-16780-2021" and standard.rule_revision >= 2
                 inputs = _inputs(product, indicator)
-                probe = _constant_value(indicator.thresholds.level_1)
+                probe = _constant_value((indicator.base_thresholds or indicator.thresholds).level_1 if cement_detail else indicator.thresholds.level_1)
                 if probe is None:
                     probe = Decimal("0")
                 direct_definition = _definition_for(product, indicator, indicator.direct_input_key)
                 if direct_definition is not None and direct_definition.minimum is not None:
                     probe = max(probe, direct_definition.minimum)
-                inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
-                request = EvaluationRequest(
-                    evaluation_date=max(standard.effective_date, date.today()),
-                    standard_id=standard.id,
-                    product_id=product.id,
-                    input_mode=InputMode.DIRECT,
-                    inputs=inputs,
-                )
+                if cement_detail:
+                    request = _cement_detail_probe(standard, indicator.id, probe)
+                else:
+                    inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
+                    request = EvaluationRequest(
+                        evaluation_date=max(standard.effective_date, date.today()),
+                        standard_id=standard.id,
+                        product_id=product.id,
+                        input_mode=InputMode.DIRECT,
+                        inputs=inputs,
+                    )
                 evaluated = engine.evaluate(standard, request)
                 result = next(item for item in evaluated.results if item.indicator_id == indicator.id)
                 counters[result.grade.value] += 1
@@ -138,12 +183,15 @@ def check(data_dir: Path, scope_path: Path | None = Path("data/scope-44.json")) 
                         if direct_definition is not None and direct_definition.maximum is not None and probe > direct_definition.maximum:
                             continue
                         candidate = request.model_copy(deep=True)
-                        candidate.inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
+                        if cement_detail:
+                            candidate = _cement_detail_probe(standard, indicator.id, probe)
+                        else:
+                            candidate.inputs[indicator.direct_input_key] = InputValue(value=probe, unit=indicator.unit)
                         checked = next(
                             item for item in engine.evaluate(standard, candidate).results if item.indicator_id == indicator.id
                         )
                         expected = _expected_grade(probe, limits, indicator.comparison)
-                        if checked.grade is not expected:
+                        if checked.grade is not expected or (cement_detail and checked.actual_value != probe):
                             boundary_errors.append(
                                 {
                                     "standard": standard.number,

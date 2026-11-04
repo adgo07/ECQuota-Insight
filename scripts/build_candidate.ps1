@@ -7,6 +7,7 @@ param(
     [string]$SourceCommit,
     [string]$CandidateId,
     [switch]$FormalRelease,
+    [switch]$StageDCement,
     [string]$ReleaseTag,
     [switch]$AllowDirty
 )
@@ -33,6 +34,9 @@ param(
 # `tests/test_release_artifacts.py` can then verify via UEBENCH_ARTIFACT_DIR.
 $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+if ($FormalRelease -and $StageDCement) {
+    throw "水泥 Stage D 专用候选入口不得用于正式发布。"
+}
 
 function Resolve-PythonExecutable {
     param([string]$Explicit, [string]$Root)
@@ -165,7 +169,7 @@ foreach ($Key in $RequiredNameKeys) {
 Write-Host "产品版本：$Version"
 
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
-    $OutputFolder = if ($FormalRelease) { "dist\formal-release-{0}" -f $Version } else { "dist\candidate-{0}" -f $Version }
+    $OutputFolder = if ($FormalRelease) { "dist\formal-release-{0}" -f $Version } elseif ($StageDCement) { "dist\candidate-stage-d-{0}" -f $Version } else { "dist\candidate-{0}" -f $Version }
     $OutputDir = Join-Path $ProjectRoot $OutputFolder
 }
 $Release = [IO.Path]::GetFullPath($OutputDir)
@@ -210,7 +214,8 @@ if (-not $SkipTests) {
 foreach ($Target in @((Join-Path $ProjectRoot "build\uebench"), (Join-Path $ProjectRoot "dist\UEBench"))) {
     if (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Recurse -Force }
 }
-& $PythonExe -m PyInstaller --noconfirm (Join-Path $ProjectRoot "uebench.spec")
+$SpecName = if ($StageDCement) { "uebench-stage-d.spec" } else { "uebench.spec" }
+& $PythonExe -m PyInstaller --noconfirm (Join-Path $ProjectRoot $SpecName)
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller 构建失败。" }
 $PayloadDir = Join-Path $ProjectRoot "dist\UEBench"
 if (-not (Test-Path -LiteralPath $PayloadDir -PathType Container)) {
