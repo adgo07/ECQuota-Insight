@@ -52,9 +52,9 @@
 | 原文与内部决定的边界 | 不改写标准PDF或宣称官方已发布勘误；此项为项目内部确认的专业解释 |
 | 官方解释/勘误 | 尚未取得；若今后获得新材料需重新核对、版本化记录 |
 | 业务影响 | 高：部分外购熟料水泥综合能耗计算 |
-| 关联 Mapping | `standards/mappings/GB16780-2021/标准映射表_V1.1_修订稿.md` §17.2、§28 |
-| 关联 Rule / Calculator | `data/definitions/gb-16780-2021.json`；后续Stage B/C逐项核查，不以本次文档批准表示已实现 |
-| 关联测试 / Golden | 后续应覆盖部分外购熟料、`e_sh`与`E_sh`差异造成的重复计电陷阱 |
+| 关联 Mapping | `standards/mappings/GB16780-2021/标准映射表_V1.2_修订稿.md` §17.2、§28 |
+| 关联 Rule / Calculator | 2026-11-11源码：`src/uebench/domain/gb16780.py`、唯一未发布`standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json`；生产data仍为配套r1，Stage D/真实签包未完成 |
+| 关联测试 / Golden | `tests/test_gb16780_core.py`、`tests/golden/gb16780_candidates_v1.json` C02：部分外购与e_sh/E_sh重复计电陷阱；独立手算见`docs/golden/GB16780_GOLDEN_CANDIDATES_V1.md` |
 | 状态 | `RESOLVED`（仅指**内部处理决定已确认**，非官方确认，也非代码已修改） |
 | 确认日期 | 2026-10-11 |
 
@@ -72,9 +72,9 @@
 | 当前代码差异 | 2026-10-11核对的`data/definitions/gb-16780-2021.json` 3级仍为`[94+1.20(g-75)]K`；本次未修改JSON；Stage B/C须专项改造 |
 | 官方解释 | 尚无组合公式的官方确认 |
 | 业务影响 | 高：海拔>1500m且配比≠75%的3级边界 |
-| 关联 Mapping | `standards/mappings/GB16780-2021/标准映射表_V1.1_修订稿.md` §8.1、§26.2、§28 |
-| 关联 Rule / Calculator | `data/definitions/gb-16780-2021.json` 3级阈值表达式（待后续独立修复） |
-| 关联测试 / Golden | `K=1.05,g=80` 时新口径104.70、旧JSON口径105.00；并测`T−δ/T/T+δ`、K=1及g=75 |
+| 关联 Mapping | `standards/mappings/GB16780-2021/标准映射表_V1.2_修订稿.md` §8.1、§26.2、§28 |
+| 关联 Rule / Calculator | 2026-11-11唯一未发布r2候选与`src/uebench/domain/gb16780.py`已采用确认公式；生产data配套r1仍只读保留，正式Stage D/真实签包未完成 |
+| 关联测试 / Golden | `tests/test_gb16780_core.py`已覆盖`K=1.05,g=80`的104.70/105.00陷阱、`T−δ/T/T+δ`、K=1、g=75与实际气压链；原始独立手算见水泥Golden候选说明 |
 | 状态 | `PROVISIONAL`（**内部实现约定已确认**，标准本身仍有未获官方解释的歧义） |
 | 确认日期 | 2026-10-11 |
 
