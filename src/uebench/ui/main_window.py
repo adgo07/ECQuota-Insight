@@ -70,7 +70,6 @@ from uebench.application.build_identity import (
 )
 from uebench.application.evaluation_support import (
     FORMAL_EVALUATION_UNSUPPORTED_LABEL,
-    evaluation_support_label,
     filter_formally_evaluable,
     standard_confirmation_message,
     supports_formal_evaluation,
@@ -110,7 +109,7 @@ from uebench.domain.models import (
     parse_decimal,
 )
 from uebench.application.reporting import PERIOD_LABEL, STATISTICS_SCOPE, build_report_view, gb29446_business_labels, render_gb29446_warning
-from uebench.ui.presentation import format_local_date, format_local_datetime
+from uebench.ui.presentation import format_local_date, format_local_datetime, software_support_text
 from uebench.ui.settings_page import SettingsPage
 from uebench.ui.design_tokens import APP_STYLE
 from uebench.ui.responsive_fields import ResponsiveFields
@@ -445,7 +444,7 @@ class MainWindow(QMainWindow):
         content_layout = QHBoxLayout(content_host)
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.addStretch()
-        self.pages.setMaximumWidth(1536)
+        self.pages.setMaximumWidth(1440)
         content_layout.addWidget(self.pages, 1)
         content_layout.addStretch()
         layout.addWidget(content_host, 1)
@@ -594,10 +593,10 @@ class MainWindow(QMainWindow):
         tasks = TaskCardGrid()
         self.home_task_buttons = {}
         for key, title, description, icon_name, enabled in (
-            ("standards", "标准库", "查阅标准与要求", "standards", True),
-            ("evaluation", "新建对标", "填写数据，计算判级", "new", True),
+            ("standards", "标准库", "", "standards", True),
+            ("evaluation", "新建对标", "", "new", True),
             ("import", "表格导入", "暂未开放", "excel", False),
-            ("records", "对标记录", "查看保存时结果", "records", True),
+            ("records", "对标记录", "", "records", True),
             ("factors", "折标系数库", "暂未开放", "factors", False),
         ):
             button = TaskCard(title, description, self._icon(icon_name, "#FFFFFF" if key == "standards" else "#197CC2"), emphasized=key == "standards")
@@ -626,6 +625,7 @@ class MainWindow(QMainWindow):
         heading.setProperty("class", "sectionTitle")
         row.addWidget(heading, 1)
         all_records = QPushButton("查看全部")
+        self.home_all_records = all_records
         all_records.clicked.connect(lambda: self.navigate("records"))
         row.addWidget(all_records)
         self.home_retry = QPushButton("重试")
@@ -693,6 +693,10 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.standard_table, 1)
         self.standard_count_label = QLabel("")
         layout.addWidget(self.standard_count_label)
+        self.standard_clear_filters = QPushButton("清除筛选")
+        self.standard_clear_filters.clicked.connect(self._clear_standard_filters)
+        self.standard_clear_filters.hide()
+        layout.addWidget(self.standard_clear_filters, 0, Qt.AlignmentFlag.AlignLeft)
         return page
 
     def _build_standard_detail(self) -> QWidget:
@@ -1008,6 +1012,9 @@ class MainWindow(QMainWindow):
         input_controls_layout.addLayout(buttons)
         layout.addWidget(self.input_controls_container)
         action_row = QHBoxLayout()
+        self.calculation_save_notice = QLabel("计算成功后自动生成一条对标记录")
+        self.calculation_save_notice.setWordWrap(True)
+        action_row.addWidget(self.calculation_save_notice)
         action_row.addStretch()
         action_row.addWidget(calculate)
         layout.addLayout(action_row)
@@ -1078,7 +1085,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.gb29446_result_section)
 
         self.gb29446_explanation_section, explanation_layout = self._card()
-        self.gb29446_explanation = QLabel("完成计算后显示本次计算与判定说明。")
+        self.gb29446_explanation = QLabel("")
         self.gb29446_explanation.setWordWrap(True)
         # 说明里含 E_d / e_d 真下标（富文本）；只有显式声明富文本才会渲染为下标。
         self.gb29446_explanation.setTextFormat(Qt.TextFormat.RichText)
@@ -1087,7 +1094,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.gb29446_explanation_section)
 
         self.gb29446_basis_section, basis_layout = self._card()
-        self.gb29446_basis = QLabel("完成计算后显示本次评价的标准依据。")
+        self.gb29446_basis = QLabel("")
         self.gb29446_basis.setWordWrap(True)
         basis_layout.addWidget(self.gb29446_basis)
         # 页面顶部已有统一的「查看标准原文」入口；这里不再重复一个同样的按钮，
@@ -1183,13 +1190,38 @@ class MainWindow(QMainWindow):
         self.record_count_label = QLabel("")
         self.record_previous = QPushButton("上一页")
         self.record_next = QPushButton("下一页")
+        self.record_empty_action = QPushButton("新建对标")
+        self.record_empty_action.clicked.connect(self._record_empty_action_clicked)
+        self.record_empty_action.hide()
         self.record_previous.clicked.connect(lambda: self._change_record_page(-1))
         self.record_next.clicked.connect(lambda: self._change_record_page(1))
         foot.addWidget(self.record_count_label, 1)
+        foot.addWidget(self.record_empty_action)
         foot.addWidget(self.record_previous)
         foot.addWidget(self.record_next)
         layout.addLayout(foot)
         return page
+
+    def _clear_standard_filters(self) -> None:
+        self.standard_search.blockSignals(True)
+        self.standard_status_filter.blockSignals(True)
+        self.standard_search.clear()
+        self.standard_status_filter.setCurrentIndex(0)
+        self.standard_search.blockSignals(False)
+        self.standard_status_filter.blockSignals(False)
+        self.refresh_standards()
+
+    def _record_empty_action_clicked(self) -> None:
+        if self.record_search.text() or self.record_status_filter.currentIndex():
+            self.record_search.blockSignals(True)
+            self.record_status_filter.blockSignals(True)
+            self.record_search.clear()
+            self.record_status_filter.setCurrentIndex(0)
+            self.record_search.blockSignals(False)
+            self.record_status_filter.blockSignals(False)
+            self._record_filters_changed()
+        else:
+            self.start_formal_evaluation()
 
     def _record_filters_changed(self, *_args) -> None:
         self.record_search_timer.stop()
@@ -1292,6 +1324,9 @@ class MainWindow(QMainWindow):
             has_formal_scope = self.home_formal_scope_count.text() != "0 项"
             self.home_start_evaluation.setEnabled(has_formal_scope and message is None)
             self.home_empty_start.setEnabled(has_formal_scope and message is None)
+            if hasattr(self, "record_empty_action"):
+                clearing_filters = bool(self.record_search.text() or self.record_status_filter.currentIndex())
+                self.record_empty_action.setEnabled(clearing_filters or (has_formal_scope and message is None))
         if hasattr(self, "evaluation_readiness_notice"):
             self.evaluation_readiness_notice.setText(message or "")
             self.evaluation_readiness_notice.setVisible(message is not None)
@@ -1313,6 +1348,7 @@ class MainWindow(QMainWindow):
         """保存后的主要动作是查看；重算仍调用原正式用例，明确生成新记录。"""
         busy = getattr(self, "_calculating", False)
         saved = self.last_result_id is not None and self._is_gb29446()
+        self.calculation_save_notice.setVisible(not saved)
         role = "secondary" if saved else "primary"
         self.calculate_button.setText("正在计算…" if busy else "重新计算并生成新记录" if saved else "计算并判级")
         if self.calculate_button.property("role") != role:
@@ -1328,7 +1364,8 @@ class MainWindow(QMainWindow):
             self.home_recent.setRowCount(0)
             self.home_recent.hide()
             self.home_empty_start.hide()
-            self.home_recent_notice.setText("最近对标读取失败，请重试。")
+            self.home_all_records.hide()
+            self.home_recent_notice.setText("最近对标读取失败")
             self.home_recent_notice.show()
             self.home_retry.show()
 
@@ -1355,6 +1392,7 @@ class MainWindow(QMainWindow):
         self.home_standard_library_version.setText(self._standard_library_version_text())
         self.home_recent.setRowCount(0)
         self.home_retry.hide()
+        self.home_all_records.setVisible(bool(records))
         self.home_recent_notice.setText("暂无对标记录")
         self.home_recent_notice.setVisible(not records)
         self.home_recent.setVisible(bool(records))
@@ -1391,11 +1429,12 @@ class MainWindow(QMainWindow):
     def refresh_standards(self) -> None:
         try:
             self._refresh_standards_data()
-            self.standard_retry.hide()
+            self.standard_retry.setVisible(not self.standard_table.rowCount() and not (self.standard_search.text() or self.standard_status_filter.currentIndex()))
         except Exception:
             _LOGGER.exception("标准目录读取失败")
             self.standard_table.setRowCount(0)
-            self.standard_count_label.setText("标准目录读取失败，请重试。")
+            self.standard_count_label.setText("标准目录读取失败")
+            self.standard_clear_filters.hide()
             self.standard_retry.show()
 
     def _refresh_standards_data(self) -> None:
@@ -1435,14 +1474,16 @@ class MainWindow(QMainWindow):
                 standard.title,
                 status,
                 format_local_date(standard.effective_date),
-                evaluation_support_label(standard),
+                software_support_text(standard),
             ]
             for column, value in enumerate(values):
                 item = _item(value)
                 item.setData(Qt.ItemDataRole.UserRole, standard.id)
                 self.standard_table.setItem(row, column, item)
         self.standard_table.fit_columns()
-        self.standard_count_label.setText(f"共 {self.standard_table.rowCount()} 项标准" if self.standard_table.rowCount() else "没有匹配结果")
+        filtered = bool(self.standard_search.text() or self.standard_status_filter.currentIndex())
+        self.standard_count_label.setText(f"共 {self.standard_table.rowCount()} 项标准" if self.standard_table.rowCount() else "没有匹配的标准" if filtered else "暂无配套标准")
+        self.standard_clear_filters.setVisible(not self.standard_table.rowCount() and filtered)
         self.refresh_standard_detail()
 
     def _selected_library_standard_id(self) -> str | None:
@@ -1838,7 +1879,7 @@ class MainWindow(QMainWindow):
             status.setText(OFFICIAL_SOURCE_PLATFORM_NAME if url else NO_OFFICIAL_SOURCE_LABEL)
         support = getattr(self, "eval_support_label", None)
         if support is not None:
-            support.setText(evaluation_support_label(standard_id) if standard_id else "—")
+            support.setText(software_support_text(standard_id) if standard_id else "—")
 
     @staticmethod
     def _gb29446_factor_map(product) -> dict[str, Decimal]:
@@ -1944,8 +1985,8 @@ class MainWindow(QMainWindow):
         self.gb29446_result_ed.setText("— kW·h/t")
         self.gb29446_result_grade.setText("—")
         self.gb29446_result_message.setText("填写数据后计算")
-        self.gb29446_explanation.setText("完成计算后显示本次计算与判定说明。")
-        self.gb29446_basis.setText("完成计算后显示本次评价的标准依据。")
+        self.gb29446_explanation.clear()
+        self.gb29446_basis.clear()
         self.gb29446_explanation.hide()
         self.gb29446_basis.hide()
         self._sync_evaluation_actions()
@@ -2562,7 +2603,9 @@ class MainWindow(QMainWindow):
         except Exception:
             _LOGGER.exception("对标记录查询失败")
             self.record_table.setRowCount(0)
-            self.record_count_label.setText("记录读取失败，请重试；原记录未被修改。")
+            self.record_count_label.setText("记录读取失败")
+            self.record_empty_action.hide()
+            self._sync_record_actions()
             self.record_previous.setEnabled(False)
             self.record_next.setEnabled(False)
             self._records_dirty = True
@@ -2591,7 +2634,11 @@ class MainWindow(QMainWindow):
         self._sync_record_actions()
         self.record_table.verticalScrollBar().setValue(scroll)
         pages = max(1, (result.total + result.page_size - 1) // result.page_size)
-        self.record_count_label.setText(f"共 {result.total} 条 · 第 {result.page} / {pages} 页" if result.total else "没有匹配记录" if self.record_search.text() or self.record_status_filter.currentIndex() else "暂无对标记录")
+        filtered = bool(self.record_search.text() or self.record_status_filter.currentIndex())
+        self.record_count_label.setText(f"共 {result.total} 条 · 第 {result.page} / {pages} 页" if result.total else "没有匹配的记录" if filtered else "暂无对标记录")
+        self.record_empty_action.setText("清除筛选" if filtered else "新建对标")
+        self.record_empty_action.setVisible(not result.total)
+        self.refresh_formal_evaluation_readiness()
         self.record_previous.setEnabled(result.page > 1)
         self.record_next.setEnabled(result.page < pages)
         self._records_loaded = True

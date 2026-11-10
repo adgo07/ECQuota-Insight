@@ -66,6 +66,87 @@ def test_settings_keeps_entry_context(window):
     assert window.settings_page.home_button.isHidden()
 
 
+def test_empty_list_actions_clear_only_filters_and_preserve_unsaved_inputs(window, monkeypatch):
+    window.start_formal_evaluation()
+    precise = "12345.12345678901234567890123456789"
+    window.gb29446_electricity.setText(precise)
+    window.navigate("standards")
+    window.standard_search.setText("不会匹配的标准")
+    assert window.standard_count_label.text() == "没有匹配的标准"
+    assert not window.standard_clear_filters.isHidden()
+    window.standard_clear_filters.click()
+    assert window.standard_table.rowCount() > 0
+    assert window.standard_search.text() == ""
+    window.navigate("records")
+    assert window.record_count_label.text() == "暂无对标记录"
+    assert window.record_empty_action.text() == "新建对标"
+    window.record_search.setText("不会匹配的企业")
+    window._record_filters_changed()
+    assert window.record_count_label.text() == "没有匹配的记录"
+    assert window.record_empty_action.text() == "清除筛选"
+    window.record_empty_action.click()
+    assert window.record_search.text() == ""
+    assert window.gb29446_electricity.text() == precise
+    query = window.context.application.query_evaluations
+    monkeypatch.setattr(window.context.application, "query_evaluations", lambda **kw: (_ for _ in ()).throw(RuntimeError("read failed")))
+    window.refresh_records()
+    assert window.record_count_label.text() == "记录读取失败"
+    assert window.record_empty_action.isHidden()
+    assert not window.record_view_button.isEnabled()
+    assert not window.record_delete_button.isEnabled()
+    monkeypatch.setattr(window.context.application, "query_evaluations", query)
+    window.refresh_records()
+    assert window.record_count_label.text() == "暂无对标记录"
+    assert not window.record_empty_action.isHidden()
+
+
+def test_first_calculation_consequence_and_single_result_placeholder(window):
+    window.start_formal_evaluation()
+    assert not window.calculation_save_notice.isHidden()
+    assert "自动生成一条对标记录" in window.calculation_save_notice.text()
+    assert window.gb29446_result_message.text() == "填写数据后计算"
+    assert window.gb29446_explanation.text() == window.gb29446_basis.text() == ""
+    fill_and_calculate(window)
+    assert window.calculation_save_notice.isHidden()
+    assert window.calculate_button.text() == "重新计算并生成新记录"
+    assert window.gb29446_view_record.property("role") == "primary"
+    assert window.gb29446_explanation.text() and window.gb29446_basis.text()
+    window.gb29446_electricity.setText("9")
+    assert window.gb29446_result_message.text() == "数据已修改，请重新计算"
+    assert window.gb29446_explanation.text() == window.gb29446_basis.text() == ""
+
+
+def test_empty_record_new_action_respects_readiness_but_filter_clear_stays_available(window, monkeypatch):
+    window.navigate("records")
+    monkeypatch.setattr(window.context.application, "formal_evaluation_block_message", lambda: "当前安装文件不完整")
+    window.refresh_formal_evaluation_readiness()
+    assert not window.record_empty_action.isEnabled()
+    window.record_search.setText("无匹配")
+    window._record_filters_changed()
+    assert window.record_empty_action.text() == "清除筛选"
+    assert window.record_empty_action.isEnabled()
+    window.record_empty_action.click()
+    assert window.record_search.text() == ""
+    assert window.record_empty_action.text() == "新建对标"
+    assert not window.record_empty_action.isEnabled()
+
+
+def test_home_copy_and_content_limit_follow_current_guideline(window, monkeypatch):
+    from PySide6.QtWidgets import QLabel
+    assert window.pages.maximumWidth() == 1440
+    for key in ("standards", "evaluation", "records"):
+        descriptions = [label for label in window.home_task_buttons[key].findChildren(QLabel)
+                        if label.property("class") == "taskDescription"]
+        assert all(label.isHidden() for label in descriptions)
+    assert not window.home_empty_start.isHidden()
+    assert window.home_all_records.isHidden()
+    monkeypatch.setattr(window.context.application, "list_recent_evaluations", lambda *_: (_ for _ in ()).throw(RuntimeError("read failed")))
+    window.refresh_home()
+    assert window.home_recent_notice.text() == "最近对标读取失败"
+    assert not window.home_retry.isHidden()
+    assert window.home_empty_start.isHidden() and window.home_all_records.isHidden()
+
+
 def test_standard_requirement_table_does_not_clip_last_row(window):
     window.navigate("standards")
     row = next(row for row in range(window.standard_table.rowCount())

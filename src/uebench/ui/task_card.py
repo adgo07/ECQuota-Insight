@@ -32,6 +32,7 @@ class TaskCard(QPushButton):
         heading.setProperty("class", "taskTitle")
         detail = QLabel(description)
         detail.setProperty("class", "taskDescription")
+        detail.setVisible(bool(description))
         for label in (image, heading, detail):
             label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
             label.setWordWrap(True)

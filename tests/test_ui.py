@@ -12,7 +12,6 @@ import pytest
 
 from uebench.application import evaluation_support
 from uebench.application.evaluation_support import (
-    FORMAL_EVALUATION_SUPPORTED_LABEL,
     FORMAL_EVALUATION_UNSUPPORTED_LABEL,
 )
 from uebench.application.official_sources import VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
@@ -127,7 +126,7 @@ def test_main_window_lists_published_standard(tmp_path: Path) -> None:
     assert window.eval_standard.count() == 0
     assert window.eval_standard.currentData() is None
     # 普通标准库列顺序：编号 / 名称 / 标准状态 / 实施日期 / 软件评价支持状态 / 官方来源。
-    assert window.standard_table.item(0, 4).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
+    assert window.standard_table.item(0, 4).text() == "未开放"
     window.navigation.setCurrentRow(1)
     assert window.pages.currentIndex() == 1
     window.standard_table.selectRow(0)
@@ -342,7 +341,7 @@ def test_standard_library_shows_pending_standard_in_chinese(tmp_path: Path) -> N
     assert window.standard_table.rowCount() == 1
     # 「标准状态」只描述标准文档本身的效力；软件能否正式评价由独立列承载。
     assert window.standard_table.item(0, 2).text() == "待确认"
-    assert window.standard_table.item(0, 4).text() == FORMAL_EVALUATION_UNSUPPORTED_LABEL
+    assert window.standard_table.item(0, 4).text() == "未开放"
     window.standard_table.selectRow(0)
     # 未重新梳理的标准只能如实显示 Owner 确认的「适用范围尚待整理」，不得由界面代写范围文字；
     # 该文字本身已点名「适用范围」，不再重复字段名前缀。
@@ -380,7 +379,7 @@ def test_evaluation_hides_date_and_project_and_uses_mode_buttons(tmp_path: Path,
     assert window.eval_standard.minimumWidth() >= 360
     # 版本下拉框已经说明选择方式（“当前有效标准（自动）”）；右侧不再重复一句「当前有效」。
     assert window.eval_standard_status.text() == ""
-    assert window.eval_support_label.text() == FORMAL_EVALUATION_SUPPORTED_LABEL
+    assert window.eval_support_label.text() == "正式支持"
     # 「四、标准依据」里不再有重复的「查看标准原文」；页面顶部统一入口保留。
     assert VIEW_OFFICIAL_SOURCE_BUTTON_TEXT not in [
         button.text() for button in window.gb29446_basis_section.findChildren(QPushButton)
