@@ -101,8 +101,8 @@ def expected_grade(actual: Decimal, thresholds: dict[str, Decimal]) -> Grade:
     return Grade.NOT_QUALIFIED
 
 
-# 水泥r2仅DETAIL，所有五项的原始量边界由test_gb16780_core独立覆盖。
-@pytest.mark.parametrize("standard", [s for s in load_first_batch() if s.id != "gb-16780-2021"], ids=lambda item: item.number)
+# 生产水泥仍为已签名r1工程基线；未发布r2的DETAIL边界另由test_gb16780_core覆盖。
+@pytest.mark.parametrize("standard", load_first_batch(), ids=lambda item: item.number)
 def test_every_first_batch_indicator_has_sources_and_boundary_grading(standard: StandardDefinition) -> None:
     engine = EvaluationEngine()
     for product in standard.products:

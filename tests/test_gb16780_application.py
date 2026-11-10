@@ -22,7 +22,7 @@ def cement_context(tmp_path, monkeypatch):
     # 仅此测试夹具允许受测应用路径；默认生产门禁仍不含水泥。
     monkeypatch.setattr(evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset({"gb-29446-2019", "gb-16780-2021"}))
     context = create_context(tmp_path / "隔离水泥", enforce_standard_library_readiness=False)
-    standard = StandardDefinition.model_validate_json((ROOT / "data/definitions/gb-16780-2021.json").read_text(encoding="utf-8"))
+    standard = StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json").read_text(encoding="utf-8"))
     context.standards.install(standard)
     yield context
     context.database.dispose()

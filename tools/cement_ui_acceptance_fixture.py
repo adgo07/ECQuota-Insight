@@ -43,8 +43,9 @@ def isolated_context(scenario):
     context = create_context(ROOT / "work/cement-acceptance" / scenario,
                              enforce_standard_library_readiness=False)
     for standard_id in ("gb-29446-2019", "gb-16780-2021"):
-        context.standards.install(StandardDefinition.model_validate_json(
-            (ROOT / "data/definitions" / f"{standard_id}.json").read_text(encoding="utf-8")))
+        definition_path = (ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json"
+                           if standard_id == "gb-16780-2021" else ROOT / "data/definitions" / f"{standard_id}.json")
+        context.standards.install(StandardDefinition.model_validate_json(definition_path.read_text(encoding="utf-8")))
     return context
 
 

@@ -1,6 +1,8 @@
 # GB 16780—2021 软件解释决定与后续待办（Stage A → Stage B）
 
-状态：**Owner批准V1.2业务映射冻结（MAPPING FROZEN）；正式软件Rule/Calculator尚未修改，Stage B/C/D不得跳过。**
+状态：**Owner批准V1.2业务映射冻结（MAPPING FROZEN）；Stage B已审、Stage C源码已实现（IMPLEMENTED），r2为唯一未发布候选，Stage D与配套签名未完成，不得宣称正式支持。**
+
+2026-11-11当前进展及有限阶段隔离见[水泥入口](README.md)与[候选入口](../../development/GB16780-2021/README.md)。下方Stage A时待办保留原业务决定与当时阶段背景，现按当前任务推进；不重新审批已确认口径。
 
 本文件是决策索引而非第二套标准问题台账。真正的标准原文疑似问题仅登记于仓库根目录 [STANDARD_ISSUES_REGISTER.md](../../../STANDARD_ISSUES_REGISTER.md)，稳定编号为 **001 和 003**。另外两项软件取舍不登记标准问题编号。
 

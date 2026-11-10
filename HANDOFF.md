@@ -2,7 +2,7 @@
 
 ### 2026-11-11 水泥接入启动（当前，覆盖旧任务的禁止启动限制）
 
-Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage C 应用与产品分块实施）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，Stage B设计提交55d09fa已由父Agent独立审查通过；现按分块实现及定向验证推进，再按独立 Golden / Stage D / 原生及候选包验收开放。第1块证据见[核心实施记录](docs/governance/GB16780_STAGE_C_CORE_REPORT_20261111.md)。第2块见[应用与产品实施记录](docs/governance/GB16780_STAGE_C_PRODUCT_REPORT_20261111.md)，源码定向通过，原生及配套签名待验。
+Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage C 应用与产品分块实施）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，Stage B设计提交55d09fa已由父Agent独立审查通过；现按分块实现及定向验证推进，再按独立 Golden / Stage D / 原生及候选包验收开放。第1块证据见[核心实施记录](docs/governance/GB16780_STAGE_C_CORE_REPORT_20261111.md)。第2块见[应用与产品实施记录](docs/governance/GB16780_STAGE_C_PRODUCT_REPORT_20261111.md)，源码定向通过，原生及配套签名待验。当前水泥为IMPLEMENTED、唯一未发布r2候选隔离，生产data/PIN恢复r1一致；[有限隔离与工具记录](docs/governance/GB16780_UNPUBLISHED_CANDIDATE_20261111.md)分别保留私钥缺失、原生桌面待恢复两项OPEN，不据此开放或发布。
 
 RS05 仍 IN PROGRESS、Reference Standard Product Closure 仍 PARTIAL、0.2.0 NOT RELEASED；原有未验环境事项保留在 RS05 执行报告。当前正式评价范围仍仅选煤，本次设计不修改支持门禁、Frozen lock、数据库或冻结映射。Excel 正式用户流程继续 DEFERRED。不操作真实库、已安装产品或旧测试包；下方旧日期“不启动水泥 / RS06 NOT STARTED”仅记载当时任务边界，不覆盖本次授权。
 

@@ -24,7 +24,7 @@ BASES = (("80", "87", "94"), ("100", "107", "117"), ("48", "57", "61"), ("94", "
 
 @pytest.fixture
 def standard():
-    return StandardDefinition.model_validate_json((ROOT / "data/definitions/gb-16780-2021.json").read_text(encoding="utf-8"))
+    return StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json").read_text(encoding="utf-8"))
 
 
 def golden_request():
