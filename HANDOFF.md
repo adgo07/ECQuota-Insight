@@ -1,6 +1,13 @@
 # HANDOFF — ECQuota 当前交接
 
-更新时间：2026-10-28
+### 2026-11-11 水泥接入启动（当前，覆盖旧任务的禁止启动限制）
+
+Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage B 内部设计审查）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，内部审查后进入实现，再按独立 Golden / Stage D / 原生及候选包验收开放。
+
+RS05 仍 IN PROGRESS、Reference Standard Product Closure 仍 PARTIAL、0.2.0 NOT RELEASED；原有未验环境事项保留在 RS05 执行报告。当前正式评价范围仍仅选煤，本次设计不修改支持门禁、Frozen lock、数据库或冻结映射。Excel 正式用户流程继续 DEFERRED。不操作真实库、已安装产品或旧测试包；下方旧日期“不启动水泥 / RS06 NOT STARTED”仅记载当时任务边界，不覆盖本次授权。
+
+
+更新时间：2026-11-11
 
 > 本文件是**当前**交接入口，只描述现行权威状态。
 > 历史材料（QZC-A01 bootstrap、Numeric DRAFT/BLOCKED 时期、UEBench 时期发布流水账、旧交付哈希、旧开发机绝对路径）已移至
@@ -38,7 +45,7 @@
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = NOT STARTED。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
+当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = IN PROGRESS（水泥 Stage B 内部设计审查）。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
 
 **2026-10-28 当前补录：** 实际候选 `rc-69562ee` 的干净构建源码为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`，完整回归 1214 passed / 66 skipped、Artifact Gate 63 passed；设计独立确认该 SHA 三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并；合并不等于正式发布。C 的 Win11 原生 150% 短定向 12 项及设计独立复核通过，C-DEF-001／002 两项 P3 在本机定向范围关闭；保存快照、取消／恢复审计与保护备份已核。本次治理提交不改变实际打包输入、不重打包，不把其提交 SHA 当作被测构建。
 
@@ -104,8 +111,8 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  ← 当前阶段
-→ RS06 第二标准架构验证                              NOT STARTED
+→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  （环境收口保留）
+→ RS06 第二标准架构验证（水泥 Stage B）               IN PROGRESS
 ```
 
 **唯一总体路线入口**：[`参考标准开发路线.md`](参考标准开发路线.md)。
@@ -147,12 +154,12 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- 当前阶段：RS05 — Product Simplification & Standard Library Pairing（IN PROGRESS）；RS06 保持 NOT STARTED；
+- 当前任务：RS06 水泥 Stage B 内部审查，审查通过再实施；RS05 既有交付环境收口继续 IN PROGRESS；
 - 普通用户只使用随软件配套的标准库，不再手动安装、导入、扫描或管理标准包；
 - Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
 - 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；
 - 定向回归、RS04 Golden、Numeric/N01-A、literal full suite、Source Gate、Windows Candidate、Artifact Gate、自检及构建源码 exact-head CI 已按对应提交取得证据；后续仅在构建输入改变或实测发现缺陷时按影响复验；
-- PR #33 已合并；纳入经审核文档后由干净 source SHA 重建最终候选，按[RS05 最新交付矩阵](docs/governance/RS05_EXECUTION_REPORT.md)核对实物门禁与隔离环境证据。`rc-4e43490`、`rc-f689658` 与 PR #32 的 `rc-b102e36` 均保留各自历史身份，不能代替当前 UI 最终候选。源码 Win11 原生 150% 局部观察不等于最终安装包、真实离线、125%／跨屏或两代安装器覆盖通过。不正式发布 v0.2.0，不开始 RS06。
+- PR #33 已合并；纳入经审核文档后由干净 source SHA 重建最终候选，按[RS05 最新交付矩阵](docs/governance/RS05_EXECUTION_REPORT.md)核对实物门禁与隔离环境证据。`rc-4e43490`、`rc-f689658` 与 PR #32 的 `rc-b102e36` 均保留各自历史身份，不能代替当前 UI 最终候选。源码 Win11 原生 150% 局部观察不等于最终安装包、真实离线、125%／跨屏或两代安装器覆盖通过。不正式发布 v0.2.0；RS06 水泥接入按2026-11-11授权推进。
 
 Reference Standard Product Closure 仍为 PARTIAL。
 
