@@ -1,6 +1,6 @@
 # GB 16780—2021 水泥接入 Stage B 设计
 
-日期：2026-11-11。状态：**内部审查候选；本提交仅设计，未实施、未验收、未开放正式评价。**
+日期：2026-11-11。状态：**Stage B 已由父Agent独立审查通过（设计提交55d09fa）；Stage C 分块实施中，尚未Stage D验收、未开放正式评价。**
 
 本文件是 RS06 的专项设计，不是第二份总体路线。Owner 已批准启动水泥并跳过用户试用前置；不重复请求批准既定业务口径。唯一业务权威为 [V1.2 冻结映射](../../standards/mappings/GB16780-2021/标准映射表_V1.2_修订稿.md)，不修改、移动或重命名其正文。设计审查通过后进入 Stage C；Stage D 前不声明 SUPPORTED。
 
@@ -35,7 +35,7 @@ RS05 仍 IN PROGRESS、参考标准产品闭环仍 PARTIAL、0.2.0 未正式发�
 | Result 无生产线身份 | 增量可选行身份/角色字段，不改数据库表；一请求/一记录包含多线结果，无企业总等级 |
 | report_view 只接受 GB29446，Word/详情固定选煤字段 | 按标准分派报告视图；新增水泥类型和渲染分支，保留选煤现有视图及两页签壳 |
 | 仅选煤在 evaluation_support / delivery-scope 正式集合 | 开发和验收前保持不变；Stage D 证据闭合后才以最终受审提交开放水泥；其余46项不扩大 |
-| 配套签名包仍含水泥 r1 | 最终阶段以当前可信 .5 签名父包仅替换水泥，重新签名；其他47项与 corrections 原字节不变 |
+| 配套签名包仍含水泥 r1 | 最终阶段以当前可信 .5 签名父包仅替换水泥，重新签名；其他47项定义及无关corrections原字节不变；如需新增水泥corrections，只允许必要的水泥来源/解释变更并单列差异 |
 
 不改 `scope-63` / `scope-65` 开发历史快照。`data/definitions/` 继续为唯一机器定义编辑源。
 
@@ -159,16 +159,16 @@ Word包括各线指标与等级、基准及有效阈值、统计边界、输入/
 
 ## 8. 标准包与分段交付
 
-建议三个逻辑提交/审查阶段（父Agent负责实际PR/push/合并；本Agent不发布/tag）：
+建议三个逻辑提交/审查阶段（父Agent负责提交实际PR；未获Owner授权不合并，双方不发布/tag）：
 
 1. **计算与算例**：`data/definitions/gb-16780-2021.json` r2、domain/models.py兼容字段、domain/gb16780.py、engine.py极小分派、独立Golden及tests/test_first_batch_rules.py旧期望修正。正式范围仍仅选煤。
 2. **页面、记录、报告**：application/gb16780.py/服务失败异常与完整性策略、reporting分派、CementReportView、ui/gb16780_form.py、main_window接线、record_detail两页签、word_report分派及相应验证。复用facade/repository，必要API增量通过测试，不改数据库Schema。
 3. **配套标准包与开放验收**：安全构建工具最小目标参数化、重建派生索引、签名包/PIN/配套身份、候选构建和验收，最终受审提交同时修改evaluation_support与delivery-scope支持集合并更新用户手册/治理当前入口。未通过前不把水泥宣称正式支持。
 
-包以当前PIN `.5`为可信父；显式新package_id/data_version（必须排序更晚），签名仍Ed25519，no PDF/provenance-only。工具当前硬编码GB29446，改为显式受限目标参数，默认GB29446保持原行为；校验恰好一个水泥定义成员变化、其余47项定义和corrections逐字节一致。新定义与data单源规范序列化等价；安装/升级前后历史快照不变，配套readiness未被绕过。
+包以当前PIN `.5`为可信父；显式新package_id/data_version（必须排序更晚），签名仍Ed25519，no PDF/provenance-only。工具当前硬编码GB29446，改为显式受限目标参数，默认GB29446保持原行为；校验恰好一个水泥定义成员变化、其余47项定义逐字节一致；corrections仅允许必要水泥来源/解释变更，无关条目逐字节不变并单列差异。新定义与data单源规范序列化等价；安装/升级前后历史快照不变，配套readiness未被绕过。
 
 基线验证沿用已记录的精确身份：PR #37 已合并298a966，现有选煤候选为0.2.0-rc-298a966（1236 passed / 66 skipped、Artifact Gate 63项、自检6项由父任务交接）；这些是基线证据，不作为新增水泥通过项，本轮不重复构建选煤包。
 
 本轮只核文件存在性：PIN所记业务主工作树 `work/signing/development-private-key.pem` 不存在；尚未据此声称全机无密钥。后续由父Agent协调既有授权受控位置，私钥不复制到仓库、不输出内容、不从CI取用、不另造不可信签名。无法取得匹配现有公钥的私钥则最终签包/候选构建明确阻塞，其余实现及非签名验证继续；不能降级验签。
 
-当前设计出口待父Agent独立审查：Canonical、模式矩阵、依赖、保存策略、多线记录、Golden、包策略均已明确；业务映射与标准解释无需Owner重复签署。设计审查未通过前不改生产代码。Knowledge capture：本阶段无新增独立知识条目，专业解释继续引用冻结映射及现有Issue。
+当前设计出口已由父Agent独立审查通过（55d09fa）：Canonical、模式矩阵、依赖、保存策略、多线记录、Golden、包策略均已明确；业务映射与标准解释无需Owner重复签署。Stage C后续各块由父Agent独立审查；Stage D前不扩大正式支持。Knowledge capture：本阶段无新增独立知识条目，专业解释继续引用冻结映射及现有Issue。
