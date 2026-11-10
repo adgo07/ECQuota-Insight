@@ -14,7 +14,6 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtWidgets import QApplication, QLabel, QMessageBox, QPushButton
 
-from uebench.application.evaluation_support import FORMAL_EVALUATION_SUPPORTED_LABEL
 from uebench.application.official_sources import (
     NO_OFFICIAL_SOURCE_LABEL,
     OFFICIAL_SOURCE_PLATFORM_NAME,
@@ -478,7 +477,7 @@ def test_gb29446_discovery_to_new_evaluation(reference_window):
         "选煤电力消耗限额",
         "当前有效",
         "2020-07-01",
-        FORMAL_EVALUATION_SUPPORTED_LABEL,
+        "正式支持",
     ]
     window.standard_table.selectRow(0)
     # C2：选中标准后只有一行「适用范围：<scope>」，GB 29446 用 Owner 逐字确认的原文。
