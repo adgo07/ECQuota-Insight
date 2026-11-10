@@ -7,7 +7,7 @@ import re
 import tempfile
 from pathlib import Path
 
-from uebench.application.reporting import ReportField, ReportView
+from uebench.application.reporting import ReportField, ReportView, CementReportView
 
 
 def _add_subscript(paragraph, text: str) -> None:
@@ -35,7 +35,11 @@ def _row(table, field: ReportField) -> None:
 class WordReportWriter:
     """创建文件时先写同目录临时文件，成功后原子替换目标。"""
 
-    def write(self, view: ReportView, path: Path) -> Path:
+    def write(self, view: ReportView | CementReportView, path: Path) -> Path:
+        if isinstance(view, CementReportView):
+            from .cement_word_report import write_cement_report
+
+            return write_cement_report(view, path)
         from docx import Document
         from docx.enum.table import WD_TABLE_ALIGNMENT
         from docx.enum.text import WD_ALIGN_PARAGRAPH

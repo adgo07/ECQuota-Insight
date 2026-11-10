@@ -3,8 +3,8 @@
 Owner decision: the software does not ship, store, mirror or directly open
 standard PDF files.  The ordinary UI offers 「查看标准原文」 and opens a
 **pre-registered, deterministic** page on 全国标准信息公共服务平台
-(``https://std.samr.gov.cn/``), the platform operated by 国家市场监督管理总局 /
-国家标准化管理委员会.
+(``std.samr.gov.cn``) or 国家标准全文公开系统 (``openstd.samr.gov.cn``),
+both official standard services operated by 国家市场监督管理总局 / 国家标准化管理委员会.
 
 Design constraints:
 
@@ -55,8 +55,9 @@ showed 2026-10-05):
   title (``20261402-Q-469``, ``id=4C4597F6CA531E8EE06397BE0A0AECD3``) is a
   different document and is deliberately **not** registered.
 
-No other standard has a verified address yet, so
-:data:`OFFICIAL_SOURCE_URLS` holds exactly one entry.
+GB 16780—2021：2026-11-11父任务独立读取官方公开元数据页，核对现行、
+发布日期2021-10-11及实施2022-11-01。登记openstd.samr.gov.cn精确地址；
+未将工具读取元数据表述为浏览器原文视觉验收。其余标准不推测地址。
 """
 
 from __future__ import annotations
@@ -80,8 +81,9 @@ OFFICIAL_SOURCE_PLATFORM_HOME: Final[str] = "https://std.samr.gov.cn/"
 
 
 #: Canonical standard id -> verified official page.  Fixed constants only; see
-#: the module docstring for how the one entry was verified.
+#: the module docstring for each registration's verification evidence.
 OFFICIAL_SOURCE_URLS: dict[str, str] = {
+    "gb-16780-2021": "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=A98F40B6D901C95820E0B5DFDC3FCFF9",
     "gb-29446-2019": (
         "https://std.samr.gov.cn/gb/search/gbDetailed"
         "?id=9A0A4FA998CDD4A5E05397BE0A0AD02D"

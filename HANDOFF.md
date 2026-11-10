@@ -2,7 +2,7 @@
 
 ### 2026-11-11 水泥接入启动（当前，覆盖旧任务的禁止启动限制）
 
-Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage C 核心分块实施）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，Stage B设计提交55d09fa已由父Agent独立审查通过；现按分块实现及定向验证推进，再按独立 Golden / Stage D / 原生及候选包验收开放。第1块证据见[核心实施记录](docs/governance/GB16780_STAGE_C_CORE_REPORT_20261111.md)。
+Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage C 应用与产品分块实施）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，Stage B设计提交55d09fa已由父Agent独立审查通过；现按分块实现及定向验证推进，再按独立 Golden / Stage D / 原生及候选包验收开放。第1块证据见[核心实施记录](docs/governance/GB16780_STAGE_C_CORE_REPORT_20261111.md)。第2块见[应用与产品实施记录](docs/governance/GB16780_STAGE_C_PRODUCT_REPORT_20261111.md)，源码定向通过，原生及配套签名待验。
 
 RS05 仍 IN PROGRESS、Reference Standard Product Closure 仍 PARTIAL、0.2.0 NOT RELEASED；原有未验环境事项保留在 RS05 执行报告。当前正式评价范围仍仅选煤，本次设计不修改支持门禁、Frozen lock、数据库或冻结映射。Excel 正式用户流程继续 DEFERRED。不操作真实库、已安装产品或旧测试包；下方旧日期“不启动水泥 / RS06 NOT STARTED”仅记载当时任务边界，不覆盖本次授权。
 
@@ -45,7 +45,7 @@ RS05 仍 IN PROGRESS、Reference Standard Product Closure 仍 PARTIAL、0.2.0 NO
 
 `GB 29446—2019 选煤电力消耗限额`
 
-当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = IN PROGRESS（水泥 Stage C 核心分块实施）。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
+当前状态：Reference Standard Product Closure = PARTIAL。GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；RS01–RS04 = DONE。RS03 已建立的 Excel Adapter 技术能力继续保留；Excel Adapter technical capability = RETAINED，Excel user-facing formal workflow = DEFERRED。RS05 = IN PROGRESS，当前目标为 Product Simplification & Standard Library Pairing；RS06 = IN PROGRESS（水泥 Stage C 应用与产品分块实施）。普通用户无需管理标准包，标准库随完整软件版本配套更新。不得宣布 RS05 完成或发布 v0.2.0。详见 参考标准开发路线.md。
 
 **2026-10-28 当前补录：** 实际候选 `rc-69562ee` 的干净构建源码为 `69562eed5d072b9a1a1a77ab6a71f63ea0196788`，完整回归 1214 passed / 66 skipped、Artifact Gate 63 passed；设计独立确认该 SHA 三项 CI 全部 success。[PR #34](https://github.com/adgo07/ECQuota-Insight/pull/34) 已获 Owner 授权在最终审查和精确提交 CI 通过后合并；合并不等于正式发布。C 的 Win11 原生 150% 短定向 12 项及设计独立复核通过，C-DEF-001／002 两项 P3 在本机定向范围关闭；保存快照、取消／恢复审计与保护备份已核。本次治理提交不改变实际打包输入、不重打包，不把其提交 SHA 当作被测构建。
 
@@ -154,7 +154,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 
 ## 9. 下一步
 
-- 当前任务：RS06 水泥 Stage C 核心分块实施，各块提交后独立审查；RS05 既有交付环境收口继续 IN PROGRESS；
+- 当前任务：RS06 水泥 Stage C 应用与产品分块实施，各块提交后独立审查；RS05 既有交付环境收口继续 IN PROGRESS；
 - 普通用户只使用随软件配套的标准库，不再手动安装、导入、扫描或管理标准包；
 - Excel Adapter / Canonical Input / 共用 Calculator / Decimal 安全链继续保留；Excel 正式用户流程暂缓开放；
 - 设置页收敛、标准包普通入口移除、版本配套、Application readiness gate 与恢复后即时 reconciliation 已有本轮源码及 Candidate 证据；当前工作不重复实现这些完成项；

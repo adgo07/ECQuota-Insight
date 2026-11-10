@@ -7,6 +7,8 @@ from pathlib import Path
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QTabWidget, QTextEdit
 from uebench.application.gb29446 import decode_period_notes, GB29446_STANDARD_ID
 from uebench.application.reporting import gb29446_business_labels, render_gb29446_warning
+from uebench.application.reporting import CementReportView
+from .cement_presentation import report_results_html, report_inputs_html
 from uebench.application.official_sources import official_source_url, NO_OFFICIAL_SOURCE_LABEL
 from uebench.domain.models import GRADE_LABELS, Grade
 from .presentation import format_local_date, format_local_datetime
@@ -94,6 +96,13 @@ class RecordDetailPage(ResponsivePage):
         source = official_source_url(result.standard_id)
         self.source_button.setEnabled(bool(source))
         self.source_button.setToolTip(source or NO_OFFICIAL_SOURCE_LABEL)
+        if isinstance(view, CementReportView):
+            self.result_content.setHtml(report_results_html(view))
+            self.input_content.setHtml(report_inputs_html(view))
+            self.tabs.setCurrentIndex(0)
+            for text in (self.result_content, self.input_content):
+                text.verticalScrollBar().setValue(0)
+            return
         if not source:
             self.notice.setText(self.notice.text() + " " + NO_OFFICIAL_SOURCE_LABEL + "。")
         period = "未记录"

@@ -33,7 +33,7 @@ def saved_record_projection(request_json: str, result_json: str) -> str:
         request = EvaluationRequest.model_validate_json(request_json)
         result = EvaluationResult.model_validate_json(result_json)
         period = "未记录"
-        if result.standard_id == GB29446_STANDARD_ID and (request.notes or "").startswith("核算周期："):
+        if result.standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"} and (request.notes or "").startswith("核算周期："):
             code, custom, _ = decode_period_notes(request.notes)
             period = custom if code == "自定义" else code
         first = result.results[0] if result.results else None
@@ -42,6 +42,8 @@ def saved_record_projection(request_json: str, result_json: str) -> str:
         if len(result.results) > 1:
             status = "分项结果"
             core = f"{first.indicator_name}：{core}（首项）"
+            if result.standard_id == "gb-16780-2021" and request.cement_lines:
+                core = f"{len(request.cement_lines)} 条生产线 · 分项能耗等级"
         return json.dumps({"period": period or "未记录", "core": core, "status": status, "title": result.standard_title}, ensure_ascii=False)
     except (ValueError, TypeError, ArithmeticError):
         return json.dumps({"period": "未记录", "core": "无法读取保存结果", "status": RECORD_CORRUPTED_LABEL, "title": ""}, ensure_ascii=False)
