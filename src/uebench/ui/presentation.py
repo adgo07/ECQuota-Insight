@@ -32,6 +32,7 @@ __all__ = [
     "DISPLAY_PLACEHOLDER",
     "format_local_date",
     "format_local_datetime",
+    "software_support_text",
     "to_local",
 ]
 
@@ -42,6 +43,12 @@ DISPLAY_PLACEHOLDER: Final[str] = "—"
 #: Ordinary user-facing formats.  Seconds precision, no microseconds.
 DISPLAY_DATETIME_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S"
 DISPLAY_DATE_FORMAT: Final[str] = "%Y-%m-%d"
+
+
+def software_support_text(standard) -> str:
+    """只投影已批准正式范围；存在旧 Rule 不代表接入已验收。"""
+    from uebench.application.evaluation_support import supports_formal_evaluation
+    return "正式支持" if supports_formal_evaluation(standard) else "未开放"
 
 
 def to_local(dt: datetime) -> datetime:

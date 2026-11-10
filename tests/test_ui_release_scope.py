@@ -31,8 +31,6 @@ from PySide6.QtWidgets import (
 )
 
 from uebench.application.evaluation_support import (
-    FORMAL_EVALUATION_SUPPORTED_LABEL,
-    FORMAL_EVALUATION_UNSUPPORTED_LABEL,
     SUPPORTED_EVALUATION_STANDARD_IDS,
     supports_formal_evaluation,
 )
@@ -198,7 +196,7 @@ def test_new_evaluation_combo_offers_exactly_the_formally_supported_standards(wi
     offered = {window.eval_standard.itemData(index) for index in range(window.eval_standard.count())}
     assert offered == set(SUPPORTED_EVALUATION_STANDARD_IDS) == {GB29446_ID}
     assert window.eval_standard.currentData() == GB29446_ID
-    assert window.eval_support_label.text() == FORMAL_EVALUATION_SUPPORTED_LABEL
+    assert window.eval_support_label.text() == "正式支持"
 
 
 def test_unsupported_standard_cannot_reach_formal_evaluation(window) -> None:
@@ -289,7 +287,7 @@ def test_settings_replaces_ordinary_package_management(window) -> None:
 def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None:
     gb_row = _library_row(window, GB29446_ID)
     assert window.standard_table.item(gb_row, COLUMN_SUPPORT_STATUS).text() == (
-        FORMAL_EVALUATION_SUPPORTED_LABEL
+        "正式支持"
     )
     window.standard_table.selectRow(gb_row)
     assert window.standard_official_button.isEnabled()
@@ -303,7 +301,7 @@ def test_library_shows_support_status_scope_and_unsurveyed_state(window) -> None
     unsupported_id = _first_unsupported_id(window)
     other_row = _library_row(window, unsupported_id)
     assert window.standard_table.item(other_row, COLUMN_SUPPORT_STATUS).text() == (
-        FORMAL_EVALUATION_UNSUPPORTED_LABEL
+        "未开放"
     )
     # 未重新梳理的标准只能如实显示 Owner 确认的「适用范围尚待整理」（该文字已点名字段，
     # 不再重复「适用范围：」前缀），不得由 UI 代写范围文字。
@@ -570,7 +568,7 @@ def test_new_evaluation_page_reads_the_full_standard_and_is_not_duplicated(windo
     # 页面右上角有官方来源入口与支持状态。
     assert window.eval_standard_open.text() == VIEW_OFFICIAL_SOURCE_BUTTON_TEXT
     assert window.eval_official_status.text() == OFFICIAL_SOURCE_PLATFORM_NAME
-    assert window.eval_support_label.text() == FORMAL_EVALUATION_SUPPORTED_LABEL
+    assert window.eval_support_label.text() == "正式支持"
 
 
 def test_calculation_explanation_keeps_the_basis_in_plain_language(window) -> None:
