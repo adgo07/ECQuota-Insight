@@ -1,0 +1,160 @@
+{
+  "status": "CANDIDATE — not Stage D accepted",
+  "cases": [
+    {
+      "case_id": "C02-partial-purchase-four-deductions",
+      "standard_id": "gb-16780-2021",
+      "standard_version": "2021",
+      "rule_revision": 3,
+      "numeric_contract_version": "v1",
+      "numeric_profile_id": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
+      "calculator_version": "gb16780-calculator-v1",
+      "mapping_sha256": "43d75b9724d8105ca27f0b3eeadd41de7dce1f92fa26965306c69cad5c17575c",
+      "source": "V1.2 §§9–18/25; 2021式（2）–（9）; Issue001内部解释；独立手算见docs/golden/GB16780_GOLDEN_CANDIDATES_V1.md",
+      "inputs": {
+        "evaluation_date": "2026-11-11",
+        "standard_id": "gb-16780-2021",
+        "product_id": "cement-assessment",
+        "input_mode": "DETAIL",
+        "inputs": {},
+        "cement_lines": [
+          {
+            "line_id": "kiln-1",
+            "line_name": "一号生产线",
+            "production_mode": "partial_purchase",
+            "inputs": {
+              "site.altitude_m": {
+                "value": "0"
+              },
+              "clinker.production_t": {
+                "value": "1000"
+              },
+              "cement.clinker_consumption_t": {
+                "value": "1500"
+              },
+              "cement.production_t": {
+                "value": "2000"
+              },
+              "fuel.standard_coal_heat_kj_per_kgce": {
+                "value": "29307"
+              },
+              "clinker.electricity_kwh": {
+                "value": "60000"
+              },
+              "heat.generation_kwh": {
+                "value": "10000"
+              },
+              "heat.own_use_kwh": {
+                "value": "1000"
+              },
+              "deduction.co_processing_fuel_tce": {
+                "value": "2"
+              },
+              "deduction.alternative_fuel_tce": {
+                "value": "3"
+              },
+              "deduction.co_processing_electricity_kwh": {
+                "value": "1000"
+              },
+              "deduction.alternative_fuel_electricity_kwh": {
+                "value": "2000"
+              },
+              "cement.clinker_percent": {
+                "value": "75"
+              },
+              "cement.grinding_packaging_kwh": {
+                "value": "30000"
+              },
+              "cement.additives_preprocessing_kwh": {
+                "value": "2000"
+              },
+              "cement.gypsum_preprocessing_kwh": {
+                "value": "1000"
+              },
+              "cement.auxiliary_kwh": {
+                "value": "2000"
+              },
+              "cement.preparation_fuel_kgce": {
+                "value": "1000"
+              },
+              "cement.preparation_electricity_kwh": {
+                "value": "68000"
+              }
+            },
+            "fuels": [
+              {
+                "line_id": "fuel-1",
+                "energy_name": "燃料A",
+                "mass_kg": "120000",
+                "low_calorific_value_kj_per_kg": "29307"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_intermediates": {
+        "H": "3516840000",
+        "F": "120000",
+        "E_he": "1.1061",
+        "e_fc": "5000",
+        "w_fc": "3000",
+        "e_sh_before": "118.8939",
+        "e_sh": "113.8939",
+        "W_sh_before": "60",
+        "W_sh": "57",
+        "E_sh": "120.8992",
+        "w_s": "120500",
+        "W_s": "60.25",
+        "E_s": "93.32515",
+        "W_sg": "34"
+      },
+      "expected_results": {
+        "cement.comprehensive_energy": {
+          "actual": "93.32515",
+          "grade": "LEVEL_3",
+          "thresholds": [
+            "80",
+            "87",
+            "94"
+          ]
+        },
+        "clinker.comprehensive": {
+          "actual": "120.8992",
+          "grade": "NOT_QUALIFIED",
+          "thresholds": [
+            "100",
+            "107",
+            "117"
+          ]
+        },
+        "clinker.electricity": {
+          "actual": "57",
+          "grade": "LEVEL_2",
+          "thresholds": [
+            "48",
+            "57",
+            "61"
+          ]
+        },
+        "clinker.coal": {
+          "actual": "113.8939",
+          "grade": "NOT_QUALIFIED",
+          "thresholds": [
+            "94",
+            "100",
+            "109"
+          ]
+        },
+        "cement-preparation.electricity": {
+          "actual": "34",
+          "grade": "LEVEL_3",
+          "thresholds": [
+            "26",
+            "29",
+            "34"
+          ]
+        }
+      }
+    }
+  ]
+}

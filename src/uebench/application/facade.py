@@ -31,7 +31,7 @@ from .ports import (
     WorkbookImportPort,
     WordReportPort,
 )
-from .reporting import ReportView, build_report_view
+from .reporting import ReportView, CementReportView, build_report_view
 from .services import EvaluationRepository, EvaluationService, StandardCatalogService, StandardRepository
 from .package_reconciliation import PackageReconciliationService, ReconciliationOutcome
 from .package_updates import PackageDirectoryService, PackageScanItem
@@ -218,7 +218,7 @@ class ApplicationFacade:
     ) -> tuple[EvaluationRequest, EvaluationResult, StandardDefinition] | None:
         return self._evaluations.get(evaluation_id)
 
-    def get_report_view(self, evaluation_id: str) -> ReportView:
+    def get_report_view(self, evaluation_id: str) -> ReportView | CementReportView:
         loaded = self._evaluations.get(evaluation_id)
         if loaded is None:
             raise LookupError("评价记录已删除或不存在。")

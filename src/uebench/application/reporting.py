@@ -74,6 +74,39 @@ class ReportView:
     saved_rule_snapshot_sha256: str
 
 
+@dataclass(frozen=True)
+class CementMetricView:
+    name: str
+    actual: str
+    full_value: str
+    unit: str
+    grade: str
+    thresholds: tuple[ReportField, ...]
+    base_thresholds: tuple[ReportField, ...]
+
+
+@dataclass(frozen=True)
+class CementLineReport:
+    name: str
+    mode: str
+    metrics: tuple[CementMetricView, ...]
+    inputs: tuple[ReportField, ...]
+    calculations: tuple[str, ...]
+    basis: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class CementReportView:
+    record_id: str
+    title: str
+    information: tuple[ReportField, ...]
+    lines: tuple[CementLineReport, ...]
+    shared: tuple[str, ...]
+    explanations: tuple[str, ...]
+    saved_rule_revision: int
+    saved_rule_snapshot_sha256: str
+
+
 def _plain(value: Decimal | str | None) -> str:
     if value is None:
         return "—"
@@ -199,8 +232,12 @@ def _basis(item: IndicatorResult) -> tuple[str, ...]:
 
 def build_report_view(
     request: EvaluationRequest, result: EvaluationResult, snapshot: StandardDefinition,
-) -> ReportView:
+) -> ReportView | CementReportView:
     """仅投影已保存事实；未形成有效等级的记录拒绝正式报告。"""
+    if (request.standard_id, result.standard_id, snapshot.id) == ("gb-16780-2021",) * 3:
+        from .cement_reporting import build_cement_report_view
+
+        return build_cement_report_view(request, result, snapshot)
     if (request.standard_id, result.standard_id, snapshot.id) != ("gb-29446-2019",) * 3:
         raise ValueError("此报告仅支持 GB 29446—2019 选煤评价记录。")
     if request.product_id != result.product_id:

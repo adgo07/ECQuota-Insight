@@ -28,7 +28,7 @@ GB29446_ID = "gb-29446-2019"
 OFFICIAL_HOST = "std.samr.gov.cn"
 
 #: Real installed standards with no verified official page registered.
-UNREGISTERED_IDS = ("gb-16780-2021", "gb-21252-2023", "gb-21342-2025")
+UNREGISTERED_IDS = ( "gb-21252-2023", "gb-21342-2025")
 
 #: Runtime address lookups this module must never contain (fixed constants only).
 FORBIDDEN_TOKENS = ("requests", "urllib", "httpx", "socket", "webbrowser.open")
@@ -69,7 +69,7 @@ def test_registry_contains_only_official_platform_addresses() -> None:
         assert isinstance(standard_id, str) and standard_id
         parts = urlsplit(url)
         assert parts.scheme == "https", url
-        assert parts.netloc == OFFICIAL_HOST, f"{standard_id}: {url}"
+        assert parts.netloc in {OFFICIAL_HOST, "openstd.samr.gov.cn"}, f"{standard_id}: {url}"
 
 
 def test_platform_constants_describe_the_official_platform() -> None:
@@ -138,7 +138,7 @@ def test_module_opens_no_browser_and_holds_no_search_endpoint() -> None:
     assert "webbrowser" not in source
     assert "search?" not in source
     # Only the fixed detail-page form is registered.
-    assert all("/gb/search/gbDetailed?" in url for url in OFFICIAL_SOURCE_URLS.values())
+    assert all("/gb/search/gbDetailed?" in url or "/bzgk/std/newGbInfo?hcno=" in url for url in OFFICIAL_SOURCE_URLS.values())
 
 
 # ---------------------------------------------------------------------------
@@ -153,5 +153,9 @@ def test_shared_ui_labels_are_the_expected_chinese_constants() -> None:
 
 def test_registry_does_not_claim_a_source_for_every_standard() -> None:
     """The registry is deliberately sparse; a filled-everything table would be a lie."""
-    assert len(OFFICIAL_SOURCE_URLS) == 1
-    assert set(OFFICIAL_SOURCE_URLS) == {GB29446_ID}
+    assert len(OFFICIAL_SOURCE_URLS) == 2
+    assert set(OFFICIAL_SOURCE_URLS) == {GB29446_ID, "gb-16780-2021"}
+
+
+def test_cement_has_verified_exact_official_metadata_address():
+    assert official_source_url("gb-16780-2021") == "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=A98F40B6D901C95820E0B5DFDC3FCFF9"

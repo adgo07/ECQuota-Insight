@@ -430,6 +430,43 @@ class StandardDefinition(StrictModel):
         return self
 
 
+class CementFuelInput(StrictModel):
+    """原始燃料；缺失/非法十进制由依赖节点报告，不牵连独立电耗。"""
+
+    line_id: str = Field(min_length=1)
+    energy_name: str = "燃料"
+    mass_kg: Scalar = None
+    low_calorific_value_kj_per_kg: Scalar = None
+
+    @field_validator("mass_kg", "low_calorific_value_kj_per_kg", mode="before")
+    @classmethod
+    def reject_float(cls, value: Any) -> Any:
+        return _reject_float(value)
+
+
+CementProductionMode = Literal[
+    "integrated", "partial_purchase", "clinker_only", "purchased_clinker_grinding"
+]
+
+
+class CementLineInput(StrictModel):
+    line_id: str = Field(min_length=1)
+    line_name: str = "生产线"
+    production_mode: CementProductionMode
+    inputs: dict[str, InputValue] = Field(default_factory=dict)
+    fuels: list[CementFuelInput] = Field(default_factory=list)
+
+
+class CementSharedEnergy(StrictModel):
+    shared_id: str = Field(min_length=1)
+    target: Literal[
+        "clinker_fuel", "clinker_electricity", "cement_auxiliary", "cement_preparation"
+    ]
+    line_ids: list[str] = Field(min_length=1)
+    amount: InputValue | None = None
+    fuels: list[CementFuelInput] = Field(default_factory=list)
+
+
 class EvaluationRequest(StrictModel):
     evaluation_date: date
     standard_id: str
@@ -440,6 +477,8 @@ class EvaluationRequest(StrictModel):
     inputs: dict[str, InputValue]
     energy_lines: list[EnergyLine] = Field(default_factory=list)
     production_lines: list[ProductionLine] = Field(default_factory=list)
+    cement_lines: list[CementLineInput] = Field(default_factory=list)
+    cement_shared_energy: list[CementSharedEnergy] = Field(default_factory=list)
     organization_name: str | None = None
     project_name: str | None = None
     notes: str | None = None
@@ -455,6 +494,8 @@ class CalculationStep(StrictModel):
 
 
 class IndicatorResult(StrictModel):
+    line_id: str | None = None
+    line_name: str | None = None
     indicator_id: str
     indicator_name: str
     actual_value: Decimal | None

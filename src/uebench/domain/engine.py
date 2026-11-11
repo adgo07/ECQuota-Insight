@@ -292,6 +292,15 @@ class EvaluationEngine:
             raise EvaluationValidationError(
                 f"评价日期 {request.evaluation_date} 早于标准实施日期 {standard.effective_date}"
             )
+        if standard.id == "gb-16780-2021":
+            from .gb16780 import ADOPTION_MARKER, adopted, evaluate_cement
+
+            if adopted(standard):
+                return evaluate_cement(self, standard, request)
+            if standard.rule_revision >= 2 or ADOPTION_MARKER in standard.corrections or request.cement_lines or request.cement_shared_energy:
+                raise EvaluationValidationError("水泥规则版本或映射采用身份不匹配，不能套用V1.2计算器")
+        elif request.cement_lines or request.cement_shared_energy:
+            raise EvaluationValidationError("水泥专用明细不能用于其他标准")
         product = next((item for item in standard.products if item.id == request.product_id), None)
         if product is None:
             raise EvaluationValidationError(f"标准中不存在产品/工序：{request.product_id}")

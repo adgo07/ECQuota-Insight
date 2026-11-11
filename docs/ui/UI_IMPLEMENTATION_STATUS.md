@@ -1,5 +1,11 @@
 # UI 实施状态与第二阶段交接
 
+
+### 2026-11-11 水泥源码候选实现（未正式开放）
+
+GB16780 V1.2核心/应用/页面/两页签历史/Word源码已实现，稳定产品提交2402f5c的父独立应用/UI/URL40项及保存门禁9项通过。规则按[有限隔离](../governance/GB16780_UNPUBLISHED_CANDIDATE_20261111.md)保留唯一未发布r2候选，默认生产data/PIN仍配套r1、正式评价仍仅选煤。原生仅初始开窗1267×663，DPI未确认；指定操作者滚动遇系统AccessDenied并黑屏后暂停，未判断产品缺陷，也未原生通过。实际Word视觉、真实r2签名包及候选仍待验，不将源码/离屏或XML视为原生/交付通过。旧日期“不启动水泥”是旧任务边界，当前授权及状态以根TASK_STATE为准；Excel正式流程继续延期。
+
+
 ## 2026-11-10 最新中央指南局部对齐（待独立验收）
 
 平台 / Contract 预检查：软件基线 `b538ac6729d39eafbb6903d1ecfbb1cd94a26d1e`，中央已合并 main `829853a943c421e0b9864d84f3d94970d2ddf688`；已按 GUIDE_INDEX 读取家族规格、指南 v0.2、验收清单和正式资产说明。Frozen 仍锁定 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture 2.1、Numeric Contract / Profile / Conformance v1 不变。MUST 保留 Decimal 全值、空白与零区分、保存快照、D01/D02；MUST NOT 改公式、映射、Schema、范围或 lock。无本任务相关新增 Standard Issue，不改变软件解释，不需中央 Contract 修改。

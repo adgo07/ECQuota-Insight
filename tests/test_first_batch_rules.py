@@ -101,6 +101,7 @@ def expected_grade(actual: Decimal, thresholds: dict[str, Decimal]) -> Grade:
     return Grade.NOT_QUALIFIED
 
 
+# 生产水泥仍为已签名r1工程基线；未发布r2的DETAIL边界另由test_gb16780_core覆盖。
 @pytest.mark.parametrize("standard", load_first_batch(), ids=lambda item: item.number)
 def test_every_first_batch_indicator_has_sources_and_boundary_grading(standard: StandardDefinition) -> None:
     engine = EvaluationEngine()
@@ -206,17 +207,8 @@ def test_representative_corrections_and_missing_level_are_exact() -> None:
     standards = {item.number: item for item in load_first_batch()}
     engine = EvaluationEngine()
 
-    cement = standards["GB 16780-2021"]
-    request = direct_request(cement, "cement")
-    request.inputs["site.altitude_m"] = InputValue(value="2000", unit="m")
-    request.inputs["site.pressure_pa"] = InputValue(value="80000", unit="Pa")
-    request.inputs["cement.clinker_ratio_pct"] = InputValue(value="76", unit="%")
-    result = engine.evaluate(cement, request).results[0]
-    assert result.base_thresholds == {"LEVEL_1": Decimal("80"), "LEVEL_2": Decimal("87"), "LEVEL_3": Decimal("94")}
-    assert result.corrected_thresholds["LEVEL_1"] == Decimal("81.10")
-    assert result.corrected_thresholds["LEVEL_2"] == Decimal("88.15")
-    expected_level_3 = Decimal("95.20") * (Decimal("1.179") - Decimal("0.211") * Decimal("80000") / Decimal("101325"))
-    assert result.corrected_thresholds["LEVEL_3"] == expected_level_3
+    # 水泥旧[94+1.20(g-75)]K期望已退出；新双修正、边界及历史r1保真
+    # 分别在test_gb16780_core中通过DETAIL与保存的历史fixture验证。
 
     coke = standards["GB 21342-2025"]
     request = direct_request(coke, "top-charging-coke-oven")

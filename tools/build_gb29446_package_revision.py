@@ -43,6 +43,11 @@ Signing key: this is a **developer-side** tool.  The Ed25519 private key is neve
 committed and never referenced from CI; ``--private-key`` must point at an
 existing file or the tool fails with a clear message before touching anything.
 
+2026-11水泥接入：显式 ``--target-standard-id gb-16780-2021`` 只替换批准V1.2 r3。
+默认选煤行为保持兼容；不接受其它目标。水泥父/候选额外按产品既有公钥验签、
+核对全部成员哈希/数量，私钥必须匹配该信任根，不提供信任公钥替换参数。
+水泥解释与来源保存在该定义自身corrections中；包级corrections和其它47定义原字节不变。
+
 Lineage: ``PackageManifest.validate_lineage`` forbids ``parent_package_id`` when
 ``package_mode == "full"``, so the parent relationship cannot be recorded inside
 a full package's manifest.  It is recorded in
@@ -82,6 +87,8 @@ from uebench.infrastructure.packages import (  # noqa: E402
 )
 
 TARGET_STANDARD_ID = "gb-29446-2019"
+ALLOWED_REVISION_STANDARD_IDS = frozenset({TARGET_STANDARD_ID, "gb-16780-2021"})
+TRUSTED_PUBLIC_KEY_PATH = REPO_ROOT / "src/uebench/resources/update_public_key.pem"
 GHOST_MEMBER = "signature.ed25519"
 
 #: Members that must never be treated as content.
@@ -172,6 +179,43 @@ def _load_signing_key(private_key_path: Path) -> Ed25519PrivateKey:
     return private_key
 
 
+def _require_revision_target(target_standard_id: str) -> None:
+    if target_standard_id not in ALLOWED_REVISION_STANDARD_IDS:
+        raise SystemExit("规则替换目标未获本工具授权，仅允许GB29446或GB16780")
+
+
+def _verify_cement_trust(manifest_bytes: bytes, members: dict[str, bytes]):
+    """水泥新目标严格使用产品既有公钥；没有CLI信任根替换选项。"""
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+    try:
+        public_key = serialization.load_pem_public_key(TRUSTED_PUBLIC_KEY_PATH.read_bytes())
+        if not isinstance(public_key, Ed25519PublicKey):
+            raise ValueError("产品公钥不是Ed25519")
+        public_key.verify(members[GHOST_MEMBER], manifest_bytes)
+        manifest = PackageManifest.model_validate_json(manifest_bytes)
+        if manifest.package_mode != "full" or manifest.source_policy != SOURCE_POLICY_PROVENANCE_ONLY:
+            raise ValueError("水泥父/候选必须为不含原文的完整包")
+        if set(members) != {entry.path for entry in manifest.files} | STRUCTURAL_MEMBERS:
+            raise ValueError("清单成员集合不一致")
+        definitions = []
+        for entry in manifest.files:
+            raw = members[entry.path]
+            if entry.size != len(raw) or entry.sha256.lower() != _sha256_bytes(raw):
+                raise ValueError(f"成员哈希/长度不一致：{entry.path}")
+            if entry.kind == "definition":
+                definitions.append(StandardDefinition.model_validate_json(raw))
+        if any(name.startswith("sources/") or name.lower().endswith(".pdf") for name in members):
+            raise ValueError("水泥包不得包含标准原文PDF")
+        if (len(definitions) != manifest.standard_count
+                or len({d.id for d in definitions}) != len(definitions)
+                or sum(len(p.indicators) for d in definitions for p in d.products) != manifest.rule_count):
+            raise ValueError("定义数量、唯一身份或规则计数与清单不一致")
+        return public_key
+    except Exception as exc:
+        raise SystemExit(f"水泥标准包未通过既有信任根/清单校验：{type(exc).__name__}: {exc}") from exc
+
+
 def _write_signed_package(
     output: Path,
     manifest: PackageManifest,
@@ -198,7 +242,9 @@ def build_revision_package(
     minimum_app_version: str,
     package_id: str | None = None,
     issued_at: datetime | None = None,
+    target_standard_id: str = TARGET_STANDARD_ID,
 ) -> dict:
+    _require_revision_target(target_standard_id)
     parent = parent.resolve()
     output = output.resolve()
     if parent == output:
@@ -209,11 +255,24 @@ def build_revision_package(
     if parent_manifest.package_mode != "full":
         raise SystemExit(f"父基线必须是完整包，实际为 {parent_manifest.package_mode}")
 
+    public_key = None
+    if target_standard_id == "gb-16780-2021":
+        public_key = _verify_cement_trust(manifest_bytes, members)
+        if _data_version_key(data_version) <= _data_version_key(parent_manifest.data_version):
+            raise SystemExit("水泥新data_version必须晚于父基线")
+        if package_id == parent_manifest.package_id:
+            raise SystemExit("水泥新package_id必须改变")
+
     definition = StandardDefinition.model_validate_json(
         Path(definition_path).read_text(encoding="utf-8")
     )
-    if definition.id != TARGET_STANDARD_ID:
-        raise SystemExit(f"待替换定义不是 {TARGET_STANDARD_ID}：{definition.id}")
+    if definition.id != target_standard_id:
+        raise SystemExit(f"待替换定义不是 {target_standard_id}：{definition.id}")
+    if target_standard_id == "gb-16780-2021":
+        from uebench.domain.gb16780 import adopted
+
+        if not adopted(definition):
+            raise SystemExit("水泥替换定义须为明确采用V1.2的r3，不接受未审核规则")
 
     # Locate the parent's member for this standard by parsing, never by name guess.
     removed: list[str] = []
@@ -223,12 +282,12 @@ def build_revision_package(
         if entry.kind != "definition":
             continue
         candidate = StandardDefinition.model_validate_json(members[entry.path])
-        if candidate.id == TARGET_STANDARD_ID:
+        if candidate.id == target_standard_id:
             removed.append(entry.path)
             parent_definition = candidate
     if len(removed) != 1:
         raise SystemExit(
-            f"父基线中 {TARGET_STANDARD_ID} 的定义成员数应为 1，实际 {len(removed)}：{removed}"
+            f"父基线中 {target_standard_id} 的定义成员数应为 1，实际 {len(removed)}：{removed}"
         )
     if parent_definition is None or definition.rule_revision <= parent_definition.rule_revision:
         raise SystemExit("替换定义的 rule_revision 必须高于父基线")
@@ -275,7 +334,7 @@ def build_revision_package(
         )
 
     new_manifest = PackageManifest(
-        package_id=package_id or f"gb29446-r{definition.rule_revision}-from-{parent_manifest.data_version}",
+        package_id=package_id or f"gb{target_standard_id.split('-')[1]}-r{definition.rule_revision}-from-{parent_manifest.data_version}",
         data_version=data_version,
         issued_at=issued_at or datetime.now(timezone.utc),
         minimum_app_version=minimum_app_version,
@@ -289,6 +348,10 @@ def build_revision_package(
         files=package_files,
     )
     private_key = _load_signing_key(private_key_path)
+    if public_key is not None:
+        encoding, form = serialization.Encoding.Raw, serialization.PublicFormat.Raw
+        if private_key.public_key().public_bytes(encoding, form) != public_key.public_bytes(encoding, form):
+            raise SystemExit("签名私钥与产品既有信任公钥不匹配；不写入候选包")
     _write_signed_package(output, new_manifest, private_key, kept)
 
     return {
@@ -307,7 +370,9 @@ def build_revision_package(
         "rule_count": rule_count,
         "replaced_definition_member": removed,
         "added_definition_member": new_definition_member,
-        "gb29446_rule_revision": definition.rule_revision,
+        "target_standard_id": target_standard_id,
+        "target_rule_revision": definition.rule_revision,
+        ("gb29446_rule_revision" if target_standard_id == TARGET_STANDARD_ID else "gb16780_rule_revision"): definition.rule_revision,
         "unchanged_member_count": len(kept) - 1,  # exclude the new definition
     }
 
@@ -562,52 +627,63 @@ def verify_source_free_package(
     }
 
 
-def verify_revision_package(parent: Path, candidate: Path) -> dict:
-    """Assert the candidate differs from the parent ONLY for GB 29446."""
+def verify_revision_package(parent: Path, candidate: Path, *, target_standard_id: str = TARGET_STANDARD_ID) -> dict:
+    """只允许明确目标定义变化；水泥另外验证产品既有信任根。"""
+    _require_revision_target(target_standard_id)
     parent_manifest_bytes, parent_members = _read_package(parent)
     parent_manifest = PackageManifest.model_validate_json(parent_manifest_bytes)
     candidate_manifest_bytes, candidate_members = _read_package(candidate)
     candidate_manifest = PackageManifest.model_validate_json(candidate_manifest_bytes)
 
+    if target_standard_id == "gb-16780-2021":
+        try:
+            _verify_cement_trust(parent_manifest_bytes, parent_members)
+            _verify_cement_trust(candidate_manifest_bytes, candidate_members)
+        except SystemExit as exc:
+            return {"valid": False, "problems": [str(exc)], "target_standard_id": target_standard_id}
+
     problems: list[str] = []
     removed, added, changed = _diff_members(parent_members, candidate_members)
 
-    def is_gb29446_definition(name: str) -> bool:
+    def is_target_definition(name: str) -> bool:
         if not name.startswith("definitions/"):
             return False
         try:
             return StandardDefinition.model_validate_json(
                 candidate_members.get(name) or parent_members[name]
-            ).id == TARGET_STANDARD_ID
+            ).id == target_standard_id
         except Exception:
             return False
 
-    # Every removed member must be the old GB29446 definition; every added member
+    # Every removed member must be the old target definition; every added member
     # must be the new one; nothing else may differ.
     for name in removed:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员被删除：{name}")
     for name in added:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员被新增：{name}")
     for name in changed:
-        if not is_gb29446_definition(name):
+        if not is_target_definition(name):
             problems.append(f"非目标成员内容被改变：{name}")
 
     gb_old = None
     for name in removed:
-        parsed = StandardDefinition.model_validate_json(parent_members[name])
-        if parsed.id == TARGET_STANDARD_ID:
-            gb_old = parsed
+        if is_target_definition(name):
+            gb_old = StandardDefinition.model_validate_json(parent_members[name])
     gb_new = None
     for name in added:
-        parsed = StandardDefinition.model_validate_json(candidate_members[name])
-        if parsed.id == TARGET_STANDARD_ID:
-            gb_new = parsed
+        if is_target_definition(name):
+            gb_new = StandardDefinition.model_validate_json(candidate_members[name])
     if gb_new is None:
-        problems.append("候选包中没有新的 GB29446 定义成员")
+        problems.append(f"候选包中没有新的 {target_standard_id} 定义成员")
     elif gb_old is None or gb_new.rule_revision <= gb_old.rule_revision:
-        problems.append("新 GB29446 规则修订必须高于父基线")
+        problems.append(f"新 {target_standard_id} 规则修订必须高于父基线")
+    if target_standard_id == "gb-16780-2021":
+        from uebench.domain.gb16780 import adopted
+
+        if gb_new is not None and not adopted(gb_new):
+            problems.append("水泥候选未明确采用V1.2 r3")
 
     if candidate_manifest.standard_count != parent_manifest.standard_count:
         problems.append(
@@ -616,6 +692,8 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
         )
     if candidate_manifest.data_version == parent_manifest.data_version:
         problems.append("data_version 未变更")
+    elif target_standard_id == "gb-16780-2021" and _data_version_key(candidate_manifest.data_version) <= _data_version_key(parent_manifest.data_version):
+        problems.append("水泥新data_version必须晚于父基线")
     if candidate_manifest.package_id == parent_manifest.package_id:
         problems.append("package_id 未变更")
     if candidate_manifest.source_policy != parent_manifest.source_policy:
@@ -633,7 +711,9 @@ def verify_revision_package(parent: Path, candidate: Path) -> dict:
         "candidate_standard_count": candidate_manifest.standard_count,
         "parent_rule_count": parent_manifest.rule_count,
         "candidate_rule_count": candidate_manifest.rule_count,
-        "gb29446_rule_revision": None if gb_new is None else gb_new.rule_revision,
+        "target_standard_id": target_standard_id,
+        "target_rule_revision": None if gb_new is None else gb_new.rule_revision,
+        ("gb29446_rule_revision" if target_standard_id == TARGET_STANDARD_ID else "gb16780_rule_revision"): None if gb_new is None else gb_new.rule_revision,
     }
 
 
@@ -641,16 +721,18 @@ def main(argv: list[str] | None = None) -> int:
     ensure_utf8_console()
     parser = argparse.ArgumentParser(
         description=(
-            "从已签名父基线生成新的签名标准包：默认只替换 GB29446 定义；"
+            "从已签名父基线生成新的签名标准包：默认只替换 GB29446；可显式指定已批准水泥r3；"
             "加 --drop-sources 则生成不随包分发标准原文（provenance-only）的完整包"
         )
     )
+    parser.add_argument("--target-standard-id", choices=sorted(ALLOWED_REVISION_STANDARD_IDS), default=TARGET_STANDARD_ID,
+                        help="规则替换目标；仅已批准的选煤/水泥，默认选煤")
     parser.add_argument("--parent", type=Path, required=True)
     parser.add_argument(
         "--definition",
         type=Path,
         default=None,
-        help="替换用的 GB29446 定义（--drop-sources 时不需要）",
+        help="明确目标的替换定义（默认GB29446；--drop-sources 时不需要）",
     )
     parser.add_argument("--private-key", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -678,6 +760,8 @@ def main(argv: list[str] | None = None) -> int:
             "--verify-only 不接受 --definition；"
             "复核去原文包请用 --drop-sources --verify-only，复核 GB29446 替换不要带 --definition"
         )
+    if args.drop_sources and args.target_standard_id != TARGET_STANDARD_ID:
+        raise SystemExit("--drop-sources不能与水泥目标混用；本任务不改变原文分发策略")
     if args.drop_sources:
         if args.definition is not None:
             raise SystemExit("--drop-sources 不接受 --definition：去原文版本不得改动任何定义")
@@ -706,7 +790,7 @@ def main(argv: list[str] | None = None) -> int:
                     "生成结果未通过同源校验：\n  " + "\n  ".join(verification["problems"])
                 )
     elif args.verify_only:
-        report = verify_revision_package(args.parent, args.output)
+        report = verify_revision_package(args.parent, args.output, target_standard_id=args.target_standard_id)
     else:
         if args.definition is None:
             raise SystemExit("默认模式必须提供 --definition（或用 --drop-sources）")
@@ -719,8 +803,9 @@ def main(argv: list[str] | None = None) -> int:
             minimum_app_version=args.minimum_app_version,
             package_id=args.package_id,
             issued_at=issued_at,
+            target_standard_id=args.target_standard_id,
         )
-        report = {**build, **{"verification": verify_revision_package(args.parent, args.output)}}
+        report = {**build, **{"verification": verify_revision_package(args.parent, args.output, target_standard_id=args.target_standard_id)}}
         if not report["verification"]["valid"]:
             raise SystemExit(
                 "生成结果未通过同源校验：\n  " + "\n  ".join(report["verification"]["problems"])

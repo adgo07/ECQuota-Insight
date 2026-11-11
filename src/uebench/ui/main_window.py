@@ -21,6 +21,10 @@ from .responsive_page import ResponsivePage
 from .message_box import ChineseMessageButtons
 from .record_table import RecordTable, StandardTable, HomeRecentTable
 from .wheel_safe_combo import WheelSafeComboBox
+from .gb16780_form import CementForm
+from .cement_presentation import result_html as cement_result_html
+from uebench.application.gb16780 import IncompleteCementEvaluationError
+from uebench.domain.gb16780 import adopted as cement_rule_adopted
 from .official_source_dialog import OfficialSourceDialog
 from .external_browser import external_browser_environment
 from .message_box_text import install_chinese_message_box_buttons
@@ -948,6 +952,9 @@ class MainWindow(QMainWindow):
         self.eval_standard.hide()
         form_layout.addWidget(self.generic_form_container)
         form_layout.addWidget(self.gb29446_form_container)
+        self.cement_form = CementForm()
+        self.cement_form.changed.connect(self._cement_inputs_changed)
+        form_layout.addWidget(self.cement_form)
         # 规则数据不完整/版本不兼容时的显式中文提示；正常 r2 规则下始终隐藏。
         self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
@@ -1018,6 +1025,25 @@ class MainWindow(QMainWindow):
         action_row.addStretch()
         action_row.addWidget(calculate)
         layout.addLayout(action_row)
+        self.cement_result_section, cement_result_layout = self._card()
+        self.cement_notice = QLabel("填写原始明细后计算等级")
+        self.cement_notice.setWordWrap(True)
+        self.cement_results = QTextEdit()
+        self.cement_results.setReadOnly(True)
+        self.cement_results.setMinimumHeight(300)
+        cement_result_layout.addWidget(self.cement_notice)
+        cement_result_layout.addWidget(self.cement_results)
+        cement_actions = QHBoxLayout()
+        cement_actions.addStretch()
+        self.cement_view_record = QPushButton("查看对标记录")
+        self.cement_export_word = QPushButton("导出报告（Word）")
+        self.cement_view_record.clicked.connect(lambda: self.view_record(self.last_result_id) if self.last_result_id else None)
+        self.cement_export_word.clicked.connect(self.export_latest_word_report)
+        for action in (self.cement_view_record, self.cement_export_word):
+            action.setEnabled(False)
+            cement_actions.addWidget(action)
+        cement_result_layout.addLayout(cement_actions)
+        layout.addWidget(self.cement_result_section)
 
         self.generic_result_section, generic_result_layout = self._card()
         generic_result_layout.addWidget(QLabel("评价结果"))
@@ -1342,11 +1368,25 @@ class MainWindow(QMainWindow):
             self.calculate_button.setEnabled(
                 self.gb29446_rule_compatible and message is None and has_evaluable_standard and not getattr(self, "_calculating", False)
             )
+            if self._is_gb16780():
+                self.calculate_button.setEnabled(self.calculate_button.isEnabled()
+                    and cement_rule_adopted(self.current_standard) and self.last_result_id is None)
             self._sync_evaluation_actions()
 
     def _sync_evaluation_actions(self) -> None:
         """保存后的主要动作是查看；重算仍调用原正式用例，明确生成新记录。"""
         busy = getattr(self, "_calculating", False)
+        if self._is_gb16780():
+            self.calculation_save_notice.setVisible(True)
+            self.calculation_save_notice.setText("全部适用指标完整时自动生成一条对标记录")
+            self.calculate_button.setText("正在计算…" if busy else "已生成记录" if self.last_result_id else "计算等级")
+            role = "secondary" if self.last_result_id else "primary"
+            if self.calculate_button.property("role") != role:
+                self.calculate_button.setProperty("role", role)
+                self.calculate_button.style().unpolish(self.calculate_button)
+                self.calculate_button.style().polish(self.calculate_button)
+            return
+        self.calculation_save_notice.setText("计算成功后自动生成一条对标记录")
         saved = self.last_result_id is not None and self._is_gb29446()
         self.calculation_save_notice.setVisible(not saved)
         role = "secondary" if saved else "primary"
@@ -1408,7 +1448,9 @@ class MainWindow(QMainWindow):
                     period, custom, _ = decode_period_notes(request.notes)
                     period = custom if period == PERIOD_CUSTOM else period
                     period = (period or "未记录") if (request.notes or "").startswith("核算周期：") else "未记录"
-                    if result.results:
+                    if result.standard_id == "gb-16780-2021" and request.cement_lines:
+                        core = f"{len(request.cement_lines)} 条生产线 · 分项能耗等级"
+                    elif result.results:
                         item = result.results[0]
                         core = f"{self._format_result_number(item.actual_value)} {item.unit} · {self._gb29446_grade_label(item.grade)}"
                 except Exception:
@@ -1777,6 +1819,19 @@ class MainWindow(QMainWindow):
     def _is_gb29446(self) -> bool:
         return self.current_standard is not None and self.current_standard.id == GB29446_STANDARD_ID
 
+    def _is_gb16780(self) -> bool:
+        return self.current_standard is not None and self.current_standard.id == "gb-16780-2021"
+
+    def _cement_inputs_changed(self):
+        if not self._is_gb16780():
+            return
+        self.last_result_id = None
+        self.cement_results.clear()
+        self.cement_notice.setText("数据已修改，请重新计算；尚未生成新记录")
+        self.cement_view_record.setEnabled(False)
+        self.cement_export_word.setEnabled(False)
+        self.refresh_formal_evaluation_readiness()
+
     def _gb29446_definition(self, standard_id: str) -> StandardDefinition | None:
         """解析用于正式评价的 GB 29446 定义（当前加载的优先，其次已发布/标准库）。"""
 
@@ -1857,10 +1912,13 @@ class MainWindow(QMainWindow):
 
     def _set_evaluation_view(self) -> None:
         is_gb29446 = self._is_gb29446()
-        self.generic_form_container.setVisible(not is_gb29446)
+        is_cement = self._is_gb16780()
+        self.generic_form_container.setVisible(not is_gb29446 and not is_cement)
         self.gb29446_form_container.setVisible(is_gb29446)
-        self.input_controls_container.setVisible(not is_gb29446)
-        self.generic_result_section.setVisible(not is_gb29446)
+        self.cement_form.setVisible(is_cement)
+        self.cement_result_section.setVisible(is_cement)
+        self.input_controls_container.setVisible(not is_gb29446 and not is_cement)
+        self.generic_result_section.setVisible(not is_gb29446 and not is_cement)
         self.gb29446_result_section.setVisible(is_gb29446)
         self.gb29446_explanation_section.hide()
         self.gb29446_basis_section.hide()
@@ -1876,7 +1934,8 @@ class MainWindow(QMainWindow):
             button.setToolTip(url or NO_OFFICIAL_SOURCE_LABEL)
         status = getattr(self, "eval_official_status", None)
         if status is not None:
-            status.setText(OFFICIAL_SOURCE_PLATFORM_NAME if url else NO_OFFICIAL_SOURCE_LABEL)
+            platform = "国家标准全文公开系统" if standard_id == "gb-16780-2021" else OFFICIAL_SOURCE_PLATFORM_NAME
+            status.setText(platform if url else NO_OFFICIAL_SOURCE_LABEL)
         support = getattr(self, "eval_support_label", None)
         if support is not None:
             support.setText(software_support_text(standard_id) if standard_id else "—")
@@ -2031,6 +2090,12 @@ class MainWindow(QMainWindow):
         self._rebuild_selection_widgets()
         self._set_evaluation_view()
         self._apply_gb29446_rule_compatibility()
+        if self._is_gb16780():
+            self._cement_inputs_changed()
+            if not cement_rule_adopted(self.current_standard):
+                self.cement_notice.setText("配套水泥规则尚未采用V1.2，不能计算；请等待完整配套版本。")
+            self.refresh_formal_evaluation_readiness()
+            return
         if self._is_gb29446():
             if self.gb29446_rule_compatible:
                 self._populate_gb29446_coal_types()
@@ -2124,6 +2189,8 @@ class MainWindow(QMainWindow):
         if self._is_gb29446():
             self._refresh_gb29446_processes(product)
             return
+        if self._is_gb16780():
+            return
         definitions = {definition.key: definition for definition in product.input_definitions if mode in definition.modes}
         for indicator in product.indicators:
             definitions.update(
@@ -2152,6 +2219,8 @@ class MainWindow(QMainWindow):
             raise ValueError("没有可用标准")
         if self._is_gb29446():
             return self._collect_gb29446_request()
+        if self._is_gb16780():
+            return self.cement_form.collect(self._selection_mode())
         product = self._selected_product()
         definitions = {}
         if product is not None:
@@ -2356,6 +2425,9 @@ class MainWindow(QMainWindow):
             self.refresh_formal_evaluation_readiness()
 
     def _calculate_evaluation(self, request: EvaluationRequest | None) -> None:
+        if (request is not None and request.standard_id == "gb-16780-2021") or (request is None and self._is_gb16780()):
+            self._calculate_cement(request)
+            return
         is_gb29446 = self._is_gb29446() if request is None else request.standard_id == GB29446_STANDARD_ID
         if is_gb29446:
             self._clear_gb29446_result()
@@ -2492,6 +2564,37 @@ class MainWindow(QMainWindow):
             self.mark_records_dirty()
         message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
+
+    def _calculate_cement(self, request=None):
+        try:
+            request = request or self.cement_form.collect(self._selection_mode())
+            fingerprint = request.model_dump_json()
+            if self.last_result_id and getattr(self, "_cement_saved_request", None) == fingerprint:
+                return  # 同一轮双击/重复信号不再创建第二条正式记录。
+            self.last_result_id = None
+            self.cement_view_record.setEnabled(False)
+            self.cement_export_word.setEnabled(False)
+            is_preview = request.selection_mode is StandardSelectionMode.FUTURE
+            result = (self.context.application.preview_evaluation(request) if is_preview
+                      else self.context.application.evaluate(request))
+        except IncompleteCementEvaluationError as exc:
+            self.cement_results.setHtml(cement_result_html(exc.preview_result))
+            self.cement_notice.setText("部分预览，尚未生成记录。" + "；".join(exc.problems))
+            return
+        except (ValueError, TypeError, LookupError) as exc:
+            self.cement_results.clear()
+            self.cement_notice.setText(f"未生成记录：{exc}")
+            return
+        self.cement_results.setHtml(cement_result_html(result))
+        self.last_result_id = None if is_preview else result.evaluation_id
+        self._cement_saved_request = fingerprint if self.last_result_id else None
+        self.cement_view_record.setEnabled(bool(self.last_result_id))
+        self.cement_export_word.setEnabled(bool(self.last_result_id))
+        self.cement_notice.setText("预览完成，未生成正式记录。" if is_preview else "各适用指标已完整判级，已生成一条对标记录。")
+        if not is_preview:
+            self.mark_records_dirty()
+            self.refresh_home()
+        self.evaluation_scroll.ensureWidgetVisible(self.cement_notice)
 
     @staticmethod
     def _format_result_number(value: Decimal | None, places: int = 2) -> str:
@@ -2687,7 +2790,7 @@ class MainWindow(QMainWindow):
             else:
                 view = None
                 reason = "该标准尚未开放 Word 报告。"
-                if loaded[1].standard_id == GB29446_STANDARD_ID:
+                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"}:
                     try:
                         view = self.context.application.get_report_view(evaluation_id)
                         reason = ""
@@ -2879,8 +2982,11 @@ class MainWindow(QMainWindow):
             self.export_word_record(self.last_result_id)
 
     def export_word_record(self, evaluation_id: str) -> None:
+        loaded = self.context.application.get_evaluation(evaluation_id)
+        filename = ("水泥分线能耗等级评价报告.docx" if loaded and loaded[1].standard_id == "gb-16780-2021"
+                    else "选煤电力单耗等级评价报告.docx")
         path, _ = QFileDialog.getSaveFileName(
-            self, "导出Word报告", "选煤电力单耗等级评价报告.docx", "Word文档 (*.docx)"
+            self, "导出Word报告", filename, "Word文档 (*.docx)"
         )
         if not path:
             return

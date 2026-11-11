@@ -1,6 +1,6 @@
 # TASK_STATE
 
-更新时间：2026-10-28
+更新时间：2026-11-11
 
 ## 当前产品目标
 
@@ -14,18 +14,24 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
-**ECQ-RS05 — Product Simplification & Standard Library Pairing（IN PROGRESS）**
+**ECQ-RS06 — GB 16780—2021 水泥接入（Stage C 应用与产品分块实施）；RS05 既有交付环境收口继续 IN PROGRESS。**
 
 - ECQ-GOV01 = DONE（PR #8）；ECQ-RS01 = DONE（PR #9）；ECQ-RS02 = DONE（PR #10）；
   ECQ-RS03 = DONE（PR #11，Excel Adapter 技术能力）；ECQ-RS04 = DONE（PR #12）；
 - ECQ-RS05 = IN PROGRESS：按“安装完整 UEBench → 自动使用配套标准库 → 用户直接评价”的产品模型收口；
   本阶段不得写成 DONE，不得发布 UEBench 0.2.0；
-- ECQ-RS06 = NOT STARTED，不得开始第二标准；
+- ECQ-RS06 = IN PROGRESS：Owner 已授权水泥设计与实现，Stage D 前不开放正式评价；
 - GB29446 Business Capability = COMPLETE；GB29446 Product Lifecycle = COMPLETE；
 - Excel Adapter technical capability = RETAINED；Excel user-facing formal workflow = DEFERRED；
 - 用户无需管理标准包；标准库随完整软件版本配套更新；
 - Reference Standard Product Closure = PARTIAL；
 - Numeric v1、数据库 Schema、Frozen Contract 与 platform-lock 保持现有基线；GB29446 业务解释以本次批准映射为准，机器规则身份及交付物按本轮实施验证。
+
+### 2026-11-11 水泥接入启动（当前，覆盖旧任务的禁止启动限制）
+
+Owner 已批准启动 GB 16780—2021 水泥接入，并跳过用户试用前置。RS06 进入 **IN PROGRESS（Stage C 应用与产品分块实施）**；依据仍为 V1.2 冻结映射，Issue001/003 内部决定无需重复确认。设计及差异清单见 [水泥 Stage B 设计](docs/governance/GB16780_STAGE_B_DESIGN_20261111.md)，Stage B设计提交55d09fa已由父Agent独立审查通过；现按分块实现及定向验证推进，再按独立 Golden / Stage D / 原生及候选包验收开放。第1块证据见[核心实施记录](docs/governance/GB16780_STAGE_C_CORE_REPORT_20261111.md)。第2块见[应用与产品实施记录](docs/governance/GB16780_STAGE_C_PRODUCT_REPORT_20261111.md)，源码定向通过，原生及配套签名待验。当前水泥为IMPLEMENTED、唯一未发布r3候选隔离，生产data/PIN恢复r1一致；[有限隔离与工具记录](docs/governance/GB16780_UNPUBLISHED_CANDIDATE_20261111.md)分别保留私钥缺失、原生桌面待恢复两项OPEN，不据此开放或发布。[最终源码回归记录](docs/governance/GB16780_SOURCE_REGRESSION_20261111.md)如实保留b508本机完整1433通过/67跳过/2失败/1警告、远端仅1文档失败及修复后定向16通过；草稿PR38不代表正式支持或发布。
+
+RS05 仍 IN PROGRESS、Reference Standard Product Closure 仍 PARTIAL、0.2.0 NOT RELEASED；原有未验环境事项保留在 RS05 执行报告。当前正式评价范围仍仅选煤，本次设计不修改支持门禁、Frozen lock、数据库或冻结映射。Excel 正式用户流程继续 DEFERRED。不操作真实库、已安装产品或旧测试包；下方旧日期“不启动水泥 / RS06 NOT STARTED”仅记载当时任务边界，不覆盖本次授权。
 
 ### 2026-10-28 rc-69562ee 定向复验与治理补录
 
@@ -110,8 +116,8 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 → RS02 GB29446 产品生命周期闭环                      DONE
 → RS03 GB29446 Excel Adapter 闭环                    DONE
 → RS04 GB29446 Product Golden Gate                   DONE
-→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  ← 当前阶段
-→ RS06 第二标准架构验证                              NOT STARTED
+→ RS05 Product Simplification & Standard Library Pairing                     IN PROGRESS  （环境收口保留）
+→ RS06 第二标准架构验证（水泥 Stage C）               IN PROGRESS
 ```
 
 阶段定义与验收条件见 `参考标准开发路线.md`。
@@ -129,7 +135,7 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 | Reference Standard 产品证据 | `PARTIAL` |
 | Reference Standard Product Closure | `PARTIAL`（尚欠 RS05） |
 | Product Simplification & Standard Library Pairing | `IN PROGRESS`（RS05 进行中，未 DONE） |
-| 第二标准架构验证 | `NOT STARTED`（RS06 处理） |
+| 第二标准架构验证 | `IN PROGRESS`（水泥 Stage C 应用与产品分块实施，尚未正式支持） |
 
 ## 发布物状态
 
@@ -191,11 +197,11 @@ ECQ-GOV01 治理清理与路线收口                        DONE
 ## 下一步
 
 - `ECQ-GOV01 = DONE`；`ECQ-RS01 = DONE`；`ECQ-RS02 = DONE`；`ECQ-RS03 = DONE`；`ECQ-RS04 = DONE`；
-- 当前阶段 = **`RS05` — Product Simplification & Standard Library Pairing**（`IN PROGRESS`）；RS06 未开始；
+- 当前任务 = **RS06 水泥接入 Stage C 应用与产品分块实施**；RS05 Product Simplification & Standard Library Pairing 继续 IN PROGRESS；
 - `PARTIAL` 不等于“可发布”；PR #33 已合并，下一步纳入经审核文档、从实际干净源码构建最终候选，再由构建／验收线提交真实 Gate 与环境证据。Win11 源码原生 150% 局部观察已取得；最终候选安装版、真实离线、125%／跨屏、输入法／原文网页及 0.1.0 两代真实安装器覆盖等仍按[RS05 最新交付矩阵](docs/governance/RS05_EXECUTION_REPORT.md)收口；
 - 旧阶段“便携 ZIP 缺失”及 `rc-4e43490`、`rc-f689658`、`rc-b102e36` 的已验与未验结果保留各自历史身份；旧候选的哈希、启动或 Word/WPS 证据不能直接移作最终候选验收。旧 UI 试用包及其数据也保持原状。
 
-本任务停在 RS05 候选阶段，未开始 RS06。
+当前任务为 RS06 水泥接入；RS05 候选及环境缺口保留，不据此宣布完成。
 
 ## Phase 7 历史收口记录（原阶段记录）
 
