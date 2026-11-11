@@ -114,11 +114,13 @@ def supports_formal_evaluation(standard_id: str | StandardDefinition) -> bool:
     answer depends solely on :data:`SUPPORTED_EVALUATION_STANDARD_IDS`; the
     definition's ``publication_status`` is deliberately ignored.
     """
-    return _standard_id_of(standard_id) in SUPPORTED_EVALUATION_STANDARD_IDS
+    return _standard_id_of(standard_id) in (SUPPORTED_EVALUATION_STANDARD_IDS | _DEVELOPMENT_EVALUATION_IDS.get())
 
 
 def evaluation_support_label(standard_id: str | StandardDefinition) -> str:
     """Return the Chinese user-facing support label for ``standard_id``."""
+    if _standard_id_of(standard_id) in _DEVELOPMENT_EVALUATION_IDS.get():
+        return "开发验收专用，尚未正式支持"
     if supports_formal_evaluation(standard_id):
         return FORMAL_EVALUATION_SUPPORTED_LABEL
     return FORMAL_EVALUATION_UNSUPPORTED_LABEL
@@ -149,3 +151,8 @@ def filter_formally_evaluable(
     standards it may offer as a formal evaluation task.
     """
     return [definition for definition in standards if supports_formal_evaluation(definition)]
+
+
+# 仅独立开发验收入口在其整个进程范围显式设置；默认正式集合保持不变。
+from contextvars import ContextVar
+_DEVELOPMENT_EVALUATION_IDS = ContextVar("development_evaluation_ids", default=frozenset())

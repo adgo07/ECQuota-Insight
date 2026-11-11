@@ -10,11 +10,11 @@ from uebench.domain.gb16780 import adopted
 from uebench.domain.models import StandardDefinition
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATE = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json"
+CANDIDATE = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json"
 
 
 def test_only_unpublished_candidate_has_r2_and_preserves_copied_identity():
-    assert hashlib.sha256(CANDIDATE.read_bytes()).hexdigest() == "1e9db2b766c4ce84c0e21d6c899481b86c0e009749f6f63de068544a1211cfa2"
+    assert hashlib.sha256((ROOT / "tests/fixtures/gb16780/pr38-r2-unpublished.json").read_bytes()).hexdigest() == "1e9db2b766c4ce84c0e21d6c899481b86c0e009749f6f63de068544a1211cfa2"
     definition = StandardDefinition.model_validate_json(CANDIDATE.read_text(encoding="utf-8"))
     assert adopted(definition)
     assert not supports_formal_evaluation(definition)

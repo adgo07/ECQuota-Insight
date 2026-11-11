@@ -4,7 +4,7 @@ import hashlib
 import json
 
 from uebench.domain.gb16780 import (
-    ACTUALS, CALCULATOR_VERSION, NUMERIC_BEHAVIOR_VERSION, PRODUCT_ID, adopted,
+    ADOPTION_MARKER, ACTUALS, CALCULATOR_VERSION, NUMERIC_BEHAVIOR_VERSION, PRODUCT_ID, adopted,
 )
 from uebench.domain.models import Grade, InputMode
 from .gb29446 import GB29446_PERIOD_OPTIONS, decode_period_notes
@@ -37,9 +37,12 @@ class IncompleteCementEvaluationError(ValueError):
         super().__init__("部分预览，尚未生成记录：" + "；".join(self.problems))
 
 
-def completeness_problems(request, result, snapshot, *, require_period=True):
+def completeness_problems(request, result, snapshot, *, require_period=True, historical_read=False):
     problems = []
-    if (not adopted(snapshot) or request.input_mode is not InputMode.DETAIL
+    if ((not adopted(snapshot) and not (historical_read and snapshot.rule_revision == 2
+                 and snapshot.id == "gb-16780-2021"
+                 and snapshot.products and snapshot.products[0].id == PRODUCT_ID
+                 and ADOPTION_MARKER in snapshot.corrections)) or request.input_mode is not InputMode.DETAIL
             or request.product_id != PRODUCT_ID or result.product_id != PRODUCT_ID
             or result.standard_id != request.standard_id or result.rule_revision != snapshot.rule_revision
             or result.standard_version != snapshot.version or request.standard_id != snapshot.id

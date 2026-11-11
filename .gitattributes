@@ -1,0 +1,6 @@
+# 历史候选与签名载荷保持原字节。
+*.uebench -text
+tests/fixtures/gb16780/pr38-r2-unpublished.json -text
+standards/development/GB16780-2021/*-candidate.json -text
+tests/fixtures/gb16780/pr36-records/*.json -text
+tests/fixtures/gb16780/pr36-r2-source.json -text

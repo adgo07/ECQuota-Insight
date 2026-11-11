@@ -43,7 +43,7 @@ Signing key: this is a **developer-side** tool.  The Ed25519 private key is neve
 committed and never referenced from CI; ``--private-key`` must point at an
 existing file or the tool fails with a clear message before touching anything.
 
-2026-11水泥接入：显式 ``--target-standard-id gb-16780-2021`` 只替换批准V1.2 r2。
+2026-11水泥接入：显式 ``--target-standard-id gb-16780-2021`` 只替换批准V1.2 r3。
 默认选煤行为保持兼容；不接受其它目标。水泥父/候选额外按产品既有公钥验签、
 核对全部成员哈希/数量，私钥必须匹配该信任根，不提供信任公钥替换参数。
 水泥解释与来源保存在该定义自身corrections中；包级corrections和其它47定义原字节不变。
@@ -272,7 +272,7 @@ def build_revision_package(
         from uebench.domain.gb16780 import adopted
 
         if not adopted(definition):
-            raise SystemExit("水泥替换定义须为明确采用V1.2的r2，不接受未审核规则")
+            raise SystemExit("水泥替换定义须为明确采用V1.2的r3，不接受未审核规则")
 
     # Locate the parent's member for this standard by parsing, never by name guess.
     removed: list[str] = []
@@ -683,7 +683,7 @@ def verify_revision_package(parent: Path, candidate: Path, *, target_standard_id
         from uebench.domain.gb16780 import adopted
 
         if gb_new is not None and not adopted(gb_new):
-            problems.append("水泥候选未明确采用V1.2 r2")
+            problems.append("水泥候选未明确采用V1.2 r3")
 
     if candidate_manifest.standard_count != parent_manifest.standard_count:
         problems.append(
@@ -721,7 +721,7 @@ def main(argv: list[str] | None = None) -> int:
     ensure_utf8_console()
     parser = argparse.ArgumentParser(
         description=(
-            "从已签名父基线生成新的签名标准包：默认只替换 GB29446；可显式指定已批准水泥r2；"
+            "从已签名父基线生成新的签名标准包：默认只替换 GB29446；可显式指定已批准水泥r3；"
             "加 --drop-sources 则生成不随包分发标准原文（provenance-only）的完整包"
         )
     )

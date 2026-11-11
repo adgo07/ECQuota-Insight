@@ -5,7 +5,7 @@
       "case_id": "C02-partial-purchase-four-deductions",
       "standard_id": "gb-16780-2021",
       "standard_version": "2021",
-      "rule_revision": 2,
+      "rule_revision": 3,
       "numeric_contract_version": "v1",
       "numeric_profile_id": "ECQUOTA_DECIMAL_FULL_VALUE_V1",
       "calculator_version": "gb16780-calculator-v1",

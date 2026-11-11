@@ -1,4 +1,4 @@
-"""GB16780 V1.2 的分线、依赖计算。只用于明确采用映射的 r2。
+"""GB16780 V1.2 的分线、依赖计算。只用于明确采用映射的 r3。
 
 式（2）～（9）来自2021正式版；源端四扣除采用Owner批准的2019技术参考。
 ECQ-STD-GB16780-001/003是项目内部解释，不是官方勘误。
@@ -18,7 +18,7 @@ from .models import (
 
 STANDARD_ID = "gb-16780-2021"
 PRODUCT_ID = "cement-assessment"
-RULE_REVISION = 2
+RULE_REVISION = 3
 MAPPING_SHA256 = "43d75b9724d8105ca27f0b3eeadd41de7dce1f92fa26965306c69cad5c17575c"
 ADOPTION_MARKER = (
     "软件映射采用（非标准勘误）：GB16780-2021/标准映射表_V1.2_修订稿.md; "
@@ -323,7 +323,7 @@ def _unique_trace(trace):
 def evaluate_cement(engine, standard: StandardDefinition, request: EvaluationRequest) -> EvaluationResult:
     """内部入口；必须由EvaluationEngine的Profile-owned authoritative scope调用。"""
     if not adopted(standard) or request.product_id != PRODUCT_ID:
-        raise EvaluationValidationError("水泥V1.2只接受明确采用映射的r2及配套评价产品")
+        raise EvaluationValidationError("水泥V1.2只接受明确采用映射的r3及配套评价产品")
     if request.input_mode is not InputMode.DETAIL:
         raise EvaluationValidationError("水泥V1.2仅支持原始明细计算，不接受直接输入最终单位值")
     if request.inputs or request.energy_lines or request.production_lines:
@@ -334,13 +334,13 @@ def evaluate_cement(engine, standard: StandardDefinition, request: EvaluationReq
         raise EvaluationValidationError("生产线标识重复")
     product = next((item for item in standard.products if item.id == PRODUCT_ID), None)
     if product is None:
-        raise EvaluationValidationError("水泥r2规则缺少配套评价产品，映射采用身份无效")
+        raise EvaluationValidationError("水泥r3规则缺少配套评价产品，映射采用身份无效")
     if {item.id for item in product.indicators} != set(ACTUALS) or len(product.indicators) != 5:
-        raise EvaluationValidationError("水泥r2规则缺少必要指标或包含重复指标")
+        raise EvaluationValidationError("水泥r3规则缺少必要指标或包含重复指标")
     k_nodes = [display for indicator in product.indicators for display in indicator.display_calculations
                if display.key == "K" and InputMode.DETAIL in display.modes]
     if len(k_nodes) != 1:
-        raise EvaluationValidationError("水泥r2规则须包含唯一的海拔修正系数K节点")
+        raise EvaluationValidationError("水泥r3规则须包含唯一的海拔修正系数K节点")
     calculations = {line.line_id: LineCalculation(line, engine, k_nodes[0].formula) for line in request.cement_lines}
     for line in request.cement_lines:
         if set(line.inputs) - INPUTS.keys():

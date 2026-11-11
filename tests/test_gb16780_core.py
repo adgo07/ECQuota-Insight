@@ -24,7 +24,7 @@ BASES = (("80", "87", "94"), ("100", "107", "117"), ("48", "57", "61"), ("94", "
 
 @pytest.fixture
 def standard():
-    return StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json").read_text(encoding="utf-8"))
+    return StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json").read_text(encoding="utf-8"))
 
 
 def golden_request():
@@ -54,7 +54,7 @@ def evaluate(standard, request):
 
 
 def test_golden_identity_and_independent_rational_evidence(standard):
-    assert standard.rule_revision == GOLDEN["rule_revision"] == 2
+    assert standard.rule_revision == GOLDEN["rule_revision"] == 3
     assert standard.version == GOLDEN["standard_version"] == "2021"
     assert hashlib.sha256((ROOT / "standards/mappings/GB16780-2021/标准映射表_V1.2_修订稿.md").read_bytes()).hexdigest() == GOLDEN["mapping_sha256"]
     assert standard.source_sha256 == "c50768dbca219aeee201a2ef9a79093a2b8e1d384560b31de045aa2cef843a5c"
@@ -440,7 +440,7 @@ def test_raw_float_rejected_even_on_nested_shared_fuel():
         EvaluationRequest.model_validate(data)
 
 
-@pytest.mark.parametrize("revision,marker", [(1, True), (2, False), (3, True)])
+@pytest.mark.parametrize("revision,marker", [(1, True), (2, True), (3, False), (4, True)])
 def test_exact_r2_adoption_dispatch_cannot_relabel_history(standard, revision, marker):
     standard.rule_revision = revision
     if not marker:

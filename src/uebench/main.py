@@ -184,7 +184,7 @@ def run_self_check_command(data_dir: Path, output: Path | None) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _run_desktop_application() -> int:
+def _run_desktop_application(*, root=None, candidate_definition=None, candidate_title=None) -> int:
     from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import QApplication
 
@@ -200,7 +200,7 @@ def _run_desktop_application() -> int:
         application.setWindowIcon(QIcon(str(bundled_icon)))
     configure_application_font(application)
     resource_key = Path(__file__).resolve().parent / "resources" / "update_public_key.pem"
-    context = create_context(public_key_path=resource_key)
+    context = create_context(root=root, public_key_path=resource_key)
     try:
         try:
             reconcile_standard_package(context)
@@ -208,7 +208,13 @@ def _run_desktop_application() -> int:
             # 对账失败绝不能阻止界面启动：standards 安装已由 install 自行回滚，
             # 存量数据保持可用（旧行为同样是记录日志后继续启动）。
             logging.getLogger(__name__).exception("内置标准包对账失败")
+        if candidate_definition is not None:
+            if root is None:
+                raise ValueError("开发候选必须使用显式隔离数据目录")
+            context.standards.install(candidate_definition)
         window = create_main_window(context)
+        if candidate_title:
+            window.setWindowTitle(candidate_title)
         window.show()
         return application.exec()
     finally:

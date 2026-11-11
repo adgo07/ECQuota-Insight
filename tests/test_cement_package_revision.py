@@ -11,7 +11,7 @@ from uebench.infrastructure.packages import PackageManifest
 
 ROOT = Path(__file__).resolve().parents[1]
 REAL_PARENT = ROOT / "release/standard-packages/initial-standard-package-published.uebench"
-DEFINITION = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json"
+DEFINITION = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json"
 
 
 def key_file(path, key):
@@ -64,7 +64,7 @@ def test_cement_explicit_target_changes_only_one_definition_and_keeps_47_bytes(s
     candidate, report = build(synthetic, tmp_path)
     verification = tool.verify_revision_package(parent, candidate, target_standard_id="gb-16780-2021")
     assert verification["valid"], verification["problems"]
-    assert report["gb16780_rule_revision"] == 2 and report["target_standard_id"] == "gb-16780-2021"
+    assert report["gb16780_rule_revision"] == 3 and report["target_standard_id"] == "gb-16780-2021"
     assert report["standard_count"] == 48 and report["rule_count"] == 765
     _, before = tool._read_package(parent)
     raw, after = tool._read_package(candidate)

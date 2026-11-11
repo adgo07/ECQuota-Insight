@@ -22,7 +22,7 @@ def cement_context(tmp_path, monkeypatch):
     # 仅此测试夹具允许受测应用路径；默认生产门禁仍不含水泥。
     monkeypatch.setattr(evaluation_support, "SUPPORTED_EVALUATION_STANDARD_IDS", frozenset({"gb-29446-2019", "gb-16780-2021"}))
     context = create_context(tmp_path / "隔离水泥", enforce_standard_library_readiness=False)
-    standard = StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r2-candidate.json").read_text(encoding="utf-8"))
+    standard = StandardDefinition.model_validate_json((ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json").read_text(encoding="utf-8"))
     context.standards.install(standard)
     yield context
     context.database.dispose()
@@ -216,3 +216,43 @@ def test_shared_internal_ids_stay_in_audit_trace_not_history_or_word(cement_cont
     with ZipFile(path) as archive:
         xml = archive.read("word/document.xml").decode("utf-8")
     assert internal_id not in xml and "共用系统1" in xml and "e_sh_before" not in xml
+
+
+@pytest.mark.parametrize("identity", ["request", "result", "standard"])
+def test_excel_rejects_each_cement_identity_before_creation_or_audit(cement_context, tmp_path, monkeypatch, identity):
+    from unittest.mock import Mock
+    import uebench.infrastructure.excel as excel
+    value = request()
+    result = cement_context.application.evaluate(value)
+    loaded = list(cement_context.application.get_evaluation(result.evaluation_id))
+    for item in loaded:
+        if hasattr(item, "standard_id"):
+            item.standard_id = "other"
+        else:
+            item.id = "other"
+    setattr(loaded[["request", "result", "standard"].index(identity)],
+            "id" if identity == "standard" else "standard_id", "gb-16780-2021")
+    repository, audit, workbook = Mock(), Mock(), Mock()
+    repository.get.return_value = tuple(loaded)
+    monkeypatch.setattr(excel, "Workbook", workbook)
+    path = tmp_path / "existing.xlsx"
+    path.write_bytes(b"existing user file")
+    with pytest.raises(ValueError, match="水泥多指标 Excel"):
+        excel.WorkbookExportService(repository, audit).export(result.evaluation_id, path)
+    assert path.read_bytes() == b"existing user file"
+    assert audit.mock_calls == workbook.mock_calls == []
+
+
+def test_saved_g_difference_independent_of_ambient_context(cement_context):
+    from decimal import localcontext, ROUND_DOWN
+    from uebench.application.reporting import build_report_view
+    value = request()
+    put(value.cement_lines[0], "cement.clinker_percent", "76.1234567890123456789")
+    result = cement_context.application.evaluate(value)
+    loaded = cement_context.application.get_evaluation(result.evaluation_id)
+    with localcontext() as context:
+        context.prec = 2
+        context.rounding = ROUND_DOWN
+        view = build_report_view(*loaded)
+    field = next(field for field in view.lines[0].inputs if field.key == "clinker_percent_difference")
+    assert field.value == "1.1234567890123456789"

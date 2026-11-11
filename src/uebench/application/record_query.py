@@ -30,7 +30,8 @@ class RecordPage:
 def saved_record_projection(request_json: str, result_json: str) -> str:
     """SQLite 查询适配器使用的有界逐行投影；只返回小摘要，不返回大 JSON。"""
     try:
-        request = EvaluationRequest.model_validate_json(request_json)
+        from uebench.domain.cement_history import parse_saved
+        request = parse_saved(EvaluationRequest, request_json)
         result = EvaluationResult.model_validate_json(result_json)
         period = "未记录"
         if result.standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"} and (request.notes or "").startswith("核算周期："):

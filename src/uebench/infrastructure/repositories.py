@@ -103,7 +103,8 @@ class SqlStandardRepository:
 
     def _definition(self, payload: str) -> StandardDefinition:
         """Parse one stored definition payload into a fresh definition."""
-        return StandardDefinition.model_validate_json(payload)
+        from uebench.domain.cement_history import parse_saved
+        return parse_saved(StandardDefinition, payload)
 
     def get_for_evaluation(
         self,
@@ -294,6 +295,9 @@ class SqlEvaluationRepository:
         result: EvaluationResult,
         standard_snapshot: StandardDefinition,
     ) -> None:
+        from uebench.domain.cement_history import HistoricalCementRequest, HistoricalCementStandard
+        if isinstance(request, HistoricalCementRequest) or isinstance(standard_snapshot, HistoricalCementStandard):
+            raise ValueError("历史水泥快照只读，不能重新保存或转换")
         with self.database.session() as session:
             session.add(
                 EvaluationRow(
@@ -331,16 +335,27 @@ class SqlEvaluationRepository:
             row = session.get(EvaluationRow, evaluation_id)
             if row is None or row.deleted_at is not None:
                 return None
-            return (
+            loaded = (
                 self._parse_payload(evaluation_id, "request_json", row.request_json, EvaluationRequest),
                 self._parse_payload(evaluation_id, "result_json", row.result_json, EvaluationResult),
                 self._parse_payload(evaluation_id, "rule_snapshot_json", row.rule_snapshot_json, StandardDefinition),
             )
 
+            from uebench.domain.cement_history import HistoricalCementStandard, HistoricalCementRequest, original_hash
+            request, result, snapshot = loaded
+            if isinstance(snapshot, HistoricalCementStandard):
+                if (not isinstance(request, HistoricalCementRequest)
+                        or request.standard_id != snapshot.id or result.standard_id != snapshot.id
+                        or request.product_id != result.product_id or result.rule_revision != 2
+                        or result.rule_snapshot_sha256 != original_hash(snapshot)):
+                    raise StorageCorruptionError("历史水泥记录身份或原始规则哈希校验失败；原记录未修改。")
+            return loaded
+
     @staticmethod
     def _parse_payload(evaluation_id: str, field: str, payload: str, model):
         try:
-            return model.model_validate_json(payload)
+            from uebench.domain.cement_history import parse_saved
+            return parse_saved(model, payload)
         except ValueError as exc:
             _log_corruption(evaluation_id, field, exc)
             raise StorageCorruptionError(
