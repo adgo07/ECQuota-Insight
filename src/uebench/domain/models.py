@@ -453,6 +453,7 @@ class CementLineInput(StrictModel):
     line_id: str = Field(min_length=1)
     line_name: str = "生产线"
     production_mode: CementProductionMode
+    clinker_ratio_mode: Literal["manual", "automatic"] = "manual"
     inputs: dict[str, InputValue] = Field(default_factory=dict)
     fuels: list[CementFuelInput] = Field(default_factory=list)
 

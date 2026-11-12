@@ -7,10 +7,11 @@ ECQ-STD-GB16780-001/003是项目内部解释，不是官方勘误。
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from decimal import Decimal, DecimalException
+from decimal import Decimal, DecimalException, localcontext
 from uuid import uuid4
 
 from .engine import EvaluationContext, EvaluationValidationError
+from .numeric import ECQUOTA_DECIMAL_FULL_VALUE_V1
 from .models import (
     CalculationStep, EvaluationRequest, EvaluationResult, Grade, IndicatorResult,
     InputMode, InputValue, StandardDefinition, parse_decimal,
@@ -94,6 +95,35 @@ def input_number(supplied: InputValue | None, key: str) -> Decimal:
     if key == "cement.clinker_percent" and result > 100:
         raise NodeError(f"{label} 必须在0～100%之间")
     return result
+
+
+RATIO_MODES = frozenset({"integrated", "partial_purchase"})
+
+
+def clinker_ratio(inputs) -> Decimal:
+    """辅助输入值，不替代映射中独立的g；不使用显示修约或业务容差。"""
+    with localcontext(ECQUOTA_DECIMAL_FULL_VALUE_V1.decimal_context()):
+        consumption = input_number(inputs.get("cement.clinker_consumption_t"), "cement.clinker_consumption_t")
+        production = input_number(inputs.get("cement.production_t"), "cement.production_t")
+        if consumption > production:
+            raise NodeError("生产水泥消耗的熟料总量不能大于水泥总产量（计算配比超过100%）")
+        try:
+            return consumption / production * Decimal(100)
+        except DecimalException as exc:
+            raise NodeError("熟料配比无法计算，请核对熟料消耗量与水泥产量") from exc
+
+
+def clinker_ratio_warning(line) -> str | None:
+    if line.production_mode not in RATIO_MODES:
+        return None
+    try:
+        expected = clinker_ratio(line.inputs)
+        actual = input_number(line.inputs.get("cement.clinker_percent"), "cement.clinker_percent")
+    except NodeError as exc:
+        return str(exc)
+    if actual != expected:
+        return f"手工熟料配比与按熟料消耗量÷水泥产量计算的配比（{expected}%）不一致，请核对统计口径；本次采用手工值。"
+    return None
 
 
 def fuel_values(fuels):
@@ -365,8 +395,15 @@ def evaluate_cement(engine, standard: StandardDefinition, request: EvaluationReq
             )
             if engine.conditions.evaluate(indicator.applicability, context):
                 node = ACTUALS[indicator.id]
+                if node == "E_s" and line.clinker_ratio_mode == "manual":
+                    warning = clinker_ratio_warning(line)
+                    if warning:
+                        item.warnings.append(warning)
                 trace = []
                 try:
+                    if node == "E_s" and line.clinker_ratio_mode == "automatic" and line.production_mode in RATIO_MODES:
+                        if input_number(line.inputs.get("cement.clinker_percent"), "cement.clinker_percent") != clinker_ratio(line.inputs):
+                            raise NodeError("自动熟料配比已过期，请按当前熟料消耗量与水泥产量重新计算")
                     try:
                         item.actual_value = calc.get(node)
                     finally:

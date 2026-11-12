@@ -1,4 +1,4 @@
-"""水泥原始明细表单；只收集文本，不计算业务值。"""
+"""水泥原始明细表单；熟料配比辅助输入复用Domain。"""
 from datetime import date
 from uuid import uuid4
 
@@ -11,7 +11,10 @@ from PySide6.QtWidgets import (
 from .wheel_safe_combo import WheelSafeComboBox as QComboBox
 from uebench.application.gb16780 import MODE_LABELS
 from uebench.application.gb29446 import GB29446_PERIOD_OPTIONS, encode_period_notes, decode_period_notes
-from uebench.domain.gb16780 import INPUTS, DEDUCTIONS, PRODUCT_ID, STANDARD_ID
+from uebench.domain.gb16780 import (
+    INPUTS, DEDUCTIONS, PRODUCT_ID, STANDARD_ID, RATIO_MODES,
+    NodeError, clinker_ratio, clinker_ratio_warning,
+)
 from uebench.domain.models import (
     CementFuelInput, CementLineInput, CementSharedEnergy, EvaluationRequest, InputMode, InputValue,
 )
@@ -133,6 +136,7 @@ class CementLineForm(QWidget):
     def __init__(self, number=1, line_id=None):
         super().__init__()
         self.line_id = line_id or uuid4().hex
+        self._loading = False
         body = QVBoxLayout(self)
         body.setContentsMargins(0, 0, 0, 0)
         header = QHBoxLayout()
@@ -160,6 +164,20 @@ class CementLineForm(QWidget):
             self.groups.append(group)
             self.fields.update(group.fields)
             body.addWidget(group)
+        self.ratio_controls = QWidget()
+        ratio_layout = QVBoxLayout(self.ratio_controls)
+        ratio_layout.setContentsMargins(0, 0, 0, 0)
+        self.ratio_mode = QComboBox()
+        self.ratio_mode.addItem("熟料配比：按消耗量和水泥产量自动计算", "automatic")
+        self.ratio_mode.addItem("熟料配比：手工输入", "manual")
+        self.ratio_notice = QLabel()
+        self.ratio_notice.setWordWrap(True)
+        ratio_layout.addWidget(self.ratio_mode)
+        ratio_layout.addWidget(self.ratio_notice)
+        body.insertWidget(2, self.ratio_controls)
+        self.ratio_mode.currentIndexChanged.connect(self._refresh_ratio)
+        for key in ("cement.production_t", "cement.clinker_consumption_t", "cement.clinker_percent"):
+            self.fields[key].textChanged.connect(self._refresh_ratio)
         self.fuels = FuelTable()
         self.groups[1].grid.addWidget(self.fuels, 2, 0, 1, 2)
         self.fuels.changed.connect(self.changed.emit)
@@ -171,23 +189,59 @@ class CementLineForm(QWidget):
         keys = mode_keys(self.mode.currentData())
         for group in self.groups:
             group.show_keys(keys)
+        self._refresh_ratio()
+        self.changed.emit()
+
+    def _refresh_ratio(self, *_):
+        if self._loading:
+            return
+        applicable = self.mode.currentData() in RATIO_MODES
+        self.ratio_controls.setVisible(applicable)
+        automatic = self.ratio_mode.currentData() == "automatic"
+        field = self.fields["cement.clinker_percent"]
+        field.setReadOnly(automatic)
+        if not applicable:
+            self.ratio_notice.clear()
+        elif automatic:
+            inputs = {k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
+                      for k in ("cement.production_t", "cement.clinker_consumption_t")}
+            try:
+                text = str(clinker_ratio(inputs))
+                notice = "按生产水泥消耗的熟料总量÷水泥总产量×100计算。"
+            except NodeError as exc:
+                text, notice = "", str(exc)
+            field.blockSignals(True)
+            field.setText(text)
+            field.blockSignals(False)
+            self.ratio_notice.setText(notice)
+        else:
+            self.ratio_notice.setText(clinker_ratio_warning(self.collect()) or "")
         self.changed.emit()
 
     def collect(self):
         mode = self.mode.currentData()
         return CementLineInput(line_id=self.line_id, line_name=self.name.text().strip() or "生产线",
-            production_mode=mode, inputs={k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
+            production_mode=mode, clinker_ratio_mode=self.ratio_mode.currentData(),
+            inputs={k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
                 for k in mode_keys(mode) if self.fields[k].text().strip()},
             fuels=self.fuels.collect() if mode != "purchased_clinker_grinding" else [])
 
     def load(self, line):
+        self._loading = True
         self.name.setText(line.line_name)
         self.mode.setCurrentIndex(self.mode.findData(line.production_mode))
+        # 加载原始值，无论来自哪一代请求都不静默重算；切回自动由用户明确选择。
+        self.ratio_mode.setCurrentIndex(self.ratio_mode.findData("manual"))
+        for field in self.fields.values():
+            field.clear()
+        self.fuels.table.setRowCount(0)
         for key, value in line.inputs.items():
             if key in self.fields:
                 self.fields[key].setText("" if value.value is None else str(value.value))
         for fuel in line.fuels:
             self.fuels.add(fuel)
+        self._loading = False
+        self._refresh_ratio()
 
 
 class SharedEnergyForm(QGroupBox):
