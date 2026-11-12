@@ -77,3 +77,31 @@ Owner 明确要求熟料配比不可手填。适用生产线的新评价无条�
 - 完整回归与原生最终结果由 PR 验收记录补充，以实际日志为准，本文不预宣称通过。本地完整回归日志为 `work/cement-ratio-full.log` / `.xml`；最终文档提交之后生产代码保持上述定稿提交的相同字节，父任务按已记录哈希复核。
 
 生产 `data`、配套 r1、PIN、公钥、冻结映射、唯一 r3 候选 Rule、数据库 Schema、Frozen lock 和正式支持集合均不变。原生 UI、候选打包、签名及 Stage D 不由离屏测试代替；独立验收由父任务承接。
+
+
+## 2026-11-12 PR #39 独立验收报告核实与后续修复
+
+### 平台 / Contract 预检查
+
+本轮基线为业务仓 `992c2cb31963001502f499afa2d98ea70ea89974`，实际 origin、工作树、分支、HEAD 与 clean 状态已核实并 fetch；远端默认分支仍为 main。本地 main 落后 origin/main 98 提交，不将其当作本轮起点。`platform-lock.json` 仍锁定中央 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Numeric Contract / Profiles / Conformance v1 按该 SHA 读取；当前中央 GUIDE_INDEX 按已验证 origin 的 main `829853a943c421e0b9864d84f3d94970d2ddf688` 读取。适用 MUST 为 Decimal、独立 Profile、全值比较与历史只读；MUST NOT 为无来源区间、隐式修约、显示值回流及重算历史。未发现公共 Contract 冲突，不修改中央 Contract 或锁定基线。本次属于本地保存防御完善（ALLOWED PROJECT DIFFERENCE），不将清理建议冒称已证实 Frozen 违规。相关 Standard Issue 为 ECQ-STD-GB16780-001、003；本次不改变既有软件解释，也未发现应新增登记的标准原文问题。
+
+### 报告建议逐项核实
+
+- P1 的 40% / 95% 探针证明软件执行了配比修正，不能证明违反标准或存在有来源的“表1常见范围”。冻结 V1.2 §8 引用标准 §5.4，明确对高于或低于75%的熟料配比按百分点增减限额；表1给出80/87/94基准限额，没有熟料配比区间。没有依据把40% / 95%称为异常或统一标注“表外外推”。因此本轮不添加无来源的区间和外推警告，也不把该建议登记为已证实标准缺陷。父验收另核对正式标准PDF同一条款。
+- “低端完全无防护”的说法不准确：熟料消耗量必须非负、水泥产量必须正数，且消耗量不得超过产量，已有计算配比0～100%的数值域防护。但数值可计算不等于产品满足GB 175要求，也不证明任意配比均符合标准产品适用范围。按产品类型核对GB 175及同一统计期口径的证据需求追加至既有Stage B设计待核证事项；取得依据前不发明跨产品统一合理区间。
+- P2-1 成立为死代码清理：新Engine路径直接从数量求g，删除 `input_number` 中仅针对外部g的 `>100` 守卫；真实数量边界继续由 `clinker_ratio` 执行。
+- P2-2 采纳报告给出的“至少断言”方案：保留缺省manual用于旧快照反序列化，避免把历史来源改写成automatic。新保存完整性门禁额外要求automatic，适用线的保存g与原始数量重算值相等，且水泥综合能耗trace恰有一个 `P_shx/P_s×100` 步骤，其值为有限Decimal并与计算g一致、单位为%。不符合时抛完整性异常，不写评价或保存审计；历史只读路径跳过新增来源检查，保持三JSON原字节。
+- 配比显示位数维持现有策略，本轮未采纳可选的显示位数调整建议。选煤Word跨标准下标外观及水泥原生/Word实开、EXE、安装包仍按原Stage D缺口验收。
+- 报告的GitHub 403是审阅者当时环境限制，不能据此断言CI未通过。父任务已通过连接器独立核实992c2cb的严格完整回归、Numeric v1、N01-A三项均success。本轮新提交仍须取得自己的CI证据，旧head成功不代替新head。
+
+### 本轮验证
+
+测试日志使用新文件，未覆盖原PR证据。定向与历史保存验证通过；具体数量和最终代码复验见下方追加。首次扩展命令误写N01-A路径，pytest未收集测试即报路径不存在，原日志保留 `work/pr39-review-followup-final.log`，随后按真实 `tests/pilots/numeric/test_qzc_n01_a.py` 重跑。完整full suite与远端workflow由父任务对稳定提交单次执行；本轮不合并、不发布，不改变生产data、r3候选Rule、Frozen Mapping、PIN、公钥或Schema。
+
+
+本轮实际结果：
+
+- 水泥core/application/UI/ratio/package sources、历史、科学符号、选煤Word、Frozen Numeric/N01-A：311项通过，exit 0（`work/pr39-review-followup-verified.log` / `.xml`）；随后仅按父审查新增有限Decimal与布尔型trace边界，生产逻辑未再扩展。
+- 最终来源门禁及保存/历史回归：61项通过，exit 0（`work/pr39-review-followup-edge-final.log` / `.xml`）。非有限trace首次普通赋值被Pydantic既有校验先行拒绝，原失败证据保留 `work/pr39-review-followup-edge.log`；最终测试明确注入损坏Engine对象验证门禁，未放松模型。最后将布尔用例特化为g=1、trace=True以覆盖数值相等陷阱，并在下一项复验。
+- Numeric workflow本地等效专项（Frozen Conformance、N01-A、GB29446、Engine、Excel、UI）及8项最终来源门禁：146项通过，exit 0（`work/pr39-review-followup-numeric.log` / `.xml`）。compileall、公共Engine无全局ROUND6、生产规则显式修约声明检查通过，声明0项（`work/pr39-review-followup-static.log`）。本地等效不冒称远端workflow已执行。
+- 父独立探针确认40%及95%配比阈值保持41.50/46.75/52.00与102/110/118；新manual来源被保存门禁拒绝，v1/manual历史读取允许且请求/结果序列化前后不变。远端新head完整full suite及三项CI由父任务追加，不以旧head通过代替。

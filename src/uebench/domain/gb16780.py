@@ -92,8 +92,6 @@ def input_number(supplied: InputValue | None, key: str) -> Decimal:
     if supplied.unit not in (None, unit):
         raise NodeError(f"{label} 单位应为 {unit}")
     result = number(supplied.value, label, positive=positive, negative=key == "site.altitude_m")
-    if key == "cement.clinker_percent" and result > 100:
-        raise NodeError(f"{label} 必须在0～100%之间")
     return result
 
 

@@ -183,3 +183,58 @@ def test_engine_uses_quantities_for_each_line_even_if_manual(cement_context):
         steps = [step for item in result.results if item.line_id == line_id for step in item.calculation_trace
                  if step.expression == "P_shx/P_s×100"]
         assert steps and all(step.value == expected for step in steps)
+
+
+@pytest.mark.parametrize("tamper", [
+    "manual", "saved-ratio", "trace-ratio", "missing-trace", "duplicate-trace", "trace-unit",
+    "nonfinite-trace", "bool-trace",
+])
+def test_new_save_gate_rejects_inconsistent_ratio_provenance(cement_context, monkeypatch, tamper):
+    import uebench.application.gb16780 as service_module
+
+    original = service_module.calculated_ratio_request
+
+    def altered(value):
+        normalized = original(value)
+        if tamper == "manual":
+            normalized.cement_lines[0].clinker_ratio_mode = "manual"
+        elif tamper == "saved-ratio":
+            put(normalized.cement_lines[0], "cement.clinker_percent", "99")
+        return normalized
+
+    monkeypatch.setattr(service_module, "calculated_ratio_request", altered)
+    engine = cement_context.evaluation_service.engine
+    evaluate = engine.evaluate
+
+    def altered_result(*args, **kwargs):
+        result = evaluate(*args, **kwargs)
+        for item in result.results:
+            if item.indicator_id == "cement.comprehensive_energy":
+                if tamper == "trace-ratio":
+                    for step in item.calculation_trace:
+                        if step.expression == "P_shx/P_s×100":
+                            step.value = Decimal(99)
+                elif tamper in {"nonfinite-trace", "bool-trace"}:
+                    for step in item.calculation_trace:
+                        if step.expression == "P_shx/P_s×100":
+                            # 明确模拟损坏Engine对象；正常Pydantic赋值已先行拒绝非有限数。
+                            object.__setattr__(step, "value", Decimal("sNaN") if tamper == "nonfinite-trace" else True)
+                elif tamper == "trace-unit":
+                    for step in item.calculation_trace:
+                        if step.expression == "P_shx/P_s×100":
+                            step.unit = "t"
+                elif tamper == "duplicate-trace":
+                    item.calculation_trace.append(next(step.model_copy(deep=True) for step in item.calculation_trace
+                                                       if step.expression == "P_shx/P_s×100"))
+                elif tamper == "missing-trace":
+                    item.calculation_trace = [step for step in item.calculation_trace
+                                              if step.expression != "P_shx/P_s×100"]
+        return result
+
+    monkeypatch.setattr(engine, "evaluate", altered_result)
+    value = request()
+    if tamper == "bool-trace":
+        put(value.cement_lines[0], "cement.clinker_consumption_t", "20")  # g=1；True==Decimal(1)。
+    with pytest.raises(IncompleteCementEvaluationError, match="来源"):
+        cement_context.application.evaluate(value)
+    assert state(cement_context) == (0, 0)

@@ -2,9 +2,11 @@
 from __future__ import annotations
 import hashlib
 import json
+from decimal import Decimal
 
 from uebench.domain.gb16780 import (
-    ADOPTION_MARKER, ACTUALS, CALCULATOR_VERSION, NUMERIC_BEHAVIOR_VERSION, PRODUCT_ID, adopted,
+    ADOPTION_MARKER, ACTUALS, CALCULATOR_VERSION, NUMERIC_BEHAVIOR_VERSION, PRODUCT_ID,
+    RATIO_MODES, NodeError, adopted, clinker_ratio, input_number,
 )
 from uebench.domain.models import Grade, InputMode
 from .gb29446 import GB29446_PERIOD_OPTIONS, decode_period_notes
@@ -68,6 +70,23 @@ def completeness_problems(request, result, snapshot, *, require_period=True, his
         problems.append("分线结果含缺项、重复或不匹配的指标")
     by_pair = {(item.line_id, item.indicator_id): item for item in result.results}
     for line in request.cement_lines:
+        if not historical_read:
+            # 旧快照缺省 manual 只用于保真读取；新记录必须保留真实计算来源。
+            if line.clinker_ratio_mode != "automatic":
+                problems.append(f"{line.line_name}：新记录的熟料配比来源必须为自动计算")
+            if line.production_mode in RATIO_MODES:
+                try:
+                    expected_ratio = clinker_ratio(line.inputs)
+                    saved_ratio = input_number(line.inputs.get("cement.clinker_percent"), "cement.clinker_percent")
+                    item = by_pair.get((line.line_id, "cement.comprehensive_energy"))
+                    ratio_steps = ([step for step in item.calculation_trace if step.expression == "P_shx/P_s×100"]
+                                   if item else [])
+                    if (saved_ratio != expected_ratio or len(ratio_steps) != 1
+                            or any(not isinstance(step.value, Decimal) or not step.value.is_finite()
+                                   or step.value != expected_ratio or step.unit != "%" for step in ratio_steps)):
+                        problems.append(f"{line.line_name}：保存配比、原始数量与计算来源不一致")
+                except NodeError as exc:
+                    problems.append(f"{line.line_name}：{exc}")
         for key in ACTUALS:
             item = by_pair.get((line.line_id, key))
             if item is None:
