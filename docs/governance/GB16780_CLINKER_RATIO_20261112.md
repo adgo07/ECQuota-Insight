@@ -35,6 +35,9 @@
 - `.github/workflows/numeric-v1-adoption.yml` 的本地等效检查：`compileall src tests tools`、生产全局 ROUND6 禁止词断言、已发布规则隐含修约断言通过，已发布显式修约声明 0 项。
 - Numeric workflow 所列 Frozen Conformance、N01-A migration、GB29446、Engine、Excel、UI 专项：138 passed，19.44 s；`work/cement-ratio-numeric.log` / `.xml`。
 - 现有解释器没有 pip，未安装或升级依赖；依赖记录通过 `importlib.metadata` 读取：jsonschema 4.26.0、jsonschema-specifications 2025.9.1、attrs 26.1.0、referencing 0.37.0、rpds-py 2026.6.3。本地等效执行不冒称 GitHub workflow 已运行。
-- 水泥定向及完整回归待本轮完成后补入。
+- 生产代码与测试定稿提交：`ffc3ce92ec06ca24f50f136342d3a4eb78fd7b88`。
+- 水泥定向（core、application、UI、ratio）：202 passed，13.62 s；`work/cement-ratio-focused.log` / `.xml`。新增 22 项覆盖低精度/rounding/Inexact trap 的 ambient 隔离、0/100/原始略超100、循环小数、缺失/非法/零分母/单位、应用请求防绕过及部分预览、手工差异、模式/多线隔离、重复加载、自动保存恰一次和旧无 mode 请求三 JSON 原字节保真。
+- 父任务独立源码审查通过；独立 ratio + cement_history：36 passed，4.22 s，`work/ratio-parent-acceptance/independent-tests.xml`；父任务已记录生产文件哈希。
+- 完整回归与原生最终结果由 PR 验收记录补充，以实际日志为准，本文不预宣称通过。本地完整回归日志为 `work/cement-ratio-full.log` / `.xml`；最终文档提交之后生产代码保持上述定稿提交的相同字节，父任务按已记录哈希复核。
 
 生产 `data`、配套 r1、PIN、公钥、冻结映射、唯一 r3 候选 Rule、数据库 Schema、Frozen lock 和正式支持集合均不变。原生 UI、候选打包、签名及 Stage D 不由离屏测试代替；独立验收由父任务承接。
