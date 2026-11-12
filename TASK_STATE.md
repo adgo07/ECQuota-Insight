@@ -1,5 +1,7 @@
 # TASK_STATE
 
+2026-11-12完整判级预览续更：Owner授权继续开发后，已实现两炉型明细能耗/26、表1/2修正、最高级别及局部缺项状态，接入独立Application与Facade只读preview_coke；见[本轮实施记录](docs/governance/GB21342_STAGE_C_ASSESSMENT_REPORT_20261112.md)。不接GUI/原始能源折标/正式记录/生产包，整体MAPPING和正式范围不变；001软件决定已采用，003区间内相邻线性已作软件算法选择，其余OPEN边界保留。下方首块段落是此前局部进度，当前调用能力以本续更为准。
+
 更新时间：2026-11-11
 
 ## 当前产品目标
@@ -13,6 +15,10 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 总体路线唯一入口：`参考标准开发路线.md`。
 
 ## 当前任务
+
+### 2026-11-12 焦炭授权首块（并行，不改变正式范围）
+
+Owner已授权PR23核实修复合并后开始焦炭开发。PR23已合并`ea28ca46fdff826e92f2a907f8faf4e9726f435b`；原文式3及完整外属未计入时26调整经独立原文复核与父Agent审查，作为局部开发依据。现完成独立Domain首块与定向验证，见[首块设计](docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)、[实施记录](docs/governance/GB21342_STAGE_C_CORE_REPORT_20261112.md)。不接GUI/正式记录/标准包；整体仍MAPPING，完整映射未获批准冻结，Issue001已按Owner明确的软件最高级别决定记PROVISIONAL、002～005仍OPEN，正式范围仍仅GB29446。本块不是整标准IMPLEMENTED/SUPPORTED或Stage D通过，水泥与RS05既有边界不变。
 
 **ECQ-RS06 — GB 16780—2021 水泥接入（Stage C 应用与产品分块实施）；RS05 既有交付环境收口继续 IN PROGRESS。**
 

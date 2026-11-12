@@ -111,6 +111,12 @@ class ApplicationFacade:
     def preview_evaluation(self, request: EvaluationRequest) -> EvaluationResult:
         return self._evaluation.preview(request)
 
+    def preview_coke(self, request):
+        """预览焦炭专用明细判级，不采用legacy规则或写正式记录。"""
+        from .gb21342 import preview_coke
+
+        return preview_coke(request)
+
     def list_current_standards(self, evaluation_date: date) -> list[StandardDefinition]:
         return self._standards.list_current(evaluation_date)
 
