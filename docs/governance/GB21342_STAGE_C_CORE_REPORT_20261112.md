@@ -26,7 +26,8 @@ MUST：纯Domain、严格Decimal、28位ROUND_HALF_EVEN工作精度、全值、�
 - Frozen Numeric v1可执行向量、原N01-A、GB29446、Engine、Excel、UI专项组合：138 passed（本地19.71s）。命令为`python -m pytest tests/conformance/numeric/test_ecquota_numeric_v1.py tests/pilots/numeric/test_qzc_n01_a.py tests/test_gb29446.py tests/test_engine.py tests/test_excel.py tests/test_ui.py -q -ra -p no:cacheprovider -o addopts=''`。
 - 测试通过独立工作树`PYTHONPATH=src`，未使用已安装旧源码计算焦炭。Python来自既有测试虚拟环境；未操作真实用户数据。
 - `compileall -q src tests tools`通过。源码门禁前两次setup产生43项环境错误，分别为系统pytest临时目录权限与工作树work父目录尚未创建；建立work并指定新`--basetemp work/pytest-core-source-fixed`后上述338项全部通过，没有修改业务代码掩盖环境错误。
-- 独立源码/Golden审查进行中；literal full suite由新PR的Pull Request Gate严格单次执行，Numeric workflow另跑。CI未完成前本记录不写full PASS。
+- [独立源码/Golden验收](GB21342_CORE_INDEPENDENT_ACCEPTANCE_20261112.md)已通过：103原始探针、3项初轮边界、6个零商案例均PASS；独立核心151＋Frozen Conformance20合计171 passed（1.32s），三项发现全部关闭，无剩余首块阻塞。验收代码SHA256为`5b7b09602e84a19632131bda551a4edb76bd6bb9224d1f0cfa96e9147e042b5c`。此为首块验收，不是整标准Stage D。
+- literal full suite由新PR的Pull Request Gate严格单次执行，Numeric workflow另跑。CI未完成前本记录不写full PASS。
 - 父Agent另以未复用实现预期的探针独立验证：97+3−50−10−5=35kgce，P7t，actual5，完整外属evaluation31，部分actual5且evaluation=None，通过。
 
 独立审查修复：十进制非法lexical解析也在完整局部Context中执行，不污染调用者InvalidOperation flags；真零分量只在算术使用时归一精确0，原始Decimal exponent仍保留于trace；net精确0且P已验证有限正时商直接精确0，避免零商因极端P指数被Clamped误拒。非零下溢继续拒绝，不提升Profile精度或改变非零算术范围。
