@@ -1,0 +1,73 @@
+{
+  "commit": "18dd79af74476372e8b6b337df119ce04d9d9198",
+  "pdf_sha256": "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
+  "tables": {
+    "A3": {
+      "columns": [
+        "pressure_MPa",
+        "temperature_C",
+        "enthalpy_kJ_per_kg",
+        "coefficient_kgce_per_kg"
+      ],
+      "pdf_rows": 20,
+      "mapping_rows": 20,
+      "compared_cells": 80,
+      "mismatch_rows": 0
+    },
+    "A4": {
+      "columns": [
+        "temperature_C",
+        "pressure_MPa",
+        "enthalpy_kJ_per_kg",
+        "coefficient_kgce_per_kg"
+      ],
+      "pdf_rows": 84,
+      "mapping_rows": 84,
+      "compared_cells": 336,
+      "mismatch_rows": 0
+    }
+  },
+  "json_facts": [
+    {
+      "path": "data/definitions/gb-21342-2025.json",
+      "supersedes": [],
+      "detail_formula": [
+        {
+          "op": "per_unit",
+          "input_keys": [
+            "energy.total_standard_coal",
+            "production.total_equivalent"
+          ]
+        },
+        {
+          "op": "per_unit",
+          "input_keys": [
+            "energy.total_standard_coal",
+            "production.total_equivalent"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "standards/development/scope-63/definitions/gb-21342-2025.json",
+      "supersedes": [],
+      "detail_formula": [
+        {
+          "op": "per_unit",
+          "input_keys": [
+            "energy.total_standard_coal",
+            "production.total_equivalent"
+          ]
+        },
+        {
+          "op": "per_unit",
+          "input_keys": [
+            "energy.total_standard_coal",
+            "production.total_equivalent"
+          ]
+        }
+      ]
+    }
+  ],
+  "pdf_filename": "08.GB 21342-2025焦炭单位产品能源消耗限额.pdf"
+}
