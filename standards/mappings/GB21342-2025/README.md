@@ -9,4 +9,6 @@
 
 ## 2026-11-12 授权后的首块实施
 
-PR23已合并；Owner授权继续开发下，按经独立核验的原文式（3）与完整外属且未计入时的26调整实现独立Domain核心。见[首块设计](../../../docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)、[实施记录](../../../docs/governance/GB21342_STAGE_C_CORE_REPORT_20261112.md)、[独立Golden候选](../../../docs/golden/GB21342_CORE_INDEPENDENT_GOLDEN_CANDIDATES_20261112.md)。本块不接GUI、正式记录或标准包；部分/未知调整未定。整体仍MAPPING，无现行批准映射，001～005仍OPEN，未纳入正式支持；代码首块完成不等于整标准IMPLEMENTED或Stage D通过。
+PR23已合并；Owner授权继续开发下，按经独立核验的原文式（3）与完整外属且未计入时的26调整实现独立Domain核心。见[首块设计](../../../docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)、[实施记录](../../../docs/governance/GB21342_STAGE_C_CORE_REPORT_20261112.md)、[独立Golden候选](../../../docs/golden/GB21342_CORE_INDEPENDENT_GOLDEN_CANDIDATES_20261112.md)。本块不接GUI、正式记录或标准包；部分/未知调整未定。整体仍MAPPING，无现行批准映射，001按Owner明确的软件最高级别决定记PROVISIONAL，002～005仍OPEN，未纳入正式支持；代码首块完成不等于整标准IMPLEMENTED或Stage D通过。
+
+Mapping草稿§7及PR23核验记录的001 OPEN保留当时身份；2026-11-12后续内部软件决定以[唯一台账001](../../../STANDARD_ISSUES_REGISTER.md#ecq-std-gb21342-001--炉龄修正后1级与2级限额非单调的等级表达)及[当前设计](../../../docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)为准。只同步软件内部决定，不改标准原文事实、历史核验结论或整映射批准状态，解释不进入产品界面或导出。
