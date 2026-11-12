@@ -128,16 +128,7 @@ def _item(value, *, align_right: bool = False) -> QTableWidgetItem:
     return item
 
 
-#: 普通界面里的 ``E_d`` / ``e_d`` 必须以**真下标**呈现。内部变量键、JSON 与领域字段名
-#: 保持不变，只在展示层把它们渲染成 Qt 富文本；绝不能把字面量 “<sub>” 直接塞进纯文本。
-_SUBSCRIPT_D = re.compile(r"([Ee])_d")
-
-
-def _rich_text(value) -> str:
-    """把普通文本转成 Qt 富文本：先转义，再把 ``E_d`` / ``e_d`` 变成真下标。"""
-
-    escaped = html.escape("" if value is None else str(value), quote=False)
-    return _SUBSCRIPT_D.sub(r"\1<sub>d</sub>", escaped).replace("\n", "<br>")
+from uebench.application.scientific_symbols import symbols_html as _rich_text
 
 
 def _rich_label(value) -> QLabel:
@@ -2579,11 +2570,13 @@ class MainWindow(QMainWindow):
                       else self.context.application.evaluate(request))
         except IncompleteCementEvaluationError as exc:
             self.cement_results.setHtml(cement_result_html(exc.preview_result))
-            self.cement_notice.setText("部分预览，尚未生成记录。" + "；".join(exc.problems))
+            self.cement_notice.setTextFormat(Qt.TextFormat.RichText)
+            self.cement_notice.setText(_rich_text("部分预览，尚未生成记录。" + "；".join(exc.problems)))
             return
         except (ValueError, TypeError, LookupError) as exc:
             self.cement_results.clear()
-            self.cement_notice.setText(f"未生成记录：{exc}")
+            self.cement_notice.setTextFormat(Qt.TextFormat.RichText)
+            self.cement_notice.setText(_rich_text(f"未生成记录：{exc}"))
             return
         self.cement_results.setHtml(cement_result_html(result))
         self.last_result_id = None if is_preview else result.evaluation_id

@@ -1,18 +1,10 @@
 """水泥报告写入器；只消费应用层保存视图，不读取规则或运行计算器。"""
 import os
 from pathlib import Path
-import re
 import tempfile
 
 
-def _text(paragraph, text):
-    for part in re.split(r"([EeWwPQ]_(?:shx|sh|sg|he|fm|fz|fc|BM|idw|s|h|m|g|0))", str(text)):
-        if re.fullmatch(r"[EeWwPQ]_[A-Za-z0-9]+", part):
-            base, sub = part.split("_", 1)
-            paragraph.add_run(base)
-            paragraph.add_run(sub).font.subscript = True
-        elif part:
-            paragraph.add_run(part)
+from uebench.application.scientific_symbols import append_symbol_runs as _text
 
 
 def write_cement_report(view, path):

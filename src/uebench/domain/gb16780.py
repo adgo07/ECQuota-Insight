@@ -7,10 +7,11 @@ ECQ-STD-GB16780-001/003是项目内部解释，不是官方勘误。
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from decimal import Decimal, DecimalException
+from decimal import Decimal, DecimalException, localcontext
 from uuid import uuid4
 
 from .engine import EvaluationContext, EvaluationValidationError
+from .numeric import ECQUOTA_DECIMAL_FULL_VALUE_V1
 from .models import (
     CalculationStep, EvaluationRequest, EvaluationResult, Grade, IndicatorResult,
     InputMode, InputValue, StandardDefinition, parse_decimal,
@@ -25,7 +26,7 @@ ADOPTION_MARKER = (
     f"sha256={MAPPING_SHA256}"
 )
 CALCULATOR_VERSION = "gb16780-calculator-v1"
-NUMERIC_BEHAVIOR_VERSION = "gb16780-v1.2-full-value-v1"
+NUMERIC_BEHAVIOR_VERSION = "gb16780-v1.2-calculated-ratio-v2"
 
 # 名称/单位/正数要求也作为原始输入校验契约；规则定义须与其一致。
 INPUTS = {
@@ -91,9 +92,23 @@ def input_number(supplied: InputValue | None, key: str) -> Decimal:
     if supplied.unit not in (None, unit):
         raise NodeError(f"{label} 单位应为 {unit}")
     result = number(supplied.value, label, positive=positive, negative=key == "site.altitude_m")
-    if key == "cement.clinker_percent" and result > 100:
-        raise NodeError(f"{label} 必须在0～100%之间")
     return result
+
+
+RATIO_MODES = frozenset({"integrated", "partial_purchase"})
+
+
+def clinker_ratio(inputs) -> Decimal:
+    """Owner 2026-11-12 决定：新评价的 g 仅从原始数量计算。"""
+    with localcontext(ECQUOTA_DECIMAL_FULL_VALUE_V1.decimal_context()):
+        consumption = input_number(inputs.get("cement.clinker_consumption_t"), "cement.clinker_consumption_t")
+        production = input_number(inputs.get("cement.production_t"), "cement.production_t")
+        if consumption > production:
+            raise NodeError("生产水泥消耗的熟料总量不能大于水泥总产量（计算配比超过100%）")
+        try:
+            return consumption / production * Decimal(100)
+        except DecimalException as exc:
+            raise NodeError("熟料配比无法计算，请核对熟料消耗量与水泥产量") from exc
 
 
 def fuel_values(fuels):
@@ -144,7 +159,12 @@ class LineCalculation:
                 trace.extend(self.steps.get(name, []))
 
         try:
-            if key in INPUTS:
+            if key == "cement.clinker_percent":
+                value = clinker_ratio(self.line.inputs)
+                dep("cement.clinker_consumption_t")
+                dep("cement.production_t")
+                trace.append(self.step(INPUTS[key][0], "P_shx/P_s×100", value, "%"))
+            elif key in INPUTS:
                 supplied = self.line.inputs.get(key)
                 label, unit, _ = INPUTS[key]
                 if key in DEDUCTIONS and (supplied is None or supplied.value in (None, "")):

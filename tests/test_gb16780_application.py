@@ -247,7 +247,7 @@ def test_saved_g_difference_independent_of_ambient_context(cement_context):
     from decimal import localcontext, ROUND_DOWN
     from uebench.application.reporting import build_report_view
     value = request()
-    put(value.cement_lines[0], "cement.clinker_percent", "76.1234567890123456789")
+    put(value.cement_lines[0], "cement.clinker_consumption_t", "1522.469135780246913578")
     result = cement_context.application.evaluate(value)
     loaded = cement_context.application.get_evaluation(result.evaluation_id)
     with localcontext() as context:

@@ -167,9 +167,10 @@ class EvaluationService:
             raise ValueError("尚未实施标准只能预览，不能形成正式判定或保存评价记录。")
         standard = self._resolve_standard(request)
         if request.standard_id == "gb-16780-2021":
-            from .gb16780 import require_formal_request
+            from .gb16780 import require_formal_request, calculated_ratio_request
 
             require_formal_request(request, standard)
+            request = calculated_ratio_request(request)
         result = self._calculate(request, standard)
         if request.standard_id == "gb-16780-2021":
             from .gb16780 import require_complete

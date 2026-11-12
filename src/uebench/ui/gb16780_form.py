@@ -1,4 +1,4 @@
-"""水泥原始明细表单；只收集文本，不计算业务值。"""
+"""水泥原始明细表单；熟料配比辅助输入复用Domain。"""
 from datetime import date
 from uuid import uuid4
 
@@ -8,10 +8,14 @@ from PySide6.QtWidgets import (
     QPushButton, QGroupBox, QTableWidget, QTableWidgetItem, QHeaderView,
     QListWidget, QListWidgetItem, QAbstractItemView, QTextEdit,
 )
+from uebench.application.scientific_symbols import symbols_html
 from .wheel_safe_combo import WheelSafeComboBox as QComboBox
 from uebench.application.gb16780 import MODE_LABELS
 from uebench.application.gb29446 import GB29446_PERIOD_OPTIONS, encode_period_notes, decode_period_notes
-from uebench.domain.gb16780 import INPUTS, DEDUCTIONS, PRODUCT_ID, STANDARD_ID
+from uebench.domain.gb16780 import (
+    INPUTS, DEDUCTIONS, PRODUCT_ID, STANDARD_ID, RATIO_MODES,
+    NodeError, clinker_ratio,
+)
 from uebench.domain.models import (
     CementFuelInput, CementLineInput, CementSharedEnergy, EvaluationRequest, InputMode, InputValue,
 )
@@ -36,9 +40,12 @@ class FieldGroup(QGroupBox):
             label, unit, _ = INPUTS[key]
             if key == "site.pressure_pa":
                 label += "（海拔>1500m时填写）"
+            elif key == "cement.clinker_percent":
+                label += "（自动计算）"
             elif key not in DEDUCTIONS:
                 label += " *"
-            self.labels[key] = QLabel(f"{label}（{unit.replace('kWh', 'kW·h')}）")
+            self.labels[key] = QLabel(symbols_html(f"{label}（{unit.replace('kWh', 'kW·h')}）"))
+            self.labels[key].setTextFormat(Qt.TextFormat.RichText)
             self.labels[key].setWordWrap(True)
             field = QLineEdit()
             field.setObjectName("cement_" + key.replace(".", "_"))
@@ -133,6 +140,7 @@ class CementLineForm(QWidget):
     def __init__(self, number=1, line_id=None):
         super().__init__()
         self.line_id = line_id or uuid4().hex
+        self._loading = False
         body = QVBoxLayout(self)
         body.setContentsMargins(0, 0, 0, 0)
         header = QHBoxLayout()
@@ -160,6 +168,15 @@ class CementLineForm(QWidget):
             self.groups.append(group)
             self.fields.update(group.fields)
             body.addWidget(group)
+        self.ratio_controls = QWidget()
+        ratio_layout = QVBoxLayout(self.ratio_controls)
+        ratio_layout.setContentsMargins(0, 0, 0, 0)
+        self.ratio_notice = QLabel()
+        self.ratio_notice.setWordWrap(True)
+        ratio_layout.addWidget(self.ratio_notice)
+        body.insertWidget(2, self.ratio_controls)
+        for key in ("cement.production_t", "cement.clinker_consumption_t", "cement.clinker_percent"):
+            self.fields[key].textChanged.connect(self._refresh_ratio)
         self.fuels = FuelTable()
         self.groups[1].grid.addWidget(self.fuels, 2, 0, 1, 2)
         self.fuels.changed.connect(self.changed.emit)
@@ -171,23 +188,56 @@ class CementLineForm(QWidget):
         keys = mode_keys(self.mode.currentData())
         for group in self.groups:
             group.show_keys(keys)
+        self._refresh_ratio()
+        self.changed.emit()
+
+    def _refresh_ratio(self, *_):
+        if self._loading:
+            return
+        applicable = self.mode.currentData() in RATIO_MODES
+        self.ratio_controls.setVisible(applicable)
+        field = self.fields["cement.clinker_percent"]
+        field.setReadOnly(True)
+        if not applicable:
+            self.ratio_notice.clear()
+        else:
+            inputs = {k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
+                      for k in ("cement.production_t", "cement.clinker_consumption_t")}
+            try:
+                text = str(clinker_ratio(inputs))
+                notice = "按生产水泥消耗的熟料总量÷水泥总产量×100计算。"
+            except NodeError as exc:
+                text, notice = "", str(exc)
+            field.blockSignals(True)
+            field.setText(text)
+            field.blockSignals(False)
+            self.ratio_notice.setText(symbols_html(notice))
+            self.ratio_notice.setTextFormat(Qt.TextFormat.RichText)
         self.changed.emit()
 
     def collect(self):
         mode = self.mode.currentData()
         return CementLineInput(line_id=self.line_id, line_name=self.name.text().strip() or "生产线",
-            production_mode=mode, inputs={k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
+            production_mode=mode, clinker_ratio_mode="automatic",
+            inputs={k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
                 for k in mode_keys(mode) if self.fields[k].text().strip()},
             fuels=self.fuels.collect() if mode != "purchased_clinker_grinding" else [])
 
     def load(self, line):
+        self._loading = True
         self.name.setText(line.line_name)
         self.mode.setCurrentIndex(self.mode.findData(line.production_mode))
+        # 新建表单按原始数量计算；历史详情另走保存快照只读路径。
+        for field in self.fields.values():
+            field.clear()
+        self.fuels.table.setRowCount(0)
         for key, value in line.inputs.items():
             if key in self.fields:
                 self.fields[key].setText("" if value.value is None else str(value.value))
         for fuel in line.fuels:
             self.fuels.add(fuel)
+        self._loading = False
+        self._refresh_ratio()
 
 
 class SharedEnergyForm(QGroupBox):

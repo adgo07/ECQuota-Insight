@@ -10,17 +10,7 @@ from pathlib import Path
 from uebench.application.reporting import ReportField, ReportView, CementReportView
 
 
-def _add_subscript(paragraph, text: str) -> None:
-    """把 E_d / e_d 写成真正的 Word 下标，而非靠 HTML 解释。"""
-    for part in re.split(r"([Ee]_d)", text):
-        if not part:
-            continue
-        if part in {"E_d", "e_d"}:
-            paragraph.add_run(part[0])
-            suffix = paragraph.add_run("d")
-            suffix.font.subscript = True
-        else:
-            paragraph.add_run(part)
+from uebench.application.scientific_symbols import append_symbol_runs as _add_subscript
 
 
 def _row(table, field: ReportField) -> None:
