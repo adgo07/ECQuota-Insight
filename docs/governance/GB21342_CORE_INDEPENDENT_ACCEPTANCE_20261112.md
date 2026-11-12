@@ -23,7 +23,7 @@
 - 独立执行零商补充6例：五能量全0、P分别1E1000027和1E-1000027，各跑N/T/U三状态，actual均0，evaluation分别0/26/None；P仍必须有限且>0。
 - pytest独立执行`tests/test_gb21342_core.py`与`tests/conformance/numeric/test_ecquota_numeric_v1.py`，151+20=171 passed，exit0，1.32s。命令使用主checkout `.venv/Scripts/python.exe -m pytest ... -o addopts='' -p no:cacheprovider`，cwd为受验工作树；Python3.13.3/pytest8.4.2。
 
-证据在本记录同目录：`probe.py`、`report_final.json`、`edge_probe.py`、`edge_final.json`；失败时的`edge_before.json`和修复中间版保留追溯身份，不替代最终结果。原PDF/渲染图未复制进代码或交付物。
+原始探针临时证据位于本次父工作树的ignored目录`work/coke-independent-review-20261112`：`probe.py`、`report_final.json`、`edge_probe.py`、`edge_final.json`；此归档记录保存核验摘要，不声称这些临时文件位于文档目录或属于交付依赖。失败时的`edge_before.json`和修复中间版保留当次追溯身份，不替代最终结果。原PDF/渲染图未复制进代码或交付物。
 
 ## 发现、修复与复验
 
