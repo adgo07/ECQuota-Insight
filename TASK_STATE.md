@@ -14,6 +14,10 @@ Canonical repository：`https://github.com/adgo07/ECQuota-Insight.git`
 
 ## 当前任务
 
+### 2026-11-12 焦炭授权首块（并行，不改变正式范围）
+
+Owner已授权PR23核实修复合并后开始焦炭开发。PR23已合并`ea28ca46fdff826e92f2a907f8faf4e9726f435b`；原文式3及完整外属未计入时26调整经独立原文复核与父Agent审查，作为局部开发依据。现完成独立Domain首块与定向验证，见[首块设计](docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)、[实施记录](docs/governance/GB21342_STAGE_C_CORE_REPORT_20261112.md)。不接GUI/正式记录/标准包；整体仍MAPPING，完整映射未获批准冻结，Issue001～005仍OPEN，正式范围仍仅GB29446。本块不是整标准IMPLEMENTED/SUPPORTED或Stage D通过，水泥与RS05既有边界不变。
+
 **ECQ-RS06 — GB 16780—2021 水泥接入（Stage C 应用与产品分块实施）；RS05 既有交付环境收口继续 IN PROGRESS。**
 
 - ECQ-GOV01 = DONE（PR #8）；ECQ-RS01 = DONE（PR #9）；ECQ-RS02 = DONE（PR #10）；
