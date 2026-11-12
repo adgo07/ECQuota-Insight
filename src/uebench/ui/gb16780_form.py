@@ -8,12 +8,13 @@ from PySide6.QtWidgets import (
     QPushButton, QGroupBox, QTableWidget, QTableWidgetItem, QHeaderView,
     QListWidget, QListWidgetItem, QAbstractItemView, QTextEdit,
 )
+from uebench.application.scientific_symbols import symbols_html
 from .wheel_safe_combo import WheelSafeComboBox as QComboBox
 from uebench.application.gb16780 import MODE_LABELS
 from uebench.application.gb29446 import GB29446_PERIOD_OPTIONS, encode_period_notes, decode_period_notes
 from uebench.domain.gb16780 import (
     INPUTS, DEDUCTIONS, PRODUCT_ID, STANDARD_ID, RATIO_MODES,
-    NodeError, clinker_ratio, clinker_ratio_warning,
+    NodeError, clinker_ratio,
 )
 from uebench.domain.models import (
     CementFuelInput, CementLineInput, CementSharedEnergy, EvaluationRequest, InputMode, InputValue,
@@ -39,9 +40,12 @@ class FieldGroup(QGroupBox):
             label, unit, _ = INPUTS[key]
             if key == "site.pressure_pa":
                 label += "（海拔>1500m时填写）"
+            elif key == "cement.clinker_percent":
+                label += "（自动计算）"
             elif key not in DEDUCTIONS:
                 label += " *"
-            self.labels[key] = QLabel(f"{label}（{unit.replace('kWh', 'kW·h')}）")
+            self.labels[key] = QLabel(symbols_html(f"{label}（{unit.replace('kWh', 'kW·h')}）"))
+            self.labels[key].setTextFormat(Qt.TextFormat.RichText)
             self.labels[key].setWordWrap(True)
             field = QLineEdit()
             field.setObjectName("cement_" + key.replace(".", "_"))
@@ -167,15 +171,10 @@ class CementLineForm(QWidget):
         self.ratio_controls = QWidget()
         ratio_layout = QVBoxLayout(self.ratio_controls)
         ratio_layout.setContentsMargins(0, 0, 0, 0)
-        self.ratio_mode = QComboBox()
-        self.ratio_mode.addItem("熟料配比：按消耗量和水泥产量自动计算", "automatic")
-        self.ratio_mode.addItem("熟料配比：手工输入", "manual")
         self.ratio_notice = QLabel()
         self.ratio_notice.setWordWrap(True)
-        ratio_layout.addWidget(self.ratio_mode)
         ratio_layout.addWidget(self.ratio_notice)
         body.insertWidget(2, self.ratio_controls)
-        self.ratio_mode.currentIndexChanged.connect(self._refresh_ratio)
         for key in ("cement.production_t", "cement.clinker_consumption_t", "cement.clinker_percent"):
             self.fields[key].textChanged.connect(self._refresh_ratio)
         self.fuels = FuelTable()
@@ -197,12 +196,11 @@ class CementLineForm(QWidget):
             return
         applicable = self.mode.currentData() in RATIO_MODES
         self.ratio_controls.setVisible(applicable)
-        automatic = self.ratio_mode.currentData() == "automatic"
         field = self.fields["cement.clinker_percent"]
-        field.setReadOnly(automatic)
+        field.setReadOnly(True)
         if not applicable:
             self.ratio_notice.clear()
-        elif automatic:
+        else:
             inputs = {k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
                       for k in ("cement.production_t", "cement.clinker_consumption_t")}
             try:
@@ -213,15 +211,14 @@ class CementLineForm(QWidget):
             field.blockSignals(True)
             field.setText(text)
             field.blockSignals(False)
-            self.ratio_notice.setText(notice)
-        else:
-            self.ratio_notice.setText(clinker_ratio_warning(self.collect()) or "")
+            self.ratio_notice.setText(symbols_html(notice))
+            self.ratio_notice.setTextFormat(Qt.TextFormat.RichText)
         self.changed.emit()
 
     def collect(self):
         mode = self.mode.currentData()
         return CementLineInput(line_id=self.line_id, line_name=self.name.text().strip() or "生产线",
-            production_mode=mode, clinker_ratio_mode=self.ratio_mode.currentData(),
+            production_mode=mode, clinker_ratio_mode="automatic",
             inputs={k: InputValue(value=self.fields[k].text().strip(), unit=INPUTS[k][1])
                 for k in mode_keys(mode) if self.fields[k].text().strip()},
             fuels=self.fuels.collect() if mode != "purchased_clinker_grinding" else [])
@@ -230,8 +227,7 @@ class CementLineForm(QWidget):
         self._loading = True
         self.name.setText(line.line_name)
         self.mode.setCurrentIndex(self.mode.findData(line.production_mode))
-        # 加载原始值，无论来自哪一代请求都不静默重算；切回自动由用户明确选择。
-        self.ratio_mode.setCurrentIndex(self.ratio_mode.findData("manual"))
+        # 新建表单按原始数量计算；历史详情另走保存快照只读路径。
         for field in self.fields.values():
             field.clear()
         self.fuels.table.setRowCount(0)

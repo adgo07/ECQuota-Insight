@@ -453,6 +453,7 @@ class CementLineInput(StrictModel):
     line_id: str = Field(min_length=1)
     line_name: str = "生产线"
     production_mode: CementProductionMode
+    # manual 默认仅用于旧快照反序列化；新计算无条件从数量求 g，不以此字段切换来源。
     clinker_ratio_mode: Literal["manual", "automatic"] = "manual"
     inputs: dict[str, InputValue] = Field(default_factory=dict)
     fuels: list[CementFuelInput] = Field(default_factory=list)

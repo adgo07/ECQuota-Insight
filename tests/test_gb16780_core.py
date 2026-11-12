@@ -76,7 +76,7 @@ def test_golden_core_all_five_independent_grades_and_trace(standard):
     assert result.calculator_version == GOLDEN["calculator_version"]
     assert result.numeric_profile_id == GOLDEN["numeric_profile_id"]
     assert result.numeric_contract_version == GOLDEN["numeric_contract_version"]
-    assert result.numeric_behavior_version == "gb16780-v1.2-full-value-v1"
+    assert result.numeric_behavior_version == "gb16780-v1.2-calculated-ratio-v2"
     assert len(result.results) == 5
     intermediates = {}
     for item in result.results:
@@ -168,7 +168,7 @@ def test_double_correction_10470_not_10500_and_pressure_end_to_end(standard):
     request = golden_request()
     put(request.cement_lines[0], "site.altitude_m", "2000")
     put(request.cement_lines[0], "site.pressure_pa", "60000")
-    put(request.cement_lines[0], "cement.clinker_percent", "80")
+    put(request.cement_lines[0], "cement.clinker_consumption_t", "1600")
     with localcontext() as context:
         context.prec, context.rounding = 28, ROUND_HALF_EVEN
         k = Decimal("1.179") - Decimal("0.211") * (Decimal(60000) / Decimal(101325))
@@ -228,7 +228,7 @@ def test_all_thresholds_full_value_via_detail(standard, index, level, delta, hig
             if index < 4:
                 limits[2] *= Decimal("0.968")
             if index == 0:
-                put(line, "cement.clinker_percent", "80")
+                put(line, "cement.clinker_consumption_t", "1600")
                 limits = [v + Decimal(c) * 5 for v, c in zip(limits, ("1.10", "1.15", "1.20"))]
         target = limits[level] + Decimal(delta)
         if index in (1, 3):
@@ -288,7 +288,7 @@ def test_blank_and_explicit_zero_preserve_distinct_trace_and_snapshot(standard):
     ("heat.own_use_kwh", "10001", {IDS[0], IDS[1], IDS[3]}),
     ("fuel.standard_coal_heat_kj_per_kgce", "0", {IDS[0], IDS[1], IDS[3]}),
     ("cement.production_t", "0", {IDS[0], IDS[4]}),
-    ("cement.clinker_percent", "101", {IDS[0]}),
+    ("cement.clinker_consumption_t", "2001", {IDS[0]}),
     ("cement.preparation_electricity_kwh", "NaN", {IDS[4]}),
     ("cement.preparation_electricity_kwh", "Infinity", {IDS[4]}),
     ("cement.preparation_electricity_kwh", "-1", {IDS[4]}),

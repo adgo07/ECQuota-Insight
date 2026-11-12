@@ -1,4 +1,5 @@
 """独立历史只读页：仅消费保存的三件快照及报告视图。"""
+from uebench.application.scientific_symbols import symbols_html
 import html
 import re
 from PySide6.QtCore import Qt, Signal, QSize
@@ -15,7 +16,7 @@ from .presentation import format_local_date, format_local_datetime
 
 
 def rich_lines(lines):
-    return re.sub(r"([Ee])_d", r"\1<sub>d</sub>", html.escape("\n".join(lines))).replace("\n", "<br>")
+    return symbols_html("\n".join(lines))
 
 
 def section(title, lines):

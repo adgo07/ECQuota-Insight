@@ -1,17 +1,18 @@
 """水泥保存视图的只读HTML；不计算指标或阈值。"""
 from html import escape
+from uebench.application.scientific_symbols import symbols_html
 from uebench.domain.models import GRADE_LABELS
 from uebench.application.reporting import _plain, _display_two_places
 
 
 def section(title, lines):
-    return f"<h3>{escape(title)}</h3>" + "".join(f"<p>{escape(str(line))}</p>" for line in lines)
+    return f"<h3>{escape(title)}</h3>" + "".join(f"<p>{symbols_html(line)}</p>" for line in lines)
 
 
 def metric_table(metrics):
     rows = ["<table width='100%' cellpadding='6' border='1' cellspacing='0'><tr><th>指标</th><th>实际值</th><th>等级</th><th>基准上限 1/2/3</th><th>有效上限 1/2/3</th></tr>"]
     for name, actual, unit, grade, base, limits in metrics:
-        rows.append("<tr>" + "".join(f"<td>{escape(str(v))}</td>" for v in (name, f"{actual} {unit}", grade, base, limits)) + "</tr>")
+        rows.append("<tr>" + "".join(f"<td>{symbols_html(v)}</td>" for v in (name, f"{actual} {unit}", grade, base, limits)) + "</tr>")
     return "".join(rows) + "</table>"
 
 

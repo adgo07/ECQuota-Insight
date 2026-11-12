@@ -1,3 +1,39 @@
+# 熟料配比强制计算及科学符号显示
+
+2026-11-12 Owner 修订决定，源码实施与父独立源码审查已完成，测试证据见下；原生验收 OPEN。水泥 Stage D OPEN、未发布，正式支持集合不变。
+
+## 平台 / Contract 预检查
+
+- 业务仓 adgo07/ECQuota-Insight，基线 828e8b34f5fb165889e513d3aa1550df0590919b；已核工作树、origin、分支与 HEAD，默认远端分支 main。
+- platform-lock.json 锁定中央 ee5feb0cc34dbd99790500fadd0c4c932e202a20；相关 Frozen：Architecture 2.1、Numeric v1、Profiles v1、Conformance Vector v1。
+- MUST：Decimal、28位、ROUND_HALF_EVEN、全值比较、历史只读；MUST NOT：隐式修约、容差、显示回流、ambient context 污染。
+- 中央当前 GUIDE_INDEX 及适用 UI v0.2 指南由本次父验收读取核对。分类 ALLOWED PROJECT DIFFERENCE，不需要中央 Contract 修改。Standard Issue 001、003 保持原解释，未发现新原文问题。
+- 本次改变软件 g 输入来源策略，覆盖此前手工输入决定；不改变标准公式、阈值或 Frozen Mapping 原字节。
+
+## 当前决定
+
+Owner 明确要求熟料配比不可手填。适用生产线的新评价无条件按本期生产水泥消耗的熟料总量÷水泥总产量×100计算，不使用熟料自产产量替代。UI 只有只读自动值；Engine 同样计算，忽略请求中的 g 和历史兼容 mode，Application 保存深拷贝后的计算值与 automatic 来源，原调用方对象不变。计算 trace 保留原始数量和 P_shx/P_s×100。缺失、非法、非有限、负数、零分母、单位错误和分子超过分母时不得保存完整结果，允许其余指标部分预览。
+
+计算仍使用 Numeric Profile 独立上下文及完整小数字符串。新 numeric_behavior_version 为 gb16780-v1.2-calculated-ratio-v2，因为旧 manual 不一致请求的新结果会改变；calculator_version 与规则修订不变，规则公式未改。历史读取明确兼容 gb16780-v1.2-full-value-v1，不重算，不重写 request/result/rule_snapshot 三 JSON。旧 Golden 继续保存原证据；当前测试以数量求 g 并独立断言。
+
+所有标准的用户可见符号按真实上下标排版，范围及转义规则写入 AGENTS.md 和统一判定规范 §11。机器标识保持原值。
+
+## 当前验证
+
+- 完整依赖环境解释器：既有 rs05-pr34-closure-20261029/.venv，python-docx 1.2.0；测试 pythonpath 明确本树 src，临时数据库在系统 TEMP。
+- 水泥 core/application/UI/ratio、历史、科学符号与选煤 Word 定向 244 passed（退出0，work/pr39-focused.log）。后续v1历史兼容与符号最终复验35 passed，2.83秒，work/pr39-final-ratio.log / .xml。
+- Numeric workflow所列Frozen Conformance、N01-A、GB29446、Engine、Excel、UI：138 passed（退出0，work/pr39-numeric.log）。这是本地等效专项，不冒称GitHub workflow运行；完整full suite与最终三项CI由父验收在稳定提交执行。
+- 首轮使用根.venv缺python-docx，7项Word测试环境失败；另1项测试对熟料超量的影响范围预期过宽，已按依赖修正为仅水泥综合能耗不完整。首轮日志被后轮覆盖，不能再作为原始证据链接。
+- 父独立Engine探针通过：manual99、原数量800/2000时采用计算g40，阈值41.50/46.75/52.00，调用方原字节不变；零分母阻止E_s完整结果。
+- compileall src/tests/tools、禁止全局ROUND6、已发布显式修约声明0项通过；生产data/release未改。静态初验误将autocrlf=true下的工作树CRLF与Git LF blob比原字节导致断言失败，保留work/pr39-static.log；最终work/pr39-static-final.log按批准工作树SHA256及Git index==HEAD、无diff核验通过，未修改冻结文件。
+- Qt QTextDocument实际下标属性、Word run下标属性、P_H/Q_idw/m_i/P_shx完整复合角标及HTML转义通过。父已查看正确字体的离屏PNG，静态角标与自动g视觉通过，仅代表静态检查；原生工具因已有active request持续失败，Astra无原生通过结论，见work/pr39-native/README.md。原生 UI、Word 实开、签名与 Stage D 不由离屏测试代替。生产 data、PIN、公钥、锁定文件、唯一 r3 Rule 和 Frozen Mapping 不改。
+
+---
+
+## 历史记录：首次辅助输入方案（已被上述 Owner 决定覆盖）
+
+以下为当时方案及测试证据，不再代表当前输入策略。
+
 # 水泥熟料配比辅助输入与一致性校核
 
 日期：2026-11-12。状态：源码实施，待独立验收；水泥仍为 IMPLEMENTED、Stage D OPEN，唯一未发布 r3 候选不变。本次不开放正式评价、不发布产品。

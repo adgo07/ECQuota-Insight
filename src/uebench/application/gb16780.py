@@ -48,7 +48,7 @@ def completeness_problems(request, result, snapshot, *, require_period=True, his
             or result.standard_version != snapshot.version or request.standard_id != snapshot.id
             or result.numeric_contract_version != "v1"
             or result.calculator_version != CALCULATOR_VERSION
-            or result.numeric_behavior_version != NUMERIC_BEHAVIOR_VERSION
+            or result.numeric_behavior_version not in ({NUMERIC_BEHAVIOR_VERSION, "gb16780-v1.2-full-value-v1"} if historical_read else {NUMERIC_BEHAVIOR_VERSION})
             or result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1"):
         problems.append("请求、结果与水泥规则身份不一致")
     digest = hashlib.sha256(json.dumps(snapshot.model_dump(mode="json"), ensure_ascii=False,
@@ -89,3 +89,19 @@ def require_complete(request, result, snapshot):
     problems = completeness_problems(request, result, snapshot)
     if problems:
         raise IncompleteCementEvaluationError(result, problems)
+
+
+def calculated_ratio_request(request):
+    """为新保存请求记录计算配比；不改调用方对象或任何历史快照。"""
+    from uebench.domain.gb16780 import RATIO_MODES, NodeError, clinker_ratio
+    from uebench.domain.models import InputValue
+    normalized = request.model_copy(deep=True)
+    for line in normalized.cement_lines:
+        line.clinker_ratio_mode = "automatic"
+        line.inputs.pop("cement.clinker_percent", None)
+        if line.production_mode in RATIO_MODES:
+            try:
+                line.inputs["cement.clinker_percent"] = InputValue(value=str(clinker_ratio(line.inputs)), unit="%")
+            except NodeError:
+                pass  # Engine 提供部分预览；完整性门禁禁止保存。
+    return normalized

@@ -26,7 +26,7 @@ ADOPTION_MARKER = (
     f"sha256={MAPPING_SHA256}"
 )
 CALCULATOR_VERSION = "gb16780-calculator-v1"
-NUMERIC_BEHAVIOR_VERSION = "gb16780-v1.2-full-value-v1"
+NUMERIC_BEHAVIOR_VERSION = "gb16780-v1.2-calculated-ratio-v2"
 
 # 名称/单位/正数要求也作为原始输入校验契约；规则定义须与其一致。
 INPUTS = {
@@ -101,7 +101,7 @@ RATIO_MODES = frozenset({"integrated", "partial_purchase"})
 
 
 def clinker_ratio(inputs) -> Decimal:
-    """辅助输入值，不替代映射中独立的g；不使用显示修约或业务容差。"""
+    """Owner 2026-11-12 决定：新评价的 g 仅从原始数量计算。"""
     with localcontext(ECQUOTA_DECIMAL_FULL_VALUE_V1.decimal_context()):
         consumption = input_number(inputs.get("cement.clinker_consumption_t"), "cement.clinker_consumption_t")
         production = input_number(inputs.get("cement.production_t"), "cement.production_t")
@@ -111,19 +111,6 @@ def clinker_ratio(inputs) -> Decimal:
             return consumption / production * Decimal(100)
         except DecimalException as exc:
             raise NodeError("熟料配比无法计算，请核对熟料消耗量与水泥产量") from exc
-
-
-def clinker_ratio_warning(line) -> str | None:
-    if line.production_mode not in RATIO_MODES:
-        return None
-    try:
-        expected = clinker_ratio(line.inputs)
-        actual = input_number(line.inputs.get("cement.clinker_percent"), "cement.clinker_percent")
-    except NodeError as exc:
-        return str(exc)
-    if actual != expected:
-        return f"手工熟料配比与按熟料消耗量÷水泥产量计算的配比（{expected}%）不一致，请核对统计口径；本次采用手工值。"
-    return None
 
 
 def fuel_values(fuels):
@@ -174,7 +161,12 @@ class LineCalculation:
                 trace.extend(self.steps.get(name, []))
 
         try:
-            if key in INPUTS:
+            if key == "cement.clinker_percent":
+                value = clinker_ratio(self.line.inputs)
+                dep("cement.clinker_consumption_t")
+                dep("cement.production_t")
+                trace.append(self.step(INPUTS[key][0], "P_shx/P_s×100", value, "%"))
+            elif key in INPUTS:
                 supplied = self.line.inputs.get(key)
                 label, unit, _ = INPUTS[key]
                 if key in DEDUCTIONS and (supplied is None or supplied.value in (None, "")):
@@ -395,15 +387,8 @@ def evaluate_cement(engine, standard: StandardDefinition, request: EvaluationReq
             )
             if engine.conditions.evaluate(indicator.applicability, context):
                 node = ACTUALS[indicator.id]
-                if node == "E_s" and line.clinker_ratio_mode == "manual":
-                    warning = clinker_ratio_warning(line)
-                    if warning:
-                        item.warnings.append(warning)
                 trace = []
                 try:
-                    if node == "E_s" and line.clinker_ratio_mode == "automatic" and line.production_mode in RATIO_MODES:
-                        if input_number(line.inputs.get("cement.clinker_percent"), "cement.clinker_percent") != clinker_ratio(line.inputs):
-                            raise NodeError("自动熟料配比已过期，请按当前熟料消耗量与水泥产量重新计算")
                     try:
                         item.actual_value = calc.get(node)
                     finally:

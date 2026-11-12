@@ -46,34 +46,26 @@ def test_ratio_units_are_checked():
         clinker_ratio(value)
 
 
-@pytest.mark.parametrize("bad", ["74.99", "", "NaN"])
-def test_automatic_request_cannot_bypass_consistency(cement_context, bad):
+@pytest.mark.parametrize("bad", ["74.99", "", "NaN", "101"])
+@pytest.mark.parametrize("mode", ["manual", "automatic"])
+def test_request_cannot_override_calculated_ratio(cement_context, bad, mode):
     value = request()
     line = value.cement_lines[0]
-    line.clinker_ratio_mode = "automatic"
+    line.clinker_ratio_mode = mode
     put(line, "cement.clinker_percent", bad)
-    with pytest.raises(IncompleteCementEvaluationError) as caught:
-        cement_context.application.evaluate(value)
-    assert caught.value.preview_result.results[0].grade is Grade.INCOMPLETE
-    assert any(item.grade in {Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3} for item in caught.value.preview_result.results[1:])
-    assert state(cement_context) == (0, 0)
-
-
-def test_legacy_manual_difference_preserved_and_warning_saved(cement_context):
-    value = request()
-    line = value.cement_lines[0]
-    assert line.clinker_ratio_mode == "manual"
-    put(line, "cement.clinker_percent", "76")
+    before = value.model_dump_json()
     result = cement_context.application.evaluate(value)
-    item = next(item for item in result.results if item.indicator_id == "cement.comprehensive_energy")
-    assert any("手工熟料配比" in warning for warning in item.warnings)
-    assert line.inputs["cement.clinker_percent"].value == "76"
+    assert value.model_dump_json() == before
     saved = cement_context.application.get_evaluation(result.evaluation_id)
+    assert Decimal(saved[0].cement_lines[0].inputs["cement.clinker_percent"].value) == 75
+    assert saved[0].cement_lines[0].clinker_ratio_mode == "automatic"
+    assert any(step.expression == "P_shx/P_s×100" and step.value == 75
+               for item in result.results for step in item.calculation_trace)
     assert saved[1].model_dump() == result.model_dump()
-    assert state(cement_context) == (1, 1)
 
 
-def test_form_automatic_manual_load_and_line_isolation():
+def test_form_only_calculated_keyboard_and_line_isolation():
+    from PySide6.QtTest import QTest
     app = QApplication.instance() or QApplication([])
     line, second = CementLineForm(), CementLineForm()
     try:
@@ -81,22 +73,19 @@ def test_form_automatic_manual_load_and_line_isolation():
         line.fields["cement.clinker_consumption_t"].setText("1")
         line.fields["cement.production_t"].setText("3")
         assert field.isReadOnly() and field.text() == "33.33333333333333333333333333"
+        field.setFocus()
+        QTest.keyClicks(field, "99")
+        assert field.text() == "33.33333333333333333333333333"
+        assert not hasattr(line, "ratio_mode")
         assert second.fields["cement.clinker_percent"].text() == ""
         line.fields["cement.production_t"].setText("0")
         assert field.text() == "" and "大于0" in line.ratio_notice.text()
         line.fields["cement.production_t"].setText("2")
         assert field.text() == "50.0"
-        line.ratio_mode.setCurrentIndex(1)
-        field.setText("60")
+        line.load(line.collect())
+        assert field.isReadOnly() and field.text() == "50.0"
         line.fields["cement.production_t"].setText("4")
-        assert field.text() == "60" and "不一致" in line.ratio_notice.text()
-        line.ratio_mode.setCurrentIndex(0)
         assert field.text() == "25.00"
-        saved = line.collect()
-        line.load(saved)
-        assert field.text() == "25.00" and not field.isReadOnly()
-        line.fields["cement.production_t"].setText("5")
-        assert field.text() == "25.00" and "不一致" in line.ratio_notice.text()
         for mode in ("clinker_only", "purchased_clinker_grinding"):
             line.mode.setCurrentIndex(line.mode.findData(mode))
             assert line.ratio_controls.isHidden()
@@ -116,8 +105,9 @@ def test_repeated_load_preserves_values_without_duplicating_fuels():
         widget.load(original)
         widget.load(original)
         assert widget.fuels.table.rowCount() == len(original.fuels)
-        assert {k: v.value for k, v in widget.collect().inputs.items()} == {k: v.value for k, v in original.inputs.items()}
-        assert "不一致" in widget.ratio_notice.text()
+        assert Decimal(widget.collect().inputs["cement.clinker_percent"].value) == 75
+        assert original.inputs["cement.clinker_percent"].value == "76.00000000000000000000000001"
+        assert widget.fields["cement.clinker_percent"].isReadOnly()
     finally:
         widget.close()
         app.processEvents()
@@ -125,7 +115,6 @@ def test_repeated_load_preserves_values_without_duplicating_fuels():
 
 def test_automatic_save_once_and_production_change_invalidates(window):
     line = window.cement_form.lines[0]
-    line.ratio_mode.setCurrentIndex(0)
     window.calculate_evaluation()
     first_id = window.last_result_id
     assert first_id and state(window.context) == (1, 1)
@@ -145,16 +134,52 @@ def test_old_request_without_mode_read_keeps_three_json_bytes(cement_context, mo
     result = cement_context.application.evaluate(value)
     query = text("SELECT request_json,result_json,rule_snapshot_json FROM evaluations")
     with cement_context.database.engine.begin() as connection:
-        raw = json.loads(connection.execute(query).one()[0])
+        row = connection.execute(query).one()
+        old_result = json.loads(row[1])
+        old_result["numeric_behavior_version"] = "gb16780-v1.2-full-value-v1"
+        raw = json.loads(row[0])
         for line in raw["cement_lines"]:
             line.pop("clinker_ratio_mode", None)
-        connection.execute(text("UPDATE evaluations SET request_json=:raw"), {"raw": json.dumps(raw, ensure_ascii=False)})
+        connection.execute(text("UPDATE evaluations SET request_json=:raw,result_json=:result"),
+                           {"raw": json.dumps(raw, ensure_ascii=False), "result": json.dumps(old_result, ensure_ascii=False)})
         before = tuple(connection.execute(query).one())
     def forbidden(*args, **kwargs):
         raise AssertionError("历史读取不得重算")
     monkeypatch.setattr(cement_context.evaluation_service.engine, "evaluate", forbidden)
     loaded = cement_context.application.get_evaluation(result.evaluation_id)
     assert loaded[0].cement_lines[0].clinker_ratio_mode == "manual"
+    assert loaded[1].numeric_behavior_version == "gb16780-v1.2-full-value-v1"
     assert cement_context.application.get_report_view(result.evaluation_id)
     with cement_context.database.engine.connect() as connection:
         assert tuple(connection.execute(query).one()) == before
+
+
+@pytest.mark.parametrize("bad", [None, "", "NaN", "0", "-2"])
+def test_new_requests_reject_invalid_quantity_even_with_plausible_g(cement_context, bad):
+    value = request()
+    line = value.cement_lines[0]
+    put(line, "cement.clinker_percent", "75")
+    if bad is None:
+        line.inputs.pop("cement.production_t")
+    else:
+        put(line, "cement.production_t", bad)
+    with pytest.raises(IncompleteCementEvaluationError):
+        cement_context.application.evaluate(value)
+    assert state(cement_context) == (0, 0)
+
+
+def test_engine_uses_quantities_for_each_line_even_if_manual(cement_context):
+    value = request()
+    first = value.cement_lines[0]
+    second = first.model_copy(deep=True)
+    second.line_id = "independent-line"
+    put(first, "cement.clinker_percent", "99")
+    put(second, "cement.clinker_percent", "1")
+    put(second, "cement.clinker_consumption_t", "1600")
+    value.cement_lines.append(second)
+    snapshot = cement_context.application.get_published_standard(value.standard_id)
+    result = cement_context.evaluation_service.engine.evaluate(snapshot, value)
+    for line_id, expected in [(first.line_id, Decimal(75)), (second.line_id, Decimal(80))]:
+        steps = [step for item in result.results if item.line_id == line_id for step in item.calculation_trace
+                 if step.expression == "P_shx/P_s×100"]
+        assert steps and all(step.value == expected for step in steps)
