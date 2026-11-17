@@ -100,3 +100,28 @@ Knowledge capture：无新增知识文章；引用核验缺口记于本报告，
 最终返工源码焦炭四模块 **447 passed / 0 failed / 0 skipped**；父Agent独立执行产品/记录 **43 passed / 0 failed**。测试身份、文件摘要及JUnit摘要见[返工测试摘要](evidence/GB21342_PR41_REWORK_TEST_SUMMARY.json)。首轮新增节点用例中2项因Qt将tuple转换为QVariant list而断言失败，改为核对完整节点lexical值后通过；未放宽业务比较或Domain测试。额外Numeric及记录页回归在提交时仍运行，最终状态另补；本次精确提交的三项CI须推送后核对，不将旧head CI迁移为本次通过。
 
 真实证据工具已在新隔离目录成功保存3条记录并生成3份DOCX（首条为电力flows，其余总量）；这只证明数据链和文件生成，不替代Word渲染或原生验收。现有EXE本轮不重建，后续展示修复只由源码测试证明，不能将旧EXE称为本次交付。PR保持草稿，不合并、不发布、不tag；生产data、PIN、公钥、锁定文件与正式支持集均不变，水泥Stage D继续暂缓。
+
+
+## 265f215 修复后实物及报告验收续录
+
+本轮按父设计顺序执行：先固定干净源码重建隔离预览，再生成当前链的合成记录/报告，委派指定 Astra 原生验收，最后才补证据文档。构建源码始终为 `265f215aeb4705695d7b72017fb5631014e33ad9`；本续录提交仅更新证据，不声称包绑定后续文档提交。
+
+### 平台 / Contract 预检查
+
+已实查专属工作树 root/origin/branch/HEAD/status/fetch；origin 为 ECQuota-Insight，分支 `codex/coke-product-implementation-20261117`，构建前干净；main 与 origin/main 均为 `1bf58cc1c2d190f3ebc3b5f37148633102623224`、差异0/0。fetch首次沙箱写拒，正常升级后成功。lock及中央Frozen SHA仍为 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture2.1、Numeric Contract/Profile/Conformance v1按锁定SHA读取。中央本地clone实际origin已验证，ACTIVE文件通过 `origin/main`（`829853a943c421e0b9864d84f3d94970d2ddf688`）读取GUIDE_INDEX、UI v0.2/家族规格/验收清单及产品交付规则，未把其在途分支作为正式依据。MUST保持Decimal全值比较、历史快照不重算及版本追溯；MUST NOT隐式修约、显示值回流、改正式支持集或签包。未发现新公共冲突、不需中央Contract修改，D-ECQ-002～006保持已登记偏差；相关Standard Issue001～005保留，本轮不改变式3、等级解释或未决决定。
+
+### 实测证据及边界
+
+| 验证项 | 本次实际结果 |
+|---|---|
+| 全新隔离EXE | PASS：`work/coke-preview-265f215-native2/portable/UEBench-Coke-Preview/UEBench-Coke-Preview.exe`；12,228,493字节，SHA256 `082c036b0e9dac695e31db5517f29041f5ce06c8980c5604486454661dfe0355`。增强自检exit0、真实Qt离屏表单创建true、记录数0、1级/L3未定、1000kWh→122.9000kgce |
+| ZIP与载荷 | PASS：`UEBench-Coke-Preview-265f215-portable.zip` 70,733,715字节，SHA256 `074b053f3851afd5bf260ffba01470b75d4f12580059d8dfd51ec79c368fec95`，CRC通过；335载荷文件共162,602,221字节，逐文件清单SHA256 `95960ff730a3190ab14303d1502641b7b0d027cea46d8d69e4ebd3bf9b5434d7`。与旧116fd0c资产分离，不复制旧证据 |
+| 当前源码合成记录/Word | 数据链PASS：新目录 `work/coke-evidence-265f215-native2` 三条真实SQLite记录与三份DOCX；1000kWh×0.1229/2t=61.4500→1级（原sample_id111仅为稳定样本标签，不是该次实际能耗）；总量113→3级、138→未达3级；首条保留表A.2/有效系数来源 |
+| 跨进程历史保真 | PASS：独立新Python进程禁用 `coke_records.preview_coke`，三条历史全部读回并构建报告视图，实际值/等级/Rule hash一致；读取前后三列request/result/rule原始JSON SHA256逐条相同，见 `cross-process-readback.json` |
+| 原生EXE/源码历史/Office | OPEN：指定GPT-6 Astra低推理Agent初始化后，两次 `sky.list_apps()`（间隔2秒）均立即返回 `Computer Use helper already has an active request`。未得到窗口/截图/树、未启动应用或输入；不是旧轮审批timeout，也不是自动安全审核拒绝。未终止未知helper或绕过占用。新EXE交互矩阵、源码MainWindow两页签及真实Word按钮、三份DOCX的Word/WPS表格分页上下标/截断检查全部未观察，不记PASS |
+| DOCX渲染 | OPEN：使用documents技能和实际解析的bundled runtime运行 `render_docx.py`，报 `LibreOffice soffice.exe was not found on PATH`；未生成页图，不能交付视觉验收通过。未安装软件或借用用户桌面LibreOffice |
+| 精确源码CI | 265f215 Numeric v1 run44110927512与N01-A run44110927701均success；PR Gate run44110927544的compile/source gate均success，strict literal full suite仍in_progress，尚无完整套件通过结论。不能把此状态平移至后续文档提交 |
+
+[可审计摘要](evidence/GB21342_265f215_DELIVERY_ACCEPTANCE_SUMMARY.json)包含构建身份、文件hash、记录/DOCX摘要、原始JSON前后hash及CI快照；完整本机载荷清单、自检输出、原生观察继续保留在各专属目录。父Agent已独立重新计算EXE/ZIP hash并核对身份/增强自检。当前无新增生产代码，因此不无改动重复已完成回归；完整回归仍按精确head CI实际结果补录。
+
+本轮未改变生产data、PIN、公钥、lock或正式支持集；焦炭整体仍MAPPING、正式仅选煤，水泥Stage D暂缓。原生/报告视觉、生产规则参数采用/签包、整映射批准与正式安装升级/Stage D仍OPEN。PR41保持草稿，不合并、不发布、不tag。
