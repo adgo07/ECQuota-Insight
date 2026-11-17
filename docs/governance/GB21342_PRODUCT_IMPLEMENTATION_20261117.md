@@ -157,3 +157,39 @@ Knowledge capture：无新增知识文章；引用核验缺口记于本报告，
 本机现有GB/T2589—2020与GB/T12723—2024原文，已计算SHA并实际目视关键页，父独立复核；引用链、29307.6基准及与附录系数的区别写入[V1.1审核稿](../../standards/mappings/GB21342-2025/标准映射表_V1.1_审核稿.md)§5.7。该稿§7集中D01～D05边界，已提交Owner确认，当前尚未记批准。
 
 通过既有签名工具仅派生公钥比对，已确认本机既有私钥匹配软件信任根；不输出秘密、不更换公钥。旧“缺签钥/缺引用原文”是历史取证状态，不能继续作为本轮硬阻断。当前只完成dry-run，尚未签正式焦炭包或提升生产定义/PIN。正式支持须按批准映射、独立验收和配套交付实证推进；本段不宣称SUPPORTED、正式发布或水泥验收通过。
+
+
+## 2026-11-18 最终完整主应用开发包与独立验收补录
+
+### 平台 / Contract 预检查
+
+构建源码为干净 `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e`，origin仍为ECQuota-Insight、专属分支未切换；构建前重新确认HEAD/status，构建期间未混入后续文档。中央锁定SHA仍为 `ee5feb0cc34dbd99790500fadd0c4c932e202a20`，Architecture2.1及Numeric Contract/Profile/Conformance v1不升级。沿本轮已读取的中央ACTIVE标准开发/交付/UI v0.2路由，MUST保持Decimal全值比较、参数/输入/结果快照互相绑定、历史不重算；MUST NOT隐式修约、epsilon、float恢复、显示值回流、替换公钥或伪造签名。验收发现的产品衔接/展示问题按LOCAL DEFECT修复，无新增Frozen冲突或中央修改需求；D-ECQ-002～006保留。相关Standard Issue001～005，不改变既有最高级别解释或擅自处理未规定情形。
+
+### 独立检查发现及收口
+
+- 真实主应用已接焦炭专属Form、对象/统计期、炉型/产品同步、五量与能流互斥，一次Application.evaluate完整结果及审计同事务保存；最高等级已确定时不强迫低等级未知补齐。partial/不适用只显示预览；输入变更使旧结果失效、重复信号不重复保存。历史列表、两页签及Word沿保存快照链读取。
+- 本轮开发入口显式启用真实标准库readiness，先核对既有签包，再从其r1生成内存参数化候选；只在专用TEMP标记目录工作并支持重开，不把开发作用域写回正式支持集，也不新建长期候选JSON。未对账负例仍阻断。完整热值/焓、参数化规则及v2记录由同一Domain执行，v1历史保留只读兼容。
+- 1280×800和960×600实际Qt offscreen显示/滚动/抓图共22张代表图，覆盖五量、条件、明细左右、计算、结果、记录列表和两页签。计算、查看记录和Word共8次位置核对均可完整滚入viewport。父独立目视发现开发scope标签误写正式支持、禁用热值单位占位裁尾及焦炭来源未登记；`18722bd`统一复用development-aware标签、缩短为“选择单位”、登记已重新核对编号/名称/现行/发布/实施日期的固定官方页面。两张960×600补图经父复查通过。表格14列需自身横向滚动，长待定原因可换行；这些观察均为离屏，不当作原生交互通过。
+- 随后父独立覆盖审查发现保存失败时清空预览不符合设计；`f4aea0b`增加焦炭专用保存异常携带已算结果，UI保留预览及有效系数/来源，明确尚未生成记录，恢复重试且历史/Word按钮禁用。实际审计失败事务回滚与重试只生成一条记录，异常处理不再次调用计算器，也不显示保存成功；用户重试仍执行正常计算保存流程。此前`f1bbd61`及`18722bd`资产保留各自历史身份，不冒充该最终修复。
+
+### 最终开发资产及机器检查
+
+| 项目 | 实际结果 |
+|---|---|
+| 源码身份 | `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e`，source_dirty=false；完整主应用开发验收包，不是正式发布 |
+| EXE | `work/coke-application-f4aea0b/portable/UEBench-Coke-Application/UEBench-Coke-Application.exe`；12,252,624字节；SHA256 `78bb83e9f4a4e43f36ba697009e10bf9a296e774ce11d1da484fe57409a98699` |
+| ZIP | `UEBench-Coke-Application-f4aea0b.zip`；70,887,600字节；SHA256 `6c83816aa27d243812a5e1f7a263df266f39b03bfd0e7fdd6a2fa260d74655ee`；CRC PASS |
+| 载荷 | 337个文件，逐文件大小/hash全部独立重算；载荷清单SHA256 `c6fc646d962a0388651e467038019e8360f49b8f2f898f4793756c59818201c4`；内置既有签包与生产配套原字节相同，不含新的正式焦炭签包 |
+| 实际运行依赖 | Pydantic2.13.4、PySide6 6.10.1、PyInstaller6.20.0、python-docx1.2.0；最低Pydantic声明已在6e85f3c补齐并包含于最终源码 |
+| 已构建EXE自检 | exit0；真实MainWindow dispatch、readiness=true、最高等级1级、保存1条及审计52条；DOCX实际生成；离屏Qt表单可创建 |
+| 独立EXE进程重开 | exit0；request/result/rule三列原始JSON SHA256逐一不变，记录/审计数仍1/52，新增记录0，保存报告可读；不重算历史 |
+
+以上资产已由父Agent独立复算EXE/ZIP哈希。完整机器摘要见[最终开发包摘要](evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)；本机完整build-result、逐文件清单及独立校验保留在`work/coke-application-f4aea0b/`。桌面启动使用同目录“启动焦炭开发验收.cmd”或EXE加`--data-dir <独立TEMP子目录>`；不得使用正式用户目录。启动到真实主应用，开发标识直接可见；关闭保留同一标记TEMP库，重开可查历史。
+
+### 验证状态与未决边界
+
+视觉修复受影响定向69 passed、保存失败预览修复定向56 passed；分组有重叠，不相加。首轮主应用保存载荷展示遗漏property字段、readiness负例被tests/conftest默认关闭及清理日志句柄的问题均曾真实失败，已补显式适配、严格readiness=True与日志关闭后重跑通过，未放宽断言。完整源码回归仍按本机原日志/远端精确SHA终局核对。
+
+2026-11-18 00:36:36（UTC+8）重新核对精确f4的[Numeric v1 44127187683](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187683)与[N01-A 44127187637](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187637)均completed/success；[PR Gate 44127187764](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187764)仍in_progress。此前启动的本机literal full suite仍运行、尚无终局；期间HEAD推进，不将其冒称f4精确全套通过。后续CI终局另补，当前不提前宣布全套通过。
+
+原生及Word视觉仍OPEN：本轮统一Computer Use inventory仅见Codex/Explorer、未见焦炭；Word isRunning=false。此前903.2s Word请求由父中断后返回aborted，不是超时或自动审核拒绝。没有取得本最终EXE的真实表单操作、Word/WPS实开/分页证据；不以离屏截图、DOCX生成或机器自检替代。正式安装/升级/卸载、整标准Stage D仍OPEN。引用原文和匹配既有公钥的私钥已核实具备，不沿用旧“缺失”阻断；V1.1映射审核稿尚未收到Owner批准，未正式签焦炭包或改PIN/生产data/正式支持集。整体仍MAPPING、正式评价仍仅GB29446；水泥Stage D暂缓，PR41保持草稿，不合并、不发布、不tag。

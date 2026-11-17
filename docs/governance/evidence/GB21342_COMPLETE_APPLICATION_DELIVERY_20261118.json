@@ -1,0 +1,148 @@
+{
+  "schema": "ecq.coke-complete-application-delivery.v1",
+  "date": "2026-11-18",
+  "module_id": "qz.energy_quota",
+  "source_commit": "f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e",
+  "source_dirty": false,
+  "kind": "UNPUBLISHED_COKE_FULL_APPLICATION",
+  "formal_release": false,
+  "production_scope_changed": false,
+  "platform_precheck": {
+    "central_locked_sha": "ee5feb0cc34dbd99790500fadd0c4c932e202a20",
+    "frozen": [
+      "Architecture2.1",
+      "Numeric Contract v1",
+      "Numeric Profiles v1",
+      "Numeric Conformance Vector v1"
+    ],
+    "must": [
+      "Decimal28/HALF_EVEN/full-value",
+      "历史不重算",
+      "保存快照及实际参数一致"
+    ],
+    "must_not": [
+      "隐式修约或epsilon",
+      "float恢复真值",
+      "显示值回流",
+      "更换公钥或伪造签名"
+    ],
+    "classification": "LOCAL DEFECT（产品衔接及展示修复）；既有D-ECQ-002至006仍登记",
+    "central_change_needed": false,
+    "related_standard_issues": [
+      "ECQ-STD-GB21342-001",
+      "ECQ-STD-GB21342-002",
+      "ECQ-STD-GB21342-003",
+      "ECQ-STD-GB21342-004",
+      "ECQ-STD-GB21342-005"
+    ],
+    "existing_grade_interpretation_changed": false
+  },
+  "artifact": {
+    "exe": "UEBench-Coke-Application.exe",
+    "exe_bytes": 12252624,
+    "exe_sha256": "78bb83e9f4a4e43f36ba697009e10bf9a296e774ce11d1da484fe57409a98699",
+    "zip": "UEBench-Coke-Application-f4aea0b.zip",
+    "zip_bytes": 70887600,
+    "zip_sha256": "6c83816aa27d243812a5e1f7a263df266f39b03bfd0e7fdd6a2fa260d74655ee",
+    "payload_files": 337,
+    "payload_bytes": 162759428,
+    "payload_manifest_sha256": "c6fc646d962a0388651e467038019e8360f49b8f2f898f4793756c59818201c4",
+    "all_payload_rehashed": true,
+    "zip_crc": "PASS",
+    "bundled_signed_package_matches_production": true,
+    "bundled_signed_package_sha256": "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5",
+    "excluded_incompatible_icu": [
+      "icuuc.dll",
+      "icudt78.dll"
+    ]
+  },
+  "checks": {
+    "self_check_exit_code": 0,
+    "readback_exit_code": 0,
+    "main_window_dispatch": true,
+    "readiness_enforced": true,
+    "word_generated": true,
+    "saved_record_grade": "LEVEL_1",
+    "saved_counts": {
+      "records": 1,
+      "audit_rows": 52
+    },
+    "record_json_sha256": [
+      "e16642eb2d78a814db69c30324d2f6588d57720986defb6962a8893663588cd3",
+      "246c9526e41ec57a105d5f119bad14c7ac3c9ec5c05483bab2fd992ad75bf23e",
+      "ed344f51bcfbc8f67b51d551428d58dfecbfa895fb0d243daacaa3b8ea2c06bf"
+    ],
+    "reopened_json_sha256": [
+      "e16642eb2d78a814db69c30324d2f6588d57720986defb6962a8893663588cd3",
+      "246c9526e41ec57a105d5f119bad14c7ac3c9ec5c05483bab2fd992ad75bf23e",
+      "ed344f51bcfbc8f67b51d551428d58dfecbfa895fb0d243daacaa3b8ea2c06bf"
+    ],
+    "snapshots_unchanged": true,
+    "new_records_on_readback": 0
+  },
+  "runtime_dependencies": {
+    "pydantic": "2.13.4",
+    "PySide6": "6.10.1",
+    "PyInstaller": "6.20.0",
+    "python-docx": "1.2.0"
+  },
+  "targeted": {
+    "visual_fix": {
+      "passed": 69,
+      "failed": 0,
+      "junit_sha256": "8f9cf2714a7e58d90a0f79bd932d8cbd7dd50e4c2237a183c241a5483b2f06a4"
+    },
+    "save_failure_preview_fix": {
+      "passed": 56,
+      "failed": 0,
+      "source_commit": "f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e",
+      "evidence": "实施agent实际工具运行结果，58.93s"
+    },
+    "overlap": "分组存在重叠，不相加"
+  },
+  "ci_snapshot_utc": "2026-11-17T16:36:36Z",
+  "ci": {
+    "numeric": {
+      "run_id": 44127187683,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "n01a": {
+      "run_id": 44127187637,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "pull_request_gate": {
+      "run_id": 44127187764,
+      "status": "in_progress",
+      "conclusion": null
+    }
+  },
+  "local_full_suite": "仍运行；期间已有新提交，不当作f4精确全套通过",
+  "offscreen_visual": {
+    "sizes": [
+      "1280x800",
+      "960x600"
+    ],
+    "representative_png_count": 22,
+    "actions_checked": 8,
+    "all_checked_buttons_in_viewport": true,
+    "corrected_png_count": 2,
+    "parent_visual_recheck": "PASS（开发标签、固定官方来源入口、短单位占位）",
+    "scope": "仅Qt offscreen与合成数据；图像对应原始源码及已记录工作区展示修复，不当原生证据"
+  },
+  "native_gui": "OPEN",
+  "word_native_and_layout": "OPEN",
+  "native_observation": "统一inventory仅见Codex/Explorer，未见焦炭；Word isRunning=false。903.2s Word请求由父中断后返回aborted，不是超时或自动审核拒绝。未完成真实表单/Word操作。",
+  "formal_install_upgrade_stage_d": "OPEN",
+  "standard_support": "MAPPING",
+  "mapping_approval": "V1.1审核稿已提交Owner，未收到批准",
+  "formal_supported_ids": [
+    "gb-29446-2019"
+  ],
+  "cement_stage_d": "暂缓",
+  "superseded_builds": [
+    "f1bbd6135ef3b12cb06bd90b58710c0efa61e0f0",
+    "18722bd113f06dc847074afdb1b2c5bb3fcae6da"
+  ]
+}
