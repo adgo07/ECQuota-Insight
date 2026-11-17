@@ -1966,7 +1966,7 @@ class MainWindow(QMainWindow):
             button.setToolTip(url or NO_OFFICIAL_SOURCE_LABEL)
         status = getattr(self, "eval_official_status", None)
         if status is not None:
-            platform = "国家标准全文公开系统" if standard_id == "gb-16780-2021" else OFFICIAL_SOURCE_PLATFORM_NAME
+            platform = "国家标准全文公开系统" if (url or "").startswith("https://openstd.samr.gov.cn/") else OFFICIAL_SOURCE_PLATFORM_NAME
             status.setText(platform if url else NO_OFFICIAL_SOURCE_LABEL)
         support = getattr(self, "eval_support_label", None)
         if support is not None:

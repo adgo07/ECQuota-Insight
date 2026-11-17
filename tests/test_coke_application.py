@@ -199,3 +199,21 @@ def test_real_readiness_without_reconciliation_blocks_even_development_scope(mon
                 context.database.dispose()
                 from uebench.infrastructure.logging import close_logging
                 close_logging()
+
+
+def test_development_badge_official_source_and_short_unit_placeholder(window):
+    from uebench.ui.presentation import software_support_text
+    assert window.eval_support_label.text() == "开发验收专用，尚未正式支持"
+    assert software_support_text("gb-29446-2019") == "正式支持"
+    assert software_support_text("gb-21340-2019") == "未开放"
+    assert window.eval_standard_open.isEnabled()
+    assert window.eval_standard_open.toolTip() == "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=5DB2AFADA4980285095D82F5A23D947A"
+    assert window.eval_official_status.text() == "国家标准全文公开系统"
+    form = window.coke_form
+    form.energy_mode.setCurrentIndex(form.energy_mode.findData("flows"))
+    form.flows_form.add()
+    combo = form.flows_form.table.cellWidget(0, 12)
+    assert combo.currentText() == "选择单位"
+    window.show()
+    QApplication.processEvents()
+    assert combo.fontMetrics().horizontalAdvance(combo.currentText()) + 32 <= combo.width()

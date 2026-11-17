@@ -50,7 +50,7 @@ class CokeFlowsForm(QWidget):
                              (1, [(v[0], k) for k, v in REFERENCES.items()] + [("饱和蒸汽", "saturated_steam"), ("过热蒸汽", "superheated_steam"), ("其他燃料（实测热值或系数）", "other_fuel"), ("其他（需有效系数）", "other"), ("已折标能流", "standard_coal")]),
                              (3, [(u, u) for u in ("kg", "t", "m³", "kWh", "MWh", "MJ", "GJ", "kgce", "tce")]),
                              (9, [("绝对压力", "absolute"), ("表压（不能查表）", "gauge")]),
-                             (12, [("请选择热值单位", None), ("kJ/kg", "kJ/kg"), ("kJ/m³", "kJ/m³")])):
+                             (12, [("选择单位", None), ("kJ/kg", "kJ/kg"), ("kJ/m³", "kJ/m³")])):
             combo = WheelSafeComboBox()
             for label, value in options:
                 combo.addItem(label, value)
