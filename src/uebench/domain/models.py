@@ -481,6 +481,7 @@ class EvaluationRequest(StrictModel):
     production_lines: list[ProductionLine] = Field(default_factory=list)
     cement_lines: list[CementLineInput] = Field(default_factory=list)
     cement_shared_energy: list[CementSharedEnergy] = Field(default_factory=list)
+    coke_payload: dict[str, Any] | None = None
     organization_name: str | None = None
     project_name: str | None = None
     notes: str | None = None
@@ -582,6 +583,7 @@ class EvaluationResult(StrictModel):
     product_name: str
     results: list[IndicatorResult]
     rule_snapshot_sha256: str
+    coke_payload: dict[str, Any] | None = None
     warnings: list[str] = Field(default_factory=list)
 
 

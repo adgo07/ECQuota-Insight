@@ -114,6 +114,10 @@ class EvaluationService:
         return standard
 
     def _calculate(self, request: EvaluationRequest, standard: StandardDefinition) -> EvaluationResult:
+        if request.coke_payload is not None:
+            from .coke_records import calculate_record
+
+            return calculate_record(request, standard)
         result = self.engine.evaluate(
             standard,
             request,
@@ -172,6 +176,10 @@ class EvaluationService:
             require_formal_request(request, standard)
             request = calculated_ratio_request(request)
         result = self._calculate(request, standard)
+        if request.standard_id == "gb-21342-2025":
+            from .coke_records import require_complete
+
+            require_complete(request, result, standard)
         if request.standard_id == "gb-16780-2021":
             from .gb16780 import require_complete
 
