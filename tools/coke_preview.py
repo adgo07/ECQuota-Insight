@@ -9,6 +9,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 def main():
     if "--self-check" in sys.argv:
         import json
+        # 离屏创建真实Qt表单，覆盖冻结DLL载入，不操作原生桌面。
+        from PySide6.QtWidgets import QApplication
+        from uebench.ui.coke_preview import CokePreviewPage
+        application = QApplication(["coke-self-check", "-platform", "offscreen"])
+        page = CokePreviewPage()
+        page.close()
         from uebench.application.gb21342 import preview_coke
         from uebench.domain.gb21342 import CokeAssessmentInput, CokeEnergyInput
         from uebench.domain.coke_flows import CokeFlow, aggregate_flows
@@ -20,7 +26,9 @@ def main():
         assert result.grade.value == "LEVEL_1" and result.levels[2].threshold is None
         assert str(flow.rows[0].energy_kgce) == "122.9000"
         print(json.dumps({"kind":"UNPUBLISHED_PREVIEW_ONLY","grade":result.grade.value,
-                          "lower_level_unknown":True,"flow_kgce":str(flow.rows[0].energy_kgce),"records_written":0}))
+                          "lower_level_unknown":True,"flow_kgce":str(flow.rows[0].energy_kgce),
+                          "qt_form_created":True,"records_written":0}))
+        application.quit()
         return 0
     from PySide6.QtWidgets import QApplication
     from uebench.bootstrap import create_context

@@ -35,9 +35,20 @@ def main():
         "--hidden-import","alembic.runtime.migration","--hidden-import","alembic.ddl.sqlite",
         "--exclude-module","pytest","--exclude-module","hypothesis",
         str(root/"tools/coke_preview.py")],cwd=root,check=True)
+    # 与既有uebench-stage-d.spec一致：Poppler ICU78仅导出版本后缀符号，
+    # Qt6Core须使用Windows System32 ICU，不能携带扫描PATH误收集的副本。
+    internal = output/"portable/UEBench-Coke-Preview/_internal"
+    removed = []
+    for name in ("icuuc.dll", "icudt78.dll"):
+        target = internal/name
+        if target.exists():
+            if not target.resolve().is_relative_to(output):
+                raise ValueError("构建清理目标超出本次新建输出目录")
+            target.unlink()
+            removed.append(name)
     executable = output/"portable/UEBench-Coke-Preview/UEBench-Coke-Preview.exe"
     completed = subprocess.run([str(executable),"--self-check"],cwd=output,text=True,capture_output=True)
-    identity.update(exe_sha256=hashlib.sha256(executable.read_bytes()).hexdigest(),
+    identity.update(excluded_incompatible_icu=removed,exe_sha256=hashlib.sha256(executable.read_bytes()).hexdigest(),
                     self_check_exit_code=completed.returncode,self_check_stdout=completed.stdout,self_check_stderr=completed.stderr)
     (output/"build-result.json").write_text(json.dumps(identity,ensure_ascii=False,indent=2),encoding="utf-8")
     if completed.returncode:
