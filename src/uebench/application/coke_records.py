@@ -15,6 +15,12 @@ from .gb21342 import preview_coke
 
 PAYLOAD_VERSION = "gb21342-record-v1"
 ADOPTION_MARKER = f"gb21342-calculator-adoption:{ASSESSMENT_CALCULATOR_VERSION}:{ASSESSMENT_RULE_REVISION}:{SOURCE_SHA256}"
+# 已保存载荷身份只追加，不随当前计算器常量更新；未知版本组合不得推断兼容。
+READABLE_IDENTITIES = frozenset({(
+    "gb21342-record-v1", "gb21342-assessment-unpublished-v1",
+    "gb21342-table1-table2-unpublished-v1", "gb21342-highest-grade-full-value-v1",
+    "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
+)})
 STANDARD_ID = "gb-21342-2025"
 PRODUCTS = {"top_charging": "top-charging-coke-oven", "stamp_charging": "stamp-charging-coke-oven"}
 COMPLETE_GRADES = {Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3, Grade.NOT_QUALIFIED}
@@ -49,8 +55,8 @@ def _reject_floats(value):
             _reject_floats(item)
 
 
-def decode_input(payload):
-    if not isinstance(payload, dict) or payload.get("version") != PAYLOAD_VERSION:
+def decode_input(payload, *, expected_version=None):
+    if not isinstance(payload, dict) or payload.get("version") != (expected_version or PAYLOAD_VERSION):
         raise ValueError("焦炭输入载荷版本不匹配")
     _reject_floats(payload)
     try:
@@ -61,14 +67,20 @@ def decode_input(payload):
         raise ValueError("焦炭输入载荷缺项或结构无效") from exc
 
 
-def require_binding(request, snapshot, *, verify_flows=True):
+def require_binding(request, snapshot, *, verify_flows=True, historical_identity=None):
+    marker = ADOPTION_MARKER
+    if historical_identity is not None:
+        if historical_identity not in READABLE_IDENTITIES:
+            raise ValueError("焦炭保存版本组合不一致或尚不支持读取")
+        _, calculator, rule, _, source = historical_identity
+        marker = f"gb21342-calculator-adoption:{calculator}:{rule}:{source}"
     if (request.standard_id != STANDARD_ID or snapshot.id != STANDARD_ID
-            or snapshot.rule_revision < 2 or ADOPTION_MARKER not in snapshot.corrections
-            or snapshot.source_sha256 != SOURCE_SHA256
+            or snapshot.rule_revision < 2 or marker not in snapshot.corrections
+            or snapshot.source_sha256 != (historical_identity[4] if historical_identity else SOURCE_SHA256)
             or "gb-21342-2013" not in snapshot.supersedes
             or request.input_mode is not InputMode.DETAIL):
         raise ValueError("配套焦炭规则尚未采用新计算链，旧r1不能形成新记录")
-    assessment = decode_input(request.coke_payload)
+    assessment = decode_input(request.coke_payload, expected_version=historical_identity[0] if historical_identity else None)
     if (request.product_id != PRODUCTS.get(assessment.oven_type)
             or not any(p.id == request.product_id for p in snapshot.products)):
         raise ValueError("焦炭输入炉型、产品与规则快照不一致")
@@ -115,18 +127,23 @@ def calculate_record(request, snapshot):
         rule_snapshot_sha256=snapshot_hash(snapshot),results=[indicator],coke_payload=payload,warnings=list(result.warnings))
 
 
-def require_complete(request, result, snapshot):
+def require_complete(request, result, snapshot, *, historical=False):
     """只校验保存快照，不重算；最高级别已确定时不强求低级未知。"""
-    require_binding(request, snapshot, verify_flows=False)
     payload = result.coke_payload or {}
+    saved = payload.get("assessment", {})
+    identity = (payload.get("version"), result.calculator_version,
+                saved.get("rule_revision") if isinstance(saved, dict) else None,
+                result.numeric_behavior_version, snapshot.source_sha256)
+    require_binding(request, snapshot, verify_flows=False,
+                    historical_identity=identity if historical else None)
     digest = hashlib.sha256(json.dumps(request.coke_payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-    if (payload.get("version") != PAYLOAD_VERSION or payload.get("input_sha256") != digest
+    if (payload.get("version") != (identity[0] if historical else PAYLOAD_VERSION) or payload.get("input_sha256") != digest
             or result.rule_snapshot_sha256 != snapshot_hash(snapshot)
             or result.standard_id != request.standard_id or result.product_id != request.product_id
             or result.rule_revision != snapshot.rule_revision or result.standard_version != snapshot.version
             or result.standard_number != snapshot.number or result.standard_title != snapshot.title
-            or result.calculator_version != ASSESSMENT_CALCULATOR_VERSION
-            or result.numeric_behavior_version != ASSESSMENT_NUMERIC_BEHAVIOR_VERSION
+            or (not historical and result.calculator_version != ASSESSMENT_CALCULATOR_VERSION)
+            or (not historical and result.numeric_behavior_version != ASSESSMENT_NUMERIC_BEHAVIOR_VERSION)
             or result.numeric_contract_version != "v1" or result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1"
             or len(result.results) != 1):
         raise ValueError("焦炭请求、结果、版本与规则快照不一致")
@@ -141,7 +158,7 @@ def require_complete(request, result, snapshot):
             or r.get("energy",{}).get("numeric_contract_version") != result.numeric_contract_version
             or r.get("energy",{}).get("numeric_profile_id") != result.numeric_profile_id
             or r.get("calculator_version") != result.calculator_version
-            or r.get("rule_revision") != ASSESSMENT_RULE_REVISION
+            or r.get("rule_revision") != (identity[2] if historical else ASSESSMENT_RULE_REVISION)
             or r.get("source_sha256") != snapshot.source_sha256
             or r.get("numeric_behavior_version") != result.numeric_behavior_version
             or r.get("grade") != item.grade.value):

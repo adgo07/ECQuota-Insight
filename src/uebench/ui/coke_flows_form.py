@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, Q
 from .wheel_safe_combo import WheelSafeComboBox
 from uebench.domain.coke_flows import CokeFlow, COMPONENTS, REFERENCES
 from uebench.domain.gb21342 import LABELS
+from uebench.domain.coke_reference import SATURATED_STEAM, SUPERHEATED_STEAM
 
 
 class CokeFlowsForm(QWidget):
@@ -13,11 +14,12 @@ class CokeFlowsForm(QWidget):
     def __init__(self):
         super().__init__()
         body = QVBoxLayout(self)
-        hint = QLabel("干洗精煤、干全焦采用附录A；其他能源/工质优先实测有效系数，未填时采用表列参考。蒸汽查表使用绝对压力，每股能流只计一次。")
+        hint = QLabel("干洗精煤、干全焦采用附录A；其他能源/工质优先实测有效系数，未填时采用表列参考。蒸汽查表使用绝对压力，每股能流只计一次。驰/弛放气对应关系待确认，暂不自动提供表列系数；请选其他并填写有效系数及来源。")
         hint.setWordWrap(True)
         body.addWidget(hint)
-        self.table = QTableWidget(0, 10)
-        self.table.setHorizontalHeaderLabels(["分量", "能源/工质", "数量", "单位", "实测系数", "系数单位", "系数来源", "绝对压力（MPa）", "温度（℃）", "压力基准"])
+        self.table = QTableWidget(0, 11)
+        self.table.setHorizontalHeaderLabels(["分量", "能源/工质", "数量", "单位", "实测系数", "系数单位", "系数来源", "绝对压力（MPa）", "温度（℃）", "压力基准", "蒸汽表列节点"])
+        self.table.setColumnWidth(10, 215)
         self.table.setMinimumHeight(240)
         self.table.setMaximumHeight(360)
         self.table.itemChanged.connect(lambda *_: self.changed.emit())
@@ -53,6 +55,30 @@ class CokeFlowsForm(QWidget):
             self.table.setCellWidget(row, col, combo)
         for col in (2, 4, 5, 6, 7, 8):
             self.table.setItem(row, col, QTableWidgetItem(""))
+        nodes = WheelSafeComboBox()
+        nodes.setAccessibleName("蒸汽表列节点")
+        self.table.setCellWidget(row, 10, nodes)
+        energy = self.table.cellWidget(row, 1)
+        def choose_node(index):
+            node = nodes.itemData(index)
+            row = next((r for r in range(self.table.rowCount()) if self.table.cellWidget(r, 10) is nodes), -1)
+            if node is not None and row >= 0:
+                self.table.item(row, 7).setText(node[0])
+                self.table.item(row, 8).setText(node[1])
+                self.table.cellWidget(row, 9).setCurrentIndex(0)
+                nodes.setCurrentIndex(0)
+        def update_nodes():
+            nodes.blockSignals(True)
+            nodes.clear()
+            nodes.addItem("填入表列节点…", None)
+            table = {"saturated_steam":SATURATED_STEAM, "superheated_steam":SUPERHEATED_STEAM}.get(energy.currentData(), ())
+            for p, t, _, _ in table:
+                nodes.addItem(f"{p} MPa / {t} ℃", (p, t))
+            nodes.setEnabled(bool(table))
+            nodes.blockSignals(False)
+        nodes.currentIndexChanged.connect(choose_node)
+        energy.currentIndexChanged.connect(update_nodes)
+        update_nodes()
         self.table.item(row, 2).setData(256, uuid4().hex)
         self.changed.emit()
 

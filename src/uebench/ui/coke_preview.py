@@ -38,6 +38,56 @@ def result_html(result, flow_warnings=()):
     )
 
 
+def trace_text(result, step):
+    """普通计算依据使用业务名称；原始表达式仍保留在Domain快照。"""
+    inputs = result.inputs
+    values = {**LABELS, "oven_type":"焦炉类型", "heating_fuel":"加热燃料",
+              "mixed_gas_ratio":"混合煤气使用时间比例", "dry_volatile_pct":"干基挥发分",
+              "total_moisture_pct":"全水分", "oven_age_years":"炉龄",
+              "quenching_method":"熄焦方式", "conventional_oven":"常规焦炉适用事实"}
+    choices = {"top_charging":"顶装焦炉", "stamp_charging":"捣固焦炉", "coke_oven_gas":"焦炉煤气",
+               "mixed_gas":"混合煤气", "other":"其他", "unknown":"待确定",
+               "dry":"干熄焦", "wet":"湿熄焦", "mixed":"干湿并存", "True":"是", "False":"否"}
+    if step.label == "最终级别":
+        return "最终级别：" + GRADE_LABELS[result.grade]
+    value = "待确定" if step.value is None else choices.get(str(step.value), str(step.value))
+    if step.expression == "mixed_gas_ratio" and inputs.heating_fuel != "mixed_gas":
+        value = "不适用"
+    if step.expression in values:
+        return f"{step.label}：{value} {step.unit or ''}".strip()
+    expressions = {
+        "净能量":"原料煤携带有效能量＋加工耗能－焦炭产品携带能量－化工产品携带能量－回收有效能量",
+        "实际单位能耗":"净能量÷干全焦产量",
+        "外属调整":"煤气净化及废水处理外属情况",
+        "外属调整未定":"外属情况待确认",
+        "调整后评价能耗":"实际单位能耗＋外属调整",
+        "燃料修正":"焦炉煤气基准",
+        "挥发分修正":"表2精确节点",
+        "炉龄修正":"按炉龄区间取值",
+        "熄焦修正":"干熄焦为0；湿熄焦仅3级取46.46",
+    }
+    expression = expressions.get(step.label)
+    if step.label == "修正量":
+        expression = step.expression
+        symbols = {"F":"燃料修正", "V":"挥发分修正", "M":"水分修正", "Q":"熄焦修正", "A":"炉龄修正"}
+        if expression.startswith("L"):
+            left, right = expression.split("=", 1)
+            expression = left[1:]+"级修正限额＝"+"＋".join(symbols.get(part, part) for part in right.split("+"))
+        elif expression.startswith("M="):
+            expression = "水分修正＝" + expression[2:].replace("Mt", "全水分")
+        elif expression.startswith("F="):
+            expression = "燃料修正＝" + expression[2:]
+        elif expression.startswith("相邻线性插值"):
+            expression = "挥发分修正（表2）" + expression
+    elif step.label == "修正未定":
+        expression = {"F":"燃料条件待确认", "V":"挥发分待确认", "M":"水分待确认",
+                      "A":"炉龄待确认", "Q":"熄焦条件待确认"}.get(step.expression.split(";")[0], "条件待确认")
+    elif step.label.endswith("级比较"):
+        expression = "评价能耗不大于该级修正限额"
+        value = {"是":"满足", "否":"不满足"}.get(value, value)
+    return f"{step.label}：{expression or '按保存的标准依据计算'} = {value} {step.unit or ''}".strip()
+
+
 class CokePreviewPage(QWidget):
     def __init__(self, preview=preview_coke):
         super().__init__()
@@ -204,8 +254,7 @@ class CokePreviewPage(QWidget):
             self.details.setPlainText("\n".join([
                 r.source_location, f"数值配置：{r.numeric_profile_id}",
                 f"计算器版本：{r.calculator_version}", f"规则版本：{r.rule_revision}",
-                *[("最终级别：" + GRADE_LABELS[r.grade]) if s.label == "最终级别"
-                  else f"{s.label}：{s.expression} = {s.value} {s.unit or ''}" for s in r.calculation_trace],
+                *[trace_text(r, s) for s in r.calculation_trace],
                 *flow_details,
             ]))
             self.notice.setText("预览完成，不生成记录。")

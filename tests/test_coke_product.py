@@ -139,3 +139,51 @@ def test_percent_underflow_is_explicit_error_not_zero(page):
     assert page.result is None
     assert "换算超出数值配置范围" in page.notice.text()
     assert page.calculate.isEnabled()
+
+
+def test_preview_business_trace_uses_chinese_and_not_applicable(page):
+    populate(page)
+    page.run_preview()
+    text = page.details.toPlainText()
+    assert "混合煤气使用时间比例：不适用" in text
+    assert "常规焦炉适用事实：是" in text
+    assert "None" not in text and "True" not in text
+    for key in ("mixed_gas_ratio", "conventional_oven", "raw_coal_energy_kgce", "oven_type", "heating_fuel"):
+        assert key not in text
+
+
+@pytest.mark.parametrize("kind,table", [("saturated_steam", SATURATED_STEAM), ("superheated_steam", SUPERHEATED_STEAM)])
+def test_steam_nodes_select_exact_pressure_temperature_and_survive_row_removal(page, kind, table):
+    form = page.flows_form
+    form.add()
+    form.add()
+    energy = form.table.cellWidget(1, 1)
+    energy.setCurrentIndex(energy.findData(kind))
+    nodes = form.table.cellWidget(1, 10)
+    assert nodes.count() == len(table)+1
+    form.table.selectRow(0)
+    form.remove()
+    nodes.setCurrentIndex(5)
+    p, t, _, _ = table[4]
+    assert form.table.item(0, 7).text() == p
+    assert form.table.item(0, 8).text() == t
+    assert form.table.cellWidget(0, 9).currentData() == "absolute"
+    # 全部节点为表列原始 lexical 值，未猜测或插值。
+    assert tuple(nodes.itemData(5)) == (p, t)
+    assert nodes.currentData() is None
+    form.table.item(0, 7).setText("0.123")
+    assert nodes.currentData() is None
+
+
+def test_trace_preserves_distinct_correction_meanings(page):
+    populate(page)
+    page.fields["dry_volatile_pct"].setText("23.5")
+    page.choices["quenching_method"].setCurrentIndex(page.choices["quenching_method"].findData("dry"))
+    page.run_preview()
+    text = page.details.toPlainText()
+    assert "水分修正＝3.67(全水分−10)或3.71(全水分−10.5)" in text
+    assert "挥发分修正（表2）相邻线性插值" in text
+    assert "1级修正限额＝基值＋燃料修正＋挥发分修正＋水分修正＋炉龄修正" in text
+    assert "2级修正限额＝基值＋燃料修正＋挥发分修正＋水分修正" in text
+    assert "3级修正限额＝基值＋燃料修正＋挥发分修正＋水分修正＋熄焦修正＋炉龄修正" in text
+    assert "e_yl" not in text and "included_or_not_external" not in text

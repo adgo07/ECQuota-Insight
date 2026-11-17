@@ -6,7 +6,7 @@ from uebench.domain.gb21342 import LABELS
 
 
 def build_coke_report_view(request, result, snapshot):
-    require_complete(request, result, snapshot)
+    require_complete(request, result, snapshot, historical=True)
     saved = result.coke_payload["assessment"]
     values = request.coke_payload["assessment"]
     energy = saved["energy"]

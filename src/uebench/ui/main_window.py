@@ -2783,7 +2783,7 @@ class MainWindow(QMainWindow):
             else:
                 view = None
                 reason = "该标准尚未开放 Word 报告。"
-                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"}:
+                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021", "gb-21342-2025"}:
                     try:
                         view = self.context.application.get_report_view(evaluation_id)
                         reason = ""
@@ -2976,8 +2976,9 @@ class MainWindow(QMainWindow):
 
     def export_word_record(self, evaluation_id: str) -> None:
         loaded = self.context.application.get_evaluation(evaluation_id)
-        filename = ("水泥分线能耗等级评价报告.docx" if loaded and loaded[1].standard_id == "gb-16780-2021"
-                    else "选煤电力单耗等级评价报告.docx")
+        filename = {"gb-16780-2021": "水泥分线能耗等级评价报告.docx",
+                    "gb-21342-2025": "焦炭能耗对标报告.docx"}.get(
+                        loaded[1].standard_id if loaded else "", "选煤电力单耗等级评价报告.docx")
         path, _ = QFileDialog.getSaveFileName(
             self, "导出Word报告", filename, "Word文档 (*.docx)"
         )
