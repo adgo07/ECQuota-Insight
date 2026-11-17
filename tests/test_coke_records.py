@@ -51,6 +51,16 @@ def test_stale_identity_and_incomplete_rejected():
         calculate_record(request,snapshot)
 
 
+@pytest.mark.parametrize("field,value",[("calculator_version","legacy-r1"),("numeric_behavior_version","unknown"),
+                                      ("numeric_profile_id","other"),("standard_number","GB0000")])
+def test_record_version_mismatch_rejected(field,value):
+    request,snapshot = sample()
+    result = calculate_record(request,snapshot)
+    setattr(result,field,value)
+    with pytest.raises(ValueError,match="不一致"):
+        require_complete(request,result,snapshot)
+
+
 def test_sql_readback_report_no_recalculate_and_rollback(tmp_path, monkeypatch):
     from uebench.bootstrap import create_context
     from uebench.application import evaluation_support

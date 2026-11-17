@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from uebench.domain.gb21342 import (
     CokeAssessmentInput, CokeEnergyInput, ASSESSMENT_CALCULATOR_VERSION,
-    ASSESSMENT_RULE_REVISION, SOURCE_SHA256,
+    ASSESSMENT_RULE_REVISION, ASSESSMENT_NUMERIC_BEHAVIOR_VERSION, SOURCE_SHA256,
 )
 from uebench.domain.models import EvaluationResult, IndicatorResult, CalculationStep, Grade, InputMode
 from .gb21342 import preview_coke
@@ -118,13 +118,20 @@ def require_complete(request, result, snapshot):
             or result.rule_snapshot_sha256 != snapshot_hash(snapshot)
             or result.standard_id != request.standard_id or result.product_id != request.product_id
             or result.rule_revision != snapshot.rule_revision or result.standard_version != snapshot.version
+            or result.standard_number != snapshot.number or result.standard_title != snapshot.title
             or result.calculator_version != ASSESSMENT_CALCULATOR_VERSION
+            or result.numeric_behavior_version != ASSESSMENT_NUMERIC_BEHAVIOR_VERSION
             or result.numeric_contract_version != "v1" or result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1"
             or len(result.results) != 1):
         raise ValueError("焦炭请求、结果、版本与规则快照不一致")
     r = payload.get("assessment", {})
     item = result.results[0]
-    if (r.get("inputs") != request.coke_payload["assessment"]
+    if (item.indicator_id != request.product_id+".energy" or item.unit != "kgce/t"
+            or item.compliance_result is not None or item.compliance_limit is not None
+            or r.get("inputs") != request.coke_payload["assessment"]
+            or r.get("energy",{}).get("inputs") != request.coke_payload["assessment"]["energy"]
+            or r.get("energy",{}).get("numeric_contract_version") != result.numeric_contract_version
+            or r.get("energy",{}).get("numeric_profile_id") != result.numeric_profile_id
             or r.get("calculator_version") != result.calculator_version
             or r.get("rule_revision") != ASSESSMENT_RULE_REVISION
             or r.get("source_sha256") != snapshot.source_sha256

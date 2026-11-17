@@ -176,6 +176,7 @@ def calculate_energy(
 
 ASSESSMENT_CALCULATOR_VERSION = "gb21342-assessment-unpublished-v1"
 ASSESSMENT_RULE_REVISION = "gb21342-table1-table2-unpublished-v1"
+ASSESSMENT_NUMERIC_BEHAVIOR_VERSION = "gb21342-highest-grade-full-value-v1"
 # 原文表2节点，精确十进制文本；不从legacy JSON或Markdown运行时读取。
 VOLATILE_TABLES = {
     "top_charging": tuple(zip(range(21, 29), ("-8.30", "-4.20", "0", "4.25", "8.55", "11.00", "14.08", "18.71"))),
@@ -255,7 +256,7 @@ class CokeAssessmentResult:
     calculator_version: str = ASSESSMENT_CALCULATOR_VERSION
     rule_revision: str = ASSESSMENT_RULE_REVISION
     calculator_id: str = "gb21342-assessment"
-    numeric_behavior_version: str = "gb21342-highest-grade-full-value-v1"
+    numeric_behavior_version: str = ASSESSMENT_NUMERIC_BEHAVIOR_VERSION
     source_sha256: str = SOURCE_SHA256
     source_location: str = "GB 21342—2025 §4表1、§5.3表2、§6.1.1及式（3）；PDF6—8"
 
