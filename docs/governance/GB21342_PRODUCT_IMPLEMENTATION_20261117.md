@@ -49,9 +49,15 @@ Numeric专项执行：`tests/conformance/numeric/test_ecquota_numeric_v1.py`、`
 
 干净`0441b1630436d5799fcb7990084972505377a345`构建隔离预览EXE成功，SHA256=`028204a6123555c95f5fd7eb72d465286aa8ebd876ab205b937ae3ec88e77932`，自检exit0，1级/L3未定、1000kWh→122.9000kgce、记录数0均通过。身份与输出位于`work/coke-preview-0441b16/build-result.json`；EXE在其`portable/UEBench-Coke-Preview/`下。只验证无头入口，不代表原生GUI/安装器通过。
 
-完整回归第二轮出现Excel跨进程读取失败，定位到共享虚拟环境editable安装指向主目录旧源码；旧模型拒绝cement/coke新字段。该错误环境执行已中止，不能记录通过。显式设置`PYTHONPATH=<当前工作树>/src`后同一跨进程测试1 passed；后续完整回归使用该配置重跑，未改全局虚拟环境源码绑定。额外焦炭/分层/源码交付定向50 passed。完整回归结果待下方最终补录。
+完整回归第二轮出现Excel跨进程读取失败，定位到共享虚拟环境editable安装指向主目录旧源码；旧模型拒绝cement/coke新字段。该错误环境执行已中止，不能记录通过。显式设置`PYTHONPATH=<当前工作树>/src`后同一跨进程测试1 passed；后续完整回归使用该配置重跑，未改全局虚拟环境源码绑定。额外焦炭/分层/源码交付定向50 passed。本机正确环境完整回归在本报告提交时仍运行，日志`work/coke-full-suite3.log`；不预写通过。最终精确HEAD结果在[草稿PR41门禁](https://github.com/adgo07/ECQuota-Insight/pull/41/checks)核对，交接消息给出最终状态，不将旧HEAD通过迁移到新HEAD。
 
 原生Computer Use按Owner指定委派GPT-6 Astra低推理独立子Agent，父实施Agent未自行操作桌面。只允许新TEMP数据和当前隔离程序；实际观察另行补录，未观察项OPEN。
+
+原生最终结果：仅在启动24cb9c6的源码预览后枚举到窗口`398852`，未取得截图或可访问性树。应用访问返回`Computer Use app approval timed out`，属于应用访问审批超时，不是自动安全审核拒绝；未进行任何表单输入或Word实开，全部原生矩阵OPEN。后续代码/EXE没有原生复验，不将该窗口枚举记为GUI通过。专属四个辅助进程已按精确PID和父子链核实后停止，未删除TEMP/旧数据。完整观察位于`work/coke-native-20261117/NATIVE_OBSERVATION.md`。
+
+0441b16便携ZIP共337个载荷文件，85,015,482字节，SHA256=`fe37a0f1bbfc1497fc08d9fd9e41edc5c497895162cf2e39e11a23b860d4d449`，CRC通过；`payload-sha256.json`记录每个文件的大小/hash。该资产只对应0441b16，后续身份校验补强不冒充已进入该资产。
+
+`ed161e0924b1f841f6af62689cff9a9b326e1b22`进一步核对记录的数值行为版本、标准信息、单位及专属输入副本，全部焦炭测试423 passed；随后缺项/非法载荷错误处理定向11 passed（含既有记录案例）。没有改变式3、阈值或Numeric行为版本的值。最终头提交的CI重新执行，旧头Numeric/N01-A成功仅属各自版本证据。
 
 ## 保留事项
 

@@ -61,6 +61,15 @@ def test_record_version_mismatch_rejected(field,value):
         require_complete(request,result,snapshot)
 
 
+@pytest.mark.parametrize("payload",[{}, {"version":"gb21342-record-v1"},
+                                    {"version":"gb21342-record-v1","assessment":True}])
+def test_malformed_payload_is_readable_error(payload):
+    request,snapshot = sample()
+    request.coke_payload=payload
+    with pytest.raises(ValueError,match="载荷"):
+        calculate_record(request,snapshot)
+
+
 def test_sql_readback_report_no_recalculate_and_rollback(tmp_path, monkeypatch):
     from uebench.bootstrap import create_context
     from uebench.application import evaluation_support

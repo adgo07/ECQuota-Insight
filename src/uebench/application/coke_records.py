@@ -53,9 +53,12 @@ def decode_input(payload):
     if not isinstance(payload, dict) or payload.get("version") != PAYLOAD_VERSION:
         raise ValueError("焦炭输入载荷版本不匹配")
     _reject_floats(payload)
-    data = dict(payload["assessment"])
-    data["energy"] = CokeEnergyInput(**data["energy"])
-    return CokeAssessmentInput(**data)
+    try:
+        data = dict(payload["assessment"])
+        data["energy"] = CokeEnergyInput(**data["energy"])
+        return CokeAssessmentInput(**data)
+    except (KeyError, TypeError) as exc:
+        raise ValueError("焦炭输入载荷缺项或结构无效") from exc
 
 
 def require_binding(request, snapshot, *, verify_flows=True):
@@ -72,6 +75,9 @@ def require_binding(request, snapshot, *, verify_flows=True):
     if request.inputs or request.energy_lines or request.production_lines or request.cement_lines or request.cement_shared_energy:
         raise ValueError("焦炭专属输入不能与其他输入通道同时生效")
     flows = request.coke_payload.get("flows")
+    if flows is not None and (not isinstance(flows, dict) or not isinstance(flows.get("rows"), list)
+            or any(not isinstance(row, dict) or not isinstance(row.get("flow"), dict) for row in flows["rows"])):
+        raise ValueError("焦炭原始能流载荷结构无效")
     if flows is not None and verify_flows:
         from uebench.domain.coke_flows import aggregate_flows, CokeFlow, COMPONENTS
         rows = flows.get("rows", [])
@@ -125,6 +131,8 @@ def require_complete(request, result, snapshot):
             or len(result.results) != 1):
         raise ValueError("焦炭请求、结果、版本与规则快照不一致")
     r = payload.get("assessment", {})
+    if not isinstance(r, dict) or not isinstance(r.get("energy"), dict):
+        raise ValueError("焦炭结果载荷缺项或结构无效")
     item = result.results[0]
     if (item.indicator_id != request.product_id+".energy" or item.unit != "kgce/t"
             or item.compliance_result is not None or item.compliance_limit is not None
@@ -144,7 +152,9 @@ def require_complete(request, result, snapshot):
     # 高等级先行，只要求到首个满足等级之前的比较均确定。
     selected = Grade.NOT_QUALIFIED
     levels = r.get("levels", [])
-    if [v.get("grade") for v in levels] != ["LEVEL_1", "LEVEL_2", "LEVEL_3"]:
+    if (not isinstance(levels, list) or any(not isinstance(v, dict) or not
+            {"grade","threshold","base_threshold","matched","undetermined_reasons"} <= v.keys() for v in levels)
+            or [v.get("grade") for v in levels] != ["LEVEL_1", "LEVEL_2", "LEVEL_3"]):
         raise ValueError("焦炭逐级快照缺项或顺序不一致")
     if ({v["grade"]:v["threshold"] for v in levels if v["threshold"] is not None}
             != {k:str(v) for k,v in item.corrected_thresholds.items()}
