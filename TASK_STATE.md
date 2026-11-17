@@ -1,5 +1,9 @@
 # TASK_STATE
 
+## 2026-11-17 当前任务调整
+
+PR #40 已验收合并（`1bf58cc1c2d190f3ebc3b5f37148633102623224`），当前继续焦炭产品方案设计，见[焦炭设计续篇](docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)。Owner 明确水泥正式验收暂缓：保留 IMPLEMENTED / Stage D OPEN，不改变已有实现。RS05 仍 IN PROGRESS，正式评价仍仅选煤，0.2.0 未发布。下方旧日期工作安排不覆盖本段。
+
 2026-11-12完整判级预览续更：Owner授权继续开发后，已实现两炉型明细能耗/26、表1/2修正、最高级别及局部缺项状态，接入独立Application与Facade只读preview_coke；见[本轮实施记录](docs/governance/GB21342_STAGE_C_ASSESSMENT_REPORT_20261112.md)。不接GUI/原始能源折标/正式记录/生产包，整体MAPPING和正式范围不变；001软件决定已采用，003区间内相邻线性已作软件算法选择，其余OPEN边界保留。下方首块段落是此前局部进度，当前调用能力以本续更为准。
 
 更新时间：2026-11-11

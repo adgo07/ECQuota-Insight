@@ -48,3 +48,16 @@ Frozen锁定中央`ee5feb0cc34dbd99790500fadd0c4c932e202a20`；Numeric Contract/
 - 静态检索新API的src引用仅Domain、新Application入口和Facade薄委托；UI、Word/基础设施报告及reporting.py均无该API调用，未改这些路径。本内部001解释保留治理资料，没有新接入UI/Word/外部导出。此处不声称完成未来GUI/Word实机验收。
 
 审查无剩余阻塞缺陷。可交父审核PR40；不授权合并，不代表整标准正式支持或Stage D通过。full suite、原N01-A及其它所需门禁由实施/父执行记录，不以本次定向424项冒充。
+# 2026-11-17 PR40 合并前复验补录
+
+结论：PASS，仅覆盖已折标五分量、式3/26、表1/2修正及最高级别只读预览。受验 head `43055d5775d11c9124f87037c690471a1bfcf622`，base `ea28ca46fdff826e92f2a907f8faf4e9726f435b`；Owner 授权无问题即合并，merge=`1bf58cc1c2d190f3ebc3b5f37148633102623224`。未发现需修改生产代码的阻塞缺陷。
+
+平台 / Contract 预检查：中央 lock `ee5feb0cc34dbd99790500fadd0c4c932e202a20` 不变；相关 Frozen 为 Architecture2.1、Numeric Contract/Profile/Conformance v1。MUST 保持 Decimal28/HALF_EVEN、全值比较及上下文隔离；MUST NOT 隐式修约、epsilon、float恢复、只读预览写正式记录。无新增公共冲突或中央修改需求；D-ECQ-002～006保持 REGISTERED DEVIATION。相关 Issue001～005，不改变既有软件解释或未决状态。
+
+复核全部生产差异、两组测试、映射表1/2与式3、现行设计及台账；检查非单调选择、高级未知不跳过、低级未知不阻断已知高级、部分外属/表外挥发分/混合熄焦局部结果、Facade薄委托和正式范围门禁。合并前 diff --check 通过。
+
+本次实际执行 core、assessment、Frozen numeric 三模块，JUnit核对 **424 tests / 0 failures / 0 errors / 0 skipped，exit0**。系统Python缺pytest，改用仓库虚拟环境；沙箱首次执行到100%后未正常退出，已停止，不计通过；第二次临时目录/JUnit写入PermissionError，不计通过。允许测试写入专属临时目录后最终运行通过，未放宽测试。
+
+精确head远端三项CI均success：PR Gate `43245188753`、Numeric v1 `43245188786`、N01-A `43245188757`；另读取PR Gate job核对严格完整套件、发布源门禁及编译步骤实际success。本轮未重复本地full suite。合并前review threads为空、head未变且mergeable=true，转ready后带expected_head_sha合并成功。
+
+不将本验收扩展为GUI、Word、EXE、安装包或整标准Stage D通过。上文为原日期验收证据。Knowledge capture：无新增条目。
