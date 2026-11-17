@@ -1,5 +1,9 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-11-17 焦炭实施交接
+
+当前接续[产品接入实施记录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md)。独立分支`codex/coke-product-implementation-20261117`保留设计提交，已完成隔离预览/原始能流明确部分/记录报告承载，构建精确`0441b16`的未发布预览EXE并通过无头自检。独立验收按报告中的源码、脚本、记录/DOCX及构建身份逐项核查，不继承旧CI或旧候选通过结论。生产规则、签包和PIN未提升；映射整体MAPPING、正式范围仅选煤、水泥Stage D暂缓，0.2.0未发布。尚待核验的自动热值/焓换算、参数采用、私钥及原生/报告视觉不得记为完成。
+
 ## 2026-11-17 当前交接
 
 PR #40 已验收合并，main=`1bf58cc1c2d190f3ebc3b5f37148633102623224`。继续按[焦炭设计续篇](docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)推进产品方案；水泥正式验收按 Owner 指示暂缓，IMPLEMENTED / Stage D OPEN 保留。正式支持仍仅选煤。旧段落中的当前任务安排按本段更新，不抹去历史证据。
