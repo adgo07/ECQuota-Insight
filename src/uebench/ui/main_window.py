@@ -22,6 +22,7 @@ from .message_box import ChineseMessageButtons
 from .record_table import RecordTable, StandardTable, HomeRecentTable
 from .wheel_safe_combo import WheelSafeComboBox
 from .gb16780_form import CementForm
+from .gb21342_form import CokeForm
 from .cement_presentation import result_html as cement_result_html
 from uebench.application.gb16780 import IncompleteCementEvaluationError
 from uebench.domain.gb16780 import adopted as cement_rule_adopted
@@ -946,6 +947,11 @@ class MainWindow(QMainWindow):
         self.cement_form = CementForm()
         self.cement_form.changed.connect(self._cement_inputs_changed)
         form_layout.addWidget(self.cement_form)
+        self.coke_form = CokeForm()
+        self.coke_form.changed.connect(self._coke_inputs_changed)
+        self.coke_form.view_record.clicked.connect(lambda: self.view_record(self.last_result_id) if self.last_result_id else None)
+        self.coke_form.export_word.clicked.connect(self.export_latest_word_report)
+        form_layout.addWidget(self.coke_form)
         # 规则数据不完整/版本不兼容时的显式中文提示；正常 r2 规则下始终隐藏。
         self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
@@ -1362,11 +1368,22 @@ class MainWindow(QMainWindow):
             if self._is_gb16780():
                 self.calculate_button.setEnabled(self.calculate_button.isEnabled()
                     and cement_rule_adopted(self.current_standard) and self.last_result_id is None)
+            if self._is_gb21342():
+                from uebench.application.coke_records import is_adopted_snapshot
+                adopted = is_adopted_snapshot(self.current_standard)
+                self.calculate_button.setEnabled(self.calculate_button.isEnabled() and adopted and self.last_result_id is None)
+                if not adopted:
+                    self.coke_form.notice.setText("配套焦炭规则尚未采用新计算链，请等待完整配套版本。")
             self._sync_evaluation_actions()
 
     def _sync_evaluation_actions(self) -> None:
         """保存后的主要动作是查看；重算仍调用原正式用例，明确生成新记录。"""
         busy = getattr(self, "_calculating", False)
+        if self._is_gb21342():
+            self.calculation_save_notice.setVisible(True)
+            self.calculation_save_notice.setText("最高等级可确定时自动生成一条对标记录")
+            self.calculate_button.setText("正在计算…" if busy else "已生成记录" if self.last_result_id else "计算并判级")
+            return
         if self._is_gb16780():
             self.calculation_save_notice.setVisible(True)
             self.calculation_save_notice.setText("全部适用指标完整时自动生成一条对标记录")
@@ -1813,6 +1830,28 @@ class MainWindow(QMainWindow):
     def _is_gb16780(self) -> bool:
         return self.current_standard is not None and self.current_standard.id == "gb-16780-2021"
 
+    def _is_gb21342(self) -> bool:
+        return self.current_standard is not None and self.current_standard.id == "gb-21342-2025"
+
+    def _coke_inputs_changed(self):
+        if not self._is_gb21342():
+            return
+        self.last_result_id = None
+        self._coke_saved_request = None
+        self.coke_form.output.clear()
+        self.coke_form.details.clear()
+        self.coke_form.notice.setText("数据已修改，请重新计算；尚未生成新记录。")
+        self.coke_form.view_record.setEnabled(False)
+        self.coke_form.export_word.setEnabled(False)
+        oven = self.coke_form.choices["oven_type"].currentData()
+        from uebench.application.coke_records import PRODUCTS
+        index = self.eval_product.findData(PRODUCTS.get(oven))
+        if index >= 0:
+            self.eval_product.blockSignals(True)
+            self.eval_product.setCurrentIndex(index)
+            self.eval_product.blockSignals(False)
+        self.refresh_formal_evaluation_readiness()
+
     def _cement_inputs_changed(self):
         if not self._is_gb16780():
             return
@@ -1904,12 +1943,14 @@ class MainWindow(QMainWindow):
     def _set_evaluation_view(self) -> None:
         is_gb29446 = self._is_gb29446()
         is_cement = self._is_gb16780()
-        self.generic_form_container.setVisible(not is_gb29446 and not is_cement)
+        is_coke = self._is_gb21342()
+        self.coke_form.setVisible(is_coke)
+        self.generic_form_container.setVisible(not is_gb29446 and not is_cement and not is_coke)
         self.gb29446_form_container.setVisible(is_gb29446)
         self.cement_form.setVisible(is_cement)
         self.cement_result_section.setVisible(is_cement)
-        self.input_controls_container.setVisible(not is_gb29446 and not is_cement)
-        self.generic_result_section.setVisible(not is_gb29446 and not is_cement)
+        self.input_controls_container.setVisible(not is_gb29446 and not is_cement and not is_coke)
+        self.generic_result_section.setVisible(not is_gb29446 and not is_cement and not is_coke)
         self.gb29446_result_section.setVisible(is_gb29446)
         self.gb29446_explanation_section.hide()
         self.gb29446_basis_section.hide()
@@ -2081,6 +2122,9 @@ class MainWindow(QMainWindow):
         self._rebuild_selection_widgets()
         self._set_evaluation_view()
         self._apply_gb29446_rule_compatibility()
+        if self._is_gb21342():
+            self._coke_inputs_changed()
+            return
         if self._is_gb16780():
             self._cement_inputs_changed()
             if not cement_rule_adopted(self.current_standard):
@@ -2106,6 +2150,12 @@ class MainWindow(QMainWindow):
         self.refresh_formal_evaluation_readiness()
 
     def _product_changed(self) -> None:
+        if self._is_gb21342():
+            from uebench.application.coke_records import PRODUCTS
+            oven = next((key for key, product in PRODUCTS.items() if product == self.eval_product.currentData()), None)
+            combo = self.coke_form.choices["oven_type"]
+            combo.setCurrentIndex(combo.findData(oven))
+            return
         self._refresh_input_table()
 
     def _set_input_mode(self, mode: InputMode) -> None:
@@ -2210,6 +2260,8 @@ class MainWindow(QMainWindow):
             raise ValueError("没有可用标准")
         if self._is_gb29446():
             return self._collect_gb29446_request()
+        if self._is_gb21342():
+            return self.coke_form.collect_request(self._selection_mode())
         if self._is_gb16780():
             return self.cement_form.collect(self._selection_mode())
         product = self._selected_product()
@@ -2416,6 +2468,9 @@ class MainWindow(QMainWindow):
             self.refresh_formal_evaluation_readiness()
 
     def _calculate_evaluation(self, request: EvaluationRequest | None) -> None:
+        if (request is not None and request.standard_id == "gb-21342-2025") or (request is None and self._is_gb21342()):
+            self._calculate_coke(request)
+            return
         if (request is not None and request.standard_id == "gb-16780-2021") or (request is None and self._is_gb16780()):
             self._calculate_cement(request)
             return
@@ -2555,6 +2610,45 @@ class MainWindow(QMainWindow):
             self.mark_records_dirty()
         message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
+
+    def _calculate_coke(self, request=None):
+        from uebench.application.coke_records import IncompleteCokeEvaluationError
+        form = self.coke_form
+        try:
+            request = request or form.collect_request(self._selection_mode())
+            fingerprint = request.model_dump_json()
+            if self.last_result_id and getattr(self, "_coke_saved_request", None) == fingerprint:
+                return
+            self.last_result_id = None
+            form.view_record.setEnabled(False)
+            form.export_word.setEnabled(False)
+            result = self.context.application.evaluate(request)
+        except IncompleteCokeEvaluationError as exc:
+            form.display_saved_result(exc.preview_result)
+            form.notice.setText("预览完成，待确定或不适用，尚未生成记录。" + str(exc))
+            return
+        except (ValueError, TypeError, LookupError) as exc:
+            form.output.clear()
+            form.details.clear()
+            form.notice.setText("未生成记录：" + str(exc))
+            target = form.locate_error(str(exc))
+            self.evaluation_scroll.ensureWidgetVisible(target if target is not None else form.notice)
+            return
+        except Exception:
+            _LOGGER.exception("焦炭计算或保存失败")
+            form.output.clear()
+            form.details.clear()
+            form.notice.setText("计算或保存失败，尚未生成记录，请重试。")
+            return
+        form.display_saved_result(result)
+        self.last_result_id = result.evaluation_id
+        self._coke_saved_request = fingerprint
+        form.view_record.setEnabled(True)
+        form.export_word.setEnabled(True)
+        form.notice.setText("最高等级已确定，已生成一条对标记录。")
+        self.mark_records_dirty()
+        self.refresh_home()
+        self.evaluation_scroll.ensureWidgetVisible(form.notice)
 
     def _calculate_cement(self, request=None):
         try:

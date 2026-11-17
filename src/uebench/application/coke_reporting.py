@@ -41,13 +41,24 @@ def build_coke_report_view(request, result, snapshot):
                             + ("；"+"；".join(level["undetermined_reasons"]) if level["undetermined_reasons"] else ""))
     flows = request.coke_payload.get("flows")
     if flows:
-        from uebench.domain.coke_flows import REFERENCES
+        # v2名称取保存参数；旧v1采用固定展示字典，不随当前系数表改名。
+        legacy_names = {"dry_clean_coal":"干洗精煤", "dry_coke":"干全焦", "coal_tar":"高温煤焦油（干基）",
+                        "crude_benzene":"粗苯", "coke_oven_gas":"焦炉煤气", "blast_furnace_gas":"高炉煤气",
+                        "converter_gas":"转炉煤气", "natural_gas":"天然气", "diesel":"柴油", "gasoline":"汽油",
+                        "electricity":"电力（当量值）", "heat":"热力（当量值）", "fresh_water":"新水", "soft_water":"软化水",
+                        "compressed_air":"压缩空气", "oxygen":"氧气", "nitrogen_byproduct":"氮气（做副产品）", "nitrogen_main":"氮气（做主产品）"}
+        saved_references = (snapshot.coke_rule_parameters or {}).get("flow_reference", {}).get("references", {})
         for row in flows["rows"]:
             flow = row["flow"]
-            name = REFERENCES.get(flow["energy_id"], ("蒸汽或其他能流",))[0]
+            name = saved_references.get(flow["energy_id"], (legacy_names.get(flow["energy_id"], "蒸汽或其他能流"),))[0]
             inputs.append(field(LABELS[flow["component"]]+" · "+name,
                 f"{flow['quantity']} {flow['unit']} × {row['coefficient']} {row['coefficient_unit']} = {row['energy_kgce']} kgce"))
             inputs.append(field("系数来源",row["coefficient_source"]))
+            trace = row.get("conversion_trace")
+            if trace:
+                inputs.append(field(trace["method"], trace["input_value"], trace["input_unit"]))
+                inputs.append(field("实测折标换算", f"{trace['expression']} = {trace['coefficient']} {row['coefficient_unit']}"))
+                inputs.append(field("换算依据", trace["basis"]))
     oven = "顶装焦炉" if values["oven_type"] == "top_charging" else "捣固焦炉"
     basis = ("GB 21342—2025 §4表1、§5.3表2、§6.1.1及§6.2式（3）",)
     return CementReportView(result.evaluation_id,"焦炭能耗对标报告",information,

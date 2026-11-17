@@ -10,6 +10,8 @@ from enum import StrEnum
 
 from .models import parse_decimal
 from .models import Grade
+from .coke_rules import (require_parameters, ASSESSMENT_CALCULATOR_VERSION,
+                         ASSESSMENT_RULE_REVISION, ASSESSMENT_NUMERIC_BEHAVIOR_VERSION)
 from .numeric import ECQUOTA_DECIMAL_FULL_VALUE_V1, NumericProfile
 
 CALCULATOR_ID = "gb21342-energy-balance"
@@ -113,6 +115,7 @@ def calculate_energy(
     inputs: CokeEnergyInput,
     *,
     profile: NumericProfile = ECQUOTA_DECIMAL_FULL_VALUE_V1,
+    rule_parameters=None,
 ) -> CokeEnergyResult:
     """计算已折标五分量；部分外属保留actual，调整及评价值未定。
 
@@ -125,6 +128,8 @@ def calculate_energy(
         raise CokeCalculationError("本核心仅支持已声明的项目数值配置ECQUOTA_DECIMAL_FULL_VALUE_V1")
     # 重新构造验证，防止绕过常规构造的未正规化数据进入权威计算。
     inputs = CokeEnergyInput(**{field.name: getattr(inputs, field.name) for field in fields(inputs)})
+    parameters = require_parameters(rule_parameters)
+    config = parameters.assessment
     trace = []
     warnings = []
 
@@ -157,7 +162,7 @@ def calculate_energy(
                 step("外属调整未定", PARTIAL_ISSUE, None, "kgce/t")
                 warnings.append("煤气净化或废水处理仅部分外属、部分计入或情况不明，26调整尚未确定；保留实际单位能耗。")
             else:
-                adjustment = Decimal(26) if inputs.external_services_status is ExternalServicesStatus.BOTH_EXTERNAL_EXCLUDED else Decimal(0)
+                adjustment = Decimal(config["external_adjustment"]) if inputs.external_services_status is ExternalServicesStatus.BOTH_EXTERNAL_EXCLUDED else Decimal(0)
                 evaluation = actual + adjustment
                 status = "DETERMINED"
                 step("外属调整", inputs.external_services_status.value, adjustment, "kgce/t")
@@ -174,14 +179,10 @@ def calculate_energy(
     )
 
 
-ASSESSMENT_CALCULATOR_VERSION = "gb21342-assessment-unpublished-v1"
-ASSESSMENT_RULE_REVISION = "gb21342-table1-table2-unpublished-v1"
-ASSESSMENT_NUMERIC_BEHAVIOR_VERSION = "gb21342-highest-grade-full-value-v1"
-# 原文表2节点，精确十进制文本；不从legacy JSON或Markdown运行时读取。
-VOLATILE_TABLES = {
-    "top_charging": tuple(zip(range(21, 29), ("-8.30", "-4.20", "0", "4.25", "8.55", "11.00", "14.08", "18.71"))),
-    "stamp_charging": tuple(zip(range(25, 33), ("0", "3.20", "6.44", "11.40", "14.65", "17.93", "21.23", "24.50"))),
-}
+# 兼容只读调用者；计算真值从同一版本化参数声明取得。
+from .coke_rules import _ASSESSMENT
+VOLATILE_TABLES = {key: tuple((int(x), y) for x, y in value["volatile"])
+                   for key, value in _ASSESSMENT["ovens"].items()}
 
 
 def _optional_number(value, label):
@@ -269,12 +270,14 @@ class CokeAssessmentResult:
         return self.energy.numeric_contract_version
 
 
-def assess_coke(inputs: CokeAssessmentInput, *, profile=ECQUOTA_DECIMAL_FULL_VALUE_V1) -> CokeAssessmentResult:
+def assess_coke(inputs: CokeAssessmentInput, *, profile=ECQUOTA_DECIMAL_FULL_VALUE_V1, rule_parameters=None) -> CokeAssessmentResult:
     """两炉型修正及最高级别业务链；只读，不生成正式记录。"""
     if not isinstance(inputs, CokeAssessmentInput):
         raise CokeCalculationError("请提供焦炭评价输入")
     inputs = CokeAssessmentInput(**{field.name: getattr(inputs, field.name) for field in fields(inputs)})
-    energy = calculate_energy(inputs.energy, profile=profile)
+    parameters = require_parameters(rule_parameters)
+    config = parameters.assessment
+    energy = calculate_energy(inputs.energy, profile=profile, rule_parameters=parameters)
     trace = list(energy.calculation_trace)
     warnings = list(energy.warnings)
 
@@ -315,15 +318,16 @@ def assess_coke(inputs: CokeAssessmentInput, *, profile=ECQUOTA_DECIMAL_FULL_VAL
             unknown(key, "缺少焦炉类型")
         bases = (None, None, None)
     else:
-        bases = tuple(Decimal(value) for value in ((110, 110, 135) if top else (115, 115, 140)))
+        oven = config["ovens"][inputs.oven_type]
+        bases = tuple(Decimal(value) for value in oven["bases"])
         if inputs.heating_fuel == "coke_oven_gas":
             fuel = Decimal(0)
             step("燃料修正", "F=0；焦炉煤气基准", fuel)
         elif inputs.heating_fuel == "mixed_gas" and inputs.mixed_gas_ratio is not None:
-            fuel = compute("F", "F=(8或12)×混合煤气使用时间比例", lambda: Decimal(8 if top else 12)*inputs.mixed_gas_ratio)
+            fuel = compute("F", "F=(8或12)×混合煤气使用时间比例", lambda: Decimal(oven["mixed_fuel"])*inputs.mixed_gas_ratio)
         else:
             fuel = unknown("F", "缺少加热燃料或混合煤气使用时间比例，或燃料无表列修正规则")
-        table = VOLATILE_TABLES[inputs.oven_type]
+        table = tuple((Decimal(x), y) for x, y in oven["volatile"])
         x = inputs.dry_volatile_pct
         if x is None:
             volatile = unknown("V", "缺少干基挥发分")
@@ -340,15 +344,15 @@ def assess_coke(inputs: CokeAssessmentInput, *, profile=ECQUOTA_DECIMAL_FULL_VAL
                                    lambda: Decimal(fa)+(x-Decimal(a))*(Decimal(fb)-Decimal(fa))/Decimal(b-a))
         moisture = (unknown("M", "缺少全水分") if inputs.total_moisture_pct is None else
                     compute("M", "M=3.67(Mt−10)或3.71(Mt−10.5)",
-                            lambda: Decimal("3.67" if top else "3.71")*(inputs.total_moisture_pct-Decimal("10" if top else "10.5"))))
+                            lambda: Decimal(oven["moisture_slope"])*(inputs.total_moisture_pct-Decimal(oven["moisture_base"]))))
     age = inputs.oven_age_years
     if age is None:
         age_correction = unknown("A", "缺少炉龄")
     else:
-        age_correction = Decimal(0 if age <= 15 else "2.50" if age <= 25 else "5.50")
+        age_correction = Decimal(config["age_corrections"][0 if age <= Decimal(config["age_boundaries"][0]) else 1 if age <= Decimal(config["age_boundaries"][1]) else 2])
         step("炉龄修正", "≤15:0；(15,25]:2.50；>25:5.50", age_correction)
     if inputs.quenching_method in {"dry", "wet"}:
-        quench = Decimal(0 if inputs.quenching_method == "dry" else "46.46")
+        quench = Decimal(0 if inputs.quenching_method == "dry" else config["wet_quenching"])
         step("熄焦修正", "干熄焦0；湿熄焦46.46（仅3级）", quench)
     else:
         quench = unknown("Q", "熄焦方式缺失、未知或干湿并存，3级修正未定")

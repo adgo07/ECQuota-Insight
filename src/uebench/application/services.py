@@ -177,8 +177,10 @@ class EvaluationService:
             request = calculated_ratio_request(request)
         result = self._calculate(request, standard)
         if request.standard_id == "gb-21342-2025":
-            from .coke_records import require_complete
+            from .coke_records import require_complete, IncompleteCokeEvaluationError, COMPLETE_GRADES
 
+            if result.results[0].grade not in COMPLETE_GRADES:
+                raise IncompleteCokeEvaluationError("焦炭结果尚未完整判级，未生成记录", preview_result=result)
             require_complete(request, result, standard)
         if request.standard_id == "gb-16780-2021":
             from .gb16780 import require_complete

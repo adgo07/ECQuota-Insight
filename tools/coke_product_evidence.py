@@ -13,12 +13,9 @@ sys.path.insert(0, str(ROOT / "src"))
 
 def fixture_snapshot():
     from uebench.domain.models import StandardDefinition
-    from uebench.application.coke_records import ADOPTION_MARKER
+    from uebench.application.coke_records import candidate_snapshot
     snapshot = StandardDefinition.model_validate_json((ROOT / "data/definitions/gb-21342-2025.json").read_text(encoding="utf-8"))
-    snapshot.rule_revision = 2
-    snapshot.corrections.append(ADOPTION_MARKER)
-    snapshot.supersedes = ["gb-21342-2013"]
-    return snapshot
+    return candidate_snapshot(snapshot)
 
 
 def main():

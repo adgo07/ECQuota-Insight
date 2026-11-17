@@ -156,3 +156,19 @@ def filter_formally_evaluable(
 # 仅独立开发验收入口在其整个进程范围显式设置；默认正式集合保持不变。
 from contextvars import ContextVar
 _DEVELOPMENT_EVALUATION_IDS = ContextVar("development_evaluation_ids", default=frozenset())
+
+
+from contextlib import contextmanager
+
+
+@contextmanager
+def development_evaluation_scope(standard_ids):
+    """显式隔离开发入口使用；退出及异常均恢复调用者作用域。"""
+    ids = frozenset(standard_ids)
+    if not ids or any(not isinstance(item, str) or not item for item in ids):
+        raise ValueError("开发评价范围须为明确的标准标识集合")
+    token = _DEVELOPMENT_EVALUATION_IDS.set(ids)
+    try:
+        yield
+    finally:
+        _DEVELOPMENT_EVALUATION_IDS.reset(token)

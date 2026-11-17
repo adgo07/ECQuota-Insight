@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 import pytest
 
-from uebench.application.coke_records import ADOPTION_MARKER, input_payload, calculate_record, require_complete
+from uebench.application.coke_records import ADOPTION_MARKER, input_payload, calculate_record, require_complete, candidate_snapshot
 from uebench.domain.models import StandardDefinition, EvaluationRequest, InputMode, Grade
 from uebench.domain.gb21342 import CokeAssessmentInput, CokeEnergyInput
 
@@ -20,9 +20,7 @@ def sample():
         product_id="top-charging-coke-oven",input_mode=InputMode.DETAIL,inputs={},
         coke_payload=input_payload(assessment),organization_name="合成焦炭验收对象",notes="2026年10月（合成数据）")
     snapshot = StandardDefinition.model_validate_json((ROOT / "data/definitions/gb-21342-2025.json").read_text(encoding="utf-8"))
-    snapshot.rule_revision = 2
-    snapshot.corrections.append(ADOPTION_MARKER)
-    snapshot.supersedes = ["gb-21342-2013"]
+    snapshot = candidate_snapshot(snapshot)
     return request,snapshot
 
 
@@ -92,6 +90,7 @@ def test_sql_readback_report_no_recalculate_and_rollback(tmp_path, monkeypatch):
     def fail(*args,**kwargs):
         raise AssertionError("历史不得重算")
     monkeypatch.setattr(coke_records,"preview_coke",fail)
+    monkeypatch.setattr(coke_records,"assess_coke",fail)
     loaded = context.application.get_evaluation(result.evaluation_id)
     view = build_report_view(*loaded)
     assert view.lines[0].metrics[0].grade == "1级"
@@ -137,6 +136,7 @@ def test_flows_record_saved_readback_and_report(tmp_path, monkeypatch):
     try:
         result = context.application.evaluate(request)
         monkeypatch.setattr(coke_records, "preview_coke", lambda *_: pytest.fail("历史不得重算"))
+        monkeypatch.setattr(coke_records, "assess_coke", lambda *a, **k: pytest.fail("历史不得重算"))
         loaded = context.application.get_evaluation(result.evaluation_id)
         assert loaded[0].coke_payload == request.coke_payload
         view = context.application.get_report_view(result.evaluation_id)
@@ -169,7 +169,7 @@ def test_flows_record_tamper_rejected(change):
         calculate_record(request, snapshot)
 
 
-def test_saved_v1_survives_current_version_upgrade_and_write_stays_strict(tmp_path, monkeypatch):
+def test_saved_v2_survives_current_version_upgrade_and_write_stays_strict(tmp_path, monkeypatch):
     from uebench.bootstrap import create_context
     from uebench.application import coke_records
     request, snapshot = sample()
@@ -183,6 +183,7 @@ def test_saved_v1_survives_current_version_upgrade_and_write_stays_strict(tmp_pa
     monkeypatch.setattr(coke_records, "ASSESSMENT_NUMERIC_BEHAVIOR_VERSION", "future-numeric-v2")
     monkeypatch.setattr(coke_records, "ADOPTION_MARKER", "gb21342-calculator-adoption:future-v2:future-rule-v2:"+snapshot.source_sha256)
     monkeypatch.setattr(coke_records, "preview_coke", lambda *_: pytest.fail("历史不得重算"))
+    monkeypatch.setattr(coke_records, "assess_coke", lambda *a, **k: pytest.fail("历史不得重算"))
     context = create_context(tmp_path / "historical", enforce_standard_library_readiness=False)
     try:
         view = context.application.get_report_view(result.evaluation_id)
@@ -229,6 +230,7 @@ def test_desktop_coke_record_two_tabs_and_real_word_export(tmp_path, monkeypatch
     context = create_context(tmp_path / "desktop", enforce_standard_library_readiness=False)
     context.evaluations.save(request, result, snapshot)
     monkeypatch.setattr(coke_records, "preview_coke", lambda *_: pytest.fail("历史不得重算"))
+    monkeypatch.setattr(coke_records, "assess_coke", lambda *a, **k: pytest.fail("历史不得重算"))
     for name in ("warning", "critical", "information"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
     target = tmp_path / "焦炭.docx"

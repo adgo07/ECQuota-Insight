@@ -12,18 +12,56 @@ from uebench.domain.gb21342 import (
 )
 from uebench.domain.models import EvaluationResult, IndicatorResult, CalculationStep, Grade, InputMode
 from .gb21342 import preview_coke
+from uebench.domain.gb21342 import assess_coke
+from uebench.domain.coke_rules import parse_rule_parameters, verified_rule_payload
 
-PAYLOAD_VERSION = "gb21342-record-v1"
+PAYLOAD_VERSION = "gb21342-record-v2"
 ADOPTION_MARKER = f"gb21342-calculator-adoption:{ASSESSMENT_CALCULATOR_VERSION}:{ASSESSMENT_RULE_REVISION}:{SOURCE_SHA256}"
 # 已保存载荷身份只追加，不随当前计算器常量更新；未知版本组合不得推断兼容。
 READABLE_IDENTITIES = frozenset({(
     "gb21342-record-v1", "gb21342-assessment-unpublished-v1",
     "gb21342-table1-table2-unpublished-v1", "gb21342-highest-grade-full-value-v1",
     "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
+), (
+    "gb21342-record-v2", "gb21342-assessment-parameterized-v2",
+    "gb21342-table1-table2-parameterized-v2", "gb21342-highest-grade-full-value-v1",
+    "00fcc51c02c6d73d39bcab3103227fca2ee93841abce45d1576edaeba25595a0",
 )})
 STANDARD_ID = "gb-21342-2025"
 PRODUCTS = {"top_charging": "top-charging-coke-oven", "stamp_charging": "stamp-charging-coke-oven"}
 COMPLETE_GRADES = {Grade.LEVEL_1, Grade.LEVEL_2, Grade.LEVEL_3, Grade.NOT_QUALIFIED}
+
+
+class IncompleteCokeEvaluationError(ValueError):
+    """单次计算结果可供显示，但尚不能形成记录。"""
+    def __init__(self, message, *, preview_result):
+        super().__init__(message)
+        self.preview_result = preview_result
+
+
+def candidate_snapshot(base_definition):
+    """从已加载定义生成内存r2，供隔离开发验证；不写生产源或签包。"""
+    if base_definition.id != STANDARD_ID or base_definition.source_sha256 != SOURCE_SHA256:
+        raise ValueError("焦炭候选基线身份不匹配")
+    snapshot = base_definition.model_copy(deep=True)
+    snapshot.rule_revision = 2
+    snapshot.supersedes = ["gb-21342-2013"]
+    snapshot.corrections = [v for v in snapshot.corrections if not v.startswith("gb21342-calculator-adoption:")]
+    snapshot.corrections.append(ADOPTION_MARKER)
+    snapshot.coke_rule_parameters = verified_rule_payload()
+    return snapshot
+
+
+def is_adopted_snapshot(snapshot):
+    try:
+        if (snapshot.id != STANDARD_ID or snapshot.rule_revision != 2
+                or snapshot.source_sha256 != SOURCE_SHA256 or ADOPTION_MARKER not in snapshot.corrections
+                or "gb-21342-2013" not in snapshot.supersedes or snapshot.coke_rule_parameters is None):
+            return False
+        parse_rule_parameters(snapshot.coke_rule_parameters)
+        return True
+    except (TypeError, ValueError):
+        return False
 
 
 def json_data(value):
@@ -80,6 +118,11 @@ def require_binding(request, snapshot, *, verify_flows=True, historical_identity
             or "gb-21342-2013" not in snapshot.supersedes
             or request.input_mode is not InputMode.DETAIL):
         raise ValueError("配套焦炭规则尚未采用新计算链，旧r1不能形成新记录")
+    legacy_history = historical_identity is not None and historical_identity[0] == "gb21342-record-v1"
+    if not legacy_history:
+        if snapshot.rule_revision != 2 or snapshot.coke_rule_parameters is None:
+            raise ValueError("焦炭规则缺少本版本配套参数，旧r1不能形成新记录")
+        parse_rule_parameters(snapshot.coke_rule_parameters)
     assessment = decode_input(request.coke_payload, expected_version=historical_identity[0] if historical_identity else None)
     if (request.product_id != PRODUCTS.get(assessment.oven_type)
             or not any(p.id == request.product_id for p in snapshot.products)):
@@ -96,7 +139,7 @@ def require_binding(request, snapshot, *, verify_flows=True, historical_identity
         # 显式零分量保留在总量中；有明细的分量不允许以零声明覆盖。
         present = {r["flow"]["component"] for r in rows}
         zeros = [k for k in COMPONENTS if k not in present and flows.get("totals", {}).get(k) == "0"]
-        normalized = aggregate_flows([CokeFlow(**r["flow"]) for r in rows], zero_components=zeros)
+        normalized = aggregate_flows([CokeFlow(**r["flow"]) for r in rows], zero_components=zeros, flow_parameters=snapshot.coke_rule_parameters["flow_reference"])
         if json_data(asdict(normalized)) != flows:
             raise ValueError("原始能流与折标快照不一致")
         if normalized.energy_input(assessment.energy.dry_coke_output_t, assessment.energy.external_services_status) != assessment.energy:
@@ -106,9 +149,10 @@ def require_binding(request, snapshot, *, verify_flows=True, historical_identity
 
 def calculate_record(request, snapshot):
     assessment = require_binding(request, snapshot)
-    result = preview_coke(assessment)
+    parameters = parse_rule_parameters(snapshot.coke_rule_parameters)
+    result = assess_coke(assessment, rule_parameters=parameters)
     product = next(p for p in snapshot.products if p.id == request.product_id)
-    payload = {"version": PAYLOAD_VERSION, "assessment": json_data(asdict(result)),
+    payload = {"version": PAYLOAD_VERSION, "rule_parameters_sha256": parameters.sha256, "assessment": json_data(asdict(result)),
                "input_sha256": hashlib.sha256(json.dumps(request.coke_payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()}
     indicator = IndicatorResult(indicator_id=request.product_id+".energy", indicator_name="焦炭单位产品能耗",
         actual_value=result.energy.evaluation_energy_kgce_per_t, unit="kgce/t", grade=result.grade,
@@ -147,6 +191,10 @@ def require_complete(request, result, snapshot, *, historical=False):
             or result.numeric_contract_version != "v1" or result.numeric_profile_id != "ECQUOTA_DECIMAL_FULL_VALUE_V1"
             or len(result.results) != 1):
         raise ValueError("焦炭请求、结果、版本与规则快照不一致")
+    if identity[0] != "gb21342-record-v1":
+        parameters = parse_rule_parameters(snapshot.coke_rule_parameters)
+        if payload.get("rule_parameters_sha256") != parameters.sha256:
+            raise ValueError("焦炭结果与规则参数快照不一致")
     r = payload.get("assessment", {})
     if not isinstance(r, dict) or not isinstance(r.get("energy"), dict):
         raise ValueError("焦炭结果载荷缺项或结构无效")

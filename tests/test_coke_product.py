@@ -20,7 +20,8 @@ def test_independent_energy_golden_and_measured_priority():
     assert r.totals[COMPONENTS[1]] == D("1194.3")
     assert r.totals[COMPONENTS[0]] is None
     assert aggregate_flows([flow(measured_coefficient="0.2", coefficient_unit="kgce/kWh", source="报告期实测")]).rows[0].energy_kgce == D(200)
-    assert aggregate_flows([flow(energy_id="dry_clean_coal", quantity="1", unit="t", measured_coefficient="99")]).rows[0].energy_kgce == D("1014.3")
+    with pytest.raises(CokeCalculationError, match="固定系数"):
+        aggregate_flows([flow(energy_id="dry_clean_coal", quantity="1", unit="t", measured_coefficient="99")])
 
 
 @pytest.mark.parametrize("table,kind", [(SATURATED_STEAM,"saturated_steam"),(SUPERHEATED_STEAM,"superheated_steam")])

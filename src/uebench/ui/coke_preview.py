@@ -89,22 +89,24 @@ def trace_text(result, step):
 
 
 class CokePreviewPage(QWidget):
-    def __init__(self, preview=preview_coke):
+    def __init__(self, preview=preview_coke, *, embedded=False):
         super().__init__()
         self.preview = preview
         self.result = None
         self.fields, self.choices = {}, {}
         outer = QVBoxLayout(self)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
+        scroll = None if embedded else QScrollArea()
+        if scroll is not None:
+            scroll.setWidgetResizable(True)
         content = QWidget()
         body = QVBoxLayout(content)
         body.setContentsMargins(28, 24, 28, 24)
         body.setSpacing(16)
-        title = QLabel("焦炭能耗计算预览")
+        self.title = title = QLabel("焦炭能耗计算预览")
         title.setProperty("class", "pageTitle")
         body.addWidget(title)
-        body.addWidget(QLabel("GB 21342—2025 · 隔离预览，不生成记录"))
+        self.scope_notice = QLabel("GB 21342—2025 · 隔离预览，不生成记录")
+        body.addWidget(self.scope_notice)
 
         def section(title):
             group = QGroupBox(title)
@@ -181,8 +183,11 @@ class CokePreviewPage(QWidget):
         self.details_toggle.toggled.connect(self.details.setVisible)
         body.addWidget(self.details_toggle)
         body.addWidget(self.details)
-        scroll.setWidget(content)
-        outer.addWidget(scroll)
+        if embedded:
+            outer.addWidget(content)
+        else:
+            scroll.setWidget(content)
+            outer.addWidget(scroll)
         self.update_conditions()
         self.update_energy_mode()
 
@@ -233,6 +238,31 @@ class CokePreviewPage(QWidget):
         return CokeAssessmentInput(energy=energy, **parameters, mixed_gas_ratio=ratio,
             **{key: values[key] for key in ("dry_volatile_pct", "total_moisture_pct", "oven_age_years")})
 
+    def show_result(self, result):
+        self.result = result
+        flow_warnings = self.flow_result.warnings if self.flow_result else ()
+        self.output.setHtml(result_html(self.result, flow_warnings))
+        r = self.result
+        flow_details = []
+        if self.flow_result:
+            for row in self.flow_result.rows:
+                flow = row.flow
+                label = REFERENCES.get(flow.energy_id, ({"saturated_steam":"饱和蒸汽",
+                    "superheated_steam":"过热蒸汽", "standard_coal":"已折标能流"}.get(flow.energy_id,"其他能源或工质"),))[0]
+                flow_details.append(f"{LABELS[flow.component]} · {label}：{flow.quantity} {flow.unit} × "
+                    f"{row.coefficient} {row.coefficient_unit} = {row.energy_kgce} kgce；{row.coefficient_source}")
+                if row.conversion_trace:
+                    trace = row.conversion_trace
+                    flow_details.append(f"{trace['method']}：{trace['input_value']} {trace['input_unit']} ÷ "
+                        f"{trace['denominator_kj_per_kgce']} kJ/kgce = {trace['coefficient']} {row.coefficient_unit}；"
+                        f"{trace['basis']}；{trace['source']}；{trace['reference_version']}")
+        self.details.setPlainText("\n".join([
+            r.source_location, f"数值配置：{r.numeric_profile_id}",
+            f"计算器版本：{r.calculator_version}", f"规则版本：{r.rule_revision}",
+            *[trace_text(r, s) for s in r.calculation_trace],
+            *flow_details,
+        ]))
+
     def run_preview(self):
         self.calculate.setEnabled(False)
         self.result = None
@@ -240,23 +270,7 @@ class CokePreviewPage(QWidget):
         self.details.clear()
         try:
             self.result = self.preview(self.collect())
-            flow_warnings = self.flow_result.warnings if self.flow_result else ()
-            self.output.setHtml(result_html(self.result, flow_warnings))
-            r = self.result
-            flow_details = []
-            if self.flow_result:
-                for row in self.flow_result.rows:
-                    flow = row.flow
-                    label = REFERENCES.get(flow.energy_id, ({"saturated_steam":"饱和蒸汽",
-                        "superheated_steam":"过热蒸汽", "standard_coal":"已折标能流"}.get(flow.energy_id,"其他能源或工质"),))[0]
-                    flow_details.append(f"{LABELS[flow.component]} · {label}：{flow.quantity} {flow.unit} × "
-                        f"{row.coefficient} {row.coefficient_unit} = {row.energy_kgce} kgce；{row.coefficient_source}")
-            self.details.setPlainText("\n".join([
-                r.source_location, f"数值配置：{r.numeric_profile_id}",
-                f"计算器版本：{r.calculator_version}", f"规则版本：{r.rule_revision}",
-                *[trace_text(r, s) for s in r.calculation_trace],
-                *flow_details,
-            ]))
+            self.show_result(self.result)
             self.notice.setText("预览完成，不生成记录。")
         except ValueError as exc:
             self.notice.setText("请检查输入：" + str(exc))

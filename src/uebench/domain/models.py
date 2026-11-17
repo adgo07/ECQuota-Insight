@@ -379,6 +379,7 @@ class StandardDefinition(StrictModel):
     selection_schema: list[SelectionLevel] = Field(default_factory=list)
     products: list[ProductDefinition]
     corrections: list[str] = Field(default_factory=list)
+    coke_rule_parameters: dict[str, Any] | None = Field(default=None, exclude_if=lambda value: value is None)
     lifecycle_status: LifecycleStatus = LifecycleStatus.ACTIVE
     obsolete_date: date | None = None
     replaced_by: list[str] = Field(default_factory=list)
