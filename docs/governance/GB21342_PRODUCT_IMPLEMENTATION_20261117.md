@@ -125,3 +125,9 @@ Knowledge capture：无新增知识文章；引用核验缺口记于本报告，
 [可审计摘要](evidence/GB21342_265f215_DELIVERY_ACCEPTANCE_SUMMARY.json)包含构建身份、文件hash、记录/DOCX摘要、原始JSON前后hash及CI快照；完整本机载荷清单、自检输出、原生观察继续保留在各专属目录。父Agent已独立重新计算EXE/ZIP hash并核对身份/增强自检。当前无新增生产代码，因此不无改动重复已完成回归；完整回归仍按精确head CI实际结果补录。
 
 本轮未改变生产data、PIN、公钥、lock或正式支持集；焦炭整体仍MAPPING、正式仅选煤，水泥Stage D暂缓。原生/报告视觉、生产规则参数采用/签包、整映射批准与正式安装升级/Stage D仍OPEN。PR41保持草稿，不合并、不发布、不tag。
+
+### 构建源码CI最终核实
+
+上节“strict literal full suite仍in_progress”为提交时历史快照。后续实际重新查询确认：构建源码 `265f215aeb4705695d7b72017fb5631014e33ad9` 的 PR Gate `44110927544`、Numeric v1 `44110927512`、N01-A `44110927701` 均已 completed/success；job `134135978175` 全部步骤（含严格单次 literal full suite 与 summary）均 completed/success，父Agent亦独立核实。未将此结论套用到后续纯文档head；文档提交的CI另按精确SHA跟踪。包仍绑定干净265f215，不因纯证据文档更新重建。
+
+本轮续派同一Astra低推理Agent，一次 `list_apps` 探测成功并发现已安装Word；随后应用操作尚未取得明确结果或可审截图。该枚举恢复不能视为EXE、历史页或Word原生通过，当前矩阵仍OPEN。未重复在途请求、终止未知helper或自动安装Office；可独立同步的CI/构建/记录证据先行提交，后续原生实际结果另按观察补录。

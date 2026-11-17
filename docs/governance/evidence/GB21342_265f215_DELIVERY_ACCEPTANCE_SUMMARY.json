@@ -163,5 +163,36 @@
       "source_gate": "success"
     }
   },
-  "production_code_changed_this_round": false
+  "production_code_changed_this_round": false,
+  "ci_final_verified": {
+    "commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "numeric_v1": {
+      "run_id": 44110927512,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "n01a": {
+      "run_id": 44110927701,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "pr_gate": {
+      "run_id": 44110927544,
+      "status": "completed",
+      "conclusion": "success",
+      "full_suite_job_id": 134135978175,
+      "all_steps": "completed/success",
+      "strict_literal_full_suite": "success",
+      "summary": "success"
+    },
+    "independent_parent_verified": true
+  },
+  "native_followup": {
+    "status": "OPEN",
+    "list_apps": "success",
+    "installed_word_detected": true,
+    "application_operation": "awaiting_result",
+    "observed_exe_windows": 0,
+    "note": "本轮工具枚举恢复不等于应用可访问或原生通过；未终止未知helper或重复申请"
+  }
 }
