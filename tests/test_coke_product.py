@@ -129,3 +129,13 @@ def test_flow_mode_ignores_totals_and_shows_effective_source(page):
     page.run_preview()
     assert page.result.energy.actual_energy_kgce_per_t == 200
     assert "来源待补" in page.output.toPlainText()
+
+
+def test_percent_underflow_is_explicit_error_not_zero(page):
+    populate(page)
+    page.choices["heating_fuel"].setCurrentIndex(page.choices["heating_fuel"].findData("mixed_gas"))
+    page.fields["mixed_gas_percent"].setText("1e-1000026")
+    page.run_preview()
+    assert page.result is None
+    assert "换算超出数值配置范围" in page.notice.text()
+    assert page.calculate.isEnabled()

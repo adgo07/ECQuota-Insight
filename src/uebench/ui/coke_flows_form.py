@@ -13,7 +13,7 @@ class CokeFlowsForm(QWidget):
     def __init__(self):
         super().__init__()
         body = QVBoxLayout(self)
-        hint = QLabel("实测栏填写有效折标系数；留空采用表列参考。蒸汽压力为绝对压力。每股能流只计一次。")
+        hint = QLabel("干洗精煤、干全焦采用附录A；其他能源/工质优先实测有效系数，未填时采用表列参考。蒸汽查表使用绝对压力，每股能流只计一次。")
         hint.setWordWrap(True)
         body.addWidget(hint)
         self.table = QTableWidget(0, 10)

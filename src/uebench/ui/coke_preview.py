@@ -1,5 +1,5 @@
 """焦炭隔离预览页。普通正式流程不注册此页，不写记录。"""
-from decimal import localcontext
+from decimal import DecimalException, localcontext
 from html import escape
 
 from PySide6.QtWidgets import (
@@ -175,8 +175,11 @@ class CokePreviewPage(QWidget):
             if percent is not None:
                 if not 0 <= percent <= 100:
                     raise ValueError("混合煤气使用时间占比须在0至100%之间")
-                with localcontext(_declared_context()):
-                    ratio = percent / 100
+                try:
+                    with localcontext(_declared_context()):
+                        ratio = percent / 100
+                except DecimalException as exc:
+                    raise ValueError("混合煤气使用时间占比换算超出数值配置范围") from exc
         return CokeAssessmentInput(energy=energy, **parameters, mixed_gas_ratio=ratio,
             **{key: values[key] for key in ("dry_volatile_pct", "total_moisture_pct", "oven_age_years")})
 
