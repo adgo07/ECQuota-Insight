@@ -39,6 +39,13 @@ class IncompleteCokeEvaluationError(ValueError):
         self.preview_result = preview_result
 
 
+class CokeRecordSaveError(RuntimeError):
+    """计算已完成但记录事务失败；携带预览，异常cause供技术日志追踪。"""
+    def __init__(self, *, preview_result):
+        super().__init__("保存失败，未生成记录，可重试。")
+        self.preview_result = preview_result
+
+
 def candidate_snapshot(base_definition):
     """从已加载定义生成内存r2，供隔离开发验证；不写生产源或签包。"""
     if base_definition.id != STANDARD_ID or base_definition.source_sha256 != SOURCE_SHA256:

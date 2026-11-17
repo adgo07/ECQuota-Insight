@@ -2612,7 +2612,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
 
     def _calculate_coke(self, request=None):
-        from uebench.application.coke_records import IncompleteCokeEvaluationError
+        from uebench.application.coke_records import IncompleteCokeEvaluationError, CokeRecordSaveError
         form = self.coke_form
         try:
             request = request or form.collect_request(self._selection_mode())
@@ -2626,6 +2626,12 @@ class MainWindow(QMainWindow):
         except IncompleteCokeEvaluationError as exc:
             form.display_saved_result(exc.preview_result)
             form.notice.setText("预览完成，待确定或不适用，尚未生成记录。" + str(exc))
+            return
+        except CokeRecordSaveError as exc:
+            _LOGGER.exception("焦炭记录保存失败，保留本次计算预览")
+            form.display_saved_result(exc.preview_result)
+            form.notice.setText("保存失败，未生成记录，可重试。")
+            self.evaluation_scroll.ensureWidgetVisible(form.notice)
             return
         except (ValueError, TypeError, LookupError) as exc:
             form.output.clear()

@@ -161,21 +161,59 @@ def test_source_smoke_reopens_saved_snapshots_without_calculator(tmp_path, monke
         assert reopened["snapshots_unchanged"] and reopened["record_id"] == result["record_id"]
 
 
-def test_transaction_failure_keeps_no_record_and_allows_retry(window, monkeypatch):
+def test_transaction_failure_keeps_preview_no_record_and_allows_retry(window, monkeypatch, caplog):
     context = window.context
     before = context.evaluations.count()
+    audit_before = context.audit.list_recent()
     original = context.audit.append
     def fail(*args, **kwargs):
-        raise RuntimeError("合成审计失败")
+        original(*args, **kwargs)  # 连已加入事务的审计行也必须回滚。
+        raise RuntimeError("合成审计失败，技术细节不得显示给用户")
     monkeypatch.setattr(context.audit, "append", fail)
     window.calculate_button.click()
     assert context.evaluations.count() == before and window.last_result_id is None
-    assert "保存失败" in window.coke_form.notice.text()
-    assert "已生成一条" not in window.coke_form.notice.text()
-    assert window.calculate_button.isEnabled() and not window.coke_form.export_word.isEnabled()
+    assert context.audit.list_recent() == audit_before
+    form = window.coke_form
+    assert "保存失败，未生成记录，可重试" in form.notice.text()
+    assert "技术细节" not in form.notice.text() and "已生成一条" not in form.notice.text()
+    assert "实际能耗" in form.output.toPlainText() and "111" in form.output.toPlainText()
+    assert "1级" in form.output.toPlainText() and form.details.toPlainText()
+    assert form.result is not None
+    assert "保留本次计算预览" in caplog.text and "合成审计失败" in caplog.text
+    assert window.calculate_button.isEnabled()
+    assert not form.export_word.isEnabled() and not form.view_record.isEnabled()
     monkeypatch.setattr(context.audit, "append", original)
     window.calculate_button.click()
     assert window.last_result_id and context.evaluations.count() == before+1
+    assert len(context.audit.list_recent()) == len(audit_before)+1
+    window.calculate_evaluation()
+    assert context.evaluations.count() == before+1
+
+
+def test_application_save_error_retains_cause_and_single_computed_preview(window, monkeypatch):
+    from uebench.application.coke_records import CokeRecordSaveError
+    from uebench.application import coke_records
+    context = window.context
+    request = window.coke_form.collect_request(window._selection_mode())
+    failure = RuntimeError("合成保存异常")
+    computed = []
+    original = coke_records.assess_coke
+    def calculate(*args, **kwargs):
+        result = original(*args, **kwargs)
+        computed.append(result)
+        return result
+    def save_fail(*args, **kwargs):
+        raise failure
+    monkeypatch.setattr(coke_records, "assess_coke", calculate)
+    monkeypatch.setattr(context.evaluations, "save", save_fail)
+    before = context.evaluations.count()
+    with pytest.raises(CokeRecordSaveError) as caught:
+        context.application.evaluate(request)
+    assert caught.value.__cause__ is failure and len(computed) == 1
+    preview = caught.value.preview_result
+    assert preview.results[0].grade.value == "LEVEL_1"
+    assert preview.coke_payload["assessment"]["energy"]["actual_energy_kgce_per_t"] == "111"
+    assert context.evaluations.count() == before
 
 
 def test_real_readiness_without_reconciliation_blocks_even_development_scope(monkeypatch):

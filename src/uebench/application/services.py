@@ -186,5 +186,12 @@ class EvaluationService:
             from .gb16780 import require_complete
 
             require_complete(request, result, standard)
-        self.evaluations.save(request, result, standard)
+        try:
+            self.evaluations.save(request, result, standard)
+        except Exception as exc:
+            if request.standard_id == "gb-21342-2025":
+                from .coke_records import CokeRecordSaveError
+
+                raise CokeRecordSaveError(preview_result=result) from exc
+            raise
         return result
