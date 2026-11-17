@@ -88,6 +88,7 @@ def test_preview_partial_stale_and_literal_text(page):
     assert page.result.grade.value == "LEVEL_1"
     assert page.result.levels[2].threshold is None
     assert "待确定" in page.output.toPlainText()
+    assert "最高满足级别" not in page.details.toPlainText()
     page.fields["raw_coal_energy_kgce"].setText("111.000000000000000000001")
     assert page.result is None and "过期" in page.notice.text()
     page.run_preview()

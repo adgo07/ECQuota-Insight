@@ -192,7 +192,8 @@ class CokePreviewPage(QWidget):
             self.details.setPlainText("\n".join([
                 r.source_location, f"数值配置：{r.numeric_profile_id}",
                 f"计算器版本：{r.calculator_version}", f"规则版本：{r.rule_revision}",
-                *[f"{s.label}：{s.expression} = {s.value} {s.unit or ''}" for s in r.calculation_trace],
+                *[("最终级别：" + GRADE_LABELS[r.grade]) if s.label == "最终级别"
+                  else f"{s.label}：{s.expression} = {s.value} {s.unit or ''}" for s in r.calculation_trace],
             ]))
             self.notice.setText("预览完成，不生成记录。")
         except ValueError as exc:

@@ -52,4 +52,4 @@ def build_coke_report_view(request, result, snapshot):
     basis = ("GB 21342—2025 §4表1、§5.3表2、§6.1.1及§6.2式（3）",)
     return CementReportView(result.evaluation_id,"焦炭能耗对标报告",information,
         (CementLineReport(request.organization_name or "评价对象",oven,(metric,),tuple(inputs),tuple(calculations),basis),),(),
-        tuple(saved["warnings"]),result.rule_revision,result.rule_snapshot_sha256)
+        ("同一统计期、同一常规焦炉类型；采用保存时输入、能流及计算结果。", *saved["warnings"]),result.rule_revision,result.rule_snapshot_sha256)
