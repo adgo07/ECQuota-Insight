@@ -59,6 +59,14 @@ Numeric专项执行：`tests/conformance/numeric/test_ecquota_numeric_v1.py`、`
 
 `ed161e0924b1f841f6af62689cff9a9b326e1b22`进一步核对记录的数值行为版本、标准信息、单位及专属输入副本，全部焦炭测试423 passed；随后缺项/非法载荷错误处理定向11 passed（含既有记录案例）。没有改变式3、阈值或Numeric行为版本的值。最终头提交的CI重新执行，旧头Numeric/N01-A成功仅属各自版本证据。
 
+### 后续构建修复与全套执行边界
+
+0441b16及baed566旧预览资产后经载荷审查发现误收集`icuuc.dll`/`icudt78.dll`，与现有`uebench-stage-d.spec`已记录的Poppler ICU78/Windows Qt符号冲突相同；旧自检只验证业务链，未覆盖Qt载入。因此这些资产标记为被替代，不作为可用GUI产物交付，旧exit0/CRC结论仅保留其原有范围。
+
+构建修复`b2acf1aba5200e3b70ae1b92269e1ebd86daa4fe`仅在本次全新输出目录内核对目标路径后移除两个不兼容副本；不修改系统DLL或既有产物。`--self-check`增加离屏创建真实Qt表单，源码自检已返回`qt_form_created=true`、记录数0。后续替代EXE必须在新精确源码构建并通过该增强自检，以对应`build-result.json`/`portable-result.json`为准；离屏不冒充原生验收。
+
+本机第三轮全套在执行期间HEAD有推进，收集时固定HEAD的两项构建身份测试如实失败；冻结HEAD后该两项单独复验2 passed，未修改测试规则。该混合HEAD本机全套不能记为精确提交通过；后续以固定检出的精确HEAD CI作为完整回归依据，最终计数与状态由PR41门禁及交接给出。其余本机失败/跳过仍以原日志完整保留，不用定向复验覆盖全套结论。
+
 ## 保留事项
 
 整标准仍MAPPING、现行批准映射无；正式评价范围仍仅GB29446。签名私钥缺失不通过换公钥处理；正式规则/签包/PIN/交付须成套。水泥IMPLEMENTED / Stage D OPEN保留，RS05 IN PROGRESS，0.2.0未发布。本报告不授权合并、发布或tag。
