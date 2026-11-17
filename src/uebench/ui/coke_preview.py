@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from .wheel_safe_combo import WheelSafeComboBox
 from uebench.application.gb21342 import preview_coke
-from uebench.domain.coke_flows import normalize_energy
+from uebench.domain.coke_flows import normalize_energy, REFERENCES
 from .coke_flows_form import CokeFlowsForm
 from uebench.domain.models import GRADE_LABELS
 from uebench.domain.gb21342 import (
@@ -17,7 +17,7 @@ from uebench.domain.gb21342 import (
 )
 
 
-def result_html(result):
+def result_html(result, flow_warnings=()):
     def number(value):
         return "待确定" if value is None else escape(str(value))
     energy = result.energy
@@ -27,7 +27,7 @@ def result_html(result):
         f"<td>{escape('；'.join(level.undetermined_reasons))}</td></tr>"
         for level in result.levels
     )
-    warnings = "<br>".join(escape(w) for w in result.warnings)
+    warnings = "<br>".join(escape(w) for w in (*result.warnings, *flow_warnings))
     return (
         f"<h2>{escape(GRADE_LABELS[result.grade])}</h2>"
         f"<p>实际能耗：{number(energy.actual_energy_kgce_per_t)} kgce/t<br>"
@@ -187,13 +187,23 @@ class CokePreviewPage(QWidget):
         self.details.clear()
         try:
             self.result = self.preview(self.collect())
-            self.output.setHtml(result_html(self.result))
+            flow_warnings = self.flow_result.warnings if self.flow_result else ()
+            self.output.setHtml(result_html(self.result, flow_warnings))
             r = self.result
+            flow_details = []
+            if self.flow_result:
+                for row in self.flow_result.rows:
+                    flow = row.flow
+                    label = REFERENCES.get(flow.energy_id, ({"saturated_steam":"饱和蒸汽",
+                        "superheated_steam":"过热蒸汽", "standard_coal":"已折标能流"}.get(flow.energy_id,"其他能源或工质"),))[0]
+                    flow_details.append(f"{LABELS[flow.component]} · {label}：{flow.quantity} {flow.unit} × "
+                        f"{row.coefficient} {row.coefficient_unit} = {row.energy_kgce} kgce；{row.coefficient_source}")
             self.details.setPlainText("\n".join([
                 r.source_location, f"数值配置：{r.numeric_profile_id}",
                 f"计算器版本：{r.calculator_version}", f"规则版本：{r.rule_revision}",
                 *[("最终级别：" + GRADE_LABELS[r.grade]) if s.label == "最终级别"
                   else f"{s.label}：{s.expression} = {s.value} {s.unit or ''}" for s in r.calculation_trace],
+                *flow_details,
             ]))
             self.notice.setText("预览完成，不生成记录。")
         except ValueError as exc:

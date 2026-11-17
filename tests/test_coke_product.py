@@ -107,3 +107,25 @@ def test_percent_and_not_applicable(page):
     page.choices["conventional_oven"].setCurrentIndex(page.choices["conventional_oven"].findData(False))
     page.run_preview()
     assert page.result.grade.value == "NOT_APPLICABLE"
+
+
+def test_flow_mode_ignores_totals_and_shows_effective_source(page):
+    populate(page)
+    page.energy_mode.setCurrentIndex(page.energy_mode.findData("flows"))
+    form=page.flows_form
+    form.add()
+    for col,value in ((0,"processing_energy_kgce"),(1,"electricity"),(3,"kWh")):
+        combo=form.table.cellWidget(0,col)
+        combo.setCurrentIndex(combo.findData(value))
+    form.table.item(0,2).setText("1000")
+    for key,box in form.zeros.items():
+        box.setChecked(key != "processing_energy_kgce")
+    page.run_preview()
+    assert page.result.energy.actual_energy_kgce_per_t == D("122.9")
+    assert "表A.2" in page.details.toPlainText()
+    assert "0.1229" in page.details.toPlainText()
+    form.table.item(0,4).setText("0.2")
+    form.table.item(0,5).setText("kgce/kWh")
+    page.run_preview()
+    assert page.result.energy.actual_energy_kgce_per_t == 200
+    assert "来源待补" in page.output.toPlainText()
