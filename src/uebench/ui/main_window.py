@@ -1697,6 +1697,7 @@ class MainWindow(QMainWindow):
         self.eval_standard.blockSignals(False)
         multiple_standards = self.eval_standard.count() > 1
         self.eval_standard.setVisible(multiple_standards)
+        self.eval_standard.setEnabled(multiple_standards)
         self.eval_standard_summary.setVisible(not multiple_standards)
         self.eval_standard.setToolTip(self._formal_scope_hint())
         self._standard_changed()

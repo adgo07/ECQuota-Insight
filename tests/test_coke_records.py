@@ -49,8 +49,15 @@ def test_word_mixed_gas_ratio_uses_saved_fuel(fuel, ratio, expected, tmp_path):
     result = calculate_record(request, snapshot)
     view = build_report_view(request, result, snapshot)
     path = WordReportWriter().write(view, tmp_path / "coke.docx")
+    from docx.shared import Pt
+
+    document = Document(path)
+    assert not any(paragraph.style.name == "Normal" and not paragraph.text for paragraph in document.paragraphs)
+    assert document.tables[0].cell(0, 0).paragraphs[0].paragraph_format.space_after == Pt(1)
+    basis = next(paragraph for paragraph in document.paragraphs if paragraph.text.startswith("实际能耗："))
+    assert basis.paragraph_format.keep_with_next is True
     values = []
-    for table in Document(path).tables:
+    for table in document.tables:
         for row in table.rows:
             cells = [cell.text for cell in row.cells]
             if "混合煤气使用时间比例" in cells:

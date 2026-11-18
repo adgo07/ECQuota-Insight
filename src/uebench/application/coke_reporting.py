@@ -1,8 +1,14 @@
 """焦炭保存快照投影；复用现有多指标报告载体和两页签，不运行计算器。"""
+from dataclasses import dataclass
 from .coke_records import require_complete, PRODUCTS
 from .reporting import ReportField, CementReportView, CementLineReport, CementMetricView, _local_datetime_text
 from uebench.domain.models import GRADE_LABELS, Grade
 from uebench.domain.gb21342 import LABELS
+
+
+@dataclass(frozen=True)
+class CokeReportView(CementReportView):
+    """焦炭保存快照的报告视图。"""
 
 
 def build_coke_report_view(request, result, snapshot):
@@ -66,6 +72,6 @@ def build_coke_report_view(request, result, snapshot):
                 inputs.append(field("换算依据", trace["basis"]))
     oven = "顶装焦炉" if values["oven_type"] == "top_charging" else "捣固焦炉"
     basis = ("GB 21342—2025 §4表1、§5.3表2、§6.1.1及§6.2式（3）",)
-    return CementReportView(result.evaluation_id,"焦炭能耗对标报告",information,
+    return CokeReportView(result.evaluation_id,"焦炭能耗对标报告",information,
         (CementLineReport(request.organization_name or "评价对象",oven,(metric,),tuple(inputs),tuple(calculations),basis),),(),
         ("同一统计期、同一常规焦炉类型；采用保存时输入、能流及计算结果。", *saved["warnings"]),result.rule_revision,result.rule_snapshot_sha256)

@@ -38,7 +38,7 @@ def window(monkeypatch):
         with application_context(Path(directory)) as context:
             widget = MainWindow(context)
             assert widget.eval_standard.currentData() == "gb-29446-2019"
-            assert not widget.eval_standard.isHidden()
+            assert not widget.eval_standard.isHidden() and widget.eval_standard.isEnabled()
             widget.eval_standard.setCurrentIndex(widget.eval_standard.findData(STANDARD_ID))
             assert widget.current_standard.id == STANDARD_ID
             populate(widget.coke_form)
