@@ -37,11 +37,8 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    # 定义是 Git 文本文件。统一换行后摘要才与工作树检出配置无关。
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def _entry(path: Path, scope: str) -> tuple[dict[str, Any], tuple[str, str, int]]:
