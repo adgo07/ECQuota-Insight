@@ -24,6 +24,11 @@ name: Windows Release Candidate
 # authenticode_signed = false).
 on:
   workflow_dispatch:
+    inputs:
+      verify_rebuilt_legacy_upgrade:
+        description: "Run an isolated installer upgrade from a rebuilt 0.1.0 baseline"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -193,6 +198,25 @@ jobs:
             throw "ACTIVE-CANDIDATE.json 的 payload_tree_sha256 与 payload-manifest.json 不一致。"
           }
           Write-Host "Provenance verified: $headSha / $env:EXPECTED_CANDIDATE"
+
+      - name: Verify rebuilt 0.1.0 installer upgrade
+        if: inputs.verify_rebuilt_legacy_upgrade
+        shell: pwsh
+        env:
+          NAMES_JSON: ${{ steps.version.outputs.names }}
+        run: |
+          $names = $env:NAMES_JSON | ConvertFrom-Json
+          python tools/verify_rebuilt_windows_upgrade.py --candidate (Join-Path dist/candidate $names.installer) --evidence (Join-Path $env:RUNNER_TEMP 'uebench-upgrade-evidence')
+          if ($LASTEXITCODE -ne 0) { throw "隔离的 0.1.0 安装升级验收未通过。" }
+
+      - name: Upload isolated upgrade evidence
+        if: always() && inputs.verify_rebuilt_legacy_upgrade
+        uses: actions/upload-artifact@v4
+        with:
+          name: UEBench-Installer-Upgrade-${{ steps.version.outputs.candidate_id }}
+          path: ${{ runner.temp }}/uebench-upgrade-evidence/
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Upload Candidate artifacts
         uses: actions/upload-artifact@v4
