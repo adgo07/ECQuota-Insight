@@ -1,5 +1,31 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-11-18 焦炭 Stage D 当前状态
+
+焦炭验收接续 [Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。当前已核实签包、普通窗口键鼠、历史与 Word 导出、Microsoft Word 实排、126 项定向检查及 Windows 独立安装全链。接续核实同一运行源码的正式作业 `44320265653` 和最终文档 HEAD 的严格全量结果。同一运行源码的正式构建与严格全量通过、PR #41 合并后，焦炭支持状态生效为 SUPPORTED。水泥正式验收暂缓。
+
+以下按日期保留前期记录。
+
+## 2026-11-18 焦炭映射批准记录
+
+2026-11-18 Owner 已明确批准焦炭映射 V1.1 全文及审核稿处理口径，并授权签包和 Stage D 验收。批准对象为 fe0e821 中的审核稿，Git blob 内容 SHA256 为 c92f98a5e05839f3c11bd2463bf70e5d1195ff2a8e8621fc81a5371629c84778，Windows CRLF 检出文件 SHA256 为 c3f8ed9bd6f6e1df001a156e388e1e14c66f52d5e44b125aa1126c7cfb5d5515。D01—D05 作为软件处理决定采用，标准疑义按原登记状态跟踪。桌面、Word 分页及安装升级验收通过后方可合并 PR #41。水泥正式验收暂缓。
+
+[现行映射及批准记录](standards/mappings/GB21342-2025/标准映射表_V1.1_审核稿.md)
+
+## 2026-11-18 焦炭完整功能任务
+
+完整主应用开发包从干净提交 `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e` 构建，包含开发标签、官方来源、占位修复及保存失败后保留预览。机器自检、跨进程重开、337 个载荷文件哈希及 ZIP CRC 均通过。本机资产位于 `work/coke-application-f4aea0b/`。精确 f4 的 Numeric v1 与 N01-A 已通过，PR Gate 的严格全量执行失败。同期本机全量也报告失败，且运行期间 HEAD 发生变化。离屏两尺寸代表图和修复后两图已独立复查。原生 GUI、Word 实开分页、正式安装升级及 Stage D 仍待验。详见[开发包摘要](docs/governance/evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)与[独立验收补录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-最终完整主应用开发包与独立验收补录)。
+
+本轮已完成主应用、参数绑定、热值/焓换算及交付工具的源码实施，当前进入独立完整回归和原生验收。最新状态见[TASK_STATE](TASK_STATE.md)及[完整功能续录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-完整功能实施续录)。V1.1映射审核稿已请求Owner确认，未收到批准前不得自记批准；生产r1/PIN/公钥/正式支持集尚未改变。引用原文和匹配签名私钥已具备，历史“缺失”不再成立。水泥正式验收继续暂缓。
+
+## 2026-11-17 焦炭实施交接
+
+当前接续[产品接入实施记录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md)。独立分支`codex/coke-product-implementation-20261117`保留设计提交，已完成隔离预览/原始能流明确部分/记录报告承载，构建精确`0441b16`的未发布预览EXE并通过无头自检。独立验收按报告中的源码、脚本、记录/DOCX及构建身份逐项核查，不继承旧CI或旧候选通过结论。生产规则、签包和PIN未提升；映射整体MAPPING、正式范围仅选煤、水泥Stage D暂缓，0.2.0未发布。尚待核验的自动热值/焓换算、参数采用、私钥及原生/报告视觉不得记为完成。
+
+## 2026-11-17 当前交接
+
+PR #40 已验收合并，main=`1bf58cc1c2d190f3ebc3b5f37148633102623224`。继续按[焦炭设计续篇](docs/governance/GB21342_STAGE_B_DESIGN_20261112.md)推进产品方案；水泥正式验收按 Owner 指示暂缓，IMPLEMENTED / Stage D OPEN 保留。正式支持仍仅选煤。旧段落中的当前任务安排按本段更新，不抹去历史证据。
+
 2026-11-12完整判级预览续更：Owner授权继续开发后，已实现两炉型明细能耗/26、表1/2修正、最高级别及局部缺项状态，接入独立Application与Facade只读preview_coke；见[本轮实施记录](docs/governance/GB21342_STAGE_C_ASSESSMENT_REPORT_20261112.md)。不接GUI/原始能源折标/正式记录/生产包，整体MAPPING和正式范围不变；001软件决定已采用，003区间内相邻线性已作软件算法选择，其余OPEN边界保留。下方首块段落是此前局部进度，当前调用能力以本续更为准。
 
 2026-11-12焦炭首块补充：Owner授权PR23修复合并后开始开发；PR23已合并`ea28ca46fdff826e92f2a907f8faf4e9726f435b`。原文式3与明确完整外属未计入时26调整，经独立原文复核和父Agent审查，作为局部开发依据；[独立Domain首块](docs/governance/GB21342_STAGE_C_CORE_REPORT_20261112.md)已实现并定向验证，不接产品入口或正式记录。整体MAPPING，无整映射批准冻结，001软件最高级别决定已确认（PROVISIONAL），002～005仍OPEN，正式范围不变。后续按已确认最高级别策略接入判级，不新增企业字段或限定/准入合规主结论，解释仅保留内部资料；literal full suite及独立审查以本PR实际证据为准。水泥和RS05原有状态继续有效。

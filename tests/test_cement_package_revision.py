@@ -11,6 +11,7 @@ from uebench.infrastructure.packages import PackageManifest
 
 ROOT = Path(__file__).resolve().parents[1]
 REAL_PARENT = ROOT / "release/standard-packages/initial-standard-package-published.uebench"
+PREDECESSOR = ROOT / "tests/fixtures/standard-packages/2026.10-published.5.uebench"
 DEFINITION = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json"
 
 
@@ -26,7 +27,7 @@ def synthetic(tmp_path, monkeypatch):
     public = tmp_path / "SYNTHETIC-test-only-public.pem"
     public.write_bytes(key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo))
     monkeypatch.setattr(tool, "TRUSTED_PUBLIC_KEY_PATH", public)
-    raw, members = tool._read_package(REAL_PARENT)
+    raw, members = tool._read_package(PREDECESSOR)
     manifest = PackageManifest.model_validate_json(raw)
     manifest.package_id = "SYNTHETIC-test-only-parent"
     parent = tmp_path / "SYNTHETIC-test-only-parent.uebench"
@@ -108,7 +109,7 @@ def test_cement_verifier_refuses_signed_version_downgrade(synthetic, tmp_path):
     parent, _, key = synthetic
     rewrite(candidate, key, data_version="2026.10-published.4")
     result = tool.verify_revision_package(parent, candidate, target_standard_id="gb-16780-2021")
-    assert not result["valid"] and "水泥新data_version必须晚于父基线" in result["problems"]
+    assert not result["valid"] and "标准包新data_version必须晚于父基线" in result["problems"]
 
 
 def test_wrong_signing_key_is_rejected_before_candidate_written(synthetic, tmp_path):
@@ -125,7 +126,7 @@ def test_real_trust_root_with_missing_private_key_is_a_clear_blocker(tmp_path):
     output = tmp_path / "must-not-exist.uebench"
     with pytest.raises(SystemExit, match="缺少本地开发签名私钥"):
         tool.build_revision_package(REAL_PARENT, DEFINITION, tmp_path / "missing.pem", output,
-            data_version="2026.11-published.1", minimum_app_version="0.2.0", target_standard_id="gb-16780-2021")
+            data_version="2026.11-published.2", minimum_app_version="0.2.0", target_standard_id="gb-16780-2021")
     assert not output.exists()
     assert tool.TRUSTED_PUBLIC_KEY_PATH == ROOT / "src/uebench/resources/update_public_key.pem"
 
@@ -160,7 +161,7 @@ def test_cement_cannot_be_auto_detected_as_default_coal_target(synthetic, tmp_pa
             data_version="2026.11-published.1", minimum_app_version="0.2.0")
 
 
-@pytest.mark.parametrize("target", ["gb-00000-2021", "gb-21342-2025", "", "../gb-16780-2021"])
+@pytest.mark.parametrize("target", ["gb-00000-2021", "", "../gb-16780-2021"])
 def test_unapproved_target_is_rejected_without_opening_or_writing_files(tmp_path, target):
     with pytest.raises(SystemExit, match="未获本工具授权"):
         tool.build_revision_package(tmp_path / "absent", DEFINITION, tmp_path / "none", tmp_path / "none-output",

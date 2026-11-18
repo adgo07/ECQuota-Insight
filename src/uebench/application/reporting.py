@@ -234,6 +234,10 @@ def build_report_view(
     request: EvaluationRequest, result: EvaluationResult, snapshot: StandardDefinition,
 ) -> ReportView | CementReportView:
     """仅投影已保存事实；未形成有效等级的记录拒绝正式报告。"""
+    if (request.standard_id, result.standard_id, snapshot.id) == ("gb-21342-2025",) * 3 and request.coke_payload is not None:
+        from .coke_reporting import build_coke_report_view
+
+        return build_coke_report_view(request, result, snapshot)
     if (request.standard_id, result.standard_id, snapshot.id) == ("gb-16780-2021",) * 3:
         from .cement_reporting import build_cement_report_view
 

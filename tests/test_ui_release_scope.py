@@ -194,7 +194,7 @@ def test_new_evaluation_combo_offers_exactly_the_formally_supported_standards(wi
     assert len(library_ids) > 3, "标准库应远多于正式评价范围内的标准"
 
     offered = {window.eval_standard.itemData(index) for index in range(window.eval_standard.count())}
-    assert offered == set(SUPPORTED_EVALUATION_STANDARD_IDS) == {GB29446_ID}
+    assert offered == set(SUPPORTED_EVALUATION_STANDARD_IDS) == {GB29446_ID, "gb-21342-2025"}
     assert window.eval_standard.currentData() == GB29446_ID
     assert window.eval_support_label.text() == "正式支持"
 
@@ -212,8 +212,9 @@ def test_unsupported_standard_cannot_reach_formal_evaluation(window) -> None:
 
 
 def test_home_page_affords_formal_evaluation_only_from_the_registry(window) -> None:
-    assert window.home_formal_scope_count.text() == "1 项"
+    assert window.home_formal_scope_count.text() == "2 项"
     assert "GB 29446-2019" in window.home_scope_label.text()
+    assert "GB 21342-2025" in window.home_scope_label.text()
     assert window.home_start_evaluation.isEnabled()
     window.home_start_evaluation.click()
     assert window.navigation.currentRow() == 2

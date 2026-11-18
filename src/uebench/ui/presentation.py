@@ -47,8 +47,13 @@ DISPLAY_DATE_FORMAT: Final[str] = "%Y-%m-%d"
 
 def software_support_text(standard) -> str:
     """只投影已批准正式范围；存在旧 Rule 不代表接入已验收。"""
-    from uebench.application.evaluation_support import supports_formal_evaluation
-    return "正式支持" if supports_formal_evaluation(standard) else "未开放"
+    from uebench.application.evaluation_support import (
+        evaluation_support_label, FORMAL_EVALUATION_SUPPORTED_LABEL,
+        FORMAL_EVALUATION_UNSUPPORTED_LABEL,
+    )
+    label = evaluation_support_label(standard)
+    return {FORMAL_EVALUATION_SUPPORTED_LABEL:"正式支持",
+            FORMAL_EVALUATION_UNSUPPORTED_LABEL:"未开放"}.get(label, label)
 
 
 def to_local(dt: datetime) -> datetime:

@@ -37,6 +37,8 @@ def saved_record_projection(request_json: str, result_json: str) -> str:
         if result.standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"} and (request.notes or "").startswith("核算周期："):
             code, custom, _ = decode_period_notes(request.notes)
             period = custom if code == "自定义" else code
+        if result.standard_id == "gb-21342-2025":
+            period = (request.notes or "").strip() or "未记录"
         first = result.results[0] if result.results else None
         status = GRADE_LABELS[first.grade] if first else "无法判定"
         core = f"{_display_two_places(first.actual_value)} {first.unit}" if first and first.actual_value is not None else "未形成有效结果"

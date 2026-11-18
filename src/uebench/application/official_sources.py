@@ -57,7 +57,13 @@ showed 2026-10-05):
 
 GB 16780—2021：2026-11-11父任务独立读取官方公开元数据页，核对现行、
 发布日期2021-10-11及实施2022-11-01。登记openstd.samr.gov.cn精确地址；
-未将工具读取元数据表述为浏览器原文视觉验收。其余标准不推测地址。
+未将工具读取元数据表述为浏览器原文视觉验收。
+
+GB 21342—2025：2026-11-18重新读取下方登记的国家标准全文公开系统页面，
+核对标准号GB 21342-2025、标题焦炭单位产品能源消耗限额、现行，
+发布日期2025-04-25、实施日期2026-05-01；与本仓标准身份一致。
+仅登记固定官方页面，不抓取或分发PDF，不将元数据读取当作原生浏览器验收。
+其余标准不推测地址。
 """
 
 from __future__ import annotations
@@ -83,6 +89,7 @@ OFFICIAL_SOURCE_PLATFORM_HOME: Final[str] = "https://std.samr.gov.cn/"
 #: Canonical standard id -> verified official page.  Fixed constants only; see
 #: the module docstring for each registration's verification evidence.
 OFFICIAL_SOURCE_URLS: dict[str, str] = {
+    "gb-21342-2025": "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=5DB2AFADA4980285095D82F5A23D947A",
     "gb-16780-2021": "https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=A98F40B6D901C95820E0B5DFDC3FCFF9",
     "gb-29446-2019": (
         "https://std.samr.gov.cn/gb/search/gbDetailed"

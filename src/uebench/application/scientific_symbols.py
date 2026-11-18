@@ -2,8 +2,10 @@
 from html import escape
 import re
 
-# 标准接入时按批准映射扩展；大小写及多字母角标必须完整保留。
-_SYMBOL = re.compile(r"(?<![A-Za-z0-9_])([EeWwPQm])_(shx|sh|sg|he|fm|fz|fc|BM|idw|H|d|s|h|m|g|i|0)(?![A-Za-z0-9_])")
+# 大小写及多字母角标必须完整保留。焦炭符号取自已核对的 GB 21342—2025 式（1）至（3）及表2。
+_COKE_SYMBOLS = r"e_(?:yl|jg|jt|jf|yr)|(?:E′?|p)_JT|Δe_0|(?:f|x′?)_i|V_d|M_t"
+_COMMON_SYMBOLS = r"[EeWwPQm]_(?:shx|sh|sg|he|fm|fz|fc|BM|idw|H|d|s|h|m|g|i|0)"
+_SYMBOL = re.compile(rf"(?<![A-Za-z0-9_])(?:{_COKE_SYMBOLS}|{_COMMON_SYMBOLS})(?![A-Za-z0-9_])")
 
 
 def symbol_runs(value):
@@ -13,8 +15,9 @@ def symbol_runs(value):
     for match in _SYMBOL.finditer(text):
         if match.start() > start:
             yield text[start:match.start()], False
-        yield match[1], False
-        yield match[2], True
+        base, subscript = match[0].rsplit("_", 1)
+        yield base, False
+        yield subscript, True
         start = match.end()
     if start < len(text):
         yield text[start:], False

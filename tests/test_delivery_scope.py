@@ -14,7 +14,7 @@ from tools.promote_gb29435_2025 import main as retired_promoter_main
 def test_current_signed_package_matches_explicit_bundled_scope() -> None:
     result = validate_scope(package_path=PINNED_PACKAGE)
     assert result["bundled_count"] == 48
-    assert result["formal_evaluation_count"] == 1
+    assert result["formal_evaluation_count"] == 2
 
 
 def test_preview_catalogue_is_derived_from_definition() -> None:
@@ -36,7 +36,7 @@ def test_sixteen_drafts_do_not_enter_bundled_or_formal_scope(tmp_path: Path) -> 
             shutil.copyfile(path, target)
     result = validate_scope(definitions_dir=copied, package_path=PINNED_PACKAGE)
     assert result == {"definition_count": 64, "bundled_count": 48,
-                      "formal_evaluation_count": 1, "draft_count": 16}
+                      "formal_evaluation_count": 2, "draft_count": 16}
 
 
 def test_draft_cannot_be_placed_on_bundled_list(tmp_path: Path) -> None:

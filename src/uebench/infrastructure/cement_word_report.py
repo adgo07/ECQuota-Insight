@@ -4,6 +4,7 @@ from pathlib import Path
 import tempfile
 
 
+from uebench.application.coke_reporting import CokeReportView
 from uebench.application.scientific_symbols import append_symbol_runs as _text
 
 
@@ -15,6 +16,8 @@ def write_cement_report(view, path):
     from docx.oxml.ns import qn
     from docx.shared import Cm, Pt, RGBColor
 
+    is_coke_report = isinstance(view, CokeReportView)
+    cell_paragraph_spacing = Pt(1 if is_coke_report else 3)
     document = Document()
     section = document.sections[0]
     section.page_width, section.page_height = Cm(21), Cm(29.7)
@@ -63,8 +66,8 @@ def write_cement_report(view, path):
                 cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
                 for paragraph in cell.paragraphs:
                     paragraph.paragraph_format.keep_with_next = False
-                    paragraph.paragraph_format.space_after = Pt(3)
-                    paragraph.paragraph_format.space_before = Pt(3)
+                    paragraph.paragraph_format.space_after = cell_paragraph_spacing
+                    paragraph.paragraph_format.space_before = cell_paragraph_spacing
         borders = OxmlElement("w:tblBorders")
         for side in ("top", "left", "bottom", "right", "insideH", "insideV"):
             item = OxmlElement("w:" + side)
@@ -72,7 +75,8 @@ def write_cement_report(view, path):
                 item.set(qn("w:" + attr), value)
             borders.append(item)
         output._tbl.tblPr.append(borders)
-        document.add_paragraph().paragraph_format.space_after = Pt(0)
+        if not is_coke_report:
+            document.add_paragraph().paragraph_format.space_after = Pt(0)
         return output
 
     document.add_heading("评价信息", level=1)
@@ -95,8 +99,12 @@ def write_cement_report(view, path):
             pairs.append(row + [""] * (4 - len(row)))
         table(("输入项", "保存值", "输入项", "保存值"), pairs, (4.3, 4.3, 4.3, 4.3))
         document.add_heading("计算与判级依据", level=2)
-        for text in (*line.calculations, *line.basis):
-            _text(document.add_paragraph(), text)
+        calculation_basis = (*line.calculations, *line.basis)
+        for index, text in enumerate(calculation_basis):
+            paragraph = document.add_paragraph()
+            if is_coke_report and index < len(calculation_basis) - 1:
+                paragraph.paragraph_format.keep_with_next = True
+            _text(paragraph, text)
     if view.shared:
         document.add_heading("共用系统分摊", level=1)
         for text in view.shared:

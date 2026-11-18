@@ -3,7 +3,7 @@
 The registry exists because "a standard is installed in the library" used to be
 conflated with "the software formally supports evaluating it", which made 43 of
 48 installed standards look evaluable.  These tests pin the 0.2.0 owner decision
-(GB 29446-2019 only) and prove the decision is independent of
+(GB 29446-2019 and GB 21342-2025) and prove the decision is independent of
 ``StandardDefinition.publication_status``.
 
 The bundled definition IDs are selected by ``data/delivery-scope.json`` from
@@ -43,7 +43,7 @@ MODULE = ROOT / "src" / "uebench" / "application" / "evaluation_support.py"
 SUPPORTED_ID = "gb-29446-2019"
 
 #: Real installed standards that are NOT in the 0.2.0 formal evaluation scope.
-UNSUPPORTED_INSTALLED_IDS = ("gb-16780-2021", "gb-21252-2023", "gb-21342-2025")
+UNSUPPORTED_INSTALLED_IDS = ("gb-16780-2021", "gb-21252-2023")
 
 _CHINESE = re.compile(r"[\u4e00-\u9fff]")
 
@@ -68,10 +68,10 @@ def _installed_definitions() -> list[StandardDefinition]:
 # ---------------------------------------------------------------------------
 
 
-def test_registry_is_a_frozenset_with_exactly_the_supported_id() -> None:
+def test_registry_contains_exactly_the_approved_ids() -> None:
     assert isinstance(SUPPORTED_EVALUATION_STANDARD_IDS, frozenset)
-    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019"}), (
-        "0.2.0 formally supports only GB 29446-2019; widening this set is an owner "
+    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019", "gb-21342-2025"}), (
+        "The candidate includes GB 29446-2019 and GB 21342-2025; widening this set is an owner "
         "decision that must update this test and carry its own evidence"
     )
 
@@ -91,8 +91,8 @@ def test_other_installed_standards_are_not_formally_evaluable() -> None:
         assert supports_formal_evaluation(definition) is False
 
 
-def test_installed_library_has_exactly_one_formally_evaluable_standard() -> None:
-    """The whole published runtime library: one evaluable standard, not 43.
+def test_installed_library_contains_both_formally_evaluable_standards() -> None:
+    """The 48 installed definitions contain two evaluable standards.
 
     The delivery allowlist is the set that actually ships (48 definitions),
     so "43 of 48 looked evaluable" is asserted against the real product data
@@ -101,7 +101,7 @@ def test_installed_library_has_exactly_one_formally_evaluable_standard() -> None
     definitions = _installed_definitions()
     assert len(definitions) == 48, "正式运行库必须仍是 48 项已发布标准"
     evaluable = filter_formally_evaluable(definitions)
-    assert [definition.id for definition in evaluable] == [SUPPORTED_ID]
+    assert {definition.id for definition in evaluable} == {SUPPORTED_ID, "gb-21342-2025"}
 
 
 def test_filter_preserves_input_order_and_drops_unsupported() -> None:

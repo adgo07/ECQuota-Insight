@@ -379,6 +379,7 @@ class StandardDefinition(StrictModel):
     selection_schema: list[SelectionLevel] = Field(default_factory=list)
     products: list[ProductDefinition]
     corrections: list[str] = Field(default_factory=list)
+    coke_rule_parameters: dict[str, Any] | None = Field(default=None, exclude_if=lambda value: value is None)
     lifecycle_status: LifecycleStatus = LifecycleStatus.ACTIVE
     obsolete_date: date | None = None
     replaced_by: list[str] = Field(default_factory=list)
@@ -481,6 +482,7 @@ class EvaluationRequest(StrictModel):
     production_lines: list[ProductionLine] = Field(default_factory=list)
     cement_lines: list[CementLineInput] = Field(default_factory=list)
     cement_shared_energy: list[CementSharedEnergy] = Field(default_factory=list)
+    coke_payload: dict[str, Any] | None = None
     organization_name: str | None = None
     project_name: str | None = None
     notes: str | None = None
@@ -582,6 +584,7 @@ class EvaluationResult(StrictModel):
     product_name: str
     results: list[IndicatorResult]
     rule_snapshot_sha256: str
+    coke_payload: dict[str, Any] | None = None
     warnings: list[str] = Field(default_factory=list)
 
 

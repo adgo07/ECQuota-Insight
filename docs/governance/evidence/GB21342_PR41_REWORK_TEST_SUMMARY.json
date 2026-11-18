@@ -1,0 +1,36 @@
+{
+  "schema": "ecq.coke-rework-tests.v1",
+  "date": "2026-11-17",
+  "base_commit": "116fd0c4b43bbcc2e2eb735a1ecaf55616d273de",
+  "source_identity": "下列文件摘要对应本次返工源码；测试运行时尚未提交，不冒称base_commit精确通过",
+  "source_files_sha256": {
+    "src/uebench/application/coke_records.py": "c9fdf6892d965fb09b5eb19b3d5f7cb4f6d20a4d63d25359db3d2259a0b2cb57",
+    "src/uebench/application/coke_reporting.py": "94127731f8f01e6a8ead7f999066c985fd0ef9cef5c69fb2613fe170f9b501bf",
+    "src/uebench/application/record_query.py": "6c11d15e5347492d481b802e75f91478f1d8661f2dda9d39e4e3817aa75297a2",
+    "src/uebench/ui/coke_flows_form.py": "d39289e4627e1a47cedd320b8b237e53465f4c22bfaa1e567a8e6daba0f0a877",
+    "src/uebench/ui/coke_preview.py": "198c561080e20229816bf6895c471f96896040738faef57fe02ac897035c084f",
+    "src/uebench/ui/main_window.py": "66b44fe6588f0558b4c84b29b0015074834b69b14d3cc47777f5c39723df53aa",
+    "tests/test_coke_product.py": "342dc165aba466443912246e2350ff903211fef054d0f86c7fa65127730393b4",
+    "tests/test_coke_records.py": "196191aec2c33d1aa9ee5ebe676c70622193323e94f09fdb685dfc833984f124",
+    "tools/coke_product_evidence.py": "811c53e57b2a5a840879da1a8e15aea436401359ebbaf09779d92dad2339f897"
+  },
+  "tests": 447,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "junit_sha256": "064660d196751ba990651530392ec29dbd24629389476a37cbc30022da2f07c3",
+  "suite": [
+    "test_coke_records.py",
+    "test_coke_product.py",
+    "test_gb21342_core.py",
+    "test_gb21342_assessment.py"
+  ],
+  "independent_parent_recheck": {
+    "tests": 43,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 18.53
+  },
+  "native_gui_and_word_layout": "OPEN",
+  "exact_head_full_suite_ci": "提交推送后另核，不继承旧head结果"
+}

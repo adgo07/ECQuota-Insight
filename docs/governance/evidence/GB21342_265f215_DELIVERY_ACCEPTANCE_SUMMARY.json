@@ -1,0 +1,198 @@
+{
+  "source_commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+  "build": {
+    "source_commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "source_dirty": false,
+    "kind": "UNPUBLISHED_PREVIEW_ONLY",
+    "formal_release": false,
+    "production_scope_changed": false,
+    "build_time_utc": "2026-11-17T15:24:05.069557+00:00",
+    "excluded_incompatible_icu": [
+      "icuuc.dll",
+      "icudt78.dll"
+    ],
+    "exe_sha256": "082c036b0e9dac695e31db5517f29041f5ce06c8980c5604486454661dfe0355",
+    "self_check_exit_code": 0,
+    "self_check_stdout": "{\"kind\": \"UNPUBLISHED_PREVIEW_ONLY\", \"grade\": \"LEVEL_1\", \"lower_level_unknown\": true, \"flow_kgce\": \"122.9000\", \"qt_form_created\": true, \"records_written\": 0}\n",
+    "self_check_stderr": "",
+    "exe_size": 12228493,
+    "payload_files": 335,
+    "payload_bytes": 162602221,
+    "payload_manifest_sha256": "95960ff730a3190ab14303d1502641b7b0d027cea46d8d69e4ebd3bf9b5434d7",
+    "zip": "UEBench-Coke-Preview-265f215-portable.zip",
+    "zip_size": 70733715,
+    "zip_sha256": "074b053f3851afd5bf260ffba01470b75d4f12580059d8dfd51ec79c368fec95",
+    "zip_crc_ok": true
+  },
+  "paths": {
+    "preview_root": "work/coke-preview-265f215-native2",
+    "records_root": "work/coke-evidence-265f215-native2",
+    "native_observation": "work/coke-native-265f215/NATIVE_OBSERVATION.md"
+  },
+  "record_evidence": {
+    "source_commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "source_dirty": false,
+    "kind": "UNPUBLISHED_ISOLATED_FIXTURE",
+    "production_rules_changed": false,
+    "production_scope_changed": false,
+    "records": [
+      {
+        "record_id": "6a9e6323-b4a6-43bd-bb92-dbab217e6218",
+        "sample_id": "111",
+        "evaluation_energy_kgce_per_t": "61.4500",
+        "grade": "LEVEL_1",
+        "docx": "coke-111.docx",
+        "input_mode": "flows",
+        "flow_rows": 1,
+        "docx_sha256": "a47b21ae79d1bd57c1229b0d3a3f5ce4235f6db6bb001b4f49b0e7e6337c2d49",
+        "rule_snapshot_sha256": "e61d89ea934c5a3f2499ed721cfb2eb2a607e47ba65b442794d9aea8a535f5d6"
+      },
+      {
+        "record_id": "31894aef-af16-4463-9433-3cf6bf355cb8",
+        "sample_id": "113",
+        "evaluation_energy_kgce_per_t": "113",
+        "grade": "LEVEL_3",
+        "docx": "coke-113.docx",
+        "input_mode": "totals",
+        "flow_rows": 0,
+        "docx_sha256": "19f609d5a345a68164b3366575ca956d0a984fb173d4603ea345d8cb2845a09f",
+        "rule_snapshot_sha256": "e61d89ea934c5a3f2499ed721cfb2eb2a607e47ba65b442794d9aea8a535f5d6"
+      },
+      {
+        "record_id": "52c8f93c-6629-49bf-a8c7-d7781e57367d",
+        "sample_id": "138",
+        "evaluation_energy_kgce_per_t": "138",
+        "grade": "NOT_QUALIFIED",
+        "docx": "coke-138.docx",
+        "input_mode": "totals",
+        "flow_rows": 0,
+        "docx_sha256": "83e2d8be23ac561063d18c368da204db2e2c6f3a4dcd9671f192521555a29c67",
+        "rule_snapshot_sha256": "e61d89ea934c5a3f2499ed721cfb2eb2a607e47ba65b442794d9aea8a535f5d6"
+      }
+    ]
+  },
+  "cross_process_readback": {
+    "source_commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "calculator_disabled": true,
+    "records": [
+      {
+        "record_id": "6a9e6323-b4a6-43bd-bb92-dbab217e6218",
+        "actual": "61.4500",
+        "grade": "LEVEL_1",
+        "view_built": true
+      },
+      {
+        "record_id": "31894aef-af16-4463-9433-3cf6bf355cb8",
+        "actual": "113",
+        "grade": "LEVEL_3",
+        "view_built": true
+      },
+      {
+        "record_id": "52c8f93c-6629-49bf-a8c7-d7781e57367d",
+        "actual": "138",
+        "grade": "NOT_QUALIFIED",
+        "view_built": true
+      }
+    ],
+    "original_json_unchanged": true,
+    "raw_json_sha256_before": {
+      "31894aef-af16-4463-9433-3cf6bf355cb8": {
+        "request_json": "02bc152f2e4f8aebb6ac6d1570b37414973dbf0f2ae2b732b6731494d3c6ed7b",
+        "result_json": "65a143574244e4ef6ff3f78c10993a6b01b60bc8b5120c64a9725d22c90ab745",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      },
+      "52c8f93c-6629-49bf-a8c7-d7781e57367d": {
+        "request_json": "db0d42dc2b1714c8fa46ba2058279b00ff72cfa35920796e3bfdf2d19ae33d05",
+        "result_json": "d3ac03035194affd5caf073ac5a9330e0034303db65fac8baff25704829dc49e",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      },
+      "6a9e6323-b4a6-43bd-bb92-dbab217e6218": {
+        "request_json": "d7f8f6bf17cc4871f147c0a8fe97b233412e692476cde34357bbaab14a400cf4",
+        "result_json": "602aca23890c370d4f802c7afb8737790aef3f2da03ea5cd795771b0b2f67803",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      }
+    },
+    "raw_json_sha256_after": {
+      "31894aef-af16-4463-9433-3cf6bf355cb8": {
+        "request_json": "02bc152f2e4f8aebb6ac6d1570b37414973dbf0f2ae2b732b6731494d3c6ed7b",
+        "result_json": "65a143574244e4ef6ff3f78c10993a6b01b60bc8b5120c64a9725d22c90ab745",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      },
+      "52c8f93c-6629-49bf-a8c7-d7781e57367d": {
+        "request_json": "db0d42dc2b1714c8fa46ba2058279b00ff72cfa35920796e3bfdf2d19ae33d05",
+        "result_json": "d3ac03035194affd5caf073ac5a9330e0034303db65fac8baff25704829dc49e",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      },
+      "6a9e6323-b4a6-43bd-bb92-dbab217e6218": {
+        "request_json": "d7f8f6bf17cc4871f147c0a8fe97b233412e692476cde34357bbaab14a400cf4",
+        "result_json": "602aca23890c370d4f802c7afb8737790aef3f2da03ea5cd795771b0b2f67803",
+        "rule_snapshot_json": "7a52743a4e4d9ebce616b1790f9f34bf6bacc856cf37ed1531b1831fe9d20289"
+      }
+    }
+  },
+  "native": {
+    "agent_model": "gpt-6-astra",
+    "reasoning_effort": "low",
+    "status": "OPEN",
+    "attempts": 2,
+    "error": "Computer Use helper already has an active request",
+    "observed_windows": 0,
+    "real_user_data_touched": false
+  },
+  "render": {
+    "status": "OPEN",
+    "renderer": "documents/render_docx.py",
+    "runtime": "bundled 26.1116.12010",
+    "error": "LibreOffice soffice.exe was not found on PATH"
+  },
+  "ci_at_recording": {
+    "commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "numeric_v1": {
+      "run_id": 44110927512,
+      "conclusion": "success"
+    },
+    "n01a": {
+      "run_id": 44110927701,
+      "conclusion": "success"
+    },
+    "pr_gate": {
+      "run_id": 44110927544,
+      "status": "in_progress",
+      "strict_literal_full_suite": "in_progress",
+      "compile": "success",
+      "source_gate": "success"
+    }
+  },
+  "production_code_changed_this_round": false,
+  "ci_final_verified": {
+    "commit": "265f215aeb4705695d7b72017fb5631014e33ad9",
+    "numeric_v1": {
+      "run_id": 44110927512,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "n01a": {
+      "run_id": 44110927701,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "pr_gate": {
+      "run_id": 44110927544,
+      "status": "completed",
+      "conclusion": "success",
+      "full_suite_job_id": 134135978175,
+      "all_steps": "completed/success",
+      "strict_literal_full_suite": "success",
+      "summary": "success"
+    },
+    "independent_parent_verified": true
+  },
+  "native_followup": {
+    "status": "OPEN",
+    "list_apps": "success",
+    "installed_word_detected": true,
+    "application_operation": "awaiting_result",
+    "observed_exe_windows": 0,
+    "note": "本轮工具枚举恢复不等于应用可访问或原生通过；未终止未知helper或重复申请"
+  }
+}

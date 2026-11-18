@@ -76,7 +76,7 @@ def test_user_manual_matches_the_current_product() -> None:
         "Excel 必须写明技术能力保留、正式用户流程暂缓"
     )
     assert "「Excel导入」页面提供固定模板" not in manual, "不得再把 Excel 导入描述为用户页面"
-    assert "只有 GB 29446—2019" in manual, "必须写明 0.2.0 正式评价范围只有 GB 29446—2019"
+    assert "本候选版提供 GB 29446—2019 选煤和 GB 21342—2025 焦炭的对标入口" in manual
 
 
 def test_repository_guide_describes_the_current_test_and_build_model() -> None:

@@ -1,8 +1,7 @@
 """Check the explicit boundary between editable definitions and delivery.
 
 The current package carries 48 definitions, including historical GB 29141-2012.
-Only GB 29446-2019 is authorized for formal evaluation. A draft can live in
-data/definitions without crossing either boundary.
+The formal evaluation list is validated against the application registry.
 """
 
 from __future__ import annotations
@@ -18,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
+from uebench.application.evaluation_support import SUPPORTED_EVALUATION_STANDARD_IDS  # noqa: E402
 from uebench.domain.models import StandardDefinition  # noqa: E402
 
 SCOPE = ROOT / "data/delivery-scope.json"
@@ -34,8 +34,9 @@ def validate_scope(scope_path: Path = SCOPE, definitions_dir: Path = DEFINITIONS
         raise ValueError("交付范围清单版本不兼容")
     if len(bundled) != 48 or len(set(bundled)) != 48:
         raise ValueError("随包定义必须是明确的48项且无重复")
-    if formal != ["gb-29446-2019"] or not set(formal) <= set(bundled):
-        raise ValueError("正式评价范围必须且只能包含 GB 29446—2019")
+    if (set(formal) != SUPPORTED_EVALUATION_STANDARD_IDS or len(formal) != len(set(formal))
+            or not set(formal) <= set(bundled)):
+        raise ValueError("交付清单的正式评价范围须与应用注册表一致，并且全部随包")
     if "gb-29141-2012" not in bundled:
         raise ValueError("历史随包定义 GB 29141—2012 不得丢失")
     paths = {path.stem: path for path in definitions_dir.glob("*.json")}

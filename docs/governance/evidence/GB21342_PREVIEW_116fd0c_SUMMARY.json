@@ -1,0 +1,28 @@
+{
+  "schema": "ecq.coke-preview-evidence.v1",
+  "verified_on": "2026-11-17",
+  "source_commit": "116fd0c4b43bbcc2e2eb735a1ecaf55616d273de",
+  "source_dirty": false,
+  "kind": "UNPUBLISHED_PREVIEW_ONLY",
+  "scope": "仅旧提交资产；不包含PR41返工后的源码改动",
+  "exe_sha256": "081622bcd1c05b847c0714a66073b1cfc1486f01dc2d7cc2a10a7186d1405d75",
+  "exe_bytes": 12224385,
+  "zip_sha256": "e378bd143e58d1c4166f9c05e985028ce9f59a12a5c08532ef9df4e8e8426f0d",
+  "zip_bytes": 71184370,
+  "payload_files": 335,
+  "zip_crc": "PASS",
+  "hashes_recomputed": true,
+  "self_check_exit_code": 0,
+  "self_check": {
+    "kind": "UNPUBLISHED_PREVIEW_ONLY",
+    "grade": "LEVEL_1",
+    "lower_level_unknown": true,
+    "flow_kgce": "122.9000",
+    "qt_form_created": true,
+    "records_written": 0
+  },
+  "native_gui": "OPEN",
+  "word_native_and_layout": "OPEN",
+  "formal_install_upgrade_stage_d": "OPEN",
+  "formal_release": false
+}

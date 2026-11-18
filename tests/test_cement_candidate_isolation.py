@@ -33,4 +33,4 @@ def test_production_cement_stays_exact_legacy_r1_and_matches_real_signed_pin():
         definitions = [StandardDefinition.model_validate_json(archive.read(e["path"])) for e in manifest["files"] if e["kind"] == "definition"]
     assert next(d for d in definitions if d.id == source.id) == source
     # 真实门禁全48项检查，没有“忽略水泥”或未发布例外开关。
-    assert validate_scope(package_path=package)["formal_evaluation_count"] == 1
+    assert validate_scope(package_path=package)["formal_evaluation_count"] == 2

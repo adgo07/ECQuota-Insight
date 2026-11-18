@@ -22,6 +22,7 @@ from .message_box import ChineseMessageButtons
 from .record_table import RecordTable, StandardTable, HomeRecentTable
 from .wheel_safe_combo import WheelSafeComboBox
 from .gb16780_form import CementForm
+from .gb21342_form import CokeForm
 from .cement_presentation import result_html as cement_result_html
 from uebench.application.gb16780 import IncompleteCementEvaluationError
 from uebench.domain.gb16780 import adopted as cement_rule_adopted
@@ -359,6 +360,7 @@ STANDARD_SCOPE_TEXTS: dict[str, str] = {
     GB29446_STANDARD_ID: (
         "适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，以及新建和改扩建企业的电力单耗控制。"
     ),
+    "gb-21342-2025": "适用于常规焦炉生产企业焦炭单位产品能耗的计算、考核及新建、改扩建项目的能耗控制。",
 }
 
 #: GB 29446 统计范围已确认文本（标准第5.1条），只用于「新建评价」的「统计范围说明」。
@@ -804,7 +806,8 @@ class MainWindow(QMainWindow):
         self.eval_standard = QComboBox()
         self.eval_standard.setEditable(True)
         self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.eval_standard.setPlaceholderText("输入标准编号或名称后选择")
+        self.eval_standard.setAccessibleName("对标标准")
+        self.eval_standard.setPlaceholderText("选择对标标准")
         # 下拉框必须能完整显示“标准编号 + 标准名称”，否则用户无法确认自己选的是哪一项。
         self.eval_standard.setMinimumWidth(420)
         self.eval_standard.setMinimumContentsLength(34)
@@ -939,13 +942,18 @@ class MainWindow(QMainWindow):
         self.gb29446_notes.setParent(self.gb29446_form_container)
         self.gb29446_notes.setVisible(False)
 
-        self.eval_standard.setParent(page)
+        page_layout.insertWidget(2, self.eval_standard)
         self.eval_standard.hide()
         form_layout.addWidget(self.generic_form_container)
         form_layout.addWidget(self.gb29446_form_container)
         self.cement_form = CementForm()
         self.cement_form.changed.connect(self._cement_inputs_changed)
         form_layout.addWidget(self.cement_form)
+        self.coke_form = CokeForm()
+        self.coke_form.changed.connect(self._coke_inputs_changed)
+        self.coke_form.view_record.clicked.connect(lambda: self.view_record(self.last_result_id) if self.last_result_id else None)
+        self.coke_form.export_word.clicked.connect(self.export_latest_word_report)
+        form_layout.addWidget(self.coke_form)
         # 规则数据不完整/版本不兼容时的显式中文提示；正常 r2 规则下始终隐藏。
         self.gb29446_incompatibility_message = QLabel(GB29446_RULE_INCOMPATIBLE_MESSAGE)
         self.gb29446_incompatibility_message.setObjectName("gb29446RuleIncompatibleMessage")
@@ -1362,11 +1370,22 @@ class MainWindow(QMainWindow):
             if self._is_gb16780():
                 self.calculate_button.setEnabled(self.calculate_button.isEnabled()
                     and cement_rule_adopted(self.current_standard) and self.last_result_id is None)
+            if self._is_gb21342():
+                from uebench.application.coke_records import is_adopted_snapshot
+                adopted = is_adopted_snapshot(self.current_standard)
+                self.calculate_button.setEnabled(self.calculate_button.isEnabled() and adopted and self.last_result_id is None)
+                if not adopted:
+                    self.coke_form.notice.setText("配套焦炭规则尚未采用新计算链，请等待完整配套版本。")
             self._sync_evaluation_actions()
 
     def _sync_evaluation_actions(self) -> None:
         """保存后的主要动作是查看；重算仍调用原正式用例，明确生成新记录。"""
         busy = getattr(self, "_calculating", False)
+        if self._is_gb21342():
+            self.calculation_save_notice.setVisible(True)
+            self.calculation_save_notice.setText("最高等级可确定时自动生成一条对标记录")
+            self.calculate_button.setText("正在计算…" if busy else "已生成记录" if self.last_result_id else "计算并判级")
+            return
         if self._is_gb16780():
             self.calculation_save_notice.setVisible(True)
             self.calculation_save_notice.setText("全部适用指标完整时自动生成一条对标记录")
@@ -1553,11 +1572,23 @@ class MainWindow(QMainWindow):
         state = next((self.standard_table.item(row, 2).text() for row in range(self.standard_table.rowCount())
                       if self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole) == standard.id), "")
         self.standard_metadata.setText(f"标准编号：{standard.number}\n标准名称：{standard.title}\n标准状态：{state}\n实施日期：{format_local_date(standard.effective_date)}")
-        self.standard_requirements_notice.setText(
-            "选煤电力单耗三级上限如下。统计范围：" + _gb29446_statistics_scope_text()
-            if supports_formal_evaluation(standard.id)
-            else "软件接入及验收尚未完成，暂不展示未经确认的限值明细。"
-        )
+        supported = supports_formal_evaluation(standard.id)
+        coke_bases = {}
+        if standard.id == "gb-21342-2025":
+            from uebench.application.coke_records import PRODUCTS, is_adopted_snapshot
+            from uebench.domain.coke_rules import parse_rule_parameters
+
+            if is_adopted_snapshot(standard):
+                coke_bases = parse_rule_parameters(standard.coke_rule_parameters).assessment["ovens"]
+            requirements = (
+                "表1基本限值。焦炉条件和原料参数的修正按第5.3条计算。"
+                if coke_bases else "本机缺少配套焦炭规则，请安装完整的新版本。"
+            )
+        elif standard.id == GB29446_STANDARD_ID:
+            requirements = "选煤电力单耗三级上限如下。统计范围：" + _gb29446_statistics_scope_text()
+        else:
+            requirements = "软件接入及验收尚未完成，暂不展示未经确认的限值明细。"
+        self.standard_requirements_notice.setText(requirements)
         # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
         self.standard_detail_label.setText(standard_scope_line(standard.id))
         self.standard_confirmation_label.setText(standard_confirmation_message(standard.id))
@@ -1568,10 +1599,8 @@ class MainWindow(QMainWindow):
             OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL
         )
         # 未纳入正式评价范围的标准不提供可执行的评价入口。
-        supported = supports_formal_evaluation(standard.id)
-        # 旧规则可能尚未按批准映射重新验收；清空后只为正式支持的标准重建限值。
-        # 切换标准时不会把上一条标准的旧限值留在隐藏表格中。
-        self.standard_indicator_table.setVisible(supported)
+        show_limits = supported and (standard.id != "gb-21342-2025" or bool(coke_bases))
+        self.standard_indicator_table.setVisible(show_limits)
         self.standard_evaluate_button.setEnabled(supported)
         self.standard_evaluate_button.setToolTip(
             "用该标准发起正式评价。"
@@ -1585,26 +1614,30 @@ class MainWindow(QMainWindow):
             return expression.value if expression.op == "constant" else "公式/条件"
 
         requirement_basis = []
-        if supported:
+        if show_limits:
             for product in standard.products:
                 for indicator in product.indicators:
-                    base = indicator.base_thresholds or indicator.thresholds
+                    if coke_bases:
+                        oven = next(oven for oven, product_id in PRODUCTS.items() if product_id == product.id)
+                        limits = coke_bases[oven]["bases"]
+                    else:
+                        base = indicator.base_thresholds or indicator.thresholds
+                        limits = [limit_value(base.level_1), limit_value(base.level_2), limit_value(base.level_3)]
                     # 「适用条件/说明」不再出现在普通标准库里：条件与内部备注代码都不再展示。
                     values = [
                         product.selection_values.get("coal_type", product.name),
                         indicator.name,
                         indicator.unit,
-                        limit_value(base.level_1),
-                        limit_value(base.level_2),
-                        limit_value(base.level_3),
+                        *limits,
                     ]
                     detail_row = self.standard_indicator_table.rowCount()
                     self.standard_indicator_table.insertRow(detail_row)
                     for column, value in enumerate(values):
                         self.standard_indicator_table.setItem(detail_row, column, _item(value))
-                    for line in self._gb29446_basis_for_display(indicator).splitlines():
-                        if line.startswith("等级依据："):
-                            requirement_basis.append(f"{values[0]}：{line}")
+                    if standard.id == GB29446_STANDARD_ID:
+                        for line in self._gb29446_basis_for_display(indicator).splitlines():
+                            if line.startswith("等级依据："):
+                                requirement_basis.append(f"{values[0]}：{line}")
         self.standard_requirements_basis.setText("\n".join(dict.fromkeys(requirement_basis)))
         self.standard_requirements_basis.setVisible(bool(requirement_basis))
         self.standard_indicator_table.setFixedHeight(
@@ -1630,7 +1663,8 @@ class MainWindow(QMainWindow):
     def _formally_evaluable_standards(self) -> list[StandardDefinition]:
         """当前选择方式下**可以正式评价**的标准（正式评价范围注册表决定）。"""
 
-        return filter_formally_evaluable(self._standards_for_selection())
+        standards = filter_formally_evaluable(self._standards_for_selection())
+        return sorted(standards, key=lambda item: item.id != GB29446_STANDARD_ID)
 
     def _formal_scope_hint(self) -> str:
         """用于说明“为什么只有这些标准可选”的中文提示（来自注册表，不写死编号）。"""
@@ -1661,6 +1695,10 @@ class MainWindow(QMainWindow):
             # the first standard in the newly selected version scope.
             self.eval_standard.setCurrentIndex(0)
         self.eval_standard.blockSignals(False)
+        multiple_standards = self.eval_standard.count() > 1
+        self.eval_standard.setVisible(multiple_standards)
+        self.eval_standard.setEnabled(multiple_standards)
+        self.eval_standard_summary.setVisible(not multiple_standards)
         self.eval_standard.setToolTip(self._formal_scope_hint())
         self._standard_changed()
 
@@ -1813,6 +1851,28 @@ class MainWindow(QMainWindow):
     def _is_gb16780(self) -> bool:
         return self.current_standard is not None and self.current_standard.id == "gb-16780-2021"
 
+    def _is_gb21342(self) -> bool:
+        return self.current_standard is not None and self.current_standard.id == "gb-21342-2025"
+
+    def _coke_inputs_changed(self):
+        if not self._is_gb21342():
+            return
+        self.last_result_id = None
+        self._coke_saved_request = None
+        self.coke_form.output.clear()
+        self.coke_form.details.clear()
+        self.coke_form.notice.setText("数据已修改，请重新计算；尚未生成新记录。")
+        self.coke_form.view_record.setEnabled(False)
+        self.coke_form.export_word.setEnabled(False)
+        oven = self.coke_form.choices["oven_type"].currentData()
+        from uebench.application.coke_records import PRODUCTS
+        index = self.eval_product.findData(PRODUCTS.get(oven))
+        if index >= 0:
+            self.eval_product.blockSignals(True)
+            self.eval_product.setCurrentIndex(index)
+            self.eval_product.blockSignals(False)
+        self.refresh_formal_evaluation_readiness()
+
     def _cement_inputs_changed(self):
         if not self._is_gb16780():
             return
@@ -1904,12 +1964,14 @@ class MainWindow(QMainWindow):
     def _set_evaluation_view(self) -> None:
         is_gb29446 = self._is_gb29446()
         is_cement = self._is_gb16780()
-        self.generic_form_container.setVisible(not is_gb29446 and not is_cement)
+        is_coke = self._is_gb21342()
+        self.coke_form.setVisible(is_coke)
+        self.generic_form_container.setVisible(not is_gb29446 and not is_cement and not is_coke)
         self.gb29446_form_container.setVisible(is_gb29446)
         self.cement_form.setVisible(is_cement)
         self.cement_result_section.setVisible(is_cement)
-        self.input_controls_container.setVisible(not is_gb29446 and not is_cement)
-        self.generic_result_section.setVisible(not is_gb29446 and not is_cement)
+        self.input_controls_container.setVisible(not is_gb29446 and not is_cement and not is_coke)
+        self.generic_result_section.setVisible(not is_gb29446 and not is_cement and not is_coke)
         self.gb29446_result_section.setVisible(is_gb29446)
         self.gb29446_explanation_section.hide()
         self.gb29446_basis_section.hide()
@@ -1925,7 +1987,7 @@ class MainWindow(QMainWindow):
             button.setToolTip(url or NO_OFFICIAL_SOURCE_LABEL)
         status = getattr(self, "eval_official_status", None)
         if status is not None:
-            platform = "国家标准全文公开系统" if standard_id == "gb-16780-2021" else OFFICIAL_SOURCE_PLATFORM_NAME
+            platform = "国家标准全文公开系统" if (url or "").startswith("https://openstd.samr.gov.cn/") else OFFICIAL_SOURCE_PLATFORM_NAME
             status.setText(platform if url else NO_OFFICIAL_SOURCE_LABEL)
         support = getattr(self, "eval_support_label", None)
         if support is not None:
@@ -2081,6 +2143,9 @@ class MainWindow(QMainWindow):
         self._rebuild_selection_widgets()
         self._set_evaluation_view()
         self._apply_gb29446_rule_compatibility()
+        if self._is_gb21342():
+            self._coke_inputs_changed()
+            return
         if self._is_gb16780():
             self._cement_inputs_changed()
             if not cement_rule_adopted(self.current_standard):
@@ -2106,6 +2171,12 @@ class MainWindow(QMainWindow):
         self.refresh_formal_evaluation_readiness()
 
     def _product_changed(self) -> None:
+        if self._is_gb21342():
+            from uebench.application.coke_records import PRODUCTS
+            oven = next((key for key, product in PRODUCTS.items() if product == self.eval_product.currentData()), None)
+            combo = self.coke_form.choices["oven_type"]
+            combo.setCurrentIndex(combo.findData(oven))
+            return
         self._refresh_input_table()
 
     def _set_input_mode(self, mode: InputMode) -> None:
@@ -2210,6 +2281,8 @@ class MainWindow(QMainWindow):
             raise ValueError("没有可用标准")
         if self._is_gb29446():
             return self._collect_gb29446_request()
+        if self._is_gb21342():
+            return self.coke_form.collect_request(self._selection_mode())
         if self._is_gb16780():
             return self.cement_form.collect(self._selection_mode())
         product = self._selected_product()
@@ -2416,6 +2489,9 @@ class MainWindow(QMainWindow):
             self.refresh_formal_evaluation_readiness()
 
     def _calculate_evaluation(self, request: EvaluationRequest | None) -> None:
+        if (request is not None and request.standard_id == "gb-21342-2025") or (request is None and self._is_gb21342()):
+            self._calculate_coke(request)
+            return
         if (request is not None and request.standard_id == "gb-16780-2021") or (request is None and self._is_gb16780()):
             self._calculate_cement(request)
             return
@@ -2555,6 +2631,51 @@ class MainWindow(QMainWindow):
             self.mark_records_dirty()
         message = "预览完成：尚未实施标准仅供参考，未保存正式评价记录。" if is_preview else "单项判级已完成并保存。"
         QMessageBox.information(self, "预览完成" if is_preview else "计算完成", message)
+
+    def _calculate_coke(self, request=None):
+        from uebench.application.coke_records import IncompleteCokeEvaluationError, CokeRecordSaveError
+        form = self.coke_form
+        try:
+            request = request or form.collect_request(self._selection_mode())
+            fingerprint = request.model_dump_json()
+            if self.last_result_id and getattr(self, "_coke_saved_request", None) == fingerprint:
+                return
+            self.last_result_id = None
+            form.view_record.setEnabled(False)
+            form.export_word.setEnabled(False)
+            result = self.context.application.evaluate(request)
+        except IncompleteCokeEvaluationError as exc:
+            form.display_saved_result(exc.preview_result)
+            form.notice.setText("预览完成，待确定或不适用，尚未生成记录。" + str(exc))
+            return
+        except CokeRecordSaveError as exc:
+            _LOGGER.exception("焦炭记录保存失败，保留本次计算预览")
+            form.display_saved_result(exc.preview_result)
+            form.notice.setText("保存失败，未生成记录，可重试。")
+            self.evaluation_scroll.ensureWidgetVisible(form.notice)
+            return
+        except (ValueError, TypeError, LookupError) as exc:
+            form.output.clear()
+            form.details.clear()
+            form.notice.setText("未生成记录：" + str(exc))
+            target = form.locate_error(str(exc))
+            self.evaluation_scroll.ensureWidgetVisible(target if target is not None else form.notice)
+            return
+        except Exception:
+            _LOGGER.exception("焦炭计算或保存失败")
+            form.output.clear()
+            form.details.clear()
+            form.notice.setText("计算或保存失败，尚未生成记录，请重试。")
+            return
+        form.display_saved_result(result)
+        self.last_result_id = result.evaluation_id
+        self._coke_saved_request = fingerprint
+        form.view_record.setEnabled(True)
+        form.export_word.setEnabled(True)
+        form.notice.setText("最高等级已确定，已生成一条对标记录。")
+        self.mark_records_dirty()
+        self.refresh_home()
+        self.evaluation_scroll.ensureWidgetVisible(form.notice)
 
     def _calculate_cement(self, request=None):
         try:
@@ -2783,7 +2904,7 @@ class MainWindow(QMainWindow):
             else:
                 view = None
                 reason = "该标准尚未开放 Word 报告。"
-                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021"}:
+                if loaded[1].standard_id in {GB29446_STANDARD_ID, "gb-16780-2021", "gb-21342-2025"}:
                     try:
                         view = self.context.application.get_report_view(evaluation_id)
                         reason = ""
@@ -2976,8 +3097,9 @@ class MainWindow(QMainWindow):
 
     def export_word_record(self, evaluation_id: str) -> None:
         loaded = self.context.application.get_evaluation(evaluation_id)
-        filename = ("水泥分线能耗等级评价报告.docx" if loaded and loaded[1].standard_id == "gb-16780-2021"
-                    else "选煤电力单耗等级评价报告.docx")
+        filename = {"gb-16780-2021": "水泥分线能耗等级评价报告.docx",
+                    "gb-21342-2025": "焦炭能耗对标报告.docx"}.get(
+                        loaded[1].standard_id if loaded else "", "选煤电力单耗等级评价报告.docx")
         path, _ = QFileDialog.getSaveFileName(
             self, "导出Word报告", filename, "Word文档 (*.docx)"
         )
@@ -3202,13 +3324,14 @@ class MainWindow(QMainWindow):
     def start_formal_evaluation(self) -> None:
         """首页「开始正式评价」：进入新建评价并选中正式评价范围内的标准。"""
 
-        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        evaluable = self._formally_evaluable_standards()
         if not evaluable:
             QMessageBox.information(
                 self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
             )
             return
-        self.open_evaluation_for_standard(evaluable[0].id)
+        current_id = self.eval_standard.currentData()
+        self.open_evaluation_for_standard(current_id or evaluable[0].id)
 
     def start_evaluation_for_selected_standard(self) -> None:
         """标准库「用该标准新建评价」：只有正式评价范围内的标准可用。"""

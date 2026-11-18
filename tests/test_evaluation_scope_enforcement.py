@@ -167,10 +167,10 @@ def test_published_package_really_installs_one_in_scope_and_one_out_of_scope_sta
     assert unsupported.publication_status.value == "published"
     assert supported.publication_status.value == "published"
 
-    # 这正是缺陷的形态：两个都已发布、都已安装，但只有一个在软件正式评价范围内。
+    # 这正是缺陷的形态：两个都已发布、都已安装，但水泥仍在软件正式评价范围外。
     assert supports_formal_evaluation(UNSUPPORTED_ID) is False
     assert supports_formal_evaluation(SUPPORTED_ID) is True
-    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({SUPPORTED_ID})
+    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({SUPPORTED_ID, "gb-21342-2025"})
     assert UNSUPPORTED_ID not in SUPPORTED_EVALUATION_STANDARD_IDS
 
 
@@ -223,7 +223,7 @@ def test_direct_evaluation_service_refuses_without_any_ui(context) -> None:
 def test_every_installed_standard_outside_the_registry_is_refused(context) -> None:
     """穷举真实标准包里**每一个**范围外已安装标准，逐个断言拒绝。
 
-    这条才是缺陷的完整形态：不是“gb-16780-2021 恰好被挡住”，而是“除注册表里的那一个
+    这条才是缺陷的完整形态：不是“gb-16780-2021 恰好被挡住”，而是“除注册表中明确登记的标准
     之外，任何已安装标准都拿不到正式记录”。输入与产品故意全部照搬一个合法请求，这样
     唯一可能解释拒绝的就只有范围本身。
     """
