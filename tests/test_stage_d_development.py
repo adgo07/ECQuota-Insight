@@ -6,7 +6,7 @@ from uebench.application.evaluation_support import SUPPORTED_EVALUATION_STANDARD
 
 
 def test_scope_is_unchanged_and_candidate_is_r3():
-    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019"})
+    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019", "gb-21342-2025"})
     assert not supports_formal_evaluation("gb-16780-2021")
     assert candidate_definition().rule_revision == 3
 

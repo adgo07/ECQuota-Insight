@@ -360,6 +360,7 @@ STANDARD_SCOPE_TEXTS: dict[str, str] = {
     GB29446_STANDARD_ID: (
         "适用于煤炭行业煤炭洗选过程选煤电力单耗的计算、考核，以及新建和改扩建企业的电力单耗控制。"
     ),
+    "gb-21342-2025": "适用于常规焦炉生产企业焦炭单位产品能耗的计算、考核及新建、改扩建项目的能耗控制。",
 }
 
 #: GB 29446 统计范围已确认文本（标准第5.1条），只用于「新建评价」的「统计范围说明」。
@@ -805,7 +806,8 @@ class MainWindow(QMainWindow):
         self.eval_standard = QComboBox()
         self.eval_standard.setEditable(True)
         self.eval_standard.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.eval_standard.setPlaceholderText("输入标准编号或名称后选择")
+        self.eval_standard.setAccessibleName("对标标准")
+        self.eval_standard.setPlaceholderText("选择对标标准")
         # 下拉框必须能完整显示“标准编号 + 标准名称”，否则用户无法确认自己选的是哪一项。
         self.eval_standard.setMinimumWidth(420)
         self.eval_standard.setMinimumContentsLength(34)
@@ -940,7 +942,7 @@ class MainWindow(QMainWindow):
         self.gb29446_notes.setParent(self.gb29446_form_container)
         self.gb29446_notes.setVisible(False)
 
-        self.eval_standard.setParent(page)
+        page_layout.insertWidget(2, self.eval_standard)
         self.eval_standard.hide()
         form_layout.addWidget(self.generic_form_container)
         form_layout.addWidget(self.gb29446_form_container)
@@ -1570,11 +1572,23 @@ class MainWindow(QMainWindow):
         state = next((self.standard_table.item(row, 2).text() for row in range(self.standard_table.rowCount())
                       if self.standard_table.item(row, 0).data(Qt.ItemDataRole.UserRole) == standard.id), "")
         self.standard_metadata.setText(f"标准编号：{standard.number}\n标准名称：{standard.title}\n标准状态：{state}\n实施日期：{format_local_date(standard.effective_date)}")
-        self.standard_requirements_notice.setText(
-            "选煤电力单耗三级上限如下。统计范围：" + _gb29446_statistics_scope_text()
-            if supports_formal_evaluation(standard.id)
-            else "软件接入及验收尚未完成，暂不展示未经确认的限值明细。"
-        )
+        supported = supports_formal_evaluation(standard.id)
+        coke_bases = {}
+        if standard.id == "gb-21342-2025":
+            from uebench.application.coke_records import PRODUCTS, is_adopted_snapshot
+            from uebench.domain.coke_rules import parse_rule_parameters
+
+            if is_adopted_snapshot(standard):
+                coke_bases = parse_rule_parameters(standard.coke_rule_parameters).assessment["ovens"]
+            requirements = (
+                "表1基本限值。焦炉条件和原料参数的修正按第5.3条计算。"
+                if coke_bases else "本机缺少配套焦炭规则，请安装完整的新版本。"
+            )
+        elif standard.id == GB29446_STANDARD_ID:
+            requirements = "选煤电力单耗三级上限如下。统计范围：" + _gb29446_statistics_scope_text()
+        else:
+            requirements = "软件接入及验收尚未完成，暂不展示未经确认的限值明细。"
+        self.standard_requirements_notice.setText(requirements)
         # 选中标准后只有一行：所有标准共用同一个「适用范围」字段与位置。
         self.standard_detail_label.setText(standard_scope_line(standard.id))
         self.standard_confirmation_label.setText(standard_confirmation_message(standard.id))
@@ -1585,10 +1599,8 @@ class MainWindow(QMainWindow):
             OFFICIAL_SOURCE_PLATFORM_NAME if official_url else NO_OFFICIAL_SOURCE_LABEL
         )
         # 未纳入正式评价范围的标准不提供可执行的评价入口。
-        supported = supports_formal_evaluation(standard.id)
-        # 旧规则可能尚未按批准映射重新验收；清空后只为正式支持的标准重建限值。
-        # 切换标准时不会把上一条标准的旧限值留在隐藏表格中。
-        self.standard_indicator_table.setVisible(supported)
+        show_limits = supported and (standard.id != "gb-21342-2025" or bool(coke_bases))
+        self.standard_indicator_table.setVisible(show_limits)
         self.standard_evaluate_button.setEnabled(supported)
         self.standard_evaluate_button.setToolTip(
             "用该标准发起正式评价。"
@@ -1602,26 +1614,30 @@ class MainWindow(QMainWindow):
             return expression.value if expression.op == "constant" else "公式/条件"
 
         requirement_basis = []
-        if supported:
+        if show_limits:
             for product in standard.products:
                 for indicator in product.indicators:
-                    base = indicator.base_thresholds or indicator.thresholds
+                    if coke_bases:
+                        oven = next(oven for oven, product_id in PRODUCTS.items() if product_id == product.id)
+                        limits = coke_bases[oven]["bases"]
+                    else:
+                        base = indicator.base_thresholds or indicator.thresholds
+                        limits = [limit_value(base.level_1), limit_value(base.level_2), limit_value(base.level_3)]
                     # 「适用条件/说明」不再出现在普通标准库里：条件与内部备注代码都不再展示。
                     values = [
                         product.selection_values.get("coal_type", product.name),
                         indicator.name,
                         indicator.unit,
-                        limit_value(base.level_1),
-                        limit_value(base.level_2),
-                        limit_value(base.level_3),
+                        *limits,
                     ]
                     detail_row = self.standard_indicator_table.rowCount()
                     self.standard_indicator_table.insertRow(detail_row)
                     for column, value in enumerate(values):
                         self.standard_indicator_table.setItem(detail_row, column, _item(value))
-                    for line in self._gb29446_basis_for_display(indicator).splitlines():
-                        if line.startswith("等级依据："):
-                            requirement_basis.append(f"{values[0]}：{line}")
+                    if standard.id == GB29446_STANDARD_ID:
+                        for line in self._gb29446_basis_for_display(indicator).splitlines():
+                            if line.startswith("等级依据："):
+                                requirement_basis.append(f"{values[0]}：{line}")
         self.standard_requirements_basis.setText("\n".join(dict.fromkeys(requirement_basis)))
         self.standard_requirements_basis.setVisible(bool(requirement_basis))
         self.standard_indicator_table.setFixedHeight(
@@ -1647,7 +1663,8 @@ class MainWindow(QMainWindow):
     def _formally_evaluable_standards(self) -> list[StandardDefinition]:
         """当前选择方式下**可以正式评价**的标准（正式评价范围注册表决定）。"""
 
-        return filter_formally_evaluable(self._standards_for_selection())
+        standards = filter_formally_evaluable(self._standards_for_selection())
+        return sorted(standards, key=lambda item: item.id != GB29446_STANDARD_ID)
 
     def _formal_scope_hint(self) -> str:
         """用于说明“为什么只有这些标准可选”的中文提示（来自注册表，不写死编号）。"""
@@ -1678,6 +1695,9 @@ class MainWindow(QMainWindow):
             # the first standard in the newly selected version scope.
             self.eval_standard.setCurrentIndex(0)
         self.eval_standard.blockSignals(False)
+        multiple_standards = self.eval_standard.count() > 1
+        self.eval_standard.setVisible(multiple_standards)
+        self.eval_standard_summary.setVisible(not multiple_standards)
         self.eval_standard.setToolTip(self._formal_scope_hint())
         self._standard_changed()
 
@@ -3303,13 +3323,14 @@ class MainWindow(QMainWindow):
     def start_formal_evaluation(self) -> None:
         """首页「开始正式评价」：进入新建评价并选中正式评价范围内的标准。"""
 
-        evaluable = filter_formally_evaluable(self.context.application.list_library_standards())
+        evaluable = self._formally_evaluable_standards()
         if not evaluable:
             QMessageBox.information(
                 self, "暂无可正式评价的标准", "本机标准库中没有已纳入正式评价范围的标准，请安装完整的新版本。"
             )
             return
-        self.open_evaluation_for_standard(evaluable[0].id)
+        current_id = self.eval_standard.currentData()
+        self.open_evaluation_for_standard(current_id or evaluable[0].id)
 
     def start_evaluation_for_selected_standard(self) -> None:
         """标准库「用该标准新建评价」：只有正式评价范围内的标准可用。"""

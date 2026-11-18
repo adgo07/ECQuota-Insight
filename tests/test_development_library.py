@@ -24,7 +24,7 @@ def test_unified_development_library_index_is_complete() -> None:
     assert sum(item["scope"] == "bundled" for item in entries) == 48
     assert sum(item["scope"] == "draft" for item in entries) == 16
     assert payload["canonical_source"] == "data/definitions"
-    assert payload["formal_evaluation_standard_ids"] == ["gb-29446-2019"]
+    assert payload["formal_evaluation_standard_ids"] == ["gb-29446-2019", "gb-21342-2025"]
     assert payload["comparison_snapshots"] == ["standards/development/scope-63", "standards/development/scope-65"]
 
 

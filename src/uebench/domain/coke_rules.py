@@ -1,4 +1,4 @@
-"""焦炭已核验的未发布规则参数；不是映射批准或正式发布声明。"""
+"""GB 21342—2025 V1.1 的焦炭规则参数与版本校验。"""
 from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
@@ -10,7 +10,7 @@ ASSESSMENT_CALCULATOR_VERSION = "gb21342-assessment-parameterized-v2"
 ASSESSMENT_RULE_REVISION = "gb21342-table1-table2-parameterized-v2"
 ASSESSMENT_NUMERIC_BEHAVIOR_VERSION = "gb21342-highest-grade-full-value-v1"
 
-# 本模块是开发默认参数的唯一声明；规则快照完整承载其JSON副本。
+# 此处固定本版本的校验基准；正式计算读取配套规则快照。
 _ASSESSMENT = {
     "external_adjustment": "26",
     "age_boundaries": ["15", "25"], "age_corrections": ["0", "2.50", "5.50"],

@@ -2,10 +2,7 @@
 
 A standard that is *installed in the library* is not the same thing as a standard
 whose evaluation the software *formally supports*.  For the 0.2.0 Windows desktop
-release the owner decision is that exactly one standard is inside the formal
-evaluation scope:
-
-    GB 29446-2019《选煤电力消耗限额》 -> ``gb-29446-2019``
+release candidate scope includes GB 29446-2019 and GB 21342-2025.
 
 Every other installed standard may still be browsed, inspected and cited, but the
 software does not claim a verified formal evaluation capability for it and must
@@ -54,8 +51,7 @@ __all__ = [
 
 
 #: Canonical ids of the standards this software formally supports evaluating.
-#: 0.2.0: GB 29446-2019 only.  See the module docstring before widening this.
-SUPPORTED_EVALUATION_STANDARD_IDS: frozenset[str] = frozenset({"gb-29446-2019"})
+SUPPORTED_EVALUATION_STANDARD_IDS: frozenset[str] = frozenset({"gb-29446-2019", "gb-21342-2025"})
 
 
 #: User-facing Chinese labels.  They are constants, not computed strings, so the
@@ -77,6 +73,12 @@ class MappingConfirmation:
 # Only approved mapping evidence belongs here. An absent id is pending review;
 # installed legacy rule data must never be promoted into approval evidence.
 _MAPPING_CONFIRMATIONS = MappingProxyType({
+    "gb-21342-2025": MappingConfirmation(
+        confirmed=True,
+        version="V1.1 已批准版",
+        approved_on="2026-11-18",
+        source="standards/mappings/GB21342-2025/标准映射表_V1.1_审核稿.md",
+    ),
     "gb-29446-2019": MappingConfirmation(
         confirmed=True,
         version="2026-10-18 已批准版",
@@ -137,6 +139,8 @@ def standard_confirmation_message(standard_id: str | StandardDefinition) -> str:
     if not mapping.confirmed:
         return "业务映射待整理确认；旧规则未作为已验收依据。产品/工序、指标、单位及限值明细暂不展示。"
     mapping_part = f"业务映射已确认（{mapping.version}，{mapping.approved_on}）。"
+    if _standard_id_of(standard_id) == "gb-21342-2025":
+        return mapping_part + "配套规则提供顶装和捣固常规焦炉的能耗计算与最高等级判定。"
     if supports_formal_evaluation(standard_id):
         return mapping_part + "当前已实现的业务核算能力已通过验收；软件交付与环境验收尚未全部完成。"
     return mapping_part + "软件接入及验收待完成。产品/工序、指标、单位及限值明细暂不展示。"

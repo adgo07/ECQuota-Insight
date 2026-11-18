@@ -93,18 +93,12 @@ def test_malformed_payload_is_readable_error(payload):
 
 def test_sql_readback_report_no_recalculate_and_rollback(tmp_path, monkeypatch):
     from uebench.bootstrap import create_context
-    from uebench.application import evaluation_support
     from uebench.application import coke_records
     from uebench.application.reporting import build_report_view
     from uebench.infrastructure.database import EvaluationRow
     request,snapshot = sample()
     context = create_context(tmp_path / "isolated")
     context.standards.install(snapshot)
-    # 生产范围必须先拒绝，尚无保存。
-    with pytest.raises(ValueError,match="正式评价记录"):
-        context.application.evaluate(request)
-    assert context.evaluations.count() == 0
-    monkeypatch.setattr(evaluation_support,"SUPPORTED_EVALUATION_STANDARD_IDS",frozenset({"gb-29446-2019","gb-21342-2025"}))
     result = context.application.evaluate(request)
     assert context.evaluations.count() == 1
     with context.database.session() as session:

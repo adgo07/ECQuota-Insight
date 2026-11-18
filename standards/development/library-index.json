@@ -12,7 +12,8 @@
   "bundled_standard_count": 48,
   "draft_standard_count": 16,
   "formal_evaluation_standard_ids": [
-    "gb-29446-2019"
+    "gb-29446-2019",
+    "gb-21342-2025"
   ],
   "standard_count": 64,
   "standards": [
@@ -113,12 +114,12 @@
       "title": "焦炭单位产品能源消耗限额",
       "version": "2025",
       "standard_family_id": "GB 21342",
-      "rule_revision": 1,
+      "rule_revision": 2,
       "publication_status": "published",
       "lifecycle_status": "active",
       "scope": "bundled",
       "definition_path": "data/definitions/gb-21342-2025.json",
-      "definition_sha256": "b12f3c930b795419ee9ec0a4ea5e970c0c475be0a90e8ff6af7ac247fc221457"
+      "definition_sha256": "60e6a11a6416a6f6a2bcb018c5ac5f0dd00bfc91cfdf8f81fe5c3bf052f2adc7"
     },
     {
       "number": "GB 21343-2023",

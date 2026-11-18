@@ -14,8 +14,8 @@ History, compressed:
 
 The signed 2026.10-published.4 fixture is the exact package from Git commit
 ``a230f806ec4fcfd384a25bb7bea239a9c38623f3`` (SHA256 below). It is
-reference-only test evidence, never an installer or release input. The current
-2026.10-published.5 package changes only the GB29446 r2 definition to r3.
+reference-only test evidence, never an installer or release input. Version 2026.10-published.5 changed GB29446 r2 to r3.
+The current package changes GB21342 r1 to r2.
 """
 
 from __future__ import annotations
@@ -43,8 +43,10 @@ PIN = PACKAGE_DIR / "PIN.json"
 GHOST = "signature.ed25519"
 STRUCTURAL = {"manifest.json", GHOST}
 TARGET = "gb-29446-2019"
-PINNED_SHA256 = "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
+PINNED_SHA256 = "f649e085941b41e3c942c37038ab41d582797cf0473d49a26c860b1b9d609b2f"
 REVISION_PARENT_SHA256 = "023d5caf81dd6ba1ce41a5b5d8a59676db20dd98db510b6c4329600aa47e77ff"
+COKE_PARENT = REVISION_PARENT.with_name("2026.10-published.5.uebench")
+COKE_PARENT_SHA256 = "9547e8214124cd76e999c2949dcdcf45738282a56cc0d725df08cea2a49fa2b5"
 PARENT_SHA256 = "14db53be241bcaf41953fcd9a52e510c6762dad59e5c2ba541b866c10b2e32b0"
 
 ARCHIVE_UNAVAILABLE = (
@@ -226,8 +228,9 @@ def _parent_or_skip() -> Path:
 
 def test_revision_parent_is_the_signed_git_baseline() -> None:
     record = pin()
-    assert sha256_of(REVISION_PARENT) == record["parent_baseline"]["sha256"] == REVISION_PARENT_SHA256
-    assert REVISION_PARENT.stat().st_size == record["parent_baseline"]["size"]
+    assert sha256_of(REVISION_PARENT) == REVISION_PARENT_SHA256
+    assert sha256_of(COKE_PARENT) == record["parent_baseline"]["sha256"] == COKE_PARENT_SHA256
+    assert COKE_PARENT.stat().st_size == record["parent_baseline"]["size"]
     assert read_manifest(REVISION_PARENT)["data_version"] == "2026.10-published.4"
 
 
@@ -293,10 +296,10 @@ def test_only_sources_were_removed_from_the_parent_baseline() -> None:
     assert pinned_manifest["package_id"] != parent_manifest["package_id"]
 
 
-def test_current_revision_changes_only_gb29446_definition() -> None:
+def test_predecessor_changes_only_gb29446_definition() -> None:
     """The signed r3 package keeps the other 47 definitions byte-identical."""
     parent_defs = definitions_of(REVISION_PARENT)
-    current_defs = definitions_of(PINNED)
+    current_defs = definitions_of(COKE_PARENT)
     parent_target = [key for key in parent_defs if key[0] == TARGET]
     current_target = [key for key in current_defs if key[0] == TARGET]
     assert len(parent_defs) == len(current_defs) == 48
@@ -307,13 +310,22 @@ def test_current_revision_changes_only_gb29446_definition() -> None:
     for key in set(parent_defs) - {parent_target[0]}:
         assert parent_defs[key] == current_defs[key], key
     parent_members = content_members(REVISION_PARENT)
-    current_members = content_members(PINNED)
+    current_members = content_members(COKE_PARENT)
     assert set(parent_members) - set(current_members) == {parent_defs[parent_target[0]][0]}
     assert set(current_members) - set(parent_members) == {current_defs[current_target[0]][0]}
     for name in set(parent_members) & set(current_members):
         assert parent_members[name] == current_members[name], name
-    assert read_manifest(PINNED)["source_policy"] == "provenance-only"
-    assert read_manifest(PINNED)["data_version"] == "2026.10-published.5"
+    assert read_manifest(COKE_PARENT)["source_policy"] == "provenance-only"
+    assert read_manifest(COKE_PARENT)["data_version"] == "2026.10-published.5"
+
+
+def test_pinned_revision_changes_only_coke_and_keeps_signature():
+    from tools.build_gb29446_package_revision import verify_revision_package
+
+    report = verify_revision_package(COKE_PARENT, PINNED, target_standard_id="gb-21342-2025")
+    assert report["valid"], report["problems"]
+    assert report["target_rule_revision"] == 2
+    assert report["candidate_data_version"] == "2026.11-published.1"
 
 
 def test_pinned_data_version_sorts_after_the_retired_one() -> None:

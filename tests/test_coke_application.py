@@ -1,8 +1,9 @@
-"""完整主应用链；真实签包readiness及显式开发作用域，不改生产支持集。"""
+"""完整主应用链、真实签包启动对账以及独立开发入口。"""
 import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from pathlib import Path
 import tempfile
+from contextlib import contextmanager
 import pytest
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from uebench.application.evaluation_support import development_evaluation_scope, supports_formal_evaluation, SUPPORTED_EVALUATION_STANDARD_IDS
@@ -11,15 +12,35 @@ from uebench.ui.main_window import MainWindow
 from .test_coke_product import populate
 
 
+@contextmanager
+def application_context(root):
+    from uebench.bootstrap import create_context
+    from uebench.infrastructure.logging import close_logging
+    from uebench.application.self_check import locate_public_key
+    from uebench.main import reconcile_standard_package
+
+    context = create_context(root, public_key_path=locate_public_key(), enforce_standard_library_readiness=True)
+    try:
+        reconcile_standard_package(context)
+        context.package_reconciliation.require_formal_evaluation_ready()
+        yield context
+    finally:
+        context.database.dispose()
+        close_logging()
+
+
 @pytest.fixture
 def window(monkeypatch):
     app = QApplication.instance() or QApplication([])
     for name in ("warning", "critical", "information"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
     with tempfile.TemporaryDirectory(prefix="ecq-coke-ui-test-") as directory:
-        with isolated_coke_context(Path(directory)) as context:
+        with application_context(Path(directory)) as context:
             widget = MainWindow(context)
-            assert widget.open_evaluation_for_standard(STANDARD_ID)
+            assert widget.eval_standard.currentData() == "gb-29446-2019"
+            assert not widget.eval_standard.isHidden()
+            widget.eval_standard.setCurrentIndex(widget.eval_standard.findData(STANDARD_ID))
+            assert widget.current_standard.id == STANDARD_ID
             populate(widget.coke_form)
             widget.coke_form.fields["object_name"].setText("合成焦炭对象")
             widget.coke_form.fields["period"].setText("2026年10月")
@@ -34,7 +55,7 @@ def test_main_window_real_dispatch_single_save_history_and_word(window, monkeypa
     assert window.generic_form_container.isHidden() and window.cement_form.isHidden()
     assert not form.isHidden()
     assert window.context.application.formal_evaluation_block_message() is None
-    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019"})
+    assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019", STANDARD_ID})
     calls = []
     original = window.context.application.evaluate
     def spy(request):
@@ -121,13 +142,14 @@ def test_flow_mode_real_main_application_ignores_hidden_totals_and_syncs_oven(wi
 
 
 def test_development_scope_restores_after_exception_and_never_changes_formal_set():
-    assert not supports_formal_evaluation(STANDARD_ID)
+    cement_id = "gb-16780-2021"
+    assert not supports_formal_evaluation(cement_id)
     with pytest.raises(RuntimeError):
-        with development_evaluation_scope({STANDARD_ID}):
-            assert supports_formal_evaluation(STANDARD_ID)
-            assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019"})
+        with development_evaluation_scope({cement_id}):
+            assert supports_formal_evaluation(cement_id)
+            assert SUPPORTED_EVALUATION_STANDARD_IDS == frozenset({"gb-29446-2019", STANDARD_ID})
             raise RuntimeError("合成异常")
-    assert not supports_formal_evaluation(STANDARD_ID)
+    assert not supports_formal_evaluation(cement_id)
 
 
 def test_isolation_rejects_unmarked_and_user_data(monkeypatch):
@@ -239,9 +261,21 @@ def test_real_readiness_without_reconciliation_blocks_even_development_scope(mon
                 close_logging()
 
 
-def test_development_badge_official_source_and_short_unit_placeholder(window):
+
+def test_formal_service_requires_coke_payload(window):
+    request = window.coke_form.collect_request(window._selection_mode())
+    request.coke_payload = None
+    before = window.context.evaluations.count()
+    with pytest.raises(ValueError, match="焦炭输入载荷版本"):
+        window.context.application.evaluate(request)
+    assert window.context.evaluations.count() == before
+
+
+def test_formal_badge_official_source_and_short_unit_placeholder(window):
     from uebench.ui.presentation import software_support_text
-    assert window.eval_support_label.text() == "开发验收专用，尚未正式支持"
+    assert window.eval_support_label.text() == "正式支持"
+    with development_evaluation_scope({STANDARD_ID}):
+        assert software_support_text(STANDARD_ID) == "开发验收专用，尚未正式支持"
     assert software_support_text("gb-29446-2019") == "正式支持"
     assert software_support_text("gb-21340-2019") == "未开放"
     assert window.eval_standard_open.isEnabled()

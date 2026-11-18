@@ -89,8 +89,9 @@ def build_manifest(scope_root: Path, *, generated_at: str | None = None) -> dict
     formal = delivery.get("formal_evaluation_standard_ids")
     if not isinstance(bundled, list) or len(bundled) != 48 or len(set(bundled)) != 48:
         raise DevelopmentLibraryError("随包范围必须是明确的48项")
-    if formal != ["gb-29446-2019"] or formal[0] not in bundled:
-        raise DevelopmentLibraryError("正式评价范围必须且只能是GB29446—2019")
+    if (not isinstance(formal, list) or not formal
+            or len(formal) != len(set(formal)) or not set(formal) <= set(bundled)):
+        raise DevelopmentLibraryError("正式评价范围须是明确、无重复的随包定义子集")
 
     current_paths = sorted(scope_root.glob("*.json"))
     entries: list[dict[str, Any]] = []

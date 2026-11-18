@@ -114,7 +114,7 @@ class EvaluationService:
         return standard
 
     def _calculate(self, request: EvaluationRequest, standard: StandardDefinition) -> EvaluationResult:
-        if request.coke_payload is not None:
+        if request.standard_id == "gb-21342-2025" or request.coke_payload is not None:
             from .coke_records import calculate_record
 
             return calculate_record(request, standard)

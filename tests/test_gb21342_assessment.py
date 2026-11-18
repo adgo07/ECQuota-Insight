@@ -171,6 +171,7 @@ def test_facade_preview_is_read_only_thin_application_entry():
     assert facade.preview_coke(request())==preview_coke(request())
 
 
-def test_new_preview_does_not_open_formal_scope():
+def test_approved_coke_enters_formal_scope_without_enabling_cement():
     from uebench.application.evaluation_support import supports_formal_evaluation
-    assert not supports_formal_evaluation("gb-21342-2025")
+    assert supports_formal_evaluation("gb-21342-2025")
+    assert not supports_formal_evaluation("gb-16780-2021")

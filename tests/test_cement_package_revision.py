@@ -11,6 +11,7 @@ from uebench.infrastructure.packages import PackageManifest
 
 ROOT = Path(__file__).resolve().parents[1]
 REAL_PARENT = ROOT / "release/standard-packages/initial-standard-package-published.uebench"
+PREDECESSOR = ROOT / "tests/fixtures/standard-packages/2026.10-published.5.uebench"
 DEFINITION = ROOT / "standards/development/GB16780-2021/gb-16780-2021-r3-candidate.json"
 
 
@@ -26,7 +27,7 @@ def synthetic(tmp_path, monkeypatch):
     public = tmp_path / "SYNTHETIC-test-only-public.pem"
     public.write_bytes(key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo))
     monkeypatch.setattr(tool, "TRUSTED_PUBLIC_KEY_PATH", public)
-    raw, members = tool._read_package(REAL_PARENT)
+    raw, members = tool._read_package(PREDECESSOR)
     manifest = PackageManifest.model_validate_json(raw)
     manifest.package_id = "SYNTHETIC-test-only-parent"
     parent = tmp_path / "SYNTHETIC-test-only-parent.uebench"
@@ -125,7 +126,7 @@ def test_real_trust_root_with_missing_private_key_is_a_clear_blocker(tmp_path):
     output = tmp_path / "must-not-exist.uebench"
     with pytest.raises(SystemExit, match="缺少本地开发签名私钥"):
         tool.build_revision_package(REAL_PARENT, DEFINITION, tmp_path / "missing.pem", output,
-            data_version="2026.11-published.1", minimum_app_version="0.2.0", target_standard_id="gb-16780-2021")
+            data_version="2026.11-published.2", minimum_app_version="0.2.0", target_standard_id="gb-16780-2021")
     assert not output.exists()
     assert tool.TRUSTED_PUBLIC_KEY_PATH == ROOT / "src/uebench/resources/update_public_key.pem"
 

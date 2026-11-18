@@ -53,10 +53,10 @@ def isolated_coke_context(root):
         try:
             reconcile_standard_package(context)
             context.package_reconciliation.require_formal_evaluation_ready()
-            base = next((item for item in context.standards.list_by_id(STANDARD_ID) if item.rule_revision == 1), None)
-            if base is None:
+            installed = context.standards.get_published(STANDARD_ID)
+            if installed is None:
                 raise ValueError("配套标准包缺少焦炭定义")
-            snapshot = candidate_snapshot(base)
+            snapshot = candidate_snapshot(installed) if installed.rule_revision == 1 else installed
             if not is_adopted_snapshot(snapshot):
                 raise ValueError("焦炭内存候选身份无效")
             if context.standards.get_published(STANDARD_ID) != snapshot:

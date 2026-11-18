@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from tools import build_gb29446_package_revision as tool
 from uebench.application.coke_records import candidate_snapshot
 from uebench.domain.models import StandardDefinition
-from tests.test_cement_package_revision import synthetic, key_file, rewrite, REAL_PARENT, ROOT
+from tests.test_cement_package_revision import synthetic, key_file, rewrite, PREDECESSOR, ROOT
 
 
 @pytest.fixture
@@ -67,14 +67,14 @@ def test_wrong_key_and_missing_key_cannot_write(synthetic, definition, tmp_path)
 
 
 def test_real_trust_parent_dry_run_does_not_read_key_or_write(definition, tmp_path, monkeypatch):
-    before = tool._sha256_path(REAL_PARENT)
+    before = tool._sha256_path(PREDECESSOR)
     monkeypatch.setattr(tool, "_load_signing_key", lambda *_: pytest.fail("dry-run不能读取私钥"))
     output = tmp_path / "must-not-exist"
-    report = tool.build_revision_package(REAL_PARENT, definition, None, output, data_version="2026.11-published.1",
+    report = tool.build_revision_package(PREDECESSOR, definition, None, output, data_version="2026.11-published.1",
         minimum_app_version="0.2.0", target_standard_id="gb-21342-2025", dry_run=True)
     assert report["dry_run"] and not report["signed"] and not report["output_written"]
     assert report["standard_count"] == 48 and report["unchanged_member_count"] == 48
-    assert not output.exists() and tool._sha256_path(REAL_PARENT) == before
+    assert not output.exists() and tool._sha256_path(PREDECESSOR) == before
 
 
 @pytest.mark.parametrize("which", ["correction", "definition"])
