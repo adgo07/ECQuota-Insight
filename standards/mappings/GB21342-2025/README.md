@@ -4,7 +4,7 @@
 
 ## 当前软件状态
 
-候选普通对标可使用 GB 21342—2025 现行批准映射及签名规则 r2。焦炭 **IMPLEMENTED，Stage D OPEN**，Windows 原生 Qt 和 Microsoft Word 实开已核实，精确候选安装升级及严格全量待核实。见 [Stage D 验收记录](../../../docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。
+候选普通对标采用 GB 21342—2025 现行批准映射及签名规则 r2。Windows 原生 Qt、Microsoft Word 实开及 Windows 独立安装升级全链均已验收通过。正式构建与严格全量尚待核实。同一运行源码的正式构建与严格全量通过、PR #41 合并后，焦炭支持状态生效为 SUPPORTED。见 [Stage D 验收记录](../../../docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。
 
 ## 历史实施记录
 

@@ -2,7 +2,7 @@
 
 ## 2026-11-18 焦炭 Stage D 当前状态
 
-焦炭验收接续 [Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。当前运行基线 `cae8482` 与配套包 `2026.11-published.1` 已完成签包、普通窗口键鼠、历史与 Word 导出、Microsoft Word 实排和 126 项定向检查。接续工作为核实对应候选安装升级与严格全量回归，补录至同一记录。焦炭 **IMPLEMENTED，Stage D OPEN**，水泥正式验收暂缓。
+焦炭验收接续 [Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。当前已核实签包、普通窗口键鼠、历史与 Word 导出、Microsoft Word 实排、126 项定向检查及 Windows 独立安装全链。接续核实同一运行源码的正式作业 `44320265653` 和最终文档 HEAD 的严格全量结果。同一运行源码的正式构建与严格全量通过、PR #41 合并后，焦炭支持状态生效为 SUPPORTED。水泥正式验收暂缓。
 
 以下按日期保留前期记录。
 

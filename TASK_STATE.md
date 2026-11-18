@@ -2,7 +2,7 @@
 
 ## 2026-11-18 焦炭 Stage D 当前状态
 
-候选运行源码 `cae8482` 已通过焦炭普通路径的 Windows 原生 Qt、Microsoft Word 实开及 126 项定向回归。候选包 `2026.11-published.1` 配套焦炭 r2、选煤 r3。焦炭 **IMPLEMENTED，Stage D OPEN**。待核实精确候选 Windows 安装升级和严格全量回归，验收闭合后再按 Owner 授权办理 PR #41 合并。水泥正式验收继续暂缓，0.2.0 尚未发布。
+焦炭普通路径已通过 Windows 原生 Qt、Microsoft Word 实开及 126 项定向回归，`8ea5a16` 的独立 Windows 作业也通过旧版重建安装、覆盖升级、数据保留、同版重装及卸载验收。候选包 `2026.11-published.1` 配套焦炭 r2、选煤 r3。正式构建与严格全量尚待核实。同一运行源码的正式构建与严格全量通过、PR #41 合并后，焦炭支持状态生效为 SUPPORTED。水泥正式验收继续暂缓，0.2.0 尚未发布。
 
 [Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)汇总目前证据和剩余门禁。
 
