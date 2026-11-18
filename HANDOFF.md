@@ -1,6 +1,12 @@
 # HANDOFF — ECQuota 当前交接
 
-## 2026-11-18 焦炭映射批准与签包验收
+## 2026-11-18 焦炭 Stage D 当前状态
+
+焦炭验收接续 [Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。当前运行基线 `cae8482` 与配套包 `2026.11-published.1` 已完成签包、普通窗口键鼠、历史与 Word 导出、Microsoft Word 实排和 126 项定向检查。接续工作为核实对应候选安装升级与严格全量回归，补录至同一记录。焦炭 **IMPLEMENTED，Stage D OPEN**，水泥正式验收暂缓。
+
+以下按日期保留前期记录。
+
+## 2026-11-18 焦炭映射批准记录
 
 2026-11-18 Owner 已明确批准焦炭映射 V1.1 全文及审核稿处理口径，并授权签包和 Stage D 验收。批准对象为 fe0e821 中的审核稿，Git blob 内容 SHA256 为 c92f98a5e05839f3c11bd2463bf70e5d1195ff2a8e8621fc81a5371629c84778，Windows CRLF 检出文件 SHA256 为 c3f8ed9bd6f6e1df001a156e388e1e14c66f52d5e44b125aa1126c7cfb5d5515。D01—D05 作为软件处理决定采用，标准疑义按原登记状态跟踪。桌面、Word 分页及安装升级验收通过后方可合并 PR #41。水泥正式验收暂缓。
 

@@ -1,6 +1,14 @@
 # TASK_STATE
 
-## 2026-11-18 焦炭映射批准与签包验收
+## 2026-11-18 焦炭 Stage D 当前状态
+
+候选运行源码 `cae8482` 已通过焦炭普通路径的 Windows 原生 Qt、Microsoft Word 实开及 126 项定向回归。候选包 `2026.11-published.1` 配套焦炭 r2、选煤 r3。焦炭 **IMPLEMENTED，Stage D OPEN**。待核实精确候选 Windows 安装升级和严格全量回归，验收闭合后再按 Owner 授权办理 PR #41 合并。水泥正式验收继续暂缓，0.2.0 尚未发布。
+
+[Stage D 验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)汇总目前证据和剩余门禁。
+
+以下按日期保留前期记录。
+
+## 2026-11-18 焦炭映射批准记录
 
 2026-11-18 Owner 已明确批准焦炭映射 V1.1 全文及审核稿处理口径，并授权签包和 Stage D 验收。批准对象为 fe0e821 中的审核稿，Git blob 内容 SHA256 为 c92f98a5e05839f3c11bd2463bf70e5d1195ff2a8e8621fc81a5371629c84778，Windows CRLF 检出文件 SHA256 为 c3f8ed9bd6f6e1df001a156e388e1e14c66f52d5e44b125aa1126c7cfb5d5515。D01—D05 作为软件处理决定采用，标准疑义按原登记状态跟踪。桌面、Word 分页及安装升级验收通过后方可合并 PR #41。水泥正式验收暂缓。
 

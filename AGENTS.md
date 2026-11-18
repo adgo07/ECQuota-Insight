@@ -10,7 +10,7 @@
 | 产品名称 | 单位产品能耗限额评价软件（程序包名 `uebench`） |
 | 当前 Reference Standard | `GB 29446—2019 选煤电力消耗限额` |
 | 当前产品阶段 | 参考标准 `GB 29446—2019` 产品闭环；当前阶段状态见 `TASK_STATE.md` 与 `参考标准开发路线.md`（RS01–RS06） |
-| 当前交付范围 | 单源机器定义 64 项（含 16 项原样 `draft`）；随包清单仅 48 项（含 1 项历史标准）；**正式评价范围只有 GB 29446—2019**。`standards/development/scope-63` 为既有开发范围/历史资料，不决定交付或正式评价范围 |
+| 当前交付范围 | 单源机器定义 64 项（含 16 项原样 `draft`）；随包清单仅 48 项（含 1 项历史标准）；候选普通对标入口为 GB 29446—2019 和 GB 21342—2025，焦炭 Stage D 状态见[验收记录](docs/governance/GB21342_STAGE_D_ACCEPTANCE_20261118.md)。`standards/development/scope-63` 为既有开发范围/历史资料，不决定交付或正式评价范围 |
 | Canonical repository | `https://github.com/adgo07/ECQuota-Insight.git` |
 
 本仓仍独立开发、独立安装、独立升级、独立离线运行。
