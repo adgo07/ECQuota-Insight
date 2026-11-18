@@ -2,7 +2,7 @@
 
 ## 2026-11-18 焦炭完整功能任务
 
-最终完整主应用开发包已从干净 `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e` 重建，包含开发标签/官方源/占位修复及保存失败保留预览；机器自检、跨进程重开、337载荷/hash/ZIP CRC通过，见[最终开发包摘要](docs/governance/evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)及[最终验收补录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-最终完整主应用开发包与独立验收补录)。本机资产位于`work/coke-application-f4aea0b/`，f1bbd61/18722bd仅历史。精确f4的Numeric/N01-A已成功，PR Gate及本机完整回归仍在途，不能提前记全套通过。离屏两尺寸代表图和修复后两图已独立复查；原生GUI/Word实开分页、正式安装升级及Stage D仍OPEN。当前仅准备证据工作文件，未因此合并、发布、tag或扩大生产支持范围。
+完整主应用开发包从干净提交 `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e` 构建，包含开发标签、官方来源、占位修复及保存失败后保留预览。机器自检、跨进程重开、337 个载荷文件哈希及 ZIP CRC 均通过。本机资产位于 `work/coke-application-f4aea0b/`。精确 f4 的 Numeric v1 与 N01-A 已通过，PR Gate 的严格全量执行失败。同期本机全量也报告失败，且运行期间 HEAD 发生变化。离屏两尺寸代表图和修复后两图已独立复查。原生 GUI、Word 实开分页、正式安装升级及 Stage D 仍待验。详见[开发包摘要](docs/governance/evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)与[独立验收补录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-最终完整主应用开发包与独立验收补录)。
 
 本轮已完成主应用、参数绑定、热值/焓换算及交付工具的源码实施，当前进入独立完整回归和原生验收。最新状态见[TASK_STATE](TASK_STATE.md)及[完整功能续录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-完整功能实施续录)。V1.1映射审核稿已请求Owner确认，未收到批准前不得自记批准；生产r1/PIN/公钥/正式支持集尚未改变。引用原文和匹配签名私钥已具备，历史“缺失”不再成立。水泥正式验收继续暂缓。
 

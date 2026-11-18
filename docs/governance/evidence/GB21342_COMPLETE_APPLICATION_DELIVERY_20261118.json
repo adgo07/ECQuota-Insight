@@ -119,6 +119,42 @@
     }
   },
   "local_full_suite": "仍运行；期间已有新提交，不当作f4精确全套通过",
+  "final_verification": {
+    "pull_request_gate": {
+      "run_id": 44127187764,
+      "job_id": 134194303255,
+      "source_commit": "f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e",
+      "status": "completed",
+      "conclusion": "failure",
+      "compile_and_static_import": "success",
+      "release_source_gate": "success",
+      "strict_literal_full_suite_exit_code": 1,
+      "failed_test": "tests/test_gb29446_ui_validation.py::test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox",
+      "failure_detail": "全窗控件搜索将焦炭能流表单的五个勾选框计入选煤普通表单断言",
+      "job_url": "https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187764/job/134194303255"
+    },
+    "local_full_suite": {
+      "status": "completed",
+      "conclusion": "failure",
+      "fixed_head": false,
+      "tests": 2094,
+      "passed": 2029,
+      "failures": 3,
+      "skipped": 62,
+      "errors": 0,
+      "junit_path": "work/full-coke-suite-20261118.xml",
+      "junit_sha256": "ff76b83442ea3c0193bb1d8a3ff5a65d9ca836f1ba57c1b42ace0e5be1a50d35",
+      "failures_in_common_with_ci": [
+        "tests/test_gb29446_ui_validation.py::test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox"
+      ],
+      "identity_test_failures_after_head_changed": [
+        "tests/test_identity_binding.py::test_explicit_commit_must_equal_head",
+        "tests/test_identity_binding.py::test_explicit_commit_that_is_not_head_is_refused"
+      ],
+      "identity_fixture_head": "f6e60239cfc2a5a2acfe68cc7756eecbe8f22cc7",
+      "identity_assertion_head": "6a81cd7f83c8e2c04cfe0de8b2ce376dc7c8cbe4"
+    }
+  },
   "offscreen_visual": {
     "sizes": [
       "1280x800",

@@ -192,4 +192,8 @@ Knowledge capture：无新增知识文章；引用核验缺口记于本报告，
 
 2026-11-18 00:36:36（UTC+8）重新核对精确f4的[Numeric v1 44127187683](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187683)与[N01-A 44127187637](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187637)均completed/success；[PR Gate 44127187764](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187764)仍in_progress。此前启动的本机literal full suite仍运行、尚无终局；期间HEAD推进，不将其冒称f4精确全套通过。后续CI终局另补，当前不提前宣布全套通过。
 
+上段保留 00:36:36 的历史快照。终局复核确认，`f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e` 的 PR Gate 已完成并失败。编译与静态导入检查、Release Source Gate 均通过，严格单次全量测试以退出码 1 结束。日志列出的失败用例为 `tests/test_gb29446_ui_validation.py::test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox`。源码核对显示，该用例通过 `win.findChildren(QCheckBox)` 搜索整个主窗口，把同窗焦炭能流表单的五个“无发生量（明确为0）”控件计入了选煤表单断言。PR #41 仍为草稿，修订后的提交须重新取得全量门禁证据。[PR Gate 作业日志](https://github.com/adgo07/ECQuota-Insight/actions/runs/44127187764/job/134194303255)
+
+同期本机完整回归共 2094 项，2029 通过、3 失败、62 跳过、0 错误。本机复现同一选煤用例失败。另外两项失败来自 `tests/test_identity_binding.py` 的 `test_explicit_commit_must_equal_head` 和 `test_explicit_commit_that_is_not_head_is_refused`，错误中显示夹具读取的 `f6e60239cfc2a5a2acfe68cc7756eecbe8f22cc7` 与断言执行时的 `6a81cd7f83c8e2c04cfe0de8b2ce376dc7c8cbe4` 不同。这是运行期间工作树 HEAD 推进的一次本机运行。JUnit 原件为本机工作树下 `work/full-coke-suite-20261118.xml`，SHA256 与测试清单见[机器证据摘要](evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)。
+
 原生及Word视觉仍OPEN：本轮统一Computer Use inventory仅见Codex/Explorer、未见焦炭；Word isRunning=false。此前903.2s Word请求由父中断后返回aborted，不是超时或自动审核拒绝。没有取得本最终EXE的真实表单操作、Word/WPS实开/分页证据；不以离屏截图、DOCX生成或机器自检替代。正式安装/升级/卸载、整标准Stage D仍OPEN。引用原文和匹配既有公钥的私钥已核实具备，不沿用旧“缺失”阻断；V1.1映射审核稿尚未收到Owner批准，未正式签焦炭包或改PIN/生产data/正式支持集。整体仍MAPPING、正式评价仍仅GB29446；水泥Stage D暂缓，PR41保持草稿，不合并、不发布、不tag。
