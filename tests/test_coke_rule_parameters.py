@@ -58,8 +58,11 @@ def test_record_receives_snapshot_parameters_and_tracks_hash(monkeypatch):
 
 
 def test_optional_field_does_not_change_existing_snapshot_serialization():
-    path = Path(__file__).resolve().parents[1] / "data/definitions/gb-21342-2025.json"
-    snapshot = StandardDefinition.model_validate_json(path.read_text(encoding="utf-8"))
+    from zipfile import ZipFile
+
+    root = Path(__file__).resolve().parents[1]
+    with ZipFile(root / "tests/fixtures/standard-packages/2026.10-published.5.uebench") as archive:
+        snapshot = StandardDefinition.model_validate_json(archive.read("definitions/gb-21342-2025-2025.json"))
     assert "coke_rule_parameters" not in snapshot.model_dump(mode="json")
     previous_shape = snapshot.model_dump(mode="json")
     previous_shape.pop("coke_rule_parameters", None)
