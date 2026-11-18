@@ -35,6 +35,29 @@ def test_high_grade_allows_unknown_lower_and_old_rule_rejected():
         calculate_record(request,snapshot)
 
 
+@pytest.mark.parametrize("fuel, ratio, expected", [
+    ("coke_oven_gas", None, "不适用"),
+    ("mixed_gas", "0.25", "0.25"),
+])
+def test_word_mixed_gas_ratio_uses_saved_fuel(fuel, ratio, expected, tmp_path):
+    from docx import Document
+    from uebench.application.reporting import build_report_view
+    from uebench.infrastructure.word_report import WordReportWriter
+
+    request, snapshot = sample()
+    request.coke_payload["assessment"].update(heating_fuel=fuel, mixed_gas_ratio=ratio)
+    result = calculate_record(request, snapshot)
+    view = build_report_view(request, result, snapshot)
+    path = WordReportWriter().write(view, tmp_path / "coke.docx")
+    values = []
+    for table in Document(path).tables:
+        for row in table.rows:
+            cells = [cell.text for cell in row.cells]
+            if "混合煤气使用时间比例" in cells:
+                values.append(cells[cells.index("混合煤气使用时间比例") + 1])
+    assert values == [expected]
+
+
 def test_stale_identity_and_incomplete_rejected():
     request,snapshot = sample()
     result = calculate_record(request,snapshot)

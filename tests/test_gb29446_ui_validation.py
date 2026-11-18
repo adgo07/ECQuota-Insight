@@ -24,6 +24,8 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -239,7 +241,10 @@ def test_optional_metadata_never_blocks(window) -> None:
 def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> None:
     """§五：不新增普通用户输入项，也不新增“我已确认/是否准确/是否异常”式勾选。"""
 
-    win, _context, _warnings = window
+    win, context, _warnings = window
+    coke_definition = ROOT / "data" / "definitions" / "gb-21342-2025.json"
+    context.standards.install(StandardDefinition.model_validate_json(coke_definition.read_text(encoding="utf-8")))
+    win.refresh_standard_combo()
     labels = [label.text() for label in win.gb29446_business_fields.labels.values()]
     assert labels == [
         "选煤企业类型", "选煤工艺类型",
@@ -251,8 +256,28 @@ def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> 
     assert len(win.gb29446_form_container.findChildren(QLineEdit)) == 6
     assert not any("备注" in text for text in labels)
 
-    assert win.findChildren(QCheckBox) == [], "普通界面不得新增确认勾选框"
-    texts = [label.text() for label in win.findChildren(QLabel)]
-    texts += [button.text() for button in win.findChildren(QPushButton)]
+    win.show()
+    QApplication.processEvents()
+    page = win.page_widgets["evaluation"]
+    assert win.pages.currentWidget() is page and win.gb29446_form_container.isVisible()
+    assert win.current_standard.id == "gb-29446-2019"
+    assert win.eval_standard.findData("gb-21342-2025") == -1
+    assert not win.coke_form.isVisible()
+    assert not any(checkbox.isVisible() for checkbox in win.coke_form.findChildren(QCheckBox))
+    win.gb29446_organization.setFocus()
+    focused = QApplication.focusWidget()
+    visited = set()
+    while focused is not None and focused not in visited:
+        assert focused is not win.coke_form and not win.coke_form.isAncestorOf(focused)
+        visited.add(focused)
+        QTest.keyClick(focused, Qt.Key.Key_Tab)
+        focused = QApplication.focusWidget()
+    assert len(visited) > 1
+    assert not win.open_evaluation_for_standard("gb-21342-2025")
+    assert win.current_standard.id == "gb-29446-2019"
+
+    assert not any(box.isVisible() for box in page.findChildren(QCheckBox)), "选煤界面不得新增确认勾选框"
+    texts = [label.text() for label in page.findChildren(QLabel) if label.isVisible()]
+    texts += [button.text() for button in page.findChildren(QPushButton) if button.isVisible()]
     for forbidden in ("我已确认", "是否准确", "是否异常", "确认无误", "数据准确"):
         assert not any(forbidden in text for text in texts), forbidden

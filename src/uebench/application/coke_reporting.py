@@ -24,8 +24,13 @@ def build_coke_report_view(request, result, snapshot):
     for key,(label, options) in choices.items():
         inputs.append(field(label, options.get(values.get(key), "待确定")))
     for key,label,unit in (("dry_volatile_pct","干基挥发分","%"),("total_moisture_pct","全水分","%"),
-                           ("oven_age_years","炉龄","年"),("mixed_gas_ratio","混合煤气使用时间比例","")):
+                           ("oven_age_years","炉龄","年")):
         inputs.append(field(label, values.get(key), unit))
+    fuel = values.get("heating_fuel")
+    ratio = values.get("mixed_gas_ratio") if fuel == "mixed_gas" else None
+    if fuel in {"coke_oven_gas", "other"}:
+        ratio = "不适用"
+    inputs.append(field("混合煤气使用时间比例", ratio))
     external = {"included_or_not_external":"不外属，或能耗已计入", "both_external_excluded":"两项全部外属且能耗均未计入", "partial_or_unknown":"部分或未知"}
     inputs.append(field("煤气净化及废水处理", external[values["energy"]["external_services_status"]]))
     actual = energy["actual_energy_kgce_per_t"]
