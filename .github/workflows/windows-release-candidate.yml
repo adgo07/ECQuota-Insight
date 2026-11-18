@@ -37,6 +37,9 @@ jobs:
   release-candidate:
     runs-on: windows-latest
     timeout-minutes: 90
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
     steps:
       - name: Checkout candidate head
         uses: actions/checkout@v4
