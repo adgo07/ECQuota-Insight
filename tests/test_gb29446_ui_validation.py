@@ -261,7 +261,8 @@ def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> 
     page = win.page_widgets["evaluation"]
     assert win.pages.currentWidget() is page and win.gb29446_form_container.isVisible()
     assert win.current_standard.id == "gb-29446-2019"
-    assert win.eval_standard.findData("gb-21342-2025") == -1
+    assert win.eval_standard.isVisible() and win.eval_standard.isEnabled()
+    assert win.eval_standard.findData("gb-21342-2025") >= 0
     assert not win.coke_form.isVisible()
     assert not any(checkbox.isVisible() for checkbox in win.coke_form.findChildren(QCheckBox))
     win.gb29446_organization.setFocus()
@@ -273,11 +274,19 @@ def test_ordinary_form_has_no_new_field_and_no_confirmation_checkbox(window) -> 
         QTest.keyClick(focused, Qt.Key.Key_Tab)
         focused = QApplication.focusWidget()
     assert len(visited) > 1
-    assert not win.open_evaluation_for_standard("gb-21342-2025")
-    assert win.current_standard.id == "gb-29446-2019"
 
     assert not any(box.isVisible() for box in page.findChildren(QCheckBox)), "选煤界面不得新增确认勾选框"
     texts = [label.text() for label in page.findChildren(QLabel) if label.isVisible()]
     texts += [button.text() for button in page.findChildren(QPushButton) if button.isVisible()]
     for forbidden in ("我已确认", "是否准确", "是否异常", "确认无误", "数据准确"):
         assert not any(forbidden in text for text in texts), forbidden
+
+    assert win.open_evaluation_for_standard("gb-21342-2025")
+    assert win.current_standard.id == "gb-21342-2025"
+    assert win.coke_form.isVisible()
+    assert not win.gb29446_form_container.isVisible()
+
+    assert win.open_evaluation_for_standard("gb-29446-2019")
+    assert win.current_standard.id == "gb-29446-2019"
+    assert win.gb29446_form_container.isVisible()
+    assert not win.coke_form.isVisible()
