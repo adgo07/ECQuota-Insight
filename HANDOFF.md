@@ -1,5 +1,11 @@
 # HANDOFF — ECQuota 当前交接
 
+## 2026-11-18 焦炭映射批准与签包验收
+
+2026-11-18 Owner 已明确批准焦炭映射 V1.1 全文及审核稿处理口径，并授权签包和 Stage D 验收。批准对象为 fe0e821 中的审核稿，原字节 SHA256 为 c3f8ed9bd6f6e1df001a156e388e1e14c66f52d5e44b125aa1126c7cfb5d5515。D01—D05 作为软件处理决定采用，标准疑义按原登记状态跟踪。桌面、Word 分页及安装升级验收通过后方可合并 PR #41。水泥正式验收暂缓。
+
+[现行映射及批准记录](standards/mappings/GB21342-2025/标准映射表_V1.1_审核稿.md)
+
 ## 2026-11-18 焦炭完整功能任务
 
 完整主应用开发包从干净提交 `f4aea0ba091e93e7a1bc12822d30d3e8419d3c5e` 构建，包含开发标签、官方来源、占位修复及保存失败后保留预览。机器自检、跨进程重开、337 个载荷文件哈希及 ZIP CRC 均通过。本机资产位于 `work/coke-application-f4aea0b/`。精确 f4 的 Numeric v1 与 N01-A 已通过，PR Gate 的严格全量执行失败。同期本机全量也报告失败，且运行期间 HEAD 发生变化。离屏两尺寸代表图和修复后两图已独立复查。原生 GUI、Word 实开分页、正式安装升级及 Stage D 仍待验。详见[开发包摘要](docs/governance/evidence/GB21342_COMPLETE_APPLICATION_DELIVERY_20261118.json)与[独立验收补录](docs/governance/GB21342_PRODUCT_IMPLEMENTATION_20261117.md#2026-11-18-最终完整主应用开发包与独立验收补录)。
