@@ -26,6 +26,7 @@ HISTORICAL_INSTALLER_SHA256 = "234bb4b00c3ca3ea3d992b5ed3f5e3ee2ef9f01343680ee96
 PACKAGE_FILE = "initial-standard-package-published.uebench"
 APP_ID = "{6C4394C8-8A07-4AB3-A9D5-67B18623C3B0}"
 UNINSTALL_KEY = rf"Software\Microsoft\Windows\CurrentVersion\Uninstall\{APP_ID}_is1"
+MAIN_WINDOW_TITLES = {"单位产品能耗对标软件", "单位产品能耗限额评价软件"}
 
 
 def sha256(path: Path) -> str:
@@ -113,10 +114,12 @@ def launch_and_close(executable: Path) -> None:
     callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
     user32.EnumWindows.argtypes = [callback_type, wintypes.LPARAM]
     user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
     user32.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user32.IsWindowVisible.argtypes = [wintypes.HWND]
     with subprocess.Popen([executable], cwd=executable.parent) as app:
         handle = None
+        visible_titles = set()
 
         @callback_type
         def find_window(window, _):
@@ -124,6 +127,12 @@ def launch_and_close(executable: Path) -> None:
             pid = wintypes.DWORD()
             user32.GetWindowThreadProcessId(window, ctypes.byref(pid))
             if pid.value != app.pid or not user32.IsWindowVisible(window):
+                return True
+            title = ctypes.create_unicode_buffer(256)
+            user32.GetWindowTextW(window, title, len(title))
+            if title.value:
+                visible_titles.add(title.value)
+            if title.value not in MAIN_WINDOW_TITLES:
                 return True
             handle = window
             return False
@@ -135,9 +144,19 @@ def launch_and_close(executable: Path) -> None:
                 user32.EnumWindows(find_window, 0)
                 if handle is None:
                     time.sleep(0.5)
-            require(handle is not None, f"Installed app did not present a visible window: {executable}")
-            require(bool(user32.PostMessageW(handle, 0x0010, 0, 0)), "Could not close installed app")
-            require(app.wait(timeout=20) == 0, "Installed app did not close successfully")
+            require(handle is not None, f"No installed main window: {executable}; windows: {sorted(visible_titles)}")
+            # Qt may recreate the handle while restoring the window geometry.
+            # Resolve the current main window on each bounded close attempt.
+            close_sent = False
+            deadline = time.monotonic() + 20
+            while app.poll() is None and time.monotonic() < deadline:
+                time.sleep(0.5)
+                handle = None
+                user32.EnumWindows(find_window, 0)
+                if handle is not None and user32.PostMessageW(handle, 0x0010, 0, 0):
+                    close_sent = True
+            require(close_sent and app.poll() == 0,
+                    f"Installed app did not close normally; windows: {sorted(visible_titles)}")
         finally:
             if app.poll() is None:
                 app.terminate()
