@@ -29,17 +29,22 @@ on:
         description: "Run an isolated installer upgrade from a rebuilt 0.1.0 baseline"
         type: boolean
         default: false
+      upgrade_diagnostics_only:
+        description: "Run installer diagnostics only, without delivering a Candidate"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
 
 jobs:
   release-candidate:
+    if: "!inputs.upgrade_diagnostics_only"
     runs-on: windows-latest
     timeout-minutes: 90
-    env:
-      PYTHONUTF8: "1"
-      PYTHONIOENCODING: "utf-8"
     steps:
       - name: Checkout candidate head
         uses: actions/checkout@v4
@@ -259,3 +264,53 @@ jobs:
           }
           Get-ChildItem -LiteralPath dist/candidate -File | Sort-Object Name |
             ForEach-Object { Write-Host ("  {0,12}  {1}" -f $_.Length, $_.Name) }
+
+  installer-diagnostics:
+    if: inputs.upgrade_diagnostics_only
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          architecture: x64
+          cache: pip
+
+      - name: Install diagnostic build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install -r requirements.lock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install -e . --no-deps
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          choco install innosetup --no-progress -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build isolated diagnostic payload
+        shell: pwsh
+        run: |
+          $source = (git rev-parse HEAD).Trim()
+          # This job publishes only test evidence. The Candidate job still
+          # requires its literal full suite before assembling delivery assets.
+          scripts/build_candidate.ps1 -PythonExe "$env:pythonLocation\python.exe" -SourceCommit $source -OutputDir "dist/installer-diagnostics" -SkipTests
+
+      - name: Exercise isolated installer upgrade
+        shell: pwsh
+        run: |
+          $installer = @(Get-ChildItem -LiteralPath "dist/installer-diagnostics" -Filter "UEBench-Setup-*-x64.exe" -File)
+          if ($installer.Count -ne 1) { throw "未找到唯一诊断安装器。" }
+          python tools/verify_rebuilt_windows_upgrade.py --candidate $installer[0].FullName --evidence (Join-Path $env:RUNNER_TEMP 'uebench-upgrade-evidence')
+          if ($LASTEXITCODE -ne 0) { throw "隔离安装诊断未通过。" }
+
+      - name: Upload test evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: UEBench-Installer-Diagnostics-${{ github.sha }}
+          path: ${{ runner.temp }}/uebench-upgrade-evidence/
+          if-no-files-found: warn
+          retention-days: 30
