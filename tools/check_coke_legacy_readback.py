@@ -17,7 +17,7 @@ def verify(database):
     from uebench.domain.models import EvaluationRequest, EvaluationResult, StandardDefinition
     from uebench.application.reporting import build_report_view
     def forbidden(*args, **kwargs):
-        raise AssertionError("历史读取不得调用计算器")
+        raise RuntimeError("历史读取不得调用计算器")
     disabled = [(coke_records, "preview_coke"), (coke_records, "assess_coke"),
                 (gb21342, "assess_coke"), (gb21342, "calculate_energy"), (coke_flows, "aggregate_flows")]
     original = [(module, name, getattr(module, name)) for module, name in disabled]
@@ -40,7 +40,8 @@ def verify(database):
                             "raw_json_sha256": {name: hashlib.sha256(raw.encode()).hexdigest() for name, raw in
                                 zip(("request_json", "result_json", "rule_snapshot_json"), (raw_request, raw_result, raw_snapshot))}})
         after = con.execute(query, ("gb-21342-2025",)).fetchall()
-        assert before == after
+        if before != after:
+            raise RuntimeError("历史读回期间保存载荷发生变化")
         return {"checked_at": datetime.now(timezone.utc).isoformat(), "database": str(database),
                 "readonly": True, "calculator_disabled": True, "raw_json_unchanged": before == after,
                 "count": len(records), "records": records}
